@@ -24,7 +24,7 @@ export default function createRoutes(store) {
   * @param  {function} replace Function provided by React Router to replace the location
   */
   const checkAuth = (nextState, replace) => {
-    const { loggedIn } = selectAccount()(store.getState()).toJS();
+    const { loggedIn } = selectAccount(store.getState()).toJS();
     store.dispatch(clearError());
 
     // Check if the path isn't dashboard. That way we can apply specific logic to

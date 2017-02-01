@@ -1,15 +1,13 @@
-/**
- * Test  sagas
- */
+import { put } from 'redux-saga/effects';
 
-/* eslint-disable redux-saga/yield-effects */
-// import { take, call, put, select } from 'redux-saga/effects';
-// import { defaultSaga } from '../sagas';
+import { logout } from '../sagas';
+import { sendingRequest } from '../actions';
 
-// const generator = defaultSaga();
-
-describe('defaultSaga Saga', () => {
-  it('Expect to have unit tests specified', () => {
-    expect(true).toEqual(false);
+describe('githubDataSaga Saga', () => {
+  const logoutSaga = logout();
+  // const mockedTask = createMockTask();
+  it('should start task to watch for SENDING_REQUEST action', () => {
+    const takeLatestDescriptor = logoutSaga.next().value;
+    expect(takeLatestDescriptor).toEqual(put(sendingRequest(true)));
   });
 });

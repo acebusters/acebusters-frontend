@@ -3,7 +3,7 @@ import { createSelector } from 'reselect';
 /**
  * Direct selector to the accountProvider state domain
  */
-const selectAccount = () => (state) => state.get('account');
+const selectAccount = (state) => state.get('account');
 
 /**
  * Other specific selectors
@@ -15,7 +15,7 @@ const selectAccount = () => (state) => state.get('account');
  */
 
 const makeSelectAccountData = () => createSelector(
-  selectAccount(),
+  selectAccount,
   (accountState) => accountState.toJS()
 );
 

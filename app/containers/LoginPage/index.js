@@ -25,7 +25,7 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
       <FormPageWrapper>
         <div className="form-page__form-wrapper">
           <div className="form-page__form-header">
-            <h2 className="form-page__form-heading">
+            <h2>
               <FormattedMessage {...messages.header} />
             </h2>
           </div>
