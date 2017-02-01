@@ -37,7 +37,7 @@ export function App(props) {
           { name: 'description', content: 'A React.js Boilerplate application' },
         ]}
       />
-      <Header loggedIn={props.account.loggedIn} onClickLogout={props.onClickLogout}/>
+      <Header loggedIn={props.account.loggedIn} onClickLogout={props.onClickLogout} />
       {React.Children.toArray(props.children)}
       <Footer />
     </AppWrapper>
@@ -46,6 +46,8 @@ export function App(props) {
 
 App.propTypes = {
   children: React.PropTypes.node,
+  account: React.PropTypes.object,
+  onClickLogout: React.PropTypes.func,
 };
 
 function mapDispatchToProps(dispatch) {

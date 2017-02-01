@@ -1,27 +1,31 @@
-import React, {Component} from 'react'
-import {connect} from 'react-redux'
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
+import styled from 'styled-components';
 
-import Form from '../../components/Form'
-import FormPageWrapper from '../../components/Form/FormPageWrapper'
+import Form from '../../components/Form';
 import makeSelectAccountData from '../AccountProvider/selectors';
-import {loginRequest, changeForm } from '../AccountProvider/actions'
+import { loginRequest, changeForm } from '../AccountProvider/actions';
 
-class LoginPage extends Component {
-  constructor (props) {
-    super(props)
-  }
+const FormPageWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+`;
 
-  render () {
-    let {dispatch} = this.props
-    let {accountState, currentlySending, error} = this.props.data
+export class LoginPage extends Component { // eslint-disable-line react/prefer-stateless-function
+
+  render() {
+    const { accountState, currentlySending, error } = this.props.data;
     return (
       <FormPageWrapper>
-        <div className='form-page__form-wrapper'>
-          <div className='form-page__form-header'>
-            <h2 className='form-page__form-heading'>Login</h2>
+        <div className="form-page__form-wrapper">
+          <div className="form-page__form-header">
+            <h2 className="form-page__form-heading">Login</h2>
           </div>
-          <Form 
+          <Form
             data={accountState}
             history={this.props.history}
             onChangeForm={this.props.onChangeForm}
@@ -32,21 +36,21 @@ class LoginPage extends Component {
           />
         </div>
       </FormPageWrapper>
-    )
+    );
   }
-
 }
 
 LoginPage.propTypes = {
   data: React.PropTypes.object,
   history: React.PropTypes.object,
-  onSubmitForm: React.PropTypes.func
-}
+  onSubmitForm: React.PropTypes.func,
+  onChangeForm: React.PropTypes.func,
+};
 
 
 function mapDispatchToProps(dispatch) {
   return {
-    onSubmitForm: (username, password) => dispatch(loginRequest({username, password})),
+    onSubmitForm: (username, password) => dispatch(loginRequest({ username, password })),
     onChangeForm: (newFormState) => dispatch(changeForm(newFormState)),
   };
 }

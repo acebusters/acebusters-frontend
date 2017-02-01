@@ -1,29 +1,23 @@
-/*
- *
- * AccountProvider reducer
- *
- */
-
 import { fromJS } from 'immutable';
 import {
   CHANGE_FORM,
   SET_AUTH,
   SENDING_REQUEST,
   REQUEST_ERROR,
-  CLEAR_ERROR
+  CLEAR_ERROR,
 } from './constants';
 
-import auth from '../../utils/auth'
+import auth from '../../utils/auth';
 
 // The initial application state
 const initialState = fromJS({
   accountState: {
     username: '',
-    password: ''
+    password: '',
   },
   error: '',
   currentlySending: false,
-  loggedIn: auth.loggedIn()
+  loggedIn: auth.loggedIn(),
 });
 
 function accountProviderReducer(state = initialState, action) {
@@ -43,7 +37,7 @@ function accountProviderReducer(state = initialState, action) {
     case CLEAR_ERROR:
       return state.delete('error');
     default:
-      return state
+      return state;
   }
 }
 

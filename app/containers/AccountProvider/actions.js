@@ -1,9 +1,3 @@
-/*
- *
- * AccountProvider actions
- *
- */
-
 import {
   CHANGE_FORM,
   SET_AUTH,
@@ -12,8 +6,8 @@ import {
   LOGOUT,
   REGISTER_REQUEST,
   REQUEST_ERROR,
-  CLEAR_ERROR
-} from './constants'
+  CLEAR_ERROR,
+} from './constants';
 
 /**
  * Sets the form state
@@ -21,24 +15,24 @@ import {
  * @param  {string} newFormState.username The new text of the username input field of the form
  * @param  {string} newFormState.password The new text of the password input field of the form
  */
-export function changeForm (newFormState) {
-  return {type: CHANGE_FORM, newFormState}
+export function changeForm(newFormState) {
+  return { type: CHANGE_FORM, newFormState };
 }
 
 /**
  * Sets the authentication state of the application
  * @param  {boolean} newAuthState True means a user is logged in, false means no user is logged in
  */
-export function setAuthState (newAuthState) {
-  return {type: SET_AUTH, newAuthState}
+export function setAuthState(newAuthState) {
+  return { type: SET_AUTH, newAuthState };
 }
 
 /**
  * Sets the `currentlySending` state, which displays a loading indicator during requests
  * @param  {boolean} sending True means we're sending a request, false means we're not
  */
-export function sendingRequest (sending) {
-  return {type: SENDING_REQUEST, sending}
+export function sendingRequest(sending) {
+  return { type: SENDING_REQUEST, sending };
 }
 
 /**
@@ -47,30 +41,30 @@ export function sendingRequest (sending) {
  * @param  {string} data.username The username of the user to log in
  * @param  {string} data.password The password of the user to log in
  */
-export function loginRequest (data) {
-  return {type: LOGIN_REQUEST, data}
+export function loginRequest(data) {
+  return { type: LOGIN_REQUEST, data };
 }
 
 /**
  * Tells the app we want to log out a user
  */
-export function logout () {
-  return {type: LOGOUT}
+export function logout() {
+  return { type: LOGOUT };
 }
 
 /**
  * Sets the `error` state to the error received
  * @param  {object} error The error we got when trying to make the request
  */
-export function requestError (error) {
-  return {type: REQUEST_ERROR, error}
+export function requestError(error) {
+  return { type: REQUEST_ERROR, error };
 }
 
 /**
  * Sets the `error` state as empty
  */
-export function clearError () {
-  return {type: CLEAR_ERROR}
+export function clearError() {
+  return { type: CLEAR_ERROR };
 }
 
 /**
@@ -79,6 +73,6 @@ export function clearError () {
  * @param  {string} data.username The username of the user to register
  * @param  {string} data.password The password of the user to register
  */
-export function registerRequest (data) {
-  return {type: REGISTER_REQUEST, data}
+export function registerRequest(data) {
+  return { type: REGISTER_REQUEST, data };
 }

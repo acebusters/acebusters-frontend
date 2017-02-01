@@ -1,5 +1,4 @@
 import React from 'react';
-import {connect} from 'react-redux'
 import { FormattedMessage } from 'react-intl';
 
 import A from './A';
@@ -12,7 +11,7 @@ import messages from './messages';
 
 class Header extends React.Component { // eslint-disable-line react/prefer-stateless-function
   render() {
-    let navButtons = this.props.loggedIn ? (
+    const navButtons = this.props.loggedIn ? (
       <div>
         <HeaderLink to="/features">
           <FormattedMessage {...messages.features} />
@@ -24,13 +23,13 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
     ) : (
       <div>
         <HeaderLink to="/register">
-            <FormattedMessage {...messages.register} />
+          <FormattedMessage {...messages.register} />
         </HeaderLink>
         <HeaderLink to="/login">
-            <FormattedMessage {...messages.login} />
+          <FormattedMessage {...messages.login} />
         </HeaderLink>
       </div>
-    )
+    );
     return (
       <div>
         <A href="https://twitter.com/mxstbr">
@@ -46,5 +45,10 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
     );
   }
 }
+
+Header.propTypes = {
+  loggedIn: React.PropTypes.boolean,
+  onClickLogout: React.PropTypes.func,
+};
 
 export default Header;

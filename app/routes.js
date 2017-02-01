@@ -14,8 +14,6 @@ const loadModule = (cb) => (componentModule) => {
   cb(null, componentModule.default);
 };
 
-
-
 export default function createRoutes(store) {
   // create reusable async injectors using getAsyncInjectors factory
   const { injectReducer, injectSagas } = getAsyncInjectors(store);
@@ -25,31 +23,28 @@ export default function createRoutes(store) {
   * @param  {object}   nextState The state we want to change into when we change routes
   * @param  {function} replace Function provided by React Router to replace the location
   */
-  let checkAuth = function(nextState, replace) {
-    let {loggedIn} = selectAccount()(store.getState()).toJS()
-    store.dispatch(clearError())
+  const checkAuth = (nextState, replace) => {
+    const { loggedIn } = selectAccount()(store.getState()).toJS();
+    store.dispatch(clearError());
 
     // Check if the path isn't dashboard. That way we can apply specific logic to
     // display/render the path we want to
     if (nextState.location.pathname !== '/features') {
       if (loggedIn) {
         if (nextState.location.state && nextState.location.pathname) {
-          replace(nextState.location.pathname)
+          replace(nextState.location.pathname);
         } else {
-          replace('/')
+          replace('/');
         }
       }
-    } else {
-      // If the user is already logged in, forward them to the homepage
-      if (!loggedIn) {
-        if (nextState.location.state && nextState.location.pathname) {
-          replace(nextState.location.pathname)
-        } else {
-          replace('/')
-        }
+    } else if (!loggedIn) { // If the user is already logged in, forward them to the homepage
+      if (nextState.location.state && nextState.location.pathname) {
+        replace(nextState.location.pathname);
+      } else {
+        replace('/');
       }
     }
-  }
+  };
 
   return [
     {
@@ -83,7 +78,7 @@ export default function createRoutes(store) {
             .then(loadModule(cb))
             .catch(errorLoading);
         },
-      }]
+      }],
     }, {
       path: '/login',
       name: 'login',

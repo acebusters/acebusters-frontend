@@ -1,30 +1,29 @@
-/*
- *
- * RegisterPage
- *
- */
-
-import React, { PropTypes } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
-import { FormattedMessage } from 'react-intl';
 import { createStructuredSelector } from 'reselect';
+import styled from 'styled-components';
 
-import messages from './messages';
 import makeSelectAccountData from '../AccountProvider/selectors';
-import {registerRequest, changeForm } from '../AccountProvider/actions'
-import FormPageWrapper from '../../components/Form/FormPageWrapper'
-import Form from '../../components/Form'
+import { registerRequest, changeForm } from '../AccountProvider/actions';
+import Form from '../../components/Form';
 
+const FormPageWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+`;
 
 export class RegisterPage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    let {accountState, currentlySending, error} = this.props.data
+    const { accountState, currentlySending, error } = this.props.data;
 
     return (
       <FormPageWrapper>
-        <div className='form-page__form-wrapper'>
-          <div className='form-page__form-header'>
-            <h2 className='form-page__form-heading'>Register</h2>
+        <div className="form-page__form-wrapper">
+          <div className="form-page__form-header">
+            <h2 className="form-page__form-heading">Register</h2>
           </div>
           <Form data={accountState} history={this.props.history} onChangeForm={this.props.onChangeForm} onSubmitForm={this.props.onSubmitForm} btnText={'Register'} error={error} currentlySending={currentlySending} />
         </div>
@@ -36,12 +35,13 @@ export class RegisterPage extends React.PureComponent { // eslint-disable-line r
 RegisterPage.propTypes = {
   data: React.PropTypes.object,
   history: React.PropTypes.object,
-  onSubmitForm: React.PropTypes.func
-}
+  onSubmitForm: React.PropTypes.func,
+  onChangeForm: React.PropTypes.func,
+};
 
 function mapDispatchToProps(dispatch) {
   return {
-    onSubmitForm: (username, password) => dispatch(registerRequest({username, password})),
+    onSubmitForm: (username, password) => dispatch(registerRequest({ username, password })),
     onChangeForm: (newFormState) => dispatch(changeForm(newFormState)),
   };
 }

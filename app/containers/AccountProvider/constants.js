@@ -1,9 +1,3 @@
-/*
- *
- * AccountProvider constants
- *
- */
-
 export const CHANGE_FORM = 'app/AccountProvider/CHANGE_FORM';
 export const SET_AUTH = 'app/AccountProvider/SET_AUTH';
 export const SENDING_REQUEST = 'app/AccountProvider/SENDING_REQUEST';

@@ -22,7 +22,10 @@ export class AccountProvider extends React.PureComponent { // eslint-disable-lin
 }
 
 AccountProvider.propTypes = {
-  privKey: React.PropTypes.string,
+  children: React.PropTypes.oneOfType([
+    React.PropTypes.arrayOf(React.PropTypes.node),
+    React.PropTypes.node,
+  ]),
 };
 
 const mapStateToProps = createSelector(
