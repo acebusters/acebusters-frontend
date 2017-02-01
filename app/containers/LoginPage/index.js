@@ -1,11 +1,13 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import styled from 'styled-components';
+import { FormattedMessage } from 'react-intl';
 
 import Form from '../../components/Form';
 import makeSelectAccountData from '../AccountProvider/selectors';
 import { loginRequest, changeForm } from '../AccountProvider/actions';
+import messages from './messages';
 
 const FormPageWrapper = styled.div`
   display: flex;
@@ -15,15 +17,17 @@ const FormPageWrapper = styled.div`
   width: 100%;
 `;
 
-export class LoginPage extends Component { // eslint-disable-line react/prefer-stateless-function
+export class LoginPage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   render() {
-    const { accountState, currentlySending, error } = this.props.data;
+    const { accountState, currentlySending, error } = this.props.account;
     return (
       <FormPageWrapper>
         <div className="form-page__form-wrapper">
           <div className="form-page__form-header">
-            <h2 className="form-page__form-heading">Login</h2>
+            <h2 className="form-page__form-heading">
+              <FormattedMessage {...messages.header} />
+            </h2>
           </div>
           <Form
             data={accountState}
@@ -41,7 +45,7 @@ export class LoginPage extends Component { // eslint-disable-line react/prefer-s
 }
 
 LoginPage.propTypes = {
-  data: React.PropTypes.object,
+  account: React.PropTypes.object,
   history: React.PropTypes.object,
   onSubmitForm: React.PropTypes.func,
   onChangeForm: React.PropTypes.func,
@@ -57,7 +61,7 @@ function mapDispatchToProps(dispatch) {
 
 // Which props do we want to inject, given the global state?
 const mapStateToProps = createStructuredSelector({
-  data: makeSelectAccountData(),
+  account: makeSelectAccountData(),
 });
 
 // Wrap the component to inject dispatch and state into it

@@ -1,18 +1,18 @@
 
 import {
-  defaultAction,
+  loginRequest,
 } from '../actions';
 import {
-  DEFAULT_ACTION,
+  LOGIN_REQUEST,
 } from '../constants';
 
 describe('LoginPage actions', () => {
   describe('Default Action', () => {
-    it('has a type of DEFAULT_ACTION', () => {
+    it('has a type of LOGIN_REQUEST', () => {
       const expected = {
-        type: DEFAULT_ACTION,
+        type: LOGIN_REQUEST,
       };
-      expect(defaultAction()).toEqual(expected);
+      expect(loginRequest()).toEqual(expected);
     });
   });
 });

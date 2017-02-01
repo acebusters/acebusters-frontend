@@ -8,7 +8,7 @@ import { App } from '../index';
 describe('<App />', () => {
   it('should render the header', () => {
     const renderedComponent = shallow(
-      <App />
+      <App account={{ account: { loggedIn: true } }} />
     );
     expect(renderedComponent.find(Header).length).toBe(1);
   });
@@ -16,7 +16,7 @@ describe('<App />', () => {
   it('should render its children', () => {
     const children = (<h1>Test</h1>);
     const renderedComponent = shallow(
-      <App>
+      <App account={{ account: { loggedIn: true } }} >
         {children}
       </App>
     );
@@ -25,7 +25,7 @@ describe('<App />', () => {
 
   it('should render the footer', () => {
     const renderedComponent = shallow(
-      <App />
+      <App account={{ account: { loggedIn: true } }} />
     );
     expect(renderedComponent.find(Footer).length).toBe(1);
   });
