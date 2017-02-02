@@ -8,7 +8,7 @@
 
 import React from 'react';
 import Helmet from 'react-helmet';
-import styled from 'styled-components';
+import styled, { ThemeProvider } from 'styled-components';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 
@@ -17,6 +17,7 @@ import Footer from 'components/Footer';
 import withProgressBar from 'components/ProgressBar';
 import makeSelectAccountData from '../AccountProvider/selectors';
 import { logout } from '../AccountProvider/actions';
+import theme from '../../skin-blue';
 
 const AppWrapper = styled.div`
   max-width: calc(768px + 16px * 2);
@@ -37,7 +38,9 @@ export function App(props) {
           { name: 'description', content: 'A React.js Boilerplate application' },
         ]}
       />
-      <Header loggedIn={props.account.loggedIn} onClickLogout={props.onClickLogout} />
+      <ThemeProvider theme={theme}>
+        <Header loggedIn={props.account.loggedIn} onClickLogout={props.onClickLogout} />
+      </ThemeProvider>
       {React.Children.toArray(props.children)}
       <Footer />
     </AppWrapper>

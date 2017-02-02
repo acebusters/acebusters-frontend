@@ -1,10 +1,6 @@
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-import HeaderLink from './HeaderLink';
-import Button from '../Button';
-import messages from './messages';
 import Navbar from './Navbar';
 import Logo from './Logo';
 import UserMenu from './UserMenu';
@@ -34,27 +30,37 @@ const StyledHeader = styled.header`
   `}
 `;
 
+
 class Header extends React.Component { // eslint-disable-line react/prefer-stateless-function
   render() {
-    const navButtons = this.props.loggedIn ? (
-      <div>
-        <HeaderLink to="/features">
-          <FormattedMessage {...messages.features} />
-        </HeaderLink>
-        <Button onClick={this.props.onClickLogout}>
-          <FormattedMessage {...messages.logout} />
-        </Button>
-      </div>
-    ) : (
-      <div>
-        <HeaderLink to="/register">
-          <FormattedMessage {...messages.register} />
-        </HeaderLink>
-        <HeaderLink to="/login">
-          <FormattedMessage {...messages.login} />
-        </HeaderLink>
-      </div>
-    );
+    const navButtons = this.props.loggedIn ? ([
+      <NavItem
+        href="https://github.com"
+        iconClass="fa fa-github"
+        key="1"
+        title="Github"
+      />,
+      <UserMenu
+        name="Alexander Pierce"
+        image="public/user2-160x160.jpg"
+        profileAction={this.props.onClickLogout}
+        signOutAction={this.props.onClickLogout}
+        key="2"
+      />,
+    ]) : ([
+      <NavItem
+        href="/register"
+        iconClass="fa fa-github"
+        key="1"
+        title="Register"
+      />,
+      <NavItem
+        href="/login"
+        iconClass="fa fa-github"
+        key="2"
+        title="Login"
+      />,
+    ]);
 
     return (
       <StyledHeader fixed={this.props.fixed} >
@@ -98,8 +104,5 @@ Header.defaultProps = {
   logoLg: <span><b>Ace</b>Busters</span>,
   logoSm: <span><b>A</b>B</span>,
 };
-
-Header.UserMenu = UserMenu;
-Header.Item = NavItem;
 
 export default Header;
