@@ -8,6 +8,6 @@ describe('<Header />', () => {
     const renderedComponent = shallow(
       <Header account={{ account: { loggedIn: true } }} />
     );
-    expect(renderedComponent.find('div').length).toEqual(2);
+    expect(renderedComponent.find('div').length).toEqual(1);
   });
 });
