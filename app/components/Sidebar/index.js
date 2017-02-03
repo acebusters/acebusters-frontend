@@ -90,7 +90,7 @@ const StyledAside = styled.aside`
 `;
 
 const renderChildren = (children, sidebarCollapse) => (
-  React.Children.map((list, child) =>
+  React.Children.map(children, (child) =>
     React.cloneElement(child, {
       collapse: sidebarCollapse,
     }),

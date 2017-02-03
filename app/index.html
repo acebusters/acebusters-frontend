@@ -9,6 +9,45 @@
     <link rel="manifest" href="manifest.json">
     <meta name="mobile-web-app-capable" content="yes">
     <title>React.js Boilerplate</title>
+    <style>
+
+      html {
+        font-family: sans-serif;
+        font-size: 10px;
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+      }
+
+      body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        display: block;
+        margin: 0;
+        line-height: 1.42857143;
+        color: #333;
+        background-color: #fff;
+        font-family: 'Source Sans Pro','Helvetica Neue',Helvetica,Arial,sans-serif;
+        font-weight: 400;
+        font-size: 14px;
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+
+      html, body {
+        height: 100%;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body:after, body:before {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+      }
+    </style>
   </head>
   <body>
     <!-- Display a message if JS has been disabled on the browser. -->
@@ -18,6 +57,7 @@
     <div id="app"></div>
     <!-- Open Sans Font -->
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <!-- A lot of magic happens in this file. HtmlWebpackPlugin automatically includes all assets (e.g. bundle.js, main.css) with the correct HTML tags, which is why they are missing in this HTML file. Don't add any assets here! (Check out the webpack config files in internals/webpack for details) -->
   </body>
 </html>

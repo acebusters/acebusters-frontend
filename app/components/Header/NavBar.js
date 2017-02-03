@@ -84,7 +84,7 @@ const Navbar = (props) => (
     sidebarMini={props.sidebarMini}
     collapse={props.collapse}
   >
-    <ToggleButton name="sidebar-toggle" className="fa fa-bars" onClick={props.toggle} />
+    {props.loggedIn && <ToggleButton name="sidebar-toggle" className="fa fa-bars" onClick={props.toggle} />}
 
     <StyledNavbarMenu>
       <StyledNavbarMenuList name="navbar-menu-wrapper">
@@ -100,6 +100,7 @@ Navbar.propTypes = {
   topNav: React.PropTypes.bool,
   sidebarMini: React.PropTypes.bool,
   collapse: React.PropTypes.bool,
+  loggedIn: React.PropTypes.bool,
 };
 
 export default Navbar;

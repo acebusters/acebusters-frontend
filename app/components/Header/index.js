@@ -73,6 +73,7 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
           logoSm={this.props.logoSm}
         />
         <Navbar
+          loggedIn={this.props.loggedIn}
           toggle={this.props.sidebarToggle}
           collapse={this.props.sidebarCollapse}
           sidebarMini={this.props.sidebarMini}
