@@ -21,6 +21,11 @@ const makeSelectError = () => createSelector(
   (globalState) => globalState.get('error')
 );
 
+const makeSelectSidebarCollapse = () => createSelector(
+  selectGlobal,
+  (globalState) => globalState.get('sidebarCollapse')
+);
+
 const makeSelectRepos = () => createSelector(
   selectGlobal,
   (globalState) => globalState.getIn(['userData', 'repositories'])
@@ -49,4 +54,5 @@ export {
   makeSelectError,
   makeSelectRepos,
   makeSelectLocationState,
+  makeSelectSidebarCollapse,
 };

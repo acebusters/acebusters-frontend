@@ -14,6 +14,7 @@ describe('appReducer', () => {
       loading: false,
       error: false,
       currentUser: false,
+      sidebarCollapse: true,
       userData: fromJS({
         repositories: false,
       }),

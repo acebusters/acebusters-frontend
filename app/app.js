@@ -79,6 +79,9 @@ const rootRoute = {
   childRoutes: createRoutes(store),
 };
 
+// set app div height
+document.getElementById('app').style['min-height'] = '100vh';
+
 const render = (messages) => {
   ReactDOM.render(
     <Provider store={store}>

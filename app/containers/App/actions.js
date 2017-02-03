@@ -19,6 +19,7 @@ import {
   LOAD_REPOS,
   LOAD_REPOS_SUCCESS,
   LOAD_REPOS_ERROR,
+  SIDEBAR_TOGGLE,
 } from './constants';
 
 /**
@@ -29,6 +30,12 @@ import {
 export function loadRepos() {
   return {
     type: LOAD_REPOS,
+  };
+}
+
+export function sidebarToggle() {
+  return {
+    type: SIDEBAR_TOGGLE,
   };
 }
 
