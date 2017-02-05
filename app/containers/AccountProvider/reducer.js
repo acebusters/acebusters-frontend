@@ -6,9 +6,11 @@ import {
   REQUEST_ERROR,
   CLEAR_ERROR,
   EXPORT_REQUEST,
+  IMPORT_REQUEST,
   WORKER_ERROR,
   WORKER_PROGRESS,
-  WORKER_EXPORTED,
+  WALLET_EXPORTED,
+  WALLET_IMPORTED,
 } from './constants';
 
 import auth from '../../utils/auth';
@@ -40,19 +42,24 @@ function accountProviderReducer(state = initialState, action) {
         .set('error', action.error);
     case CLEAR_ERROR:
       return state.delete('error');
+    case IMPORT_REQUEST:
     case EXPORT_REQUEST:
-      return state.set('exportProgress', 0);
+      return state.set('workerProgress', 0);
     case WORKER_ERROR:
       return state
-        .set('exportProgress', -1)
+        .set('workerProgress', -1)
         .set('error', action.event);
     case WORKER_PROGRESS:
       return state
-        .set('exportProgress', action.percent);
-    case WORKER_EXPORTED:
+        .set('workerProgress', action.percent);
+    case WALLET_EXPORTED:
       return state
-        .delete('exportProgress')
-        .set('json', action.json);
+        .delete('workerProgress')
+        .set('wallet', action.json);
+    case WALLET_IMPORTED:
+      return state
+        .delete('workerProgress')
+        .set('privKey', action.privKey);
     default:
       return state;
   }

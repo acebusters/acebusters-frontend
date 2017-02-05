@@ -10,7 +10,8 @@ import {
   WORKER_ERROR,
   WORKER_LOADED,
   WORKER_PROGRESS,
-  WORKER_EXPORTED,
+  WALLET_EXPORTED,
+  WALLET_IMPORTED,
   EXPORT_REQUEST,
 } from './constants';
 
@@ -47,7 +48,11 @@ export function sendingRequest(sending) {
  * @param  {string} data.password The password of the user to log in
  */
 export function loginRequest(data) {
-  return { type: LOGIN_REQUEST, data };
+  return {
+    type: LOGIN_REQUEST,
+    email: data.email,
+    password: data.password,
+  };
 }
 
 /**
@@ -95,10 +100,17 @@ export function workerLoaded() {
   };
 }
 
-export function workerExported(json) {
+export function walletExported(wallet) {
   return {
-    type: WORKER_EXPORTED,
-    json,
+    type: WALLET_EXPORTED,
+    wallet,
+  };
+}
+
+export function walletImported(privKey) {
+  return {
+    type: WALLET_IMPORTED,
+    privKey,
   };
 }
 
@@ -112,7 +124,6 @@ export function workerProgress(percent) {
 export function exportRequest(request) {
   return {
     type: EXPORT_REQUEST,
-    hexSeed: request.hexSeed,
-    password: request.password,
+    request,
   };
 }

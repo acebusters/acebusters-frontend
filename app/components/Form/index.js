@@ -92,7 +92,7 @@ class Form extends React.PureComponent {
     const { error } = this.props;
     return (
       <form className="form" onSubmit={this.onSubmit}>
-        {error ? <ErrorMessage error={error} /> : null}
+        {error && <ErrorMessage error={error} />}
         <FormFieldWrapper>
           <FormFieldInput
             type="text"
@@ -120,6 +120,7 @@ class Form extends React.PureComponent {
             Password
           </FormFieldLabel>
         </FormFieldWrapper>
+        {(this.props.progress) ? <div> progress: {this.props.progress} % </div> : <div> progress: 0 % </div>}
         <FormSubmitButtonWrapper>
           {this.props.currentlySending ? (
             <LoadingButton />
@@ -140,6 +141,7 @@ Form.propTypes = {
   onChangeForm: React.PropTypes.func,
   btnText: React.PropTypes.string,
   error: React.PropTypes.string,
+  progress: React.PropTypes.number,
   currentlySending: React.PropTypes.bool,
 };
 

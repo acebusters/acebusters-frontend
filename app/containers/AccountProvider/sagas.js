@@ -14,7 +14,8 @@ import {
   EXPORT_REQUEST,
   WORKER_ERROR,
   WORKER_LOADED,
-  WORKER_EXPORTED,
+  WALLET_EXPORTED,
+  WALLET_IMPORTED,
 } from './constants';
 
 /**
@@ -90,31 +91,44 @@ export function* loginFlow() {
   // Because sagas are generators, doing `while (true)` doesn't block our program
   // Basically here we say "this saga is always listening for actions"
   while (true) { // eslint-disable-line no-constant-condition
-    // And we're listening for `LOGIN_REQUEST` actions and destructuring its payload
-    const request = yield take(LOGIN_REQUEST);
-    const { username, password } = request.data;
-
-    // A `LOGOUT` action may happen while the `authorize` effect is going on, which may
-    // lead to a race condition. This is unlikely, but just in case, we call `race` which
-    // returns the "winner", i.e. the one that finished first
+    // We want the worker to load while the user is typing his credentials.
+    // If worker is not loaded until user done, something is funky.
     const winner = yield race({
-      auth: call(authorize, { username, password, isRegistering: false }),
-      logout: take(LOGOUT),
+      load: take(WORKER_LOADED),
+      request: take(LOGIN_REQUEST),
     });
-
-    // If `authorize` was the winner...
-    if (winner.auth) {
-      // ...we send Redux appropiate actions
-      yield put({ type: SET_AUTH, newAuthState: true }); // User is logged in (authorized)
-      yield put({ type: CHANGE_FORM, newFormState: { username: '', password: '' } }); // Clear form
-      forwardTo('/features'); // Go to dashboard page
-      // If `logout` won...
-    } else if (winner.logout) {
-      // ...we send Redux appropiate action
-      yield put({ type: SET_AUTH, newAuthState: false }); // User is not logged in (not authorized)
-      yield call(logout); // Call `logout` effect
-      forwardTo('/'); // Go to root page
+    if (winner.request) { // If worker not loaded on time...
+      const errorMessage = 'webworker not available.';
+      yield put({ type: REQUEST_ERROR, error: errorMessage });
+      continue;  // eslint-disable-line no-continue
     }
+    const { email, password } = yield take(LOGIN_REQUEST);
+    const wallet = yield call(login, { email });
+    if (!wallet) {
+      const errorMessage = 'email does not exist.';
+      yield put({ type: REQUEST_ERROR, error: errorMessage });
+      continue;  // eslint-disable-line no-continue
+    }
+    window.frame.contentWindow.postMessage({
+      action: 'import',
+      json: JSON.stringify(wallet),
+      password,
+    }, '*');
+    // We now either expect successful encryption or error from worker.
+    const worker = yield race({
+      error: take(WORKER_ERROR),
+      import: take(WALLET_IMPORTED),
+    });
+    // If worker exited with error...
+    if (worker.error) {
+      yield put({ type: REQUEST_ERROR, error: worker.error.event });
+      continue;  // eslint-disable-line no-continue
+    }
+    // If worker succeeded, ...
+    // ...we send Redux appropiate actions
+    yield put({ type: SET_AUTH, newAuthState: true }); // User is logged in (authorized)
+    yield put({ type: CHANGE_FORM, newFormState: { username: '', password: '' } }); // Clear form
+    forwardTo('/features'); // Go to dashboard page
   }
 }
 
@@ -144,43 +158,42 @@ export function* registerFlow() {
       load: take(WORKER_LOADED),
       request: take(EXPORT_REQUEST),
     });
-    let email;
     if (winner.request) { // If worker not loaded on time...
       const errorMessage = 'webworker not available.';
       yield put({ type: REQUEST_ERROR, error: errorMessage });
-    } else if (winner.load) { // If worker is ready, let's wait for user...
-      const request = yield take(EXPORT_REQUEST);
-      email = request.email;
-      const seed = crypto.getRandomValues(new Uint8Array(64));
-      const hexSeed = seed.toString('hex');
-      window.frame.contentWindow.postMessage({
-        action: 'export',
-        hexSeed,
-        password: request.password,
-        randomBytes: crypto.randomBytes(64),
-      }, '*');
+      continue;  // eslint-disable-line no-continue
     }
+    // If worker is ready, let's wait for user...
+    const { email, password } = yield take(EXPORT_REQUEST);
+    const seed = crypto.getRandomValues(new Uint8Array(64));
+    const hexSeed = seed.toString('hex');
+    window.frame.contentWindow.postMessage({
+      action: 'export',
+      hexSeed,
+      password,
+      randomBytes: crypto.randomBytes(64),
+    }, '*');
     // We now either expect successful encryption or error from worker.
     const worker = yield race({
       error: take(WORKER_ERROR),
-      export: take(WORKER_EXPORTED),
+      export: take(WALLET_EXPORTED),
     });
     // If worker exited with error...
     if (worker.error) {
       yield put({ type: REQUEST_ERROR, error: worker.error.event });
+      continue;  // eslint-disable-line no-continue
+    }
     // If worker succeeded, ...
-    } else if (worker.export) {
-      const wallet = yield take(WORKER_EXPORTED);
-      // We call the `authorize` task with the data, telling it that we are registering a user
-      // This returns `true` if the registering was successful, `false` if not
-      const wasSuccessful = yield call(authorize, { email, wallet });
+    const wallet = yield take(WALLET_EXPORTED);
+    // We call the `authorize` task with the data, telling it that we are registering a user
+    // This returns `true` if the registering was successful, `false` if not
+    const wasSuccessful = yield call(authorize, { email, wallet });
 
-      // If we could register a user, we send the appropiate actions
-      if (wasSuccessful) {
-        yield put({ type: SET_AUTH, newAuthState: true }); // User is logged in (authorized) after being registered
-        yield put({ type: CHANGE_FORM, newFormState: { username: '', password: '' } }); // Clear form
-        forwardTo('/features'); // Go to dashboard page
-      }
+    // If we could register a user, we send the appropiate actions
+    if (wasSuccessful) {
+      yield put({ type: SET_AUTH, newAuthState: true }); // User is logged in (authorized) after being registered
+      yield put({ type: CHANGE_FORM, newFormState: { username: '', password: '' } }); // Clear form
+      forwardTo('/features'); // Go to dashboard page
     }
   }
 }

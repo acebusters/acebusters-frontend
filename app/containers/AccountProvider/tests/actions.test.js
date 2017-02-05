@@ -11,8 +11,9 @@ describe('LoginPage actions', () => {
     it('has a type of LOGIN_REQUEST', () => {
       const expected = {
         type: LOGIN_REQUEST,
+        email: 'email',
       };
-      expect(loginRequest()).toEqual(expected);
+      expect(loginRequest({ email: 'email' })).toEqual(expected);
     });
   });
 });

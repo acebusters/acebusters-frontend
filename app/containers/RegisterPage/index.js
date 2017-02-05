@@ -4,7 +4,7 @@ import { createStructuredSelector } from 'reselect';
 import styled from 'styled-components';
 
 import makeSelectAccountData from '../AccountProvider/selectors';
-import { changeForm, workerError, workerLoaded, workerExported, workerProgress, exportRequest } from '../AccountProvider/actions';
+import { changeForm, workerError, workerLoaded, walletExported, workerProgress, exportRequest } from '../AccountProvider/actions';
 import Form from '../../components/Form';
 
 const FormPageWrapper = styled.div`
@@ -54,14 +54,14 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
     } else if (data.action === 'progress') {
       this.props.onWorkerProgress(parseInt(data.percent, 10));
     } else if (data.action === 'exported') {
-      this.props.onWorkerExported(data.json);
+      this.props.onWalletExported(data.json);
     } else {
       this.props.onWorkerError(evt);
     }
   }
 
   render() {
-    const { accountState, currentlySending, error } = this.props.data;
+    const { accountState, currentlySending, error } = this.props.account;
     const workerPath = this.props.workerPath + encodeURIComponent(location.origin);
 
     return (
@@ -70,7 +70,15 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
           <div className="form-page__form-header">
             <h2 className="form-page__form-heading">Register</h2>
           </div>
-          <Form data={accountState} history={this.props.history} onChangeForm={this.props.onChangeForm} onSubmitForm={this.props.onSubmitForm} btnText={'Register'} error={error} currentlySending={currentlySending} />
+          <Form
+            data={accountState}
+            history={this.props.history}
+            onChangeForm={this.props.onChangeForm}
+            onSubmitForm={this.props.onSubmitForm}
+            btnText={'Register'}
+            error={error}
+            currentlySending={currentlySending}
+          />
         </div>
         <iframe src={workerPath} style={{ display: 'none' }} onLoad={this.onWorkerLoaded} />
       </FormPageWrapper>
@@ -83,7 +91,7 @@ RegisterPage.defaultProps = {
 };
 
 RegisterPage.propTypes = {
-  data: React.PropTypes.object,
+  account: React.PropTypes.object,
   history: React.PropTypes.object,
   workerPath: React.PropTypes.string,
   onSubmitForm: React.PropTypes.func,
@@ -91,7 +99,7 @@ RegisterPage.propTypes = {
   onWorkerError: React.PropTypes.func,
   onWorkerLoaded: React.PropTypes.func,
   onWorkerProgress: React.PropTypes.func,
-  onWorkerExported: React.PropTypes.func,
+  onWalletExported: React.PropTypes.func,
 };
 
 function mapDispatchToProps(dispatch) {
@@ -101,13 +109,13 @@ function mapDispatchToProps(dispatch) {
     onWorkerError: (event) => dispatch(workerError(event)),
     onWorkerLoaded: () => dispatch(workerLoaded()),
     onWorkerProgress: (percent) => dispatch(workerProgress(percent)),
-    onWorkerExported: (json) => dispatch(workerExported(json)),
+    onWalletExported: (wallet) => dispatch(walletExported(wallet)),
   };
 }
 
 // Which props do we want to inject, given the global state?
 const mapStateToProps = createStructuredSelector({
-  data: makeSelectAccountData(),
+  account: makeSelectAccountData(),
 });
 
 // Wrap the component to inject dispatch and state into it

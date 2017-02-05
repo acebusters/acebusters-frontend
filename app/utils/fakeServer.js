@@ -11,7 +11,7 @@ const server = {
   init() {
     if (localStorage.users === undefined) {
       // Set default user
-      const user = 'johannbarbie@me.com';
+      const user = 'test@mail.com';
       const wallet = {
         address: '0x0735a7a806ac6fffe26318f83102d50675c95dfa',
         Crypto: {
@@ -49,7 +49,6 @@ const server = {
  */
   login(email) {
     const userExists = this.doesUserExist(email);
-
     return new Promise((resolve, reject) => {
       // If the user exists, resolve
       if (userExists) {
@@ -93,11 +92,11 @@ const server = {
     });
   },
  /**
- * Checks if a username exists in the db
- * @param  {string} username The username that should be checked
+ * Checks if a email exists in the db
+ * @param  {string} email The email that should be checked
  */
-  doesUserExist(username) {
-    return !(users[username] === undefined);
+  doesUserExist(email) {
+    return !(users[email] === undefined);
   },
 };
 

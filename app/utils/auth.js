@@ -7,18 +7,12 @@ const localStorage = (global.process && process.env.NODE_ENV === 'test') ? requi
 const auth = {
   /**
   * Logs a user in, returning a promise with `true` when done
-  * @param  {string} email The username of the user
+  * @param  {string} email The email of the user
   */
   login(email) {
-    if (auth.loggedIn()) return Promise.resolve(true);
-
     // Post a fake request
     return request.post('/login', { email })
-      .then((response) => {
-        // Save wallet to local storage
-        localStorage.wallet = response.wallet;
-        return Promise.resolve(true);
-      });
+      .then((response) => Promise.resolve(response.wallet));
   },
   /**
   * Logs the current user out
