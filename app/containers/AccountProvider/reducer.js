@@ -5,6 +5,10 @@ import {
   SENDING_REQUEST,
   REQUEST_ERROR,
   CLEAR_ERROR,
+  EXPORT_REQUEST,
+  WORKER_ERROR,
+  WORKER_PROGRESS,
+  WORKER_EXPORTED,
 } from './constants';
 
 import auth from '../../utils/auth';
@@ -36,6 +40,19 @@ function accountProviderReducer(state = initialState, action) {
         .set('error', action.error);
     case CLEAR_ERROR:
       return state.delete('error');
+    case EXPORT_REQUEST:
+      return state.set('exportProgress', 0);
+    case WORKER_ERROR:
+      return state
+        .set('exportProgress', -1)
+        .set('error', action.event);
+    case WORKER_PROGRESS:
+      return state
+        .set('exportProgress', action.percent);
+    case WORKER_EXPORTED:
+      return state
+        .delete('exportProgress')
+        .set('json', action.json);
     default:
       return state;
   }

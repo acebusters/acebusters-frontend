@@ -7,6 +7,11 @@ import {
   REGISTER_REQUEST,
   REQUEST_ERROR,
   CLEAR_ERROR,
+  WORKER_ERROR,
+  WORKER_LOADED,
+  WORKER_PROGRESS,
+  WORKER_EXPORTED,
+  EXPORT_REQUEST,
 } from './constants';
 
 /**
@@ -75,4 +80,39 @@ export function clearError() {
  */
 export function registerRequest(data) {
   return { type: REGISTER_REQUEST, data };
+}
+
+export function workerError(event) {
+  return {
+    type: WORKER_ERROR,
+    event,
+  };
+}
+
+export function workerLoaded() {
+  return {
+    type: WORKER_LOADED,
+  };
+}
+
+export function workerExported(json) {
+  return {
+    type: WORKER_EXPORTED,
+    json,
+  };
+}
+
+export function workerProgress(percent) {
+  return {
+    type: WORKER_PROGRESS,
+    percent,
+  };
+}
+
+export function exportRequest(request) {
+  return {
+    type: EXPORT_REQUEST,
+    hexSeed: request.hexSeed,
+    password: request.password,
+  };
 }

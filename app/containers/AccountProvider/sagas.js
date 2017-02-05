@@ -1,5 +1,7 @@
 import { browserHistory } from 'react-router';
 import { take, call, put, fork, race } from 'redux-saga/effects';
+import crypto from 'crypto';
+
 import auth from '../../utils/auth';
 
 import {
@@ -9,35 +11,46 @@ import {
   LOGOUT,
   CHANGE_FORM,
   REQUEST_ERROR,
-  REGISTER_REQUEST,
+  EXPORT_REQUEST,
+  WORKER_ERROR,
+  WORKER_LOADED,
+  WORKER_EXPORTED,
 } from './constants';
 
 /**
  * Effect to handle authorization
- * @param  {string} username               The username of the user
- * @param  {string} password               The password of the user
- * @param  {object} options                Options
- * @param  {boolean} options.isRegistering Is this a register request?
+ * @param  {string} email               The email of the user
+ * @param  {string} wallet              The serialized wallet of the user
  */
-export function* authorize({ username, password, isRegistering }) {
+export function* authorize({ email, wallet }) {
   // We send an action that tells Redux we're sending a request
   yield put({ type: SENDING_REQUEST, sending: true });
 
-  // We then try to register or log in the user, depending on the request
+  // We then try to register the user
   try {
-    let response;
+    return yield call(auth.register, email, wallet);
+  } catch (error) {
+    // If we get an error we send Redux the appropiate action and return
+    yield put({ type: REQUEST_ERROR, error: error.message });
 
-    // For either log in or registering, we call the proper function in the `auth`
-    // module, which is asynchronous. Because we're using generators, we can work
-    // as if it's synchronous because we pause execution until the call is done
-    // with `yield`!
-    if (isRegistering) {
-      response = yield call(auth.register, username, password);
-    } else {
-      response = yield call(auth.login, username, password);
-    }
+    return false;
+  } finally {
+    // When done, we tell Redux we're not in the middle of a request any more
+    yield put({ type: SENDING_REQUEST, sending: false });
+  }
+}
 
-    return response;
+/**
+ * Effect to login
+ * @param  {string} email               The email of the user
+ */
+export function* login({ email }) {
+  // We send an action that tells Redux we're sending a request
+  yield put({ type: SENDING_REQUEST, sending: true });
+
+  // We log in the user
+  try {
+    return yield call(auth.login, email);
   } catch (error) {
     // If we get an error we send Redux the appropiate action and return
     yield put({ type: REQUEST_ERROR, error: error.message });
@@ -122,24 +135,59 @@ export function* logoutFlow() {
 
 /**
  * Register saga
- * Very similar to log in saga!
  */
 export function* registerFlow() {
   while (true) { // eslint-disable-line no-constant-condition
-    // We always listen to `REGISTER_REQUEST` actions
-    const request = yield take(REGISTER_REQUEST);
-    const { username, password } = request.data;
-
-    // We call the `authorize` task with the data, telling it that we are registering a user
-    // This returns `true` if the registering was successful, `false` if not
-    const wasSuccessful = yield call(authorize, { username, password, isRegistering: true });
-
-    // If we could register a user, we send the appropiate actions
-    if (wasSuccessful) {
-      yield put({ type: SET_AUTH, newAuthState: true }); // User is logged in (authorized) after being registered
-      yield put({ type: CHANGE_FORM, newFormState: { username: '', password: '' } }); // Clear form
-      forwardTo('/features'); // Go to dashboard page
+    // We want the worker to load while the user is typing his credentials.
+    // If worker is not loaded until user done, something is funky.
+    const winner = yield race({
+      load: take(WORKER_LOADED),
+      request: take(EXPORT_REQUEST),
+    });
+    let email;
+    if (winner.request) { // If worker not loaded on time...
+      const errorMessage = 'webworker not available.';
+      yield put({ type: REQUEST_ERROR, error: errorMessage });
+    } else if (winner.load) { // If worker is ready, let's wait for user...
+      const request = yield take(EXPORT_REQUEST);
+      email = request.email;
+      const seed = crypto.getRandomValues(new Uint8Array(64));
+      const hexSeed = seed.toString('hex');
+      window.frame.contentWindow.postMessage({
+        action: 'export',
+        hexSeed,
+        password: request.password,
+        randomBytes: crypto.randomBytes(64),
+      }, '*');
     }
+    // We now either expect successful encryption or error from worker.
+    const worker = yield race({
+      error: take(WORKER_ERROR),
+      export: take(WORKER_EXPORTED),
+    });
+    // If worker exited with error...
+    if (worker.error) {
+      yield put({ type: REQUEST_ERROR, error: worker.error.event });
+    // If worker succeeded, ...
+    } else if (worker.export) {
+      const wallet = yield take(WORKER_EXPORTED);
+      // We call the `authorize` task with the data, telling it that we are registering a user
+      // This returns `true` if the registering was successful, `false` if not
+      const wasSuccessful = yield call(authorize, { email, wallet });
+
+      // If we could register a user, we send the appropiate actions
+      if (wasSuccessful) {
+        yield put({ type: SET_AUTH, newAuthState: true }); // User is logged in (authorized) after being registered
+        yield put({ type: CHANGE_FORM, newFormState: { username: '', password: '' } }); // Clear form
+        forwardTo('/features'); // Go to dashboard page
+      }
+    }
+  }
+}
+
+export function* exportFlow() {
+  while (true) { // eslint-disable-line no-constant-condition
+
   }
 }
 
