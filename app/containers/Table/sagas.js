@@ -70,7 +70,7 @@ export function* watchAndGet() {
   let wait;
   while (true) {                        // eslint-disable-line
     // watches the states and continues whenever new state is returned
-    const action = yield take('*');     // eslint-disable-line 
+    const action = yield take('*');     // eslint-disable-line
     const state = yield select();
 
     if (state.TableReducer.complete) {
