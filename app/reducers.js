@@ -8,6 +8,7 @@ import { combineReducers } from 'redux-immutable';
 import { LOCATION_CHANGE } from 'react-router-redux';
 
 import globalReducer from 'containers/App/reducer';
+import tableReducer from 'containers/Table/reducer';
 import languageProviderReducer from 'containers/LanguageProvider/reducer';
 import accountProviderReducer from 'containers/AccountProvider/reducer';
 
@@ -48,6 +49,7 @@ export default function createReducer(asyncReducers) {
     global: globalReducer,
     language: languageProviderReducer,
     account: accountProviderReducer,
+    table: tableReducer,
     ...asyncReducers,
   });
 }
