@@ -5,12 +5,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { getBalance, getTables, joinTable } from './actions';
+import { makeSelectAddress } from '../AccountProvider/selectors';
 
 class LobbyComponent extends React.PureComponent {  // eslint-disable-line
 
-  constructor(props) {
-    super(props);
-    this.props.getBalance();
+  componentDidMount() {
+    this.props.getBalance(this.props.myAddress);
     this.props.getTables();
   }
 
@@ -41,19 +41,21 @@ class LobbyComponent extends React.PureComponent {  // eslint-disable-line
 export function mapDispatchToProps(dispatch) {
   return {
     getTables: () => dispatch(getTables()),
-    getBalance: () => dispatch(getBalance()),
+    getBalance: (myAddress) => dispatch(getBalance(myAddress)),
     joinTable: (id) => dispatch(joinTable(id)),
   };
 }
 
 function mapStateToProps(state) {
   return {
+    myAddress: makeSelectAddress(state),
     balance: state.lobby.balance,
     tables: state.lobby.tables,
   };
 }
 
 LobbyComponent.propTypes = {
+  myAddress: React.PropTypes.string,
   tables: React.PropTypes.array,
   balance: React.PropTypes.number,
   getTables: React.PropTypes.func,
