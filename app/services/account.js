@@ -3,18 +3,18 @@ import uuid from 'node-uuid';
 
 const accountUrl = 'https://hsqkzjp3m8.execute-api.eu-west-1.amazonaws.com/v0';
 
-const accountService = {
+const account = {
 
   login(email) {
     return new Promise((resolve, reject) => {
-      fetch(accountUrl + '/query/', {
+      fetch(`${accountUrl}/query`, {
         method: 'post',
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: email,
+          email,
         }),
       }).then((rsp) => {
         if (rsp.status >= 200 && rsp.status < 300) {
@@ -24,7 +24,7 @@ const accountService = {
         } else {
           reject(rsp.status);
         }
-      }).catch((error) => { 
+      }).catch((error) => {
         reject(error);
       });
     });
@@ -33,15 +33,15 @@ const accountService = {
   register(email, wallet, recapResponse) {
     const accountId = uuid.v4();
     return new Promise((resolve, reject) => {
-      fetch(accountUrl + '/account/'+accountId, {
+      fetch(`${accountUrl}/account/${accountId}`, {
         method: 'post',
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: email,
-          recapResponse: recapResponse,
+          email,
+          recapResponse,
           wallet: JSON.stringify(wallet),
         }),
       }).then((response) => {
@@ -58,14 +58,14 @@ const accountService = {
 
   confirm(token) {
     return new Promise((resolve, reject) => {
-      fetch(accountUrl + '/confirm', {
+      fetch(`${accountUrl}/confirm`, {
         method: 'post',
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          token: token
+          token,
         }),
       }).then((response) => {
         if (response.status >= 200 && response.status < 300) {
@@ -80,4 +80,4 @@ const accountService = {
   },
 };
 
-export default accountService;
+export default account;
