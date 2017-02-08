@@ -2,7 +2,7 @@ import { browserHistory } from 'react-router';
 import { take, call, put, fork, race } from 'redux-saga/effects';
 import crypto from 'crypto';
 
-import auth from '../../utils/auth';
+import account from '../../services/account';
 
 import {
   SENDING_REQUEST,
@@ -23,13 +23,13 @@ import {
  * @param  {string} email               The email of the user
  * @param  {string} wallet              The serialized wallet of the user
  */
-export function* authorize({ email, wallet }) {
+export function* authorize({ email, wallet, recapResponse }) {
   // We send an action that tells Redux we're sending a request
   yield put({ type: SENDING_REQUEST, sending: true });
 
   // We then try to register the user
   try {
-    return yield call(auth.register, email, wallet);
+    return yield call(account.register, email, wallet, recapResponse);
   } catch (error) {
     // If we get an error we send Redux the appropiate action and return
     yield put({ type: REQUEST_ERROR, error: error.message });
@@ -51,7 +51,7 @@ export function* login({ email }) {
 
   // We log in the user
   try {
-    return yield call(auth.login, email);
+    return yield call(account.login, email);
   } catch (error) {
     // If we get an error we send Redux the appropiate action and return
     yield put({ type: REQUEST_ERROR, error: error.message });
@@ -74,7 +74,7 @@ export function* logout() {
   // `auth` module. If we get an error, we send an appropiate action. If we don't,
   // we return the response.
   try {
-    const response = yield call(auth.logout);
+    const response = yield call(account.logout);
     yield put({ type: SENDING_REQUEST, sending: false });
 
     return response;
@@ -164,15 +164,18 @@ export function* registerFlow() {
       continue;  // eslint-disable-line no-continue
     }
     // If worker is ready, let's wait for user...
-    const { email, password } = yield take(EXPORT_REQUEST);
-    const seed = crypto.getRandomValues(new Uint8Array(64));
+    const request = yield take(EXPORT_REQUEST);
+    const { email, password, recapResponse } = request.request;
+    const seed = crypto.randomBytes(32);
     const hexSeed = seed.toString('hex');
-    window.frame.contentWindow.postMessage({
+    const msg = {
       action: 'export',
       hexSeed,
       password,
       randomBytes: crypto.randomBytes(64),
-    }, '*');
+    };
+    window.msg = msg;
+    window.frame.contentWindow.postMessage(msg, '*');
     // We now either expect successful encryption or error from worker.
     const worker = yield race({
       error: take(WORKER_ERROR),
@@ -184,10 +187,10 @@ export function* registerFlow() {
       continue;  // eslint-disable-line no-continue
     }
     // If worker succeeded, ...
-    const wallet = yield take(WALLET_EXPORTED);
+    const wallet = worker.export.wallet;
     // We call the `authorize` task with the data, telling it that we are registering a user
     // This returns `true` if the registering was successful, `false` if not
-    const wasSuccessful = yield call(authorize, { email, wallet });
+    const wasSuccessful = yield call(authorize, { email, wallet, recapResponse });
 
     // If we could register a user, we send the appropiate actions
     if (wasSuccessful) {

@@ -4,7 +4,7 @@ import { createStructuredSelector } from 'reselect';
 import styled from 'styled-components';
 
 import makeSelectAccountData from '../AccountProvider/selectors';
-import { changeForm, workerError, workerLoaded, walletExported, workerProgress, exportRequest } from '../AccountProvider/actions';
+import { changeForm, workerError, workerLoaded, walletExported, workerProgress, exportRequest, recaptcha } from '../AccountProvider/actions';
 import Form from '../../components/Form';
 
 const FormPageWrapper = styled.div`
@@ -61,7 +61,7 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
   }
 
   render() {
-    const { formState, currentlySending, error } = this.props.account;
+    const { formState, currentlySending, recapResponse, error } = this.props.account;
     const workerPath = this.props.workerPath + encodeURIComponent(location.origin);
     return (
       <FormPageWrapper>
@@ -73,10 +73,12 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
             data={formState}
             history={this.props.history}
             onChangeForm={this.props.onChangeForm}
-            onSubmitForm={this.props.onSubmitForm}
+            onSubmitForm={(email, password) => { this.props.onSubmitForm(email, password, recapResponse); }}
             btnText={'Register'}
             error={error}
             recaptchaKey={'6LcE0RQUAAAAAEf6UWFsHEPedPBmRPAQiaSiWynN'}
+            onRecaptchaResponse={this.props.onRecaptcha}
+            progress={this.props.account.workerProgress}
             currentlySending={currentlySending}
           />
         </div>
@@ -96,6 +98,7 @@ RegisterPage.propTypes = {
   workerPath: React.PropTypes.string,
   onSubmitForm: React.PropTypes.func,
   onChangeForm: React.PropTypes.func,
+  onRecaptcha: React.PropTypes.func,
   onWorkerError: React.PropTypes.func,
   onWorkerLoaded: React.PropTypes.func,
   onWorkerProgress: React.PropTypes.func,
@@ -104,12 +107,13 @@ RegisterPage.propTypes = {
 
 function mapDispatchToProps(dispatch) {
   return {
-    onSubmitForm: (email, password) => dispatch(exportRequest({ email, password })),
+    onSubmitForm: (email, password, recapResponse) => dispatch(exportRequest({ email, password, recapResponse })),
     onChangeForm: (newFormState) => dispatch(changeForm(newFormState)),
     onWorkerError: (event) => dispatch(workerError(event)),
     onWorkerLoaded: () => dispatch(workerLoaded()),
     onWorkerProgress: (percent) => dispatch(workerProgress(percent)),
     onWalletExported: (wallet) => dispatch(walletExported(wallet)),
+    onRecaptcha: (response) => dispatch(recaptcha(response)),
   };
 }
 

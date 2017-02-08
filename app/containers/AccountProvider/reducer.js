@@ -11,6 +11,7 @@ import {
   WORKER_PROGRESS,
   WALLET_EXPORTED,
   WALLET_IMPORTED,
+  RECAPTCHA_RESPONSE,
 } from './constants';
 
 import auth from '../../utils/auth';
@@ -22,6 +23,7 @@ const initialState = fromJS({
     password: '',
   },
   error: '',
+  recapResponse: '',
   currentlySending: false,
   loggedIn: auth.loggedIn(),
 });
@@ -60,6 +62,9 @@ function accountProviderReducer(state = initialState, action) {
       return state
         .delete('workerProgress')
         .set('privKey', action.privKey);
+    case RECAPTCHA_RESPONSE:
+      return state
+        .set('recapResponse', action.response);
     default:
       return state;
   }
