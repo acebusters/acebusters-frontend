@@ -7,7 +7,7 @@ import { IntlProvider } from 'react-intl';
 import RegisterPage from '../index';
 
 const store = createStore(
-  (state = fromJS({ account: { accountState: {}, loggedIn: false } })) => state
+  (state = fromJS({ account: { formState: {}, loggedIn: false } })) => state
 );
 
 describe('<RegisterPage />', () => {

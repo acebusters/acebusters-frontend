@@ -7,7 +7,7 @@ import { IntlProvider } from 'react-intl';
 import LoginPage from '../index';
 
 const store = createStore(
-  (state = fromJS({ account: { accountState: {}, loggedIn: true } })) => state
+  (state = fromJS({ account: { formState: {}, loggedIn: true } })) => state
 );
 
 describe('<LoginPage />', () => {

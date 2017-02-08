@@ -61,9 +61,8 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
   }
 
   render() {
-    const { accountState, currentlySending, error } = this.props.account;
+    const { formState, currentlySending, error } = this.props.account;
     const workerPath = this.props.workerPath + encodeURIComponent(location.origin);
-
     return (
       <FormPageWrapper>
         <div className="form-page__form-wrapper">
@@ -71,12 +70,13 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
             <h2 className="form-page__form-heading">Register</h2>
           </div>
           <Form
-            data={accountState}
+            data={formState}
             history={this.props.history}
             onChangeForm={this.props.onChangeForm}
             onSubmitForm={this.props.onSubmitForm}
             btnText={'Register'}
             error={error}
+            recaptchaKey={'6LcE0RQUAAAAAEf6UWFsHEPedPBmRPAQiaSiWynN'}
             currentlySending={currentlySending}
           />
         </div>

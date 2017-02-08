@@ -45,7 +45,10 @@
     "coveralls": "cat ./coverage/lcov.info | coveralls"
   },
   "lint-staged": {
-    "*.js": ["eslint --fix","git add"]
+    "*.js": [
+      "eslint --fix",
+      "git add"
+    ]
   },
   "pre-commit": "lint:staged",
   "babel": {
@@ -229,6 +232,7 @@
     "poker-helper": "^0.1.17",
     "react": "15.4.1",
     "react-dom": "15.4.1",
+    "react-google-recaptcha": "^0.5.4",
     "react-helmet": "3.2.2",
     "react-intl": "2.1.5",
     "react-redux": "4.4.6",
@@ -242,6 +246,7 @@
     "sanitize.css": "4.1.0",
     "styled-components": "1.1.2",
     "tinycolor2": "^1.4.1",
+    "uuid": "^3.0.1",
     "warning": "3.0.0",
     "web3": "^0.18.2",
     "web3-provider-engine": "8.6.1",
