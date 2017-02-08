@@ -7,7 +7,7 @@ import { delay } from 'redux-saga';
 import { pay } from './actions';
 import * as Config from '../../app.config';
 
-import { addressSelector, privKeySelector } from '../Account/selectors';
+import { makeSelectAddress, makeSelectPrivKey } from '../AccountProvider/selectors';
 import { makeHandSelector } from '../Table/selectors';
 
 const ABI_BET = [{ name: 'bet', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
@@ -27,10 +27,10 @@ export function* dispatchDealingAction() {
   const state = yield select();
 
   const hand = makeHandSelector(state);
-  const privKey = privKeySelector(state);
+  const privKey = makeSelectPrivKey(state);
   const handId = hand.handId;
   let amount = 0;
-  const myAddr = addressSelector(state);
+  const myAddr = makeSelectAddress(state);
   const dealer = hand.dealer;
   const myPos = pokerHelper.getMyPos(hand.lineup, myAddr);
   const sb = pokerHelper.nextActivePlayer(hand.lineup, dealer + 1);

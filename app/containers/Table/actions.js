@@ -3,6 +3,7 @@
  */
 
 import EWT from 'ethereum-web-token';
+import Provider from '../../provider';
 import * as Config from '../../app.config';
 
 export const UPDATE_RECEIVED = 'UPDATE_RECEIVED';
@@ -81,6 +82,10 @@ export function getHand(handId, tableAddr) {
   return { type: GET_HAND, handId, tableAddr };
 }
 
+export function getLineupSuccess(payload) {
+  return { type: GET_LINEUP, payload };
+}
+
 export function setCards(cards, pos) {
   return { type: SET_CARDS, cards, pos };
 }
@@ -116,6 +121,10 @@ export function startPolling(tableAddr) {
       dispatch(updateReceived(tableState));
     });
   }, 3000);
+}
+
+export function stopPolling(tableAddr) {
+  clearInterval(startPolling(tableAddr));
 }
 
 function fetchCurrentHand(tableAddr) {
@@ -158,6 +167,24 @@ function show(handId, amount, holeCards, priv, tableAddr) {
       reject(err);
     });
   });
+  return promise;
+}
+
+export function getLineup(tableAddr, privKey) {
+  const provider = new Provider(Config.ethNode, privKey);
+
+  const table = provider.getTable(tableAddr);
+
+
+  const promise = new Promise((resolve, reject) => {
+    table.getLineup((error, response) => {
+      if (error) {
+        reject(error);
+      }
+      resolve(response);
+    });
+  }).then((res) => res.json(), (error) => error);
+
   return promise;
 }
 

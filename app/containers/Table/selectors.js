@@ -1,12 +1,12 @@
 import { createSelector } from 'reselect';
 import { PokerHelper, ReceiptCache } from 'poker-helper';
-import { addressSelector } from '../Account/selectors';
+import { makeSelectAddress } from '../AccountProvider/selectors';
 
 
 const rc = new ReceiptCache();
 const pokerHelper = new PokerHelper(rc);
 
-const tableStateSelector = (state) => (state) ? state.TableReducer : null;
+const tableStateSelector = (state) => (state) ? state.get('table') : null;
 
 const makeHandSelector = createSelector(
     tableStateSelector,
@@ -19,7 +19,7 @@ const makeLastHandNettedSelector = createSelector(
 );
 
 const makeMyPosSelector = createSelector(
-    [tableStateSelector, addressSelector],
+    [tableStateSelector, makeSelectAddress],
     (tableState, myAddress) => (tableState && tableState.hand && myAddress) ? pokerHelper.getMyPos(tableState.hand.lineup, myAddress) : null
 );
 
@@ -39,7 +39,7 @@ const makeMaxBetSelector = createSelector(
 );
 
 const makeMyMaxBetSelector = createSelector(
-    [tableStateSelector, addressSelector],
+    [tableStateSelector, makeSelectAddress],
     (tableState, myAddress) => (tableState && tableState.hand && myAddress) ? pokerHelper.getMyMaxBet(tableState.hand.lineup, myAddress) : 0
 );
 

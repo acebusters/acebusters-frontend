@@ -50,12 +50,12 @@ export function mapDispatchToProps(dispatch) {
   };
 }
 
-function mapStateToProps(state) {
-  return {
-    balance: state.LobbyReducer.balance,
-    tables: state.LobbyReducer.tables,
-  };
-}
+// function mapStateToProps(state) {
+//   return {
+//     balance: ,
+//     tables: [],
+//   };
+// }
 
 LobbyComponent.propTypes = {
   tables: React.PropTypes.array,
@@ -65,4 +65,4 @@ LobbyComponent.propTypes = {
   joinTable: React.PropTypes.func,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(LobbyComponent);
+export default connect(mapDispatchToProps)(LobbyComponent);

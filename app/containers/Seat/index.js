@@ -3,12 +3,12 @@
  */
 import React from 'react';
 import { connect } from 'react-redux';
-import Card from '../../components/Card'; // eslint-disable-line
+import Card from 'components/Card'; // eslint-disable-line
 import * as LocalStorage from '../../LocalStorageService';
 import { setCards } from '../Table/actions';
 import { makeCardSelector, makeStackSelector, makeLastAmountSelector, makeFoldedSelector } from './selectors';
 import { makeMyPosSelector, makeHandSelector, makeLastHandNettedSelector } from '../Table/selectors';
-import { addressSelector } from '../Account/selectors';
+import { makeSelectAddress } from '../AccountProvider/selectors';
 
 class Seat extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -35,7 +35,7 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
         <div className="player-name">{ this.props.myAddress }</div>
         <div className="betting-amount"> { this.props.lastAmount } </div>
         <div className="hole-cards row">
-          { (!this.props.folded) ? <div> <Card cardNumber={this.props.cards[0]}></Card><Card cardNumber={this.props.cards[1]}></Card></div> : null }
+          { (!this.props.folded) ? <div> <Card cardNumber={this.props.cards[0]} ></Card><Card cardNumber={this.props.cards[1]}></Card></div> : null }
         </div>
         <div className="player-name">{ (this.props.lastHandNettedOnClient === this.props.hand.handId - 1) ? this.props.stack : null }</div>
       </div>
@@ -45,7 +45,7 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
 
 const makeMapStateToProps = () => {
   const mapStateToProps = (state) => ({
-    myAddress: addressSelector(state),
+    myAddress: makeSelectAddress(state),
     hand: makeHandSelector(state),
     lastHandNettedOnClient: makeLastHandNettedSelector(state),
     myPos: makeMyPosSelector(state),

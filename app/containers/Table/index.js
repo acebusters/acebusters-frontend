@@ -5,16 +5,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
 // components and styles
-import Card from '../../components/Card.js'; // eslint-disable-line
+import Card from 'components/Card'; // eslint-disable-line
 import Seat from '../Seat'; // eslint-disable-line
 import ActionBar from '../ActionBar'; // eslint-disable-line
-import styles from '../../style/table.css'; // eslint-disable-line
-import bootstrap from '../../style/bootstrap.min.css'; // eslint-disable-line
 // actions
 import { startPolling, getLineup } from './actions';
-import { loginSuccess } from '../Account/actions';
 // selectors
-import { addressSelector } from '../Account/selectors';
+import { makeSelectAddress, makeSelectPrivKey } from '../AccountProvider/selectors';
 import { makeIsMyTurnSelector, makePotSizeSelector, makeAmountToCallSelector,
          makeHandSelector, makeLastHandNettedSelector } from './selectors';
 
@@ -24,9 +21,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   constructor(props) {
     super(props);
     const tableAddr = this.props.params.addr;
-    const priv = this.props.location.query.privKey;
-
-    this.props.login(priv);
+    const priv = this.props.priv;
     this.props.getLineup(tableAddr, priv);
     this.props.startPolling(tableAddr);
   }
@@ -97,13 +92,13 @@ export function mapDispatchToProps(dispatch) {
     updateLastHand: (handId, tableAddr) => dispatch({ type: 'GET_HAND_REQUESTED', payload: { handId, tableAddr } }),
     startPolling: (tableAddr) => dispatch(startPolling(tableAddr)),
     getLineup: (tableAddr, priv) => dispatch(getLineup(tableAddr, priv)),
-    login: (priv) => dispatch(loginSuccess(priv)),
   };
 }
 
 const mapStateToProps = (state) => ({
+  priv: makeSelectPrivKey(),
   hand: makeHandSelector(state),
-  myAddress: addressSelector(state),
+  myAddress: makeSelectAddress(state),
   lastHandNettedOnClient: makeLastHandNettedSelector(state),
   isMyTurn: makeIsMyTurnSelector(state),
   potSize: makePotSizeSelector(state),
@@ -111,6 +106,7 @@ const mapStateToProps = (state) => ({
 });
 
 Table.propTypes = {
+  priv: React.PropTypes.string,
   hand: React.PropTypes.object,
   myAddress: React.PropTypes.string,
   lastHandNettedOnClient: React.PropTypes.number,  // eslint-disable-line
@@ -118,11 +114,9 @@ Table.propTypes = {
   potSize: React.PropTypes.number,
   amountToCall: React.PropTypes.number,
   params: React.PropTypes.object,
-  location: React.PropTypes.object,
   updateLastHand: React.PropTypes.func,
   startPolling: React.PropTypes.func,
   getLineup: React.PropTypes.func,
-  login: React.PropTypes.func,
 };
 
 
