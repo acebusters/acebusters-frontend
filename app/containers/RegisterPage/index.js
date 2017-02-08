@@ -77,6 +77,7 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
             onSubmitForm={this.props.onSubmitForm}
             btnText={'Register'}
             error={error}
+            recaptchaKey={'6LcE0RQUAAAAAEf6UWFsHEPedPBmRPAQiaSiWynN'}
             currentlySending={currentlySending}
           />
         </div>

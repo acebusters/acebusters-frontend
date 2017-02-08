@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 import ErrorMessage from '../../components/ErrorMessage';
 import LoadingButton from '../../components/LoadingButton';
@@ -62,13 +63,14 @@ const FormSubmitButtonWrapper = styled.div`
   justify-content: center;
 `;
 
-class Form extends React.PureComponent {
+class Form extends React.Component {
   constructor(props) {
     super(props);
 
     this.onSubmit = this.onSubmit.bind(this);
     this.changeUsername = this.changeUsername.bind(this);
     this.changePassword = this.changePassword.bind(this);
+    this.onCaptcha = this.onCaptcha.bind(this);
   }
 
   onSubmit(event) {
@@ -76,16 +78,20 @@ class Form extends React.PureComponent {
     this.props.onSubmitForm(this.props.data.username, this.props.data.password);
   }
 
-  changeUsername(event) {
-    this.emitChange({ ...this.props.data, username: event.target.value });
+  onCaptcha(response) {
+    return response;
+  }
+
+  emitChange(newFormState) {
+    this.props.onChangeForm(newFormState);
   }
 
   changePassword(event) {
     this.emitChange({ ...this.props.data, password: event.target.value });
   }
 
-  emitChange(newFormState) {
-    this.props.onChangeForm(newFormState);
+  changeUsername(event) {
+    this.emitChange({ ...this.props.data, username: event.target.value });
   }
 
   render() {
@@ -121,6 +127,10 @@ class Form extends React.PureComponent {
           </FormFieldLabel>
         </FormFieldWrapper>
         {(this.props.progress) ? <div> progress: {this.props.progress} % </div> : <div> progress: 0 % </div>}
+        <ReCAPTCHA
+          sitekey={this.props.recaptchaKey}
+          onChange={this.onCaptcha}
+        />
         <FormSubmitButtonWrapper>
           {this.props.currentlySending ? (
             <LoadingButton />
@@ -141,6 +151,7 @@ Form.propTypes = {
   onChangeForm: React.PropTypes.func,
   btnText: React.PropTypes.string,
   error: React.PropTypes.string,
+  recaptchaKey: React.PropTypes.string,
   progress: React.PropTypes.number,
   currentlySending: React.PropTypes.bool,
 };
