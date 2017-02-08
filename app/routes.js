@@ -71,10 +71,10 @@ export default function createRoutes(store) {
     }, {
       onEnter: checkAuth,
       childRoutes: [{
-        path: '/features',
-        name: 'features',
+        path: '/lobby',
+        name: 'lobby',
         getComponent(nextState, cb) {
-          import('containers/FeaturePage')
+          import('containers/Lobby')
             .then(loadModule(cb))
             .catch(errorLoading);
         },
@@ -100,6 +100,14 @@ export default function createRoutes(store) {
       name: 'notfound',
       getComponent(nextState, cb) {
         import('containers/NotFoundPage')
+          .then(loadModule(cb))
+          .catch(errorLoading);
+      },
+    }, {
+      path: '/lobby',
+      name: 'lobby',
+      getComponent(nextState, cb) {
+        import('containers/Lobby')
           .then(loadModule(cb))
           .catch(errorLoading);
       },

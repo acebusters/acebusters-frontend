@@ -21,7 +21,7 @@ function getMyAddress(privKey) {
 }
 
 
-export default function table(state = defaultState, action) {
+export default function tableReducer(state = defaultState, action) {
   let update = {};
   let myPos;
   switch (action.type) {

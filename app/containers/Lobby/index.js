@@ -16,26 +16,22 @@ class LobbyComponent extends React.PureComponent {  // eslint-disable-line
 
   render() {
     const tables = this.props.tables;
-    const tablesList = tables.map((table) => <tr key={table.id} className="striped--light-gray">
-      <td className="pv2 ph3">{table.name}</td>
-      <td className="pv2 ph3"><button onClick={this.props.joinTable(table.id)} className="f6 link dim br2 ba ph3 pv2 mb2 dib bg-white dark-green">Join</button></td>
+    const tablesList = tables.map((table) => <tr key={table.id}>
+      <td>{table.name}</td>
+      <td><button onClick={this.props.joinTable(table.id)}>Join</button></td>
     </tr>);
 
     return (
-      <div className="mw-100 center ph3-ns">
-        <div className="cf ph2-ns">
-          <div className="fl w-100 w-third-ns pa2">
-            <h2 className="f4">My Balance: { this.props.balance }</h2>
-            <button onClick={this.props.getTables()} className="f6 link dim br2 ph3 pv2 mb2 dib white bg-black">Refresh Tables</button>
-          </div>
-          <div className="fl w-100 w-third-ns pa2">
-            <table className="collapse ba br2 b--black-10 pv2 ph3">
-              <tbody>{ tablesList }</tbody>
-            </table>
-          </div>
-          <div className="fl w-100 w-third-ns pa2">
 
-          </div>
+      <div>
+        <div>
+          <h2>My Balance: { this.props.balance }</h2>
+          <button onClick={this.props.getTables()}>Refresh Tables</button>
+        </div>
+        <div>
+          <table>
+            <tbody>{ tablesList }</tbody>
+          </table>
         </div>
       </div>
     );
@@ -50,12 +46,12 @@ export function mapDispatchToProps(dispatch) {
   };
 }
 
-// function mapStateToProps(state) {
-//   return {
-//     balance: ,
-//     tables: [],
-//   };
-// }
+function mapStateToProps(state) {
+  return {
+    balance: state.lobby.balance,
+    tables: state.lobby.tables,
+  };
+}
 
 LobbyComponent.propTypes = {
   tables: React.PropTypes.array,
@@ -65,4 +61,4 @@ LobbyComponent.propTypes = {
   joinTable: React.PropTypes.func,
 };
 
-export default connect(mapDispatchToProps)(LobbyComponent);
+export default connect(mapStateToProps, mapDispatchToProps)(LobbyComponent);
