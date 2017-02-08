@@ -6,6 +6,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getBalance, getTables, joinTable } from './actions';
 import { makeSelectAddress } from '../AccountProvider/selectors';
+import { makeSelectLobbyData } from './selectors';
+
 
 class LobbyComponent extends React.PureComponent {  // eslint-disable-line
 
@@ -49,13 +51,12 @@ export function mapDispatchToProps(dispatch) {
 function mapStateToProps(state) {
   return {
     myAddress: makeSelectAddress(state),
-    balance: state.lobby.balance,
-    tables: state.lobby.tables,
+    lobby: makeSelectLobbyData(state),
   };
 }
 
 LobbyComponent.propTypes = {
-  myAddress: React.PropTypes.string,
+  myAddress: React.PropTypes.any,
   tables: React.PropTypes.array,
   balance: React.PropTypes.number,
   getTables: React.PropTypes.func,

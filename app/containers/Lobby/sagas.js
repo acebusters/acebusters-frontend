@@ -35,4 +35,6 @@ export function* lobbySaga() {
   yield takeLatest(GET_TABLES, getTables);
 }
 
-export default lobbySaga;
+export default [
+  lobbySaga,
+];

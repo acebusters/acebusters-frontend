@@ -2,11 +2,15 @@
  * Created by helge on 20.09.16.
  */
 
+import { fromJS } from 'immutable';
 import * as LobbyActions from './actions';
 
-const defaultState = {};
+const initialState = fromJS({
+  balance: null,
+  tables: [],
+});
 
-export default function lobbyReducer(state = defaultState, action) {
+export default function lobbyReducer(state = initialState, action) {
   let update = {};
   switch (action.type) {
     case LobbyActions.BALANCE_UPDATED:
@@ -16,7 +20,7 @@ export default function lobbyReducer(state = defaultState, action) {
       return Object.assign({}, state, update);
     case LobbyActions.TABLES_UPDATED:
       update = {};
-      update.tables = action.payload.tables;
+      update.tables = action.tables;
 
       return Object.assign({}, state, update);
     default:

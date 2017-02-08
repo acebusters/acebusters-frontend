@@ -98,4 +98,6 @@ function* mySaga() {
   yield watchAndGet();
 }
 
-export default mySaga;
+export default [
+  mySaga,
+];
