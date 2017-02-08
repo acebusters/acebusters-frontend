@@ -4,7 +4,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { submitBet, submitFold, submitCheck, submitShow, stopPolling } from '../Table/actions';
-import { privKeySelector } from '../Account/selectors';
+import { privKeySelector } from '../AccountProvider/selectors';
 import { makeCardSelector } from '../Seat/selectors';
 import { makeAmountToCallSelector, makeMyMaxBetSelector, makeMaxBetSelector, makeHandSelector } from '../Table/selectors';
 
