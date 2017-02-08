@@ -2,7 +2,7 @@
 import { fromJS } from 'immutable';
 import loginPageReducer from '../reducer';
 
-describe('loginPageReducer', () => {
+describe('AccountProviderReducer', () => {
   it('returns the initial state', () => {
     expect(loginPageReducer(undefined, {})).toEqual(fromJS({
       formState: {
@@ -10,6 +10,7 @@ describe('loginPageReducer', () => {
         password: '',
       },
       error: '',
+      recapResponse: '',
       currentlySending: false,
       loggedIn: false,
     }));

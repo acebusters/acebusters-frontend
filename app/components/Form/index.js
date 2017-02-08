@@ -70,16 +70,11 @@ class Form extends React.Component {
     this.onSubmit = this.onSubmit.bind(this);
     this.changeUsername = this.changeUsername.bind(this);
     this.changePassword = this.changePassword.bind(this);
-    this.onCaptcha = this.onCaptcha.bind(this);
   }
 
   onSubmit(event) {
     event.preventDefault();
     this.props.onSubmitForm(this.props.data.username, this.props.data.password);
-  }
-
-  onCaptcha(response) {
-    return response;
   }
 
   emitChange(newFormState) {
@@ -104,7 +99,7 @@ class Form extends React.Component {
             type="text"
             id="username"
             value={this.props.data.username}
-            placeholder="frank.underwood"
+            placeholder="addr@email.org"
             onChange={this.changeUsername}
             autoCorrect="off"
             autoCapitalize="off"
@@ -127,10 +122,7 @@ class Form extends React.Component {
           </FormFieldLabel>
         </FormFieldWrapper>
         {(this.props.progress) ? <div> progress: {this.props.progress} % </div> : <div> progress: 0 % </div>}
-        <ReCAPTCHA
-          sitekey={this.props.recaptchaKey}
-          onChange={this.onCaptcha}
-        />
+        {this.props.recaptchaKey && <ReCAPTCHA sitekey={this.props.recaptchaKey} onChange={this.props.onRecaptchaResponse} />}
         <FormSubmitButtonWrapper>
           {this.props.currentlySending ? (
             <LoadingButton />
@@ -149,6 +141,7 @@ Form.propTypes = {
   data: React.PropTypes.object,
   onSubmitForm: React.PropTypes.func,
   onChangeForm: React.PropTypes.func,
+  onRecaptchaResponse: React.PropTypes.func,
   btnText: React.PropTypes.string,
   error: React.PropTypes.string,
   recaptchaKey: React.PropTypes.string,

@@ -13,6 +13,7 @@ import {
   WALLET_EXPORTED,
   WALLET_IMPORTED,
   EXPORT_REQUEST,
+  RECAPTCHA_RESPONSE,
 } from './constants';
 
 /**
@@ -125,5 +126,12 @@ export function exportRequest(request) {
   return {
     type: EXPORT_REQUEST,
     request,
+  };
+}
+
+export function recaptcha(response) {
+  return {
+    type: RECAPTCHA_RESPONSE,
+    response,
   };
 }
