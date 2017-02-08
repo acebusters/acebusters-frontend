@@ -17,7 +17,7 @@ import auth from '../../utils/auth';
 
 // The initial application state
 const initialState = fromJS({
-  accountState: {
+  formState: {
     username: '',
     password: '',
   },
@@ -30,7 +30,7 @@ function accountProviderReducer(state = initialState, action) {
   switch (action.type) {
     case CHANGE_FORM:
       return state
-        .set('accountState', action.newFormState);
+        .set('formState', action.newFormState);
     case SET_AUTH:
       return state
         .set('loggedIn', action.newAuthState);

@@ -17,13 +17,13 @@ const selectAccount = (state) => state.get('account');
 
 const makeSelectAccountData = () => createSelector(
   selectAccount,
-  (accountState) => accountState.toJS()
+  (account) => account.toJS()
 );
 
 const makeSelectAddress = () => createSelector(
   selectAccount,
-  (accountState) => {
-    const privKey = accountState.get('priv');
+  (account) => {
+    const privKey = account.get('priv');
     if (privKey) {
       const privKeyBuffer = new Buffer(privKey.replace('0x', ''), 'hex');
       return `0x${EthUtil.privateToAddress(privKeyBuffer).toString('hex')}`;
@@ -34,7 +34,7 @@ const makeSelectAddress = () => createSelector(
 
 const makeSelectPrivKey = () => createSelector(
   selectAccount,
-  (accountState) => accountState.get('priv')
+  (account) => account.get('priv')
 );
 
 export default makeSelectAccountData;

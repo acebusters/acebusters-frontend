@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import makeSelectAccountData from '../AccountProvider/selectors';
 import { changeForm, workerError, workerLoaded, walletExported, workerProgress, exportRequest } from '../AccountProvider/actions';
 import Form from '../../components/Form';
+import accountService from '../../services/AccountService';
 
 const FormPageWrapper = styled.div`
   display: flex;
@@ -61,8 +62,10 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
   }
 
   render() {
-    const { accountState, currentlySending, error } = this.props.account;
+    const { formState, currentlySending, error } = this.props.account;
     const workerPath = this.props.workerPath + encodeURIComponent(location.origin);
+
+    window.as = accountService;
 
     return (
       <FormPageWrapper>
@@ -71,7 +74,7 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
             <h2 className="form-page__form-heading">Register</h2>
           </div>
           <Form
-            data={accountState}
+            data={formState}
             history={this.props.history}
             onChangeForm={this.props.onChangeForm}
             onSubmitForm={this.props.onSubmitForm}

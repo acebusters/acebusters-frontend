@@ -67,7 +67,7 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
   }
 
   render() {
-    const { accountState, currentlySending, error } = this.props.account;
+    const { formState, currentlySending, error } = this.props.account;
     const workerPath = this.props.workerPath + encodeURIComponent(location.origin);
     return (
       <FormPageWrapper>
@@ -78,7 +78,7 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
             </h2>
           </div>
           <Form
-            data={accountState}
+            data={formState}
             history={this.props.history}
             onChangeForm={this.props.onChangeForm}
             onSubmitForm={this.props.onSubmitForm}

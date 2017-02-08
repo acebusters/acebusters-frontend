@@ -30,7 +30,7 @@ AccountProvider.propTypes = {
 
 const mapStateToProps = createSelector(
   makeSelectAccountData(),
-  (accountState) => ({ accountState })
+  (formState) => ({ formState })
 );
 
 export default connect(mapStateToProps)(AccountProvider);
