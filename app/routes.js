@@ -3,8 +3,6 @@
 // See http://blog.mxstbr.com/2016/01/react-apps-with-pages for more information
 // about the code splitting business
 import { getAsyncInjectors } from './utils/asyncInjectors';
-// import { clearError } from './containers/AccountProvider/actions';
-// import { selectAccount } from './containers/AccountProvider/selectors';
 
 const errorLoading = (err) => {
   console.error('Dynamic page loading failed', err); // eslint-disable-line no-console
@@ -18,33 +16,7 @@ export default function createRoutes(store) {
   // create reusable async injectors using getAsyncInjectors factory
   const { injectReducer, injectSagas } = getAsyncInjectors(store);
 
-  /**
-  * Checks authentication status on route change
-  * @param  {object}   nextState The state we want to change into when we change routes
-  * @param  {function} replace Function provided by React Router to replace the location
-  */
-  // const checkAuth = (nextState, replace) => {
-  //   const { loggedIn } = selectAccount(store.getState()).toJS();
-  //   store.dispatch(clearError());
-  //
-  //   // Check if the path isn't dashboard. That way we can apply specific logic to
-  //   // display/render the path we want to
-  //   if (nextState.location.pathname !== '/lobby') {
-  //     if (loggedIn) {
-  //       if (nextState.location.state && nextState.location.pathname) {
-  //         replace(nextState.location.pathname);
-  //       } else {
-  //         replace('/');
-  //       }
-  //     }
-  //   } else if (!loggedIn) { // If the user is already logged in, forward them to the homepage
-  //     if (nextState.location.state && nextState.location.pathname) {
-  //       replace(nextState.location.pathname);
-  //     } else {
-  //       replace('/');
-  //     }
-  //   }
-  // };
+  // put authenticator here
 
   return [
     {
