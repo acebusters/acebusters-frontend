@@ -9,6 +9,7 @@ import { LOCATION_CHANGE } from 'react-router-redux';
 
 import globalReducer from 'containers/App/reducer';
 import tableReducer from 'containers/Table/reducer';
+import lobbyReducer from 'containers/Lobby/reducer';
 import languageProviderReducer from 'containers/LanguageProvider/reducer';
 import accountProviderReducer from 'containers/AccountProvider/reducer';
 
@@ -50,6 +51,7 @@ export default function createReducer(asyncReducers) {
     language: languageProviderReducer,
     account: accountProviderReducer,
     table: tableReducer,
+    lobby: lobbyReducer,
     ...asyncReducers,
   });
 }

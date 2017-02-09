@@ -2,39 +2,25 @@
  * Created by helge on 20.09.16.
  */
 
+import { fromJS } from 'immutable';
 import * as LobbyActions from './actions';
 
-const defaultState = {
-  balance: 0,
+const initialState = fromJS({
+  balance: null,
   tables: [],
-};
+});
 
-export default function lobby(state = defaultState, action) {
+export default function lobbyReducer(state = initialState, action) {
   let update = {};
   switch (action.type) {
-    case LobbyActions.GET_BALANCE:
+    case LobbyActions.BALANCE_UPDATED:
       update = {};
-      if (!action.error) { update.balance = action.payload.balance; } else {
-        update.error = action.error;
-      }
+      update.balance = action.balance;
 
       return Object.assign({}, state, update);
-    case LobbyActions.GET_TABLES:
+    case LobbyActions.TABLES_UPDATED:
       update = {};
-      if (!action.error) {
-        update.tables = action.payload.tables;
-      } else {
-        update.error = action.error;
-      }
-
-      return Object.assign({}, state, update);
-    case LobbyActions.JOIN_TABLE:
-      update = {};
-      if (action.error) {
-        update.tableId = action.tableId;
-      } else {
-        update.error = action.error;
-      }
+      update.tables = action.tables;
 
       return Object.assign({}, state, update);
     default:

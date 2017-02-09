@@ -78,10 +78,6 @@ export function submitShow(handId, amount, holeCards, priv, tableAddr) {
   };
 }
 
-export function getHand(handId, tableAddr) {
-  return { type: GET_HAND, handId, tableAddr };
-}
-
 export function getLineupSuccess(payload) {
   return { type: GET_LINEUP, payload };
 }

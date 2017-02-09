@@ -29,7 +29,7 @@ export default function createRoutes(store) {
 
     // Check if the path isn't dashboard. That way we can apply specific logic to
     // display/render the path we want to
-    if (nextState.location.pathname !== '/features') {
+    if (nextState.location.pathname !== '/lobby') {
       if (loggedIn) {
         if (nextState.location.state && nextState.location.pathname) {
           replace(nextState.location.pathname);
@@ -71,12 +71,24 @@ export default function createRoutes(store) {
     }, {
       onEnter: checkAuth,
       childRoutes: [{
-        path: '/features',
-        name: 'features',
+        path: '/lobby',
+        name: 'lobby',
         getComponent(nextState, cb) {
-          import('containers/FeaturePage')
-            .then(loadModule(cb))
-            .catch(errorLoading);
+          const importModules = Promise.all([
+            import('containers/Lobby/reducer'),
+            import('containers/Lobby/sagas'),
+            import('containers/Lobby'),
+          ]);
+          const renderRoute = loadModule(cb);
+
+          importModules.then(([reducer, sagas, component]) => {
+            injectReducer('lobby', reducer.default);
+            injectSagas(sagas.default);
+
+            renderRoute(component);
+          });
+
+          importModules.catch(errorLoading);
         },
       }],
     }, {
