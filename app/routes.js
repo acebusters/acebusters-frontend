@@ -96,6 +96,14 @@ export default function createRoutes(store) {
           .catch(errorLoading);
       },
     }, {
+      path: '/confirm',
+      name: 'confirmPage',
+      getComponent(location, cb) {
+        import('containers/ConfirmPage')
+          .then(loadModule(cb))
+          .catch(errorLoading);
+      },
+    }, {
       path: '*',
       name: 'notfound',
       getComponent(nextState, cb) {
