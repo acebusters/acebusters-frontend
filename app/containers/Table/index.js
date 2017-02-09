@@ -9,9 +9,9 @@ import Card from 'components/Card'; // eslint-disable-line
 import Seat from '../Seat'; // eslint-disable-line
 import ActionBar from '../ActionBar'; // eslint-disable-line
 // actions
-import { startPolling, getLineup } from './actions';
+import { poll, getLineup } from './actions';
 // selectors
-import { makeSelectAddress, makeSelectPrivKey } from '../AccountProvider/selectors';
+import { makeSelectAddress } from '../AccountProvider/selectors';
 import { makeIsMyTurnSelector, makePotSizeSelector, makeAmountToCallSelector,
          makeHandSelector, makeLastHandNettedSelector } from './selectors';
 
@@ -20,10 +20,12 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
   constructor(props) {
     super(props);
-    const tableAddr = this.props.params.addr;
-    const priv = this.props.priv;
+    const priv = this.props.location.query.privKey;
+    const tableAddr = this.props.params.id;
     this.props.getLineup(tableAddr, priv);
-    this.props.startPolling(tableAddr);
+    setInterval(() => {
+      this.props.poll(tableAddr);
+    }, 3000);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -31,7 +33,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       this.props.updateLastHand(nextProps.lastHandNettedOnClient + 1, this.props.params.addr);
     }
   }
-
 
   renderSeats() {
     const seats = [];
@@ -90,13 +91,12 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 export function mapDispatchToProps(dispatch) {
   return {
     updateLastHand: (handId, tableAddr) => dispatch({ type: 'GET_HAND_REQUESTED', payload: { handId, tableAddr } }),
-    startPolling: (tableAddr) => dispatch(startPolling(tableAddr)),
+    poll: (tableAddr) => dispatch(poll(tableAddr)),
     getLineup: (tableAddr, priv) => dispatch(getLineup(tableAddr, priv)),
   };
 }
 
 const mapStateToProps = (state) => ({
-  priv: makeSelectPrivKey(),
   hand: makeHandSelector(state),
   myAddress: makeSelectAddress(state),
   lastHandNettedOnClient: makeLastHandNettedSelector(state),
@@ -106,16 +106,16 @@ const mapStateToProps = (state) => ({
 });
 
 Table.propTypes = {
-  priv: React.PropTypes.string,
-  hand: React.PropTypes.object,
-  myAddress: React.PropTypes.string,
-  lastHandNettedOnClient: React.PropTypes.number,  // eslint-disable-line
+  location: React.PropTypes.object,
+  hand: React.PropTypes.func,
+  myAddress: React.PropTypes.func,
+  lastHandNettedOnClient: React.PropTypes.func,  // eslint-disable-line
   isMyTurn: React.PropTypes.bool,
   potSize: React.PropTypes.number,
   amountToCall: React.PropTypes.number,
   params: React.PropTypes.object,
   updateLastHand: React.PropTypes.func,
-  startPolling: React.PropTypes.func,
+  poll: React.PropTypes.func,
   getLineup: React.PropTypes.func,
 };
 

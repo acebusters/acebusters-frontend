@@ -45,7 +45,7 @@ const makeMyMaxBetSelector = createSelector(
 
 const makeAmountToCallSelector = createSelector(
     [makeMaxBetSelector, makeMyMaxBetSelector],
-    (maxBet, myMaxbet) => (maxBet && myMaxbet) ? maxBet - myMaxbet : false
+    (maxBet, myMaxbet) => (maxBet && myMaxbet) ? maxBet - myMaxbet : 0
 );
 
 const makePotSizeSelector = createSelector(

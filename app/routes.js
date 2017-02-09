@@ -3,8 +3,8 @@
 // See http://blog.mxstbr.com/2016/01/react-apps-with-pages for more information
 // about the code splitting business
 import { getAsyncInjectors } from './utils/asyncInjectors';
-import { clearError } from './containers/AccountProvider/actions';
-import { selectAccount } from './containers/AccountProvider/selectors';
+// import { clearError } from './containers/AccountProvider/actions';
+// import { selectAccount } from './containers/AccountProvider/selectors';
 
 const errorLoading = (err) => {
   console.error('Dynamic page loading failed', err); // eslint-disable-line no-console
@@ -23,28 +23,28 @@ export default function createRoutes(store) {
   * @param  {object}   nextState The state we want to change into when we change routes
   * @param  {function} replace Function provided by React Router to replace the location
   */
-  const checkAuth = (nextState, replace) => {
-    const { loggedIn } = selectAccount(store.getState()).toJS();
-    store.dispatch(clearError());
-
-    // Check if the path isn't dashboard. That way we can apply specific logic to
-    // display/render the path we want to
-    if (nextState.location.pathname !== '/lobby') {
-      if (loggedIn) {
-        if (nextState.location.state && nextState.location.pathname) {
-          replace(nextState.location.pathname);
-        } else {
-          replace('/');
-        }
-      }
-    } else if (!loggedIn) { // If the user is already logged in, forward them to the homepage
-      if (nextState.location.state && nextState.location.pathname) {
-        replace(nextState.location.pathname);
-      } else {
-        replace('/');
-      }
-    }
-  };
+  // const checkAuth = (nextState, replace) => {
+  //   const { loggedIn } = selectAccount(store.getState()).toJS();
+  //   store.dispatch(clearError());
+  //
+  //   // Check if the path isn't dashboard. That way we can apply specific logic to
+  //   // display/render the path we want to
+  //   if (nextState.location.pathname !== '/lobby') {
+  //     if (loggedIn) {
+  //       if (nextState.location.state && nextState.location.pathname) {
+  //         replace(nextState.location.pathname);
+  //       } else {
+  //         replace('/');
+  //       }
+  //     }
+  //   } else if (!loggedIn) { // If the user is already logged in, forward them to the homepage
+  //     if (nextState.location.state && nextState.location.pathname) {
+  //       replace(nextState.location.pathname);
+  //     } else {
+  //       replace('/');
+  //     }
+  //   }
+  // };
 
   return [
     {
@@ -69,28 +69,48 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      onEnter: checkAuth,
-      childRoutes: [{
-        path: '/lobby',
-        name: 'lobby',
-        getComponent(nextState, cb) {
-          const importModules = Promise.all([
-            import('containers/Lobby/reducer'),
-            import('containers/Lobby/sagas'),
-            import('containers/Lobby'),
-          ]);
-          const renderRoute = loadModule(cb);
+      childRoutes: [],
+    }, {
+      path: '/lobby',
+      name: 'lobby',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/Lobby/reducer'),
+          import('containers/Lobby/sagas'),
+          import('containers/Lobby'),
+        ]);
+        const renderRoute = loadModule(cb);
 
-          importModules.then(([reducer, sagas, component]) => {
-            injectReducer('lobby', reducer.default);
-            injectSagas(sagas.default);
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('lobby', reducer.default);
+          injectSagas(sagas.default);
 
-            renderRoute(component);
-          });
+          renderRoute(component);
+        });
 
-          importModules.catch(errorLoading);
-        },
-      }],
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/table/:id',
+      name: 'table',
+      childRoutes: [],
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/Table/reducer'),
+          import('containers/Table/sagas'),
+          import('containers/Table'),
+        ]);
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('table', reducer.default);
+          injectSagas(sagas.default);
+
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
     }, {
       path: '/login',
       name: 'login',
