@@ -14,7 +14,12 @@ import {
   RECAPTCHA_RESPONSE,
 } from './constants';
 
-import auth from '../../utils/auth';
+import * as storageService from '../../services/localStorage';
+
+const isLoggedIn = () => {
+  const privKey = storageService.getItem('privKey');
+  return (privKey !== undefined && privKey.length > 32);
+};
 
 // The initial application state
 const initialState = fromJS({
@@ -25,7 +30,8 @@ const initialState = fromJS({
   error: '',
   recapResponse: '',
   currentlySending: false,
-  loggedIn: auth.loggedIn(),
+  privKey: storageService.getItem('privKey'),
+  loggedIn: isLoggedIn(),
 });
 
 function accountProviderReducer(state = initialState, action) {
@@ -65,7 +71,7 @@ function accountProviderReducer(state = initialState, action) {
     case WALLET_IMPORTED:
       return state
         .delete('workerProgress')
-        .set('privKey', action.privKey);
+        .set('privKey', action.data.privKey);
     case RECAPTCHA_RESPONSE:
       return state
         .set('recapResponse', action.response);

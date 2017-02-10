@@ -109,10 +109,10 @@ export function walletExported(wallet) {
   };
 }
 
-export function walletImported(privKey) {
+export function walletImported(data) {
   return {
     type: WALLET_IMPORTED,
-    privKey,
+    data,
   };
 }
 

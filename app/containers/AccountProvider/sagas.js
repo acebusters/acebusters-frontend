@@ -3,6 +3,7 @@ import { take, takeEvery, call, put, fork, race } from 'redux-saga/effects';
 import crypto from 'crypto';
 
 import account from '../../services/account';
+import * as LocalStorage from '../../services/localStorage';
 
 import {
   SENDING_REQUEST,
@@ -58,9 +59,6 @@ export function* login({ email }) {
     yield put({ type: REQUEST_ERROR, error: error.message });
 
     return false;
-  } finally {
-    // When done, we tell Redux we're not in the middle of a request any more
-    yield put({ type: SENDING_REQUEST, sending: false });
   }
 }
 
@@ -100,6 +98,8 @@ export function* loginFlow() {
       error: take(WORKER_ERROR),
       import: take(WALLET_IMPORTED),
     });
+    // When done, we tell Redux we're not in the middle of a request any more
+    yield put({ type: SENDING_REQUEST, sending: false });
     // If worker exited with error...
     if (worker.error) {
       yield put({ type: REQUEST_ERROR, error: worker.error.event });
@@ -109,7 +109,8 @@ export function* loginFlow() {
     // ...we send Redux appropiate actions
     yield put({ type: SET_AUTH, newAuthState: true }); // User is logged in (authorized)
     yield put({ type: CHANGE_FORM, newFormState: { username: '', password: '' } }); // Clear form
-    forwardTo('/features'); // Go to dashboard page
+    LocalStorage.setItem('privKey', worker.import.data.privKey);
+    forwardTo(worker.import.data.nextPath); // Go to dashboard page
   }
 }
 
@@ -122,18 +123,13 @@ export function* logoutFlow() {
   while (true) { // eslint-disable-line no-constant-condition
     yield take(LOGOUT);
     yield put({ type: SET_AUTH, newAuthState: false });
-
-    yield call(logout);
+    LocalStorage.removeItem('privKey');
     forwardTo('/');
   }
 }
 
 function* goLogin() {
   forwardTo('/login');
-}
-
-export function* logout() {
-  yield put({ type: SET_AUTH, newAuthState: false });
 }
 
 /**

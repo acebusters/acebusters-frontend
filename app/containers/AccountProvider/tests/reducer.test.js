@@ -12,6 +12,7 @@ describe('AccountProviderReducer', () => {
       error: '',
       recapResponse: '',
       currentlySending: false,
+      privKey: undefined,
       loggedIn: false,
     }));
   });

@@ -59,7 +59,12 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
       if (data.hexSeed === null) {
         this.props.onWorkerError('Message Authentication Code mismatch (wrong password)');
       } else {
-        this.props.onWalletImported(data.hexSeed);
+        const { location } = this.props;
+        let nextPath = '/features';
+        if (location.state && location.state.nextPathname) {
+          nextPath = location.state.nextPathname;
+        }
+        this.props.onWalletImported({ privKey: data.hexSeed, nextPath });
       }
     } else {
       this.props.onWorkerError(evt);
@@ -108,6 +113,7 @@ LoginPage.propTypes = {
   onWorkerLoaded: React.PropTypes.func,
   onWorkerProgress: React.PropTypes.func,
   onWalletImported: React.PropTypes.func,
+  location: React.PropTypes.any,
 };
 
 
@@ -118,7 +124,7 @@ function mapDispatchToProps(dispatch) {
     onWorkerError: (event) => dispatch(workerError(event)),
     onWorkerLoaded: () => dispatch(workerLoaded()),
     onWorkerProgress: (percent) => dispatch(workerProgress(percent)),
-    onWalletImported: (json) => dispatch(walletImported(json)),
+    onWalletImported: (data) => dispatch(walletImported(data)),
   };
 }
 

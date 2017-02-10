@@ -3,6 +3,7 @@
 // See http://blog.mxstbr.com/2016/01/react-apps-with-pages for more information
 // about the code splitting business
 import { getAsyncInjectors } from './utils/asyncInjectors';
+import { selectAccount } from './containers/AccountProvider/selectors';
 
 const errorLoading = (err) => {
   console.error('Dynamic page loading failed', err); // eslint-disable-line no-console
@@ -16,7 +17,21 @@ export default function createRoutes(store) {
   // create reusable async injectors using getAsyncInjectors factory
   const { injectReducer, injectSagas } = getAsyncInjectors(store);
 
-  // put authenticator here
+  /**
+  * Checks authentication status on route change
+  * @param  {object}   nextState The state we want to change into when we change routes
+  * @param  {function} replace Function provided by React Router to replace the location
+  */
+  const checkAuth = (nextState, replace) => {
+    const { loggedIn } = selectAccount(store.getState()).toJS();
+
+    if (!loggedIn) {
+      replace({
+        pathname: '/login',
+        state: { nextPathname: nextState.location.pathname },
+      });
+    }
+  };
 
   return [
     {
@@ -41,7 +56,16 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      childRoutes: [],
+      onEnter: checkAuth,
+      childRoutes: [{
+        path: '/features',
+        name: 'features',
+        getComponent(nextState, cb) {
+          import('containers/FeaturePage')
+            .then(loadModule(cb))
+            .catch(errorLoading);
+        },
+      }],
     }, {
       path: '/lobby',
       name: 'lobby',
