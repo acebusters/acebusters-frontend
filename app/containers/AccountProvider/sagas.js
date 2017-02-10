@@ -65,27 +65,6 @@ export function* login({ email }) {
 }
 
 /**
- * Effect to handle logging out
- */
-export function* logout() {
-  // We tell Redux we're in the middle of a request
-  yield put({ type: SENDING_REQUEST, sending: true });
-
-  // Similar to above, we try to log out by calling the `logout` function in the
-  // `auth` module. If we get an error, we send an appropiate action. If we don't,
-  // we return the response.
-  try {
-    const response = yield call(account.logout);
-    yield put({ type: SENDING_REQUEST, sending: false });
-
-    return response;
-  } catch (error) {
-    yield put({ type: REQUEST_ERROR, error: error.message });
-    return error;
-  }
-}
-
-/**
  * Log in saga
  */
 export function* loginFlow() {
@@ -104,12 +83,13 @@ export function* loginFlow() {
       continue;  // eslint-disable-line no-continue
     }
     const { email, password } = yield take(LOGIN_REQUEST);
-    const wallet = yield call(login, { email });
-    if (!wallet) {
+    const accResp = yield call(login, { email });
+    if (!accResp || !accResp.wallet) {
       const errorMessage = 'email does not exist.';
       yield put({ type: REQUEST_ERROR, error: errorMessage });
       continue;  // eslint-disable-line no-continue
     }
+    const wallet = JSON.parse(accResp.wallet);
     window.frame.contentWindow.postMessage({
       action: 'import',
       json: JSON.stringify(wallet),
@@ -146,6 +126,14 @@ export function* logoutFlow() {
     yield call(logout);
     forwardTo('/');
   }
+}
+
+function* goLogin() {
+  forwardTo('/login');
+}
+
+export function* logout() {
+  yield put({ type: SET_AUTH, newAuthState: false });
 }
 
 /**
@@ -212,10 +200,6 @@ export function* accountSaga() {
   yield fork(logoutFlow);
   yield fork(registerFlow);
   yield takeEvery(EMAIL_CONF_SUCCESS, goLogin);
-}
-
-function* goLogin() {
-  forwardTo('/login');
 }
 
 // Little helper function to abstract going to different pages

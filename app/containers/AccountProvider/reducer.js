@@ -29,12 +29,16 @@ const initialState = fromJS({
 });
 
 function accountProviderReducer(state = initialState, action) {
+  let newState = state;
   switch (action.type) {
     case CHANGE_FORM:
       return state
         .set('formState', action.newFormState);
     case SET_AUTH:
-      return state
+      if (!action.newAuthState) {
+        newState = state.delete('privKey');
+      }
+      return newState
         .set('loggedIn', action.newAuthState);
     case SENDING_REQUEST:
       return state
