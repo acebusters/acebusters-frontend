@@ -5,11 +5,12 @@ import { createSelector } from 'reselect';
 
 const selectLobby = (state) => state.get('lobby');
 
-const makeSelectLobbyData = () => createSelector(
+const makeSelectLobby = () => createSelector(
   selectLobby,
   (lobby) => lobby
 );
 
+
 export {
-    makeSelectLobbyData,
+  makeSelectLobby,
 };

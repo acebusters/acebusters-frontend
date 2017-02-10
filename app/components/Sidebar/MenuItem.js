@@ -1,4 +1,4 @@
-/* eslint-disable react/jsx-filename-extension */
+  /* eslint-disable react/jsx-filename-extension */
 import React from 'react';
 import styled from 'styled-components';
 import tinycolor from 'tinycolor2';

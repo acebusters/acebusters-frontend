@@ -12,7 +12,7 @@ function Card(props) {
 }
 
 Card.propTypes = {
-  cardNumber: React.PropTypes.array,
+  cardNumber: React.PropTypes.number,
 };
 
 

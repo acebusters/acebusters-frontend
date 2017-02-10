@@ -4,13 +4,12 @@
 import { PokerHelper, ReceiptCache } from 'poker-helper';
 import { call, put, takeLatest, select, take, fork } from 'redux-saga/effects';
 import { delay } from 'redux-saga';
-import { pay } from './actions';
-import * as Config from '../../app.config';
-
+import { updateReceived, lineupReceived } from './actions';
+import { ABI_BET, apiBasePath } from '../../app.config';
+import { fetchTableState, pay, fetchLineup } from '../../services/table';
 import { makeSelectAddress, makeSelectPrivKey } from '../AccountProvider/selectors';
 import { makeHandSelector } from '../Table/selectors';
 
-const ABI_BET = [{ name: 'bet', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
 
 const rc = new ReceiptCache();
 const pokerHelper = new PokerHelper(rc);
@@ -18,7 +17,7 @@ const pokerHelper = new PokerHelper(rc);
 export function* getHand(action) {
   const header = new Headers({ 'Content-Type': 'application/json' });
   const myInit = { headers: header, method: 'GET' };
-  const request = new Request(`${Config.apiBasePath}/table/${action.payload.tableAddr}/hand/${action.payload.handId}`, myInit);
+  const request = new Request(`${apiBasePath}/table/${action.payload.tableAddr}/hand/${action.payload.handId}`, myInit);
   const lastHand = yield call(() => fetch(request).then((res) => res.json()));
   yield put({ type: 'COMPLETE_HAND_QUERY', hand: lastHand });
 }
@@ -68,20 +67,40 @@ function* performDealingAction(action) {
 
 export function* watchAndGet() {
   let wait;
-  while (true) {                        // eslint-disable-line
+  while (true) {                                                         // eslint-disable-line
     // watches the states and continues whenever new state is returned
-    const action = yield take('*');     // eslint-disable-line
+    const action = yield take('*');                                      // eslint-disable-line
     const state = yield select();
 
-    if (state.TableReducer.complete) {
+    if (state.get('table').complete) {
       if (!wait) {
         wait = yield fork(waitThenNextHand);
       }
     }
 
-    if (state.TableReducer.hand && state.TableReducer.hand.state === 'dealing') {
+    if (state.get('table').hand && state.get('table').hand.state === 'dealing') {
       yield call(dispatchDealingAction);
     }
+  }
+}
+
+export function* poll(action) {
+  try {
+    const tableState = yield call(fetchTableState, action.tableAddr);
+    yield put(updateReceived(tableState));
+  } catch (err) {
+    // missing action
+    console.log(err);
+  }
+}
+
+export function* getLineup(action) {
+  try {
+    const lineup = yield call(fetchLineup, action.tableAddr, action.priv);
+    yield put(lineupReceived(lineup));
+  } catch (err) {
+    // missing action
+    console.log(err);
   }
 }
 
@@ -92,12 +111,14 @@ export function* waitThenNextHand() {
   yield call(delay, 2000);
 }
 
-function* mySaga() {
+function* tableSaga() {
   yield takeLatest('GET_HAND_REQUESTED', getHand);
   yield takeLatest('PERFORM_DEALING_ACTION', performDealingAction);
+  yield takeLatest('START_POLLING', poll);
+  yield takeLatest('GET_LINEUP', getLineup);
   yield watchAndGet();
 }
 
 export default [
-  mySaga,
+  tableSaga,
 ];

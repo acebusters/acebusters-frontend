@@ -3,40 +3,44 @@
  */
 
 import React from 'react';
+import Button from 'components/Button';
+import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
 import { getBalance, getTables, joinTable } from './actions';
 import { makeSelectAddress } from '../AccountProvider/selectors';
-import { makeSelectLobbyData } from './selectors';
+import { makeSelectLobby } from './selectors';
 
 
 class LobbyComponent extends React.PureComponent {  // eslint-disable-line
 
-  componentDidMount() {
+  constructor(props) {
+    super(props);
     this.props.getBalance(this.props.myAddress);
     this.props.getTables();
   }
 
   render() {
-    const tables = this.props.tables;
-    const tablesList = tables.map((table) => <tr key={table.id}>
-      <td>{table.name}</td>
-      <td><button onClick={this.props.joinTable(table.id)}>Join</button></td>
-    </tr>);
+    if (this.props.lobby.tables) {
+      const tables = this.props.lobby.tables.tableContracts;
+      const tablesList = tables.map((table) => (
+        <tr key={table}>
+          <td>{table}</td>
+          <td>
+            <Button value={table} onClick={this.props.joinTable}>Join</Button>
+          </td>
+        </tr>));
 
-    return (
-
-      <div>
+      return (
         <div>
-          <h2>My Balance: { this.props.balance }</h2>
-          <button onClick={this.props.getTables()}>Refresh Tables</button>
-        </div>
-        <div>
+          <h2>My Balance: { this.props.lobby.balance }</h2>
+          <Button onClick={this.props.getTables}>Refresh Tables</Button>
           <table>
             <tbody>{ tablesList }</tbody>
           </table>
         </div>
-      </div>
-    );
+      );
+    }
+    return null;
   }
 }
 
@@ -48,17 +52,14 @@ export function mapDispatchToProps(dispatch) {
   };
 }
 
-function mapStateToProps(state) {
-  return {
-    myAddress: makeSelectAddress(state),
-    lobby: makeSelectLobbyData(state),
-  };
-}
+const mapStateToProps = createStructuredSelector({
+  myAddress: makeSelectAddress(),
+  lobby: makeSelectLobby(),
+});
 
 LobbyComponent.propTypes = {
   myAddress: React.PropTypes.any,
-  tables: React.PropTypes.array,
-  balance: React.PropTypes.number,
+  lobby: React.PropTypes.object,
   getTables: React.PropTypes.func,
   getBalance: React.PropTypes.func,
   joinTable: React.PropTypes.func,

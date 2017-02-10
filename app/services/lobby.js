@@ -8,7 +8,6 @@ import { apiBasePath, tokenContractAddress, ABI_TOKEN_CONTRACT } from '../app.co
 export function getBalanceRequest(address) {
   const contract = web3.eth.contract(ABI_TOKEN_CONTRACT).at(tokenContractAddress);
   const baseUnit = contract.baseUnit();
-
   return new Promise((resolve, reject) => {
     contract.balanceOf(address, (err, amount) => {
       if (err) {
