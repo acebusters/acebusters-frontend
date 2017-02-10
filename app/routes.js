@@ -108,7 +108,7 @@ export default function createRoutes(store) {
           .catch(errorLoading);
       },
     }, {
-      path: '/confirm',
+      path: '/confirm(/:confCode)',
       name: 'confirmPage',
       getComponent(location, cb) {
         import('containers/ConfirmPage')

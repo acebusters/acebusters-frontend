@@ -14,6 +14,7 @@ import {
   WALLET_IMPORTED,
   EXPORT_REQUEST,
   RECAPTCHA_RESPONSE,
+  EMAIL_CONF_SUCCESS,
 } from './constants';
 
 /**
@@ -133,5 +134,11 @@ export function recaptcha(response) {
   return {
     type: RECAPTCHA_RESPONSE,
     response,
+  };
+}
+
+export function emailConfSuccess() {
+  return {
+    type: EMAIL_CONF_SUCCESS,
   };
 }

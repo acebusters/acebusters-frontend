@@ -14,3 +14,4 @@ export const WALLET_IMPORTED = 'acebusters/AccountProvider/WALLET_IMPORTED';
 export const EXPORT_REQUEST = 'acebusters/AccountProvider/EXPORT_REQUEST';
 export const IMPORT_REQUEST = 'acebusters/AccountProvider/IMPORT_REQUEST';
 export const RECAPTCHA_RESPONSE = 'acebusters/AccountProvider/RECAPTCHA_RESPONSE';
+export const EMAIL_CONF_SUCCESS = 'acebusters/AccountProvider/EMAIL_CONF_SUCCESS';

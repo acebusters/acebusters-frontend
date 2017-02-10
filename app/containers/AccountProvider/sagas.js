@@ -1,5 +1,5 @@
 import { browserHistory } from 'react-router';
-import { take, call, put, fork, race } from 'redux-saga/effects';
+import { take, takeEvery, call, put, fork, race } from 'redux-saga/effects';
 import crypto from 'crypto';
 
 import account from '../../services/account';
@@ -16,6 +16,7 @@ import {
   WORKER_LOADED,
   WALLET_EXPORTED,
   WALLET_IMPORTED,
+  EMAIL_CONF_SUCCESS,
 } from './constants';
 
 /**
@@ -23,7 +24,7 @@ import {
  * @param  {string} email               The email of the user
  * @param  {string} wallet              The serialized wallet of the user
  */
-export function* authorize({ email, wallet, recapResponse }) {
+export function* storeAccount({ email, wallet, recapResponse }) {
   // We send an action that tells Redux we're sending a request
   yield put({ type: SENDING_REQUEST, sending: true });
 
@@ -176,6 +177,8 @@ export function* registerFlow() {
     };
     window.msg = msg;
     window.frame.contentWindow.postMessage(msg, '*');
+    // We send an action that tells Redux we're sending a request
+    yield put({ type: SENDING_REQUEST, sending: true });
     // We now either expect successful encryption or error from worker.
     const worker = yield race({
       error: take(WORKER_ERROR),
@@ -188,22 +191,15 @@ export function* registerFlow() {
     }
     // If worker succeeded, ...
     const wallet = worker.export.wallet;
-    // We call the `authorize` task with the data, telling it that we are registering a user
+    // We call the `storeAccount` task with the data, telling it that we are registering a user
     // This returns `true` if the registering was successful, `false` if not
-    const wasSuccessful = yield call(authorize, { email, wallet, recapResponse });
+    const wasSuccessful = yield call(storeAccount, { email, wallet, recapResponse });
 
     // If we could register a user, we send the appropiate actions
     if (wasSuccessful) {
-      yield put({ type: SET_AUTH, newAuthState: true }); // User is logged in (authorized) after being registered
       yield put({ type: CHANGE_FORM, newFormState: { username: '', password: '' } }); // Clear form
-      forwardTo('/features'); // Go to dashboard page
+      forwardTo('/confirm'); // Go to confirm page
     }
-  }
-}
-
-export function* exportFlow() {
-  while (true) { // eslint-disable-line no-constant-condition
-
   }
 }
 
@@ -215,6 +211,11 @@ export function* accountSaga() {
   yield fork(loginFlow);
   yield fork(logoutFlow);
   yield fork(registerFlow);
+  yield takeEvery(EMAIL_CONF_SUCCESS, goLogin);
+}
+
+function* goLogin() {
+  forwardTo('/login');
 }
 
 // Little helper function to abstract going to different pages

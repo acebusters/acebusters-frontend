@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import Navbar from './NavBar';
+import Navbar from './Navbar';
 import Logo from './Logo';
 import UserMenu from './UserMenu';
 import NavItem from './NavItem';
