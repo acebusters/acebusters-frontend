@@ -11,7 +11,7 @@ const ABI_BET = [{ name: 'bet', type: 'function', inputs: [{ type: 'uint' }, { t
 const ABI_FOLD = [{ name: 'fold', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
 const ABI_SIT_OUT = [{ name: 'sitOut', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
 
-// secretSeed: 'rural tent test net drip fatigue uncle action repeat couple lawn rival'
+// secretSeed: 'rural tent tests net drip fatigue uncle action repeat couple lawn rival'
 const P1_ADDR = '0x6d2f2c0fa568243d2def3e999a791a6df45d816e';
 const P1_KEY = '0x2e39143576f97f6ecd7439a0678f330d7144110cdc58b6476687cc243d7753ca';
 

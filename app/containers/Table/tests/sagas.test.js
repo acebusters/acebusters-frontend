@@ -3,7 +3,7 @@
  */
 
 import EWT from 'ethereum-web-token';
-import { PLAYER1, PLAYER2, PLAYER3, PLAYER4, ABI } from './consts.tests';
+import { PLAYER1, PLAYER2, PLAYER3, PLAYER4, ABI } from './consts';
 import { dispatchDealingAction, watchAndGet } from '../sagas';
 
 const state = {

@@ -3,7 +3,7 @@
  */
 
 
-// secretSeed: 'rural tent test net drip fatigue uncle action repeat couple lawn rival'
+// secretSeed: 'rural tent tests net drip fatigue uncle action repeat couple lawn rival'
 export const PLAYER1 = {
   address: '0x6d2f2c0fa568243d2def3e999a791a6df45d816e',
   key: '0x2e39143576f97f6ecd7439a0678f330d7144110cdc58b6476687cc243d7753ca',
