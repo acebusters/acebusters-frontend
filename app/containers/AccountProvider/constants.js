@@ -1,17 +1,1 @@
-export const CHANGE_FORM = 'acebusters/AccountProvider/CHANGE_FORM';
 export const SET_AUTH = 'acebusters/AccountProvider/SET_AUTH';
-export const SENDING_REQUEST = 'acebusters/AccountProvider/SENDING_REQUEST';
-export const LOGIN_REQUEST = 'acebusters/AccountProvider/LOGIN_REQUEST';
-export const LOGOUT = 'acebusters/AccountProvider/LOGOUT';
-export const REQUEST_ERROR = 'acebusters/AccountProvider/REQUEST_ERROR';
-export const CLEAR_ERROR = 'acebusters/AccountProvider/CLEAR_ERROR';
-export const REGISTER_REQUEST = 'acebusters/AccountProvider/REGISTER_REQUEST';
-export const WORKER_ERROR = 'acebusters/AccountProvider/WORKER_ERROR';
-export const WORKER_LOADED = 'acebusters/AccountProvider/WORKER_LOADED';
-export const WORKER_PROGRESS = 'acebusters/AccountProvider/WORKER_PROGRESS';
-export const WALLET_EXPORTED = 'acebusters/AccountProvider/WALLET_EXPORTED';
-export const WALLET_IMPORTED = 'acebusters/AccountProvider/WALLET_IMPORTED';
-export const EXPORT_REQUEST = 'acebusters/AccountProvider/EXPORT_REQUEST';
-export const IMPORT_REQUEST = 'acebusters/AccountProvider/IMPORT_REQUEST';
-export const RECAPTCHA_RESPONSE = 'acebusters/AccountProvider/RECAPTCHA_RESPONSE';
-export const EMAIL_CONF_SUCCESS = 'acebusters/AccountProvider/EMAIL_CONF_SUCCESS';

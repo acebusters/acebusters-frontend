@@ -1,10 +1,3 @@
-/*
- *
- * AccountProvider
- *
- * this component an account object for the whole app
- */
-
 import React from 'react';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';

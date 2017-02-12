@@ -9,12 +9,6 @@ const selectAccount = (state) => state.get('account');
 /**
  * Other specific selectors
  */
-
-
-/**
- * Default selector used by AccountProvider
- */
-
 const makeSelectAccountData = () => createSelector(
   selectAccount,
   (account) => account.toJS()
@@ -37,6 +31,10 @@ const makeSelectPrivKey = () => createSelector(
   (account) => account.get('priv')
 );
 
+
+/**
+ * Default selector used by AccountProvider
+ */
 export default makeSelectAccountData;
 export {
   selectAccount,

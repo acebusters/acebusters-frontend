@@ -1,9 +1,9 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Form, Field, reduxForm, SubmissionError, propTypes } from 'redux-form/immutable';
+import { browserHistory } from 'react-router';
 
 import account from '../../services/account';
-import { emailConfSuccess } from '../AccountProvider/actions';
 
 const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -37,8 +37,6 @@ const renderField = ({ input, label, type, meta: { touched, error, warning } }) 
 export class ConfirmPage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
-    window.disp = props.dispatch;
-    window.ec = emailConfSuccess;
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
@@ -53,7 +51,7 @@ export class ConfirmPage extends React.PureComponent { // eslint-disable-line re
         throw new SubmissionError({ _error: `Email Confirmation failed with error code ${err}` });
       }
     }).then(() => {
-      this.props.dispatch(emailConfSuccess());
+      browserHistory.push('/login');
     });
   }
 
@@ -61,12 +59,7 @@ export class ConfirmPage extends React.PureComponent { // eslint-disable-line re
     const { error, handleSubmit, submitting } = this.props;
     return (
       <Form onSubmit={handleSubmit(this.handleSubmit)}>
-        <div>
-          <label htmlFor="confCode">Confirmation Code</label>
-          <div>
-            <Field name="confCode" component={renderField} type="text" placeholder="code" />
-          </div>
-        </div>
+        <Field name="confCode" component={renderField} type="text" placeholder="code" />
         {error && <strong>{error}</strong>}
         <div>
           <button type="submit" disabled={submitting}>Submit</button>

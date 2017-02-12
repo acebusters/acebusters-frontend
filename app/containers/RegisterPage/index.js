@@ -1,43 +1,80 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { createStructuredSelector } from 'reselect';
-import styled from 'styled-components';
+import ReCAPTCHA from 'react-google-recaptcha';
+import { Form, Field, reduxForm, SubmissionError, propTypes, change, formValueSelector } from 'redux-form/immutable';
+import crypto from 'crypto';
+import { browserHistory } from 'react-router';
 
-import makeSelectAccountData from '../AccountProvider/selectors';
-import { changeForm, workerError, workerLoaded, walletExported, workerProgress, exportRequest, recaptcha } from '../AccountProvider/actions';
-import Form from '../../components/Form';
+import account from '../../services/account';
+import { workerError, walletExported, register } from './actions';
 
-const FormPageWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  width: 100%;
-`;
+const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
+
+const validate = (values) => {
+  const errors = {};
+  if (!values.get('email')) {
+    errors.email = 'Required';
+  } else if (!emailRegex.test(values.get('email'))) {
+    errors.email = 'Invalid email address.';
+  }
+  if (!values.get('password')) {
+    errors.password = 'Required';
+  } else if (values.get('password').length < 8) {
+    errors.password = 'Must be 8 characters or more.';
+  }
+  if (!values.get('captchaResponse')) {
+    errors.captchaResponse = 'Required';
+  }
+  return errors;
+};
+
+const warn = (values) => {
+  const warnings = {};
+  const pw = values.get('password');
+  if (pw && pw.length < 12) {
+    warnings.password = 'Better to use a strong passwords.';
+  }
+  return warnings;
+};
+
+/* eslint-disable react/prop-types */
+const Captcha = (props) => (
+  <div>
+    <ReCAPTCHA
+      sitekey={'6LcE0RQUAAAAAEf6UWFsHEPedPBmRPAQiaSiWynN'}
+      onChange={props.input.onChange}
+    />
+  </div>
+);
+
+const renderField = ({ input, label, type, meta: { touched, error, warning } }) => (
+  <div>
+    <label htmlFor={input.name}>{label}</label>
+    <div>
+      <input {...input} placeholder={label} type={type} />
+      {touched && ((error && <span>{error}</span>) || (warning && <span>{warning}</span>))}
+    </div>
+  </div>
+);
+/* eslint-enable react/prop-types */
 
 export class RegisterPage extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   constructor(props) {
     super(props);
 
-    this.handleSerialize = this.handleSerialize.bind(this);
-    this.onWorkerLoaded = this.onWorkerLoaded.bind(this);
+    this.handleWorkerMessage = this.handleWorkerMessage.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   componentDidMount() {
-    window.addEventListener('message', this.handleSerialize, false);
+    window.addEventListener('message', this.handleWorkerMessage, false);
   }
   componentWillUnmount() {
-    window.removeEventListener('message', this.handleSerialize);
+    window.removeEventListener('message', this.handleWorkerMessage);
   }
 
-  onWorkerLoaded(event) {
-    // TODO: find another way to pass this to the saga
-    window.frame = event.target;
-    this.props.onWorkerLoaded();
-  }
-
-  handleSerialize(evt) {
+  handleWorkerMessage(evt) {
     const pathArray = this.props.workerPath.split('/');
     const origin = `${pathArray[0]}//${pathArray[2]}`;
     if (evt.origin !== origin) {
@@ -50,40 +87,72 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
     }
     const data = evt.data;
     if (data.action === 'loaded') {
-      this.props.onWorkerLoaded();
+      // the worker js is talking.
+      this.props.onWorkerInitialized();
     } else if (data.action === 'progress') {
       this.props.onWorkerProgress(parseInt(data.percent, 10));
     } else if (data.action === 'exported') {
-      this.props.onWalletExported(data.json);
+      this.props.onWalletExported({ wallet: data.json });
     } else {
       this.props.onWorkerError(evt);
     }
   }
 
+  handleSubmit(values, dispatch) {
+    if (!this.props.isWorkerInitialized) {
+      // The worker should have been loaded, while user typed.
+      // If not, we can not start wallet encryption ... error.
+      throw new SubmissionError({ _error: 'Error: encryption worker not loaded.' });
+    }
+    // TODO(ace): create a separate screen to collect real entropy.
+    const seed = crypto.randomBytes(32);
+    // Strating the worker here.
+    // Worker will encrypt seed with password in many rounds of crypt.
+    this.frame.contentWindow.postMessage({
+      action: 'export',
+      hexSeed: seed.toString('hex'),
+      password: values.get('password'),
+      randomBytes: crypto.randomBytes(64),
+    }, '*');
+    // Register saga is called, we return the promise here,
+    // so we can display form errors if any of the async ops fail.
+    return register(values, dispatch).catch((workerErr) => {
+      // If worker failed, ...
+      throw new SubmissionError({ _error: `error, Registration failed due to worker error: ${workerErr}` });
+    }).then((workerRsp) => (
+      // If worker success, ...
+      account.register(values.get('email'), workerRsp.data.wallet, values.get('captchaResponse')).catch((err) => {
+        // If store account failed, ...
+        const errMsg = 'Login failed!';
+        if (err === 409) {
+          throw new SubmissionError({ email: 'Email taken.', _error: errMsg });
+        } else {
+          throw new SubmissionError({ _error: `Registration failed with error code ${err}` });
+        }
+      }).then(() => {
+        // If store account success, ...
+        browserHistory.push('/confirm');
+      })
+    ));
+  }
+
   render() {
-    const { formState, currentlySending, recapResponse, error } = this.props.account;
     const workerPath = this.props.workerPath + encodeURIComponent(location.origin);
+    const { error, handleSubmit, submitting } = this.props;
     return (
-      <FormPageWrapper>
-        <div className="form-page__form-wrapper">
-          <div className="form-page__form-header">
-            <h2 className="form-page__form-heading">Register</h2>
+      <div>
+        <Form onSubmit={handleSubmit(this.handleSubmit)}>
+          <Field name="email" type="text" component={renderField} label="Email" />
+          <Field name="password" type="password" component={renderField} label="Password" />
+          <Field name="captchaResponse" component={Captcha} />
+          {error && <strong>{error}</strong>}
+          <div>
+            <button type="submit" disabled={submitting}>Login</button>
           </div>
-          <Form
-            data={formState}
-            history={this.props.history}
-            onChangeForm={this.props.onChangeForm}
-            onSubmitForm={(email, password) => { this.props.onSubmitForm(email, password, recapResponse); }}
-            btnText={'Register'}
-            error={error}
-            recaptchaKey={'6LcE0RQUAAAAAEf6UWFsHEPedPBmRPAQiaSiWynN'}
-            onRecaptchaResponse={this.props.onRecaptcha}
-            progress={this.props.account.workerProgress}
-            currentlySending={currentlySending}
-          />
-        </div>
-        <iframe src={workerPath} style={{ display: 'none' }} onLoad={this.onWorkerLoaded} />
-      </FormPageWrapper>
+        </Form>
+        <div> progress: {this.props.progress} % </div>
+        <iframe src={workerPath} style={{ display: 'none' }} onLoad={(event) => { this.frame = event.target; }} />
+      </div>
     );
   }
 }
@@ -93,34 +162,33 @@ RegisterPage.defaultProps = {
 };
 
 RegisterPage.propTypes = {
-  account: React.PropTypes.object,
-  history: React.PropTypes.object,
+  ...propTypes,
   workerPath: React.PropTypes.string,
-  onSubmitForm: React.PropTypes.func,
-  onChangeForm: React.PropTypes.func,
-  onRecaptcha: React.PropTypes.func,
   onWorkerError: React.PropTypes.func,
-  onWorkerLoaded: React.PropTypes.func,
+  onWorkerInitialized: React.PropTypes.func,
   onWorkerProgress: React.PropTypes.func,
   onWalletExported: React.PropTypes.func,
+  input: React.PropTypes.any,
 };
 
 function mapDispatchToProps(dispatch) {
   return {
-    onSubmitForm: (email, password, recapResponse) => dispatch(exportRequest({ email, password, recapResponse })),
-    onChangeForm: (newFormState) => dispatch(changeForm(newFormState)),
     onWorkerError: (event) => dispatch(workerError(event)),
-    onWorkerLoaded: () => dispatch(workerLoaded()),
-    onWorkerProgress: (percent) => dispatch(workerProgress(percent)),
-    onWalletExported: (wallet) => dispatch(walletExported(wallet)),
-    onRecaptcha: (response) => dispatch(recaptcha(response)),
+    onWorkerInitialized: () => dispatch(change('register', 'isWorkerInitialized', true)),
+    onWorkerProgress: (percent) => dispatch(change('register', 'workerProgress', percent)),
+    onWalletExported: (data) => dispatch(walletExported(data)),
   };
 }
 
 // Which props do we want to inject, given the global state?
-const mapStateToProps = createStructuredSelector({
-  account: makeSelectAccountData(),
+const selector = formValueSelector('register');
+const mapStateToProps = (state) => ({
+  initialValues: {
+    isWorkerInitialized: false,
+  },
+  progress: selector(state, 'workerProgress'),
+  isWorkerInitialized: selector(state, 'isWorkerInitialized'),
 });
 
 // Wrap the component to inject dispatch and state into it
-export default connect(mapStateToProps, mapDispatchToProps)(RegisterPage);
+export default connect(mapStateToProps, mapDispatchToProps)(reduxForm({ form: 'register', validate, warn })(RegisterPage));

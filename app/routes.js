@@ -111,17 +111,35 @@ export default function createRoutes(store) {
       path: '/login',
       name: 'login',
       getComponent(nextState, cb) {
-        import('containers/LoginPage')
-          .then(loadModule(cb))
-          .catch(errorLoading);
+        const importModules = Promise.all([
+          import('containers/LoginPage/sagas'),
+          import('containers/LoginPage'),
+        ]);
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([sagas, component]) => {
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
       },
     }, {
       path: '/register',
       name: 'register',
       getComponent(nextState, cb) {
-        import('containers/RegisterPage')
-          .then(loadModule(cb))
-          .catch(errorLoading);
+        const importModules = Promise.all([
+          import('containers/RegisterPage/sagas'),
+          import('containers/RegisterPage'),
+        ]);
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([sagas, component]) => {
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
       },
     }, {
       path: '/confirm(/:confCode)',
