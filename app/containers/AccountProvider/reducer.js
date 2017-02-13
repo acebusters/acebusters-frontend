@@ -1,6 +1,11 @@
 import { fromJS } from 'immutable';
 
-import { SET_AUTH } from './constants';
+import {
+  SET_AUTH,
+  SET_BALANCE,
+  WEB3_CONNECTED,
+  WEB3_DISCONNECTED,
+} from './constants';
 import * as storageService from '../../services/localStorage';
 
 const isLoggedIn = () => {
@@ -17,6 +22,12 @@ const initialState = fromJS({
 function accountProviderReducer(state = initialState, action) {
   let newState = state;
   switch (action.type) {
+    case WEB3_CONNECTED:
+      return state;
+    case WEB3_DISCONNECTED:
+      return state;
+    case SET_BALANCE:
+      return state.set('balance', action.newBal);
     case SET_AUTH:
       if (!action.newAuthState.loggedIn) {
         newState = state.delete('privKey');

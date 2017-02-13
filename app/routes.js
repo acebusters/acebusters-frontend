@@ -3,6 +3,7 @@
 // See http://blog.mxstbr.com/2016/01/react-apps-with-pages for more information
 // about the code splitting business
 import { getAsyncInjectors } from './utils/asyncInjectors';
+import { accountSaga } from './containers/AccountProvider/sagas';
 import { selectAccount } from './containers/AccountProvider/selectors';
 
 const errorLoading = (err) => {
@@ -32,6 +33,8 @@ export default function createRoutes(store) {
       });
     }
   };
+
+  injectSagas([accountSaga]);
 
   return [
     {
@@ -64,6 +67,24 @@ export default function createRoutes(store) {
           import('containers/FeaturePage')
             .then(loadModule(cb))
             .catch(errorLoading);
+        },
+      }, {
+        path: '/dashboard',
+        name: 'dashboard',
+        getComponent(nextState, cb) {
+          const importModules = Promise.all([
+            import('containers/Dashboard/reducer'),
+            import('containers/Dashboard'),
+          ]);
+
+          const renderRoute = loadModule(cb);
+
+          importModules.then(([reducer, component]) => {
+            injectReducer('dashboard', reducer.default);
+            renderRoute(component);
+          });
+
+          importModules.catch(errorLoading);
         },
       }],
     }, {

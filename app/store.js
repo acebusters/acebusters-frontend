@@ -6,7 +6,9 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import { fromJS } from 'immutable';
 import { routerMiddleware } from 'react-router-redux';
 import createSagaMiddleware from 'redux-saga';
+
 import createReducer from './reducers';
+import { accountSaga } from './containers/AccountProvider/sagas';
 import { loginSaga } from './containers/LoginPage/sagas';
 import { registerSaga } from './containers/RegisterPage/sagas';
 import { lobbySaga } from './containers/Lobby/sagas';
@@ -42,7 +44,7 @@ export default function configureStore(initialState = {}, history) {
     composeEnhancers(...enhancers)
   );
 
-  sagaMiddleware.run(formActionSaga, loginSaga, registerSaga, lobbySaga);
+  sagaMiddleware.run(formActionSaga, accountSaga, loginSaga, registerSaga, lobbySaga);
 
   // Extensions
   store.runSaga = sagaMiddleware.run;
