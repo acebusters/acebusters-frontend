@@ -46,7 +46,7 @@ module.exports = {
     message: 'Do you want i18n messages (i.e. will this component use text)?',
   }],
   actions: (data) => {
-    // Generate index.js and index.test.js
+    // Generate index.js and index.tests.js
     const actions = [{
       type: 'add',
       path: '../../app/containers/{{properCase name}}/index.js',
@@ -55,7 +55,7 @@ module.exports = {
     }, {
       type: 'add',
       path: '../../app/containers/{{properCase name}}/tests/index.test.js',
-      templateFile: './container/test.js.hbs',
+      templateFile: './container/tests.js.hbs',
       abortOnFail: true,
     }];
 

@@ -31,13 +31,13 @@ install:
 # Disable automatic builds
 build: off
 
-# Post-install test scripts
+# Post-install tests scripts
 test_script:
   # Output debugging info
   - node --version
   - node ./internals/scripts/generate-templates-for-linting
   # run tests and run build
-  - yarn run test
+  - yarn run tests
   - yarn run build
 
 # Cache node_modules for faster builds

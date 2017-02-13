@@ -19,8 +19,8 @@ import { DEFAULT_LOCALE } from '../../app/containers/App/constants';
 
 require('shelljs/global');
 
-// Glob to match all js files except test files
-const FILES_TO_PARSE = 'app/**/!(*.test).js';
+// Glob to match all js files except tests files
+const FILES_TO_PARSE = 'app/**/!(*.tests).js';
 const locales = i18n.appLocales;
 
 const newLine = () => process.stdout.write('\n');

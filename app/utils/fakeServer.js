@@ -11,7 +11,7 @@ const server = {
   init() {
     if (localStorage.users === undefined) {
       // Set default user
-      const user = 'test@mail.com';
+      const user = 'tests@mail.com';
       const wallet = {
         address: '0x0735a7a806ac6fffe26318f83102d50675c95dfa',
         Crypto: {

@@ -8,7 +8,7 @@ const BigNumber = require('bignumber.js');
 
 const ABI_BET = [{ name: 'bet', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
 const ABI_FOLD = [{ name: 'fold', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
-
+const ABI_SHOW = [{ name: 'show', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
 const ABI_DIST = [{ name: 'distribution', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }, { type: 'bytes32[]' }] }];
 
 // secretSeed: 'rural tent tests net drip fatigue uncle action repeat couple lawn rival'
@@ -23,26 +23,21 @@ const P2_KEY = '0x99e69145c6e7f44ba04d579faac9ef4ce5e942dc02b96a9d42b5fcb03e5087
 const P3_ADDR = '0xdd7acad75b52bd206777a36bc41a3b65ad1c44fc';
 const P3_KEY = '0x33de976dfb8bdf2dc3115801e514b902c4c913c351b6549947758a8b9d981722';
 
-// The initial application state
 const initialState = fromJS({
   hand: {
+    cards: [],
+    dealer: 0,
+    distribution: '',
+    handId: 0,
     lineup: [],
+    state: '',
   },
+  complete: false,
 });
 
 describe('table reducer tests', () => {
   it('should return the default state', () => {
-    expect(tableReducer(undefined, {})).toEqual(fromJS({
-      hand: {
-        cards: [],
-        dealer: 0,
-        distribution: '',
-        handId: 0,
-        lineup: [],
-        state: '',
-      },
-      complete: false,
-    }));
+    expect(tableReducer(initialState, {})).toEqual(initialState);
   });
 
   it('should recalculate lastRoundMaxBet if state changed', () => {
@@ -55,6 +50,7 @@ describe('table reducer tests', () => {
     }];
     expect(tableReducer(fromJS({
       hand: {
+        cards: [],
         dealer: 0,
         state: 'flop',
         handId: 0,
@@ -63,6 +59,7 @@ describe('table reducer tests', () => {
     }), {
       type: TableActions.UPDATE_RECEIVED,
       tableState: {
+        cards: [],
         dealer: 0,
         state: 'turn',
         handId: 0,
@@ -70,6 +67,7 @@ describe('table reducer tests', () => {
       },
     })).toEqual(fromJS({
       hand: {
+        cards: [],
         dealer: 0,
         state: 'turn',
         handId: 0,
@@ -82,6 +80,7 @@ describe('table reducer tests', () => {
   it('should not overwrite lineup', () => {
     expect(tableReducer(fromJS({
       hand: {
+        cards: [],
         handId: 1,
         dealer: 1,
         lineup: [{
@@ -93,11 +92,13 @@ describe('table reducer tests', () => {
           last: new EWT(ABI_BET).bet(1, 50).sign(P2_KEY),
           amount: 3000,
         }],
+        state: 'flop',
       },
       lastRoundMaxBet: 0,
     }), {
       type: TableActions.UPDATE_RECEIVED,
       tableState: {
+        cards: [],
         handId: 1,
         dealer: 1,
         lineup: [{
@@ -109,9 +110,11 @@ describe('table reducer tests', () => {
           last: new EWT(ABI_BET).bet(1, 50).sign(P2_KEY),
           amount: 3000,
         }],
+        state: 'flop',
       },
     })).toEqual(fromJS({
       hand: {
+        cards: [],
         handId: 1,
         dealer: 1,
         lineup: [{
@@ -123,6 +126,7 @@ describe('table reducer tests', () => {
           last: new EWT(ABI_BET).bet(1, 50).sign(P2_KEY),
           amount: 3000,
         }],
+        state: 'flop',
       },
       lastRoundMaxBet: 0,
     }));
@@ -146,6 +150,7 @@ describe('table reducer tests', () => {
     }];
     expect(tableReducer(fromJS({
       hand: {
+        cards: [],
         handId: 1,
         dealer: 1,
         state: 'flop',
@@ -155,6 +160,7 @@ describe('table reducer tests', () => {
     }), {
       type: TableActions.UPDATE_RECEIVED,
       tableState: {
+        cards: [],
         handId: 1,
         dealer: 1,
         state: 'flop',
@@ -162,6 +168,7 @@ describe('table reducer tests', () => {
       },
     })).toEqual(fromJS({
       hand: {
+        cards: [],
         handId: 1,
         dealer: 1,
         state: 'flop',
@@ -172,30 +179,35 @@ describe('table reducer tests', () => {
   });
 
   it('should add amount into lineup', () => {
-    expect(tableReducer(
-      initialState, {
-        type: TableActions.LINEUP_RECEIVED,
-        lineup: [
-          new BigNumber(0),
-          [P1_ADDR, P2_ADDR, P3_ADDR],
-          [new BigNumber(3000), new BigNumber(3000), new BigNumber(2000)],
-          [0, 0, 0],
-        ],
-      })).toEqual(fromJS({
-        hand: {
-          lineup: [{
-            address: P1_ADDR,
-            amount: 3000,
-          }, {
-            address: P2_ADDR,
-            amount: 3000,
-          }, {
-            address: P3_ADDR,
-            amount: 2000,
-          }],
-        },
-        lastHandNettedOnClient: 0,
-      })
+    expect(tableReducer(fromJS({
+      hand: {
+        cards: [],
+        lineup: [],
+      },
+    }), {
+      type: TableActions.LINEUP_RECEIVED,
+      lineup: [
+        new BigNumber(0),
+        [P1_ADDR, P2_ADDR, P3_ADDR],
+        [new BigNumber(3000), new BigNumber(3000), new BigNumber(2000)],
+        [0, 0, 0],
+      ],
+    })).toEqual(fromJS({
+      hand: {
+        cards: [],
+        lineup: [{
+          address: P1_ADDR,
+          amount: 3000,
+        }, {
+          address: P2_ADDR,
+          amount: 3000,
+        }, {
+          address: P3_ADDR,
+          amount: 2000,
+        }],
+      },
+      lastHandNettedOnClient: 0,
+    })
     );
   });
 
@@ -281,6 +293,7 @@ describe('table reducer tests', () => {
     }];
     expect(tableReducer(fromJS({
       hand: {
+        cards: [],
         handId: 1,
         dealer: 1,
         lineup: [{
@@ -293,12 +306,15 @@ describe('table reducer tests', () => {
     }), {
       type: TableActions.UPDATE_RECEIVED,
       tableState: {
+        cards: [],
         handId: 1,
         dealer: 1,
         lineup: lineup2,
+        state: 'flop',
       },
     })).toEqual(fromJS({
       hand: {
+        cards: [],
         handId: 1,
         dealer: 1,
         lineup: [{
@@ -309,6 +325,7 @@ describe('table reducer tests', () => {
           address: P2_ADDR,
           last: new EWT(ABI_BET).bet(1, 100).sign(P2_KEY),
         }],
+        state: 'flop',
       },
       lastRoundMaxBet: 0,
     }));
@@ -317,7 +334,7 @@ describe('table reducer tests', () => {
   it('should update stack sizes when hand complete', () => {
     const lineup2 = [{
       address: P1_ADDR,
-      last: new EWT(ABI_BET).bet(1, 100).sign(P1_KEY),
+      last: new EWT(ABI_SHOW).show(1, 100).sign(P1_KEY),
     }, {
       address: P2_ADDR,
       last: new EWT(ABI_FOLD).fold(1, 100).sign(P2_KEY),
@@ -325,7 +342,6 @@ describe('table reducer tests', () => {
     expect(tableReducer(fromJS({
       hand: {
         handId: 1,
-        dealer: 1,
         lineup: [{
           address: P1_ADDR,
           cards: [2, 3],
@@ -338,14 +354,12 @@ describe('table reducer tests', () => {
       type: TableActions.UPDATE_RECEIVED,
       tableState: {
         handId: 1,
-        dealer: 1,
         lineup: lineup2,
         state: 'showdown',
       },
     })).toEqual(fromJS({
       hand: {
         handId: 2,
-        dealer: 2,
         lineup: [{
           address: P1_ADDR,
           cards: [2, 3],
@@ -361,29 +375,27 @@ describe('table reducer tests', () => {
   it('should handle next hand', () => {
     expect(tableReducer(fromJS({
       hand: {
-        handId: 1,
         dealer: 1,
+        state: 'showdown',
         lineup: [{
           address: P1_ADDR,
           cards: [2, 3],
         }, {
           address: P2_ADDR,
         }],
-        state: 'showdown',
       },
       complete: true,
     }), {
       type: TableActions.NEXT_HAND,
     })).toEqual(fromJS({
       hand: {
-        handId: 1,
         dealer: 2,
+        state: 'dealing',
         lineup: [{
           address: P1_ADDR,
         }, {
           address: P2_ADDR,
         }],
-        state: 'dealing',
       },
       lastRoundMaxBet: 0,
     }));

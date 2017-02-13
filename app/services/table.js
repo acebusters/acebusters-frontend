@@ -53,12 +53,12 @@ export function fetchLineup(tableAddr, privKey) {
   const provider = new Provider(ethNode, privKey);
   const table = provider.getTable(tableAddr);
 
-  new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     table.getLineup((error, response) => {
       if (error) {
         reject(error);
       }
       resolve(response);
     });
-  }).then((res) => res.json(), (error) => error);
+  });
 }

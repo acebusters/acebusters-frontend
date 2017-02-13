@@ -16,10 +16,11 @@ export const STARTED_REQUEST = 'STARTED_REQUEST';
 export const UPDATE_RECEIVED = 'UPDATE_RECEIVED';
 export const LINEUP_RECEIVED = 'LINEUP_RECEIVED';
 export const PERFORM_DEALING_ACTION = 'PERFORM_DEALING_ACTION';
+export const UPDATE_AMOUNT = 'UPDATE_AMOUNT';
 
 
-export function getLineup() {
-  return { type: GET_LINEUP };
+export function getLineup(tableAddr, privKey) {
+  return { type: GET_LINEUP, tableAddr, privKey };
 }
 
 export function setCards(cards, pos) {
@@ -38,3 +39,6 @@ export function lineupReceived(lineup) {
   return { type: LINEUP_RECEIVED, lineup };
 }
 
+export function updateAmount(amount) {
+  return { type: UPDATE_AMOUNT, amount };
+}

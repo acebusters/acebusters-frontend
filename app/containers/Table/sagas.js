@@ -96,7 +96,7 @@ export function* poll(action) {
 
 export function* getLineup(action) {
   try {
-    const lineup = yield call(fetchLineup, action.tableAddr, action.priv);
+    const lineup = yield call(fetchLineup, action.tableAddr, action.privKey);
     yield put(lineupReceived(lineup));
   } catch (err) {
     // missing action

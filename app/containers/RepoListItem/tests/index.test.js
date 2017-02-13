@@ -18,7 +18,7 @@ const renderComponent = (props = {}) => render(
 describe('<RepoListItem />', () => {
   let item;
 
-  // Before each test reset the item data for safety
+  // Before each tests reset the item data for safety
   beforeEach(() => {
     item = {
       owner: {

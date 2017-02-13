@@ -17,7 +17,6 @@ export default function createRoutes(store) {
   const { injectReducer, injectSagas } = getAsyncInjectors(store);
 
   // put authenticator here
-
   return [
     {
       path: '/',

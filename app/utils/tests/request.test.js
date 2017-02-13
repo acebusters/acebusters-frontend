@@ -5,13 +5,13 @@
 import request from '../request';
 
 describe('request', () => {
-  // Before each test, stub the fetch function
+  // Before each tests, stub the fetch function
   beforeEach(() => {
     window.fetch = jest.fn();
   });
 
   describe('stubbing successful response', () => {
-    // Before each test, pretend we got a successful response
+    // Before each tests, pretend we got a successful response
     beforeEach(() => {
       const res = new Response('{"hello":"world"}', {
         status: 200,
@@ -34,7 +34,7 @@ describe('request', () => {
   });
 
   describe('stubbing error response', () => {
-    // Before each test, pretend we got an unsuccessful response
+    // Before each tests, pretend we got an unsuccessful response
     beforeEach(() => {
       const res = new Response('', {
         status: 404,

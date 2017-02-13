@@ -20,9 +20,9 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
   constructor(props) {
     super(props);
-    const priv = this.props.location.query.privKey;
+    const privKey = this.props.location.query.privKey;
     const tableAddr = this.props.params.id;
-    this.props.getLineup(tableAddr, priv);
+    this.props.getLineup(tableAddr, privKey);
     setInterval(() => {
       this.props.poll(tableAddr);
     }, 3000);
@@ -36,7 +36,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
   renderSeats() {
     const seats = [];
-    const lineup = this.props.hand.lineup;
+    const lineup = this.props.hand.get('lineup');
     for (let i = 0; i < lineup.length; i += 1) {
       const seat = (<Seat key={i} pos={i} > </Seat>);
       seats.push(seat);
@@ -46,7 +46,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
   renderBoard() {
     const board = [];
-    const cards = this.props.hand.cards;
+    const cards = this.props.hand.get('cards').toJS();
     if (cards && cards.length > 0) {
       for (let i = 0; i < cards.length; i += 1) {
         const card = (<Card key={i} cardNumber={cards[i]}></Card>);
@@ -63,7 +63,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       return (
         <div id="root" className="table-bg">
           <div className="status">
-            <h3>handstate: { this.props.hand.state } </h3>
+            <h3>handstate: { this.props.hand.get('state') } </h3>
             <h3>myAddress: { this.props.myAddress } </h3>
             <h3>isMyTurn: {(this.props.isMyTurn) ? 'yes' : 'no'} </h3>
             <h3>amount to call: { this.props.amountToCall} </h3>
@@ -78,7 +78,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
                 </div>
               </div>
             </div>
-            <ActionBar></ActionBar>
+            <ActionBar params={this.props.params}></ActionBar>
           </div>
         </div>
       );
@@ -107,9 +107,9 @@ const mapStateToProps = (state) => ({
 
 Table.propTypes = {
   location: React.PropTypes.object,
-  hand: React.PropTypes.func,
+  hand: React.PropTypes.object,
   myAddress: React.PropTypes.func,
-  lastHandNettedOnClient: React.PropTypes.func,  // eslint-disable-line
+  lastHandNettedOnClient: React.PropTypes.number,  // eslint-disable-line
   isMyTurn: React.PropTypes.bool,
   potSize: React.PropTypes.number,
   amountToCall: React.PropTypes.number,

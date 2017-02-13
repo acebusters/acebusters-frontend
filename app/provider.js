@@ -18,7 +18,7 @@ function Provider(rpcUrl, secret) {
       ks.generateNewAddress(pwDerivedKey, 1);
     } else if (secret) {
       ks = new wallet.keystore(); // eslint-disable-line
-      ks.addPriv = (privkeyHex) => {
+      ks.addPriv = function (privkeyHex) {
         privKey = new Buffer(privkeyHex.replace('0x', ''), 'hex');
         encPrivKey = wallet.keystore._encryptKey(privKey, pwDerivedKey); // eslint-disable-line
         const address = wallet.keystore._computeAddressFromPrivKey(privKey); // eslint-disable-line
@@ -70,12 +70,20 @@ function Provider(rpcUrl, secret) {
   this.address = addr;
 }
 
-Provider.prototype.getTable = (tableAddr) => this.web3.eth.contract(tableAbi).at(tableAddr);
+Provider.prototype.getTable = function (tableAddr) {
+  return this.web3.eth.contract(tableAbi).at(tableAddr);
+};
 
-Provider.prototype.getToken = (tokenAddr) => this.web3.eth.contract(tokenAbi).at(tokenAddr);
+Provider.prototype.getToken = function (tokenAddr) {
+  return this.web3.eth.contract(tokenAbi).at(tokenAddr);
+};
 
-Provider.prototype.getWeb3 = () => this.web3;
+Provider.prototype.getWeb3 = function () {
+  return this.web3;
+};
 
-Provider.prototype.getAddress = () => this.address;
+Provider.prototype.getAddress = function () {
+  return this.address;
+};
 
 module.exports = Provider;
