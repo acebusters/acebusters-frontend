@@ -54,7 +54,7 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
             className="btn btn-default btn-sm col-xs-4" value={'50000'}
             onClick={this.props.bet(this.props.hand.get('handId'),
                                     5000,
-                                    this.props.privKey,
+              this.props.privKey,
                                     this.props.params.addr)}
           >POST SB
           </button>

@@ -90,7 +90,6 @@ export function* poll(action) {
     yield put(updateReceived(tableState));
   } catch (err) {
     // missing action
-    console.log(err);
   }
 }
 
@@ -100,7 +99,6 @@ export function* getLineup(action) {
     yield put(lineupReceived(lineup));
   } catch (err) {
     // missing action
-    console.log(err);
   }
 }
 

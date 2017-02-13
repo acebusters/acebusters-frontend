@@ -4,7 +4,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import Card from 'components/Card'; // eslint-disable-line
-import * as LocalStorage from '../../LocalStorageService';
+import * as LocalStorage from '../../services/localStorage';
 import { setCards } from '../Table/actions';
 import { makeCardSelector, makeStackSelector, makeLastAmountSelector, makeFoldedSelector } from './selectors';
 import { makeMyPosSelector, makeHandSelector, makeLastHandNettedSelector } from '../Table/selectors';

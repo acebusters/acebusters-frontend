@@ -10,7 +10,7 @@ import Sidebar from 'components/Sidebar';
 import withProgressBar from 'components/ProgressBar';
 import makeSelectAccountData from '../AccountProvider/selectors';
 import { makeSelectSidebarCollapse } from './selectors';
-import { logout } from '../AccountProvider/actions';
+import { setAuthState } from '../AccountProvider/actions';
 import { sidebarToggle } from './actions';
 import theme from '../../skin-blue';
 
@@ -81,7 +81,7 @@ export function App(props) {
       <ThemeProvider theme={theme}>
         <Header
           loggedIn={props.account.loggedIn}
-          onClickLogout={props.onClickLogout}
+          onClickLogout={props.handleClickLogout}
           sidebarToggle={props.sidebarToggle}
         />
       </ThemeProvider>
@@ -119,7 +119,7 @@ App.defaultProps = {
 App.propTypes = {
   children: React.PropTypes.node,
   account: React.PropTypes.object,
-  onClickLogout: React.PropTypes.func,
+  handleClickLogout: React.PropTypes.func,
   sidebarToggle: React.PropTypes.func,
   fixed: React.PropTypes.bool,
   sidebarCollapse: React.PropTypes.bool,
@@ -128,7 +128,7 @@ App.propTypes = {
 
 function mapDispatchToProps(dispatch) {
   return {
-    onClickLogout: () => dispatch(logout()),
+    handleClickLogout: () => dispatch(setAuthState({ loggedIn: false })),
     sidebarToggle: () => dispatch(sidebarToggle()),
   };
 }

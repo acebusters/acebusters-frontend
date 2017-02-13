@@ -6,6 +6,7 @@
 import { fromJS } from 'immutable';
 import { combineReducers } from 'redux-immutable';
 import { LOCATION_CHANGE } from 'react-router-redux';
+import { reducer as formReducer } from 'redux-form/immutable';
 
 import globalReducer from 'containers/App/reducer';
 import tableReducer from 'containers/Table/reducer';
@@ -52,6 +53,7 @@ export default function createReducer(asyncReducers) {
     account: accountProviderReducer,
     table: tableReducer,
     lobby: lobbyReducer,
+    form: formReducer,
     ...asyncReducers,
   });
 }

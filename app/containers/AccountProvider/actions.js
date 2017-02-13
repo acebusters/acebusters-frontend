@@ -1,30 +1,9 @@
-import {
-  CHANGE_FORM,
-  SET_AUTH,
-  SENDING_REQUEST,
-  LOGIN_REQUEST,
-  LOGOUT,
-  REGISTER_REQUEST,
-  REQUEST_ERROR,
-  CLEAR_ERROR,
-  WORKER_ERROR,
-  WORKER_LOADED,
-  WORKER_PROGRESS,
-  WALLET_EXPORTED,
-  WALLET_IMPORTED,
-  EXPORT_REQUEST,
-  RECAPTCHA_RESPONSE,
+import { SET_AUTH,
+  WEB3_CONNECT,
+  WEB3_CONNECTED,
+  WEB3_DISCONNECTED,
+  SET_BALANCE,
 } from './constants';
-
-/**
- * Sets the form state
- * @param  {object} newFormState          The new state of the form
- * @param  {string} newFormState.username The new text of the username input field of the form
- * @param  {string} newFormState.password The new text of the password input field of the form
- */
-export function changeForm(newFormState) {
-  return { type: CHANGE_FORM, newFormState };
-}
 
 /**
  * Sets the authentication state of the application
@@ -34,104 +13,30 @@ export function setAuthState(newAuthState) {
   return { type: SET_AUTH, newAuthState };
 }
 
-/**
- * Sets the `currentlySending` state, which displays a loading indicator during requests
- * @param  {boolean} sending True means we're sending a request, false means we're not
- */
-export function sendingRequest(sending) {
-  return { type: SENDING_REQUEST, sending };
+export function setBalance(newBal) {
+  return { type: SET_BALANCE, newBal };
 }
 
-/**
- * Tells the app we want to log in a user
- * @param  {object} data          The data we're sending for log in
- * @param  {string} data.username The username of the user to log in
- * @param  {string} data.password The password of the user to log in
- */
-export function loginRequest(data) {
+export function web3Connect() {
+  return { type: WEB3_CONNECT };
+}
+
+export function web3Connected({ web3, isConnected }) {
   return {
-    type: LOGIN_REQUEST,
-    email: data.email,
-    password: data.password,
+    type: WEB3_CONNECTED,
+    payload: {
+      web3,
+      isConnected,
+    },
   };
 }
 
-/**
- * Tells the app we want to log out a user
- */
-export function logout() {
-  return { type: LOGOUT };
-}
-
-/**
- * Sets the `error` state to the error received
- * @param  {object} error The error we got when trying to make the request
- */
-export function requestError(error) {
-  return { type: REQUEST_ERROR, error };
-}
-
-/**
- * Sets the `error` state as empty
- */
-export function clearError() {
-  return { type: CLEAR_ERROR };
-}
-
-/**
- * Tells the app we want to register a user
- * @param  {object} data          The data we're sending for registration
- * @param  {string} data.username The username of the user to register
- * @param  {string} data.password The password of the user to register
- */
-export function registerRequest(data) {
-  return { type: REGISTER_REQUEST, data };
-}
-
-export function workerError(event) {
+export function web3Disconnected() {
   return {
-    type: WORKER_ERROR,
-    event,
-  };
-}
-
-export function workerLoaded() {
-  return {
-    type: WORKER_LOADED,
-  };
-}
-
-export function walletExported(wallet) {
-  return {
-    type: WALLET_EXPORTED,
-    wallet,
-  };
-}
-
-export function walletImported(privKey) {
-  return {
-    type: WALLET_IMPORTED,
-    privKey,
-  };
-}
-
-export function workerProgress(percent) {
-  return {
-    type: WORKER_PROGRESS,
-    percent,
-  };
-}
-
-export function exportRequest(request) {
-  return {
-    type: EXPORT_REQUEST,
-    request,
-  };
-}
-
-export function recaptcha(response) {
-  return {
-    type: RECAPTCHA_RESPONSE,
-    response,
+    type: WEB3_DISCONNECTED,
+    payload: {
+      web3: null,
+      isConnected: false,
+    },
   };
 }
