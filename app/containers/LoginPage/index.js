@@ -1,9 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { browserHistory } from 'react-router';
 import { Form, Field, reduxForm, SubmissionError, propTypes, change, formValueSelector } from 'redux-form/immutable';
 
 import account from '../../services/account';
-import { workerError, walletImported } from './actions';
+import { workerError, walletImported, login } from './actions';
+import { setAuthState } from '../AccountProvider/actions';
 
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
 
@@ -56,7 +58,7 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
     window.removeEventListener('message', this.handleWorkerMessage);
   }
 
-  handleSubmit(values) {
+  handleSubmit(values, dispatch) {
     return account.login(values.get('email')).catch((err) => {
       const errMsg = 'Login failed!';
       if (err === 404) {
@@ -73,7 +75,25 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
         json: data.wallet,
         password: values.get('password'),
       }, '*');
-      // wait until exported
+      // Login saga is called, we return the promise here,
+      // so we can display form errors if any of the async ops fail.
+      return login(values, dispatch).catch((workerErr) => {
+        // If worker failed, ...
+        throw new SubmissionError({ _error: `error, Login failed due to worker error: ${workerErr}` });
+      }).then((workerRsp) => {
+        // If worker success, ...
+        // ...tell account provider about login.
+        dispatch(setAuthState({
+          privKey: workerRsp.data.privKey,
+          loggedIn: true,
+        }));
+        const { location } = this.props;
+        let nextPath = '/features';
+        if (location.state && location.state.nextPathname) {
+          nextPath = location.state.nextPathname;
+        }
+        browserHistory.push(nextPath); // Go to page that was requested
+      });
     });
   }
 
@@ -98,12 +118,7 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
       if (data.hexSeed === null) {
         this.props.onWorkerError('Message Authentication Code mismatch (wrong password)');
       } else {
-        const { location } = this.props;
-        let nextPath = '/features';
-        if (location.state && location.state.nextPathname) {
-          nextPath = location.state.nextPathname;
-        }
-        this.props.onWalletImported({ privKey: data.hexSeed, nextPath });
+        this.props.onWalletImported({ privKey: data.hexSeed });
       }
     } else {
       this.props.onWorkerError(evt);

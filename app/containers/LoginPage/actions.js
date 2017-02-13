@@ -1,3 +1,4 @@
+import { createFormAction } from '../../services/reduxFormSaga';
 import {
   WORKER_ERROR,
   WALLET_IMPORTED,
@@ -16,3 +17,5 @@ export function walletImported(data) {
     data,
   };
 }
+
+export const login = createFormAction('LOGIN');

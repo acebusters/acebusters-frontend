@@ -46,7 +46,7 @@ function createFormAction(requestAction, types, payloadCreator = identity) {
       dispatch(formAction({
         request: requestActionVal(data),
         defer: { resolve, reject },
-        typesVal,
+        types: typesVal,
       }));
     })
   ), actionMethods);

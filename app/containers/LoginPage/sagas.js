@@ -1,13 +1,10 @@
-import { browserHistory } from 'react-router';
-import { take, put, fork, race } from 'redux-saga/effects';
+import { take, put, race } from 'redux-saga/effects';
 
 import { WORKER_ERROR, WALLET_IMPORTED } from './constants';
-import { SET_AUTH } from '../AccountProvider/constants';
+import { login } from './actions';
 
-/**
- * Login saga
- */
-export function* loginFlow() {
+// The root saga is what is sent to Redux's middleware.
+export function* loginSaga() {
   while (true) { // eslint-disable-line no-constant-condition
     // We expect successful decryption or error from worker.
     const worker = yield race({
@@ -15,22 +12,13 @@ export function* loginFlow() {
       import: take(WALLET_IMPORTED),
     });
 
-    // If worker exited with error...
+    // Resolve pending form promise.
     if (worker.error) {
-      // tell the form that something went wrong
-      continue;  // eslint-disable-line no-continue
+      yield put({ type: login.FAILURE, payload: worker.error });
+    } else {
+      yield put({ type: login.SUCCESS, payload: worker.import });
     }
-    // If worker succeeded, ...
-    const { privKey, nextPath } = worker.import.data;
-    // ...we send Redux appropiate actions
-    yield put({ type: SET_AUTH, newAuthState: { privKey, loggedIn: true } }); // User is logged in (authorized)
-    browserHistory.push(nextPath); // Go to page that was requested
   }
-}
-
-// The root saga is what is sent to Redux's middleware.
-export function* loginSaga() {
-  yield fork(loginFlow);
 }
 
 export default [
