@@ -6,16 +6,15 @@ import { createSelector } from 'reselect';
 
 import makeSelectAccountData, { makeSelectContract, makeSelectAddress } from '../AccountProvider/selectors';
 import messages from './messages';
-import { setBalance } from '../AccountProvider/actions';
 import { transferToggle } from '../App/actions';
+import { setBalance } from '../AccountProvider/actions';
 
 export class Dashboard extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   componentDidMount() {
     this.props.contract.balanceOf(this.props.address, (err, bal) => {
       if (err) {
-        console.dir(err);
-        return;
+        return err;
       }
       this.props.setBalance(bal.toNumber());
     });

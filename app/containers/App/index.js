@@ -9,6 +9,7 @@ import Content from 'components/Content';
 import Sidebar from 'components/Sidebar';
 import withProgressBar from 'components/ProgressBar';
 import makeSelectAccountData from '../AccountProvider/selectors';
+import TransferDialog from '../TransferDialog';
 import { makeSelectSidebarCollapse, makeSelectTransferShow } from './selectors';
 import { setAuthState } from '../AccountProvider/actions';
 import { sidebarToggle, transferToggle } from './actions';
@@ -109,10 +110,7 @@ export function App(props) {
         </ThemeProvider>
       </StyledDashboard>
       <Modal isOpen={props.isModalOpen} transferToggle={props.transferToggle}>
-        <h3>My Modal</h3>
-        <div className="body">
-          <p>This is the modal&apos;s body.</p>
-        </div>
+        <TransferDialog />
       </Modal>
     </div>
   );
