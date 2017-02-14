@@ -16,6 +16,7 @@ const isLoggedIn = () => {
 // The initial application state
 const initialState = fromJS({
   privKey: storageService.getItem('privKey'),
+  email: storageService.getItem('email'),
   loggedIn: isLoggedIn(),
 });
 
@@ -30,11 +31,17 @@ function accountProviderReducer(state = initialState, action) {
       return state.set('balance', action.newBal);
     case SET_AUTH:
       if (!action.newAuthState.loggedIn) {
-        newState = state.delete('privKey');
+        newState = state
+          .delete('privKey')
+          .delete('email');
         storageService.removeItem('privKey');
+        storageService.removeItem('email');
       } else {
-        newState = state.set('privKey', action.newAuthState.privKey);
+        newState = state
+          .set('privKey', action.newAuthState.privKey)
+          .set('email', action.newAuthState.email);
         storageService.setItem('privKey', action.newAuthState.privKey);
+        storageService.setItem('email', action.newAuthState.email);
       }
       return newState
         .set('loggedIn', action.newAuthState.loggedIn);
