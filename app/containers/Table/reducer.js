@@ -170,6 +170,8 @@ export default function tableReducer(state = initialState, action) {
       });
 
       const newHand = fromJS({
+        cards: [],
+        distribution: '',
         dealer: currentDealer + 1,
         state: 'dealing',
         lineup: newLineup,

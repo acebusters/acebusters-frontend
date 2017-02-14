@@ -17,7 +17,7 @@ const makeSelectAccountData = () => createSelector(
   (account) => account.toJS()
 );
 
-const makeSelectAddress = () => createSelector(
+const makeAddressSelector = () => createSelector(
   selectAccount,
   (account) => {
     const privKey = account.get('privKey');
@@ -69,7 +69,7 @@ const makeSelectPrivKey = () => createSelector(
 export default makeSelectAccountData;
 export {
   selectAccount,
-  makeSelectAddress,
+  makeAddressSelector,
   makeSelectContract,
   makeSelectPrivKey,
   makeSelectEmail,

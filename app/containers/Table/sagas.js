@@ -1,18 +1,25 @@
 /**
  * Created by helge on 25.01.17.
  */
+import EthUtil from 'ethereumjs-util';
 import { PokerHelper, ReceiptCache } from 'poker-helper';
 import { call, put, takeLatest, select, take, fork } from 'redux-saga/effects';
 import { delay } from 'redux-saga';
-import { updateReceived, lineupReceived } from './actions';
-import { ABI_BET, apiBasePath } from '../../app.config';
-import { fetchTableState, pay, fetchLineup } from '../../services/table';
-import { makeSelectAddress, makeSelectPrivKey } from '../AccountProvider/selectors';
-import { makeHandSelector } from '../Table/selectors';
-
+import { updateReceived, lineupReceived, completeBet, completeFold, completeShow } from './actions';
+import { ABI_BET, checkABIs, apiBasePath } from '../../app.config';
+import { fetchTableState, pay, fetchLineup, show } from '../../services/table';
 
 const rc = new ReceiptCache();
 const pokerHelper = new PokerHelper(rc);
+
+function selectAddress(privKey) {
+  if (privKey) {
+    const privKeyBuffer = new Buffer(privKey.replace('0x', ''), 'hex');
+    return `0x${EthUtil.privateToAddress(privKeyBuffer).toString('hex')}`;
+  }
+  return null;
+}
+
 
 export function* getHand(action) {
   const header = new Headers({ 'Content-Type': 'application/json' });
@@ -25,29 +32,27 @@ export function* getHand(action) {
 export function* dispatchDealingAction() {
   const state = yield select();
 
-  const hand = makeHandSelector(state);
-  const privKey = makeSelectPrivKey(state);
-  const handId = hand.handId;
+  const hand = state.get('table').get('hand');
+  const privKey = state.get('account').get('privKey');
+  const handId = hand.get('handId');
   let amount = 0;
-  const myAddr = makeSelectAddress(state);
-  const dealer = hand.dealer;
-  const myPos = pokerHelper.getMyPos(hand.lineup, myAddr);
-  const sb = pokerHelper.nextActivePlayer(hand.lineup, dealer + 1);
+  const myAddr = selectAddress(privKey);
+  const dealer = hand.get('dealer');
+  const myPos = pokerHelper.getMyPos(hand.get('lineup').toJS(), myAddr);
+  const sb = pokerHelper.nextActivePlayer(hand.get('lineup').toJS(), dealer + 1);
 
-  const whosTurn = pokerHelper.whosTurn(hand);
+  const whosTurn = pokerHelper.whosTurn(hand.toJS());
   if ((whosTurn === sb && myPos !== sb)
-        || (hand.state !== 'dealing')
-        || (state.TableReducer.error)
-        || state.TableReducer.performedDealing) {
+        || (hand.get('state') !== 'dealing')
+        || (state.get('table').get('error'))
+        || state.get('table').get('performedDealing')) {
     return;
   }
 
-  const bb = pokerHelper.nextActivePlayer(hand.lineup, sb + 1);
-  if (myPos === sb) {
-    amount = 50000;
-  }
+  const bb = pokerHelper.nextActivePlayer(hand.get('lineup').toJS(), sb + 1);
+  if (myPos === sb) { amount = 50000; }
   if (myPos === bb) { amount = 100000; }
-  const tableAddr = state.TableReducer.tableAddr;
+  const tableAddr = state.get('tableAddr');
   yield put({ type: 'PERFORM_DEALING_ACTION', handId, amount, privKey, tableAddr });
 }
 
@@ -60,8 +65,8 @@ function* performDealingAction(action) {
   try {
     const holeCards = yield call(() => pay(handId, amount, privKey, tableAddr, ABI_BET, 'bet').then((res) => res.json()));
     yield put({ type: 'COMPLETE_BET', handId, amount, holeCards, privKey });
-  } catch (error) {
-    yield put({ type: 'FAILED_REQUEST', error });
+  } catch (err) {
+    yield put({ type: 'FAILED_REQUEST', err });
   }
 }
 
@@ -72,13 +77,13 @@ export function* watchAndGet() {
     const action = yield take('*');                                      // eslint-disable-line
     const state = yield select();
 
-    if (state.get('table').complete) {
+    if (state.get('table').get('complete')) {
       if (!wait) {
         wait = yield fork(waitThenNextHand);
       }
     }
 
-    if (state.get('table').hand && state.get('table').hand.state === 'dealing') {
+    if (state.get('table').get('hand') && state.get('table').get('hand').get('state') === 'dealing') {
       yield call(dispatchDealingAction);
     }
   }
@@ -89,7 +94,7 @@ export function* poll(action) {
     const tableState = yield call(fetchTableState, action.tableAddr);
     yield put(updateReceived(tableState));
   } catch (err) {
-    // missing action
+    yield put({ type: 'FAILED_REQUEST', err });
   }
 }
 
@@ -98,7 +103,44 @@ export function* getLineup(action) {
     const lineup = yield call(fetchLineup, action.tableAddr, action.privKey);
     yield put(lineupReceived(lineup));
   } catch (err) {
-    // missing action
+    yield put({ type: 'FAILED_REQUEST', err });
+  }
+}
+
+export function* submitBet(action) {
+  try {
+    const cards = yield call(pay, action.handId, action.amount, action.privKey, action.tableAddr, ABI_BET, 'bet');
+    yield put(completeBet(cards, action.privKey));
+  } catch (err) {
+    yield put({ type: 'FAILED_REQUEST', err });
+  }
+}
+
+export function* submitFold(action) {
+  try {
+    const cards = yield call(pay, action.handId, action.amount, action.privKey, action.tableAddr, ABI_BET, 'bet');
+    yield put(completeFold(cards, action.privKey));
+  } catch (err) {
+    yield put({ type: 'FAILED_REQUEST', err });
+  }
+}
+
+export function* submitShow(action) {
+  try {
+    const distribution = yield call(show, action.handId, action.myMaxBet, action.cards, action.privKey, action.tableAddr);
+    yield put(completeShow(distribution));
+  } catch (err) {
+    yield put({ type: 'FAILED_REQUEST', err });
+  }
+}
+
+export function* submitCheck(action) {
+  const abi = checkABIs[action.state];
+  try {
+    const cards = yield call(pay, action.handId, action.amount, action.privKey, action.tableAddr, abi, abi[0].name);
+    yield put(completeBet(cards, action.privKey));
+  } catch (err) {
+    yield put({ type: 'FAILED_REQUEST', err });
   }
 }
 
@@ -114,6 +156,10 @@ function* tableSaga() {
   yield takeLatest('PERFORM_DEALING_ACTION', performDealingAction);
   yield takeLatest('START_POLLING', poll);
   yield takeLatest('GET_LINEUP', getLineup);
+  yield takeLatest('SUBMIT_BET', submitBet);
+  yield takeLatest('SUBMIT_FOLD', submitFold);
+  yield takeLatest('SUBMIT_CHECK', submitCheck);
+  yield takeLatest('SUBMIT_SHOW', submitShow);
   yield watchAndGet();
 }
 

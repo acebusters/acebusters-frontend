@@ -4,6 +4,7 @@
 // react + redux
 import React from 'react';
 import { connect } from 'react-redux';
+import { createStructuredSelector } from 'reselect';
 // components and styles
 import Card from 'components/Card'; // eslint-disable-line
 import Seat from '../Seat'; // eslint-disable-line
@@ -11,9 +12,11 @@ import ActionBar from '../ActionBar'; // eslint-disable-line
 // actions
 import { poll, getLineup } from './actions';
 // selectors
-import { makeSelectAddress } from '../AccountProvider/selectors';
+import { makeAddressSelector } from '../AccountProvider/selectors';
 import { makeIsMyTurnSelector, makePotSizeSelector, makeAmountToCallSelector,
-         makeHandSelector, makeLastHandNettedSelector } from './selectors';
+         makeHandSelector, makeLastHandNettedSelector, makeLineupSelector } from './selectors';
+import TableComponent from '../../components/Table';
+import H3 from '../../components/H3';
 
 
 export class Table extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -36,9 +39,9 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
   renderSeats() {
     const seats = [];
-    const lineup = this.props.hand.get('lineup');
+    const lineup = this.props.lineup.toJS();
     for (let i = 0; i < lineup.length; i += 1) {
-      const seat = (<Seat key={i} pos={i} > </Seat>);
+      const seat = (<Seat key={i} pos={i} {...this.props}> </Seat>);
       seats.push(seat);
     }
     return seats;
@@ -63,11 +66,11 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       return (
         <div id="root" className="table-bg">
           <div className="status">
-            <h3>handstate: { this.props.hand.get('state') } </h3>
-            <h3>myAddress: { this.props.myAddress } </h3>
-            <h3>isMyTurn: {(this.props.isMyTurn) ? 'yes' : 'no'} </h3>
-            <h3>amount to call: { this.props.amountToCall} </h3>
-            <h3>pot: { this.props.potSize} </h3>
+            <H3>handstate: { this.props.hand.get('state') } </H3>
+            <H3>myAddress: { this.props.myAddress } </H3>
+            <H3>isMyTurn: {(this.props.isMyTurn) ? 'yes' : 'no'} </H3>
+            <H3>amount to call: { this.props.amountToCall} </H3>
+            <H3>pot: { this.props.potSize} </H3>
           </div>
           <div className="table-container">
             <div className="poker-table">
@@ -78,7 +81,8 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
                 </div>
               </div>
             </div>
-            <ActionBar params={this.props.params}></ActionBar>
+            <TableComponent {...this.props}></TableComponent>
+            <ActionBar {...this.props}></ActionBar>
           </div>
         </div>
       );
@@ -96,19 +100,21 @@ export function mapDispatchToProps(dispatch) {
   };
 }
 
-const mapStateToProps = (state) => ({
-  hand: makeHandSelector(state),
-  myAddress: makeSelectAddress(state),
-  lastHandNettedOnClient: makeLastHandNettedSelector(state),
-  isMyTurn: makeIsMyTurnSelector(state),
-  potSize: makePotSizeSelector(state),
-  amountToCall: makeAmountToCallSelector(state),
+const mapStateToProps = createStructuredSelector({
+  hand: makeHandSelector(),
+  myAddress: makeAddressSelector(),
+  lineup: makeLineupSelector(),
+  lastHandNettedOnClient: makeLastHandNettedSelector(),
+  isMyTurn: makeIsMyTurnSelector(),
+  potSize: makePotSizeSelector(),
+  amountToCall: makeAmountToCallSelector(),
 });
 
 Table.propTypes = {
   location: React.PropTypes.object,
   hand: React.PropTypes.object,
-  myAddress: React.PropTypes.func,
+  lineup: React.PropTypes.object,
+  myAddress: React.PropTypes.string,
   lastHandNettedOnClient: React.PropTypes.number,  // eslint-disable-line
   isMyTurn: React.PropTypes.bool,
   potSize: React.PropTypes.number,

@@ -8,6 +8,7 @@ const values = ['2', '3', '4', '5', '6', '7', '8', '9', 't', 'j', 'q', 'k', 'a']
 const suits = ['clubs', 'diamonds', 'hearts', 'spades'];
 
 function Card(props) {
+  const vc = new VectorCards();
   const suit = suits[Math.floor(props.cardNumber / 13)];
   const value = values[props.cardNumber % 13];
   const link = vc.getCardData(60, suit, value);

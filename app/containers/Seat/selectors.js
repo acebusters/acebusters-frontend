@@ -5,23 +5,23 @@ import EWT from 'ethereum-web-token';
 import { createSelector } from 'reselect';
 import { makeHandSelector, makeMyPosSelector, tableStateSelector } from '../Table/selectors';
 
-const lastRoundMaxBetSelector = createSelector(
+const makeLastRoundMaxBetSelector = () => createSelector(
     tableStateSelector,
     (tableState) => (tableState) ? tableState.lastRoundMaxBet : null
 );
 
-const makeLastReceiptSelector = createSelector(
-    [makeHandSelector, makeMyPosSelector],
+const makeLastReceiptSelector = () => createSelector(
+    [makeHandSelector(), makeMyPosSelector()],
     (hand, myPos) => (hand && hand.lineup && myPos && hand.lineup[myPos].last) ? EWT.parse(hand.lineup[myPos].last) : undefined
 );
 
-const makeLastAmountSelector = createSelector(
-    makeLastReceiptSelector,
+const makeLastAmountSelector = () => createSelector(
+    makeLastReceiptSelector(),
     (lastReceipt) => (lastReceipt) ? lastReceipt.values[1] : 0
 );
 
-const makeStackSelector = createSelector(
-    [makeHandSelector, makeMyPosSelector, makeLastAmountSelector, lastRoundMaxBetSelector],
+const makeStackSelector = () => createSelector(
+    [makeHandSelector(), makeMyPosSelector(), makeLastAmountSelector(), makeLastRoundMaxBetSelector()],
     (hand, myPos, lastAmount, lastRoundMaxBet) => {
       if (hand && myPos && lastAmount && lastRoundMaxBet) {
         let stack = hand.lineup[myPos].amount - lastAmount;
@@ -34,8 +34,8 @@ const makeStackSelector = createSelector(
     }
 );
 
-const makeCardSelector = createSelector(
-    [makeHandSelector, makeMyPosSelector],
+const makeCardSelector = () => createSelector(
+    [makeHandSelector(), makeMyPosSelector()],
     (hand, myPos) => {
       if (hand && hand.get('lineup') && myPos) {
         const lu = hand.get('lineup').toJS();
@@ -46,8 +46,8 @@ const makeCardSelector = createSelector(
     }
 );
 
-const makeFoldedSelector = createSelector(
-    makeLastReceiptSelector,
+const makeFoldedSelector = () => createSelector(
+    makeLastReceiptSelector(),
     (lastReceipt) => (lastReceipt) ? lastReceipt.abi[0].name === 'fold' : false
 );
 

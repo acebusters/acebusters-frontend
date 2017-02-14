@@ -4,16 +4,18 @@ import { connect } from 'react-redux';
 import { FormattedMessage } from 'react-intl';
 import { createSelector } from 'reselect';
 
-import makeSelectAccountData, { makeSelectContract, makeSelectAddress } from '../AccountProvider/selectors';
+import makeSelectAccountData, { makeSelectContract, makeAddressSelector } from '../AccountProvider/selectors';
 import messages from './messages';
-import { transferToggle } from '../App/actions';
 import { setBalance } from '../AccountProvider/actions';
 
 export class Dashboard extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   componentDidMount() {
     this.props.contract.balanceOf(this.props.address, (err, bal) => {
-      // TODO(ace): check error
+      if (err) {
+        console.dir(err);
+        return;
+      }
       this.props.setBalance(bal.toNumber());
     });
   }
@@ -31,7 +33,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
           balance: {this.props.account.balance}
         </div>
         <ul>
-          <button onClick={this.props.transferToggle}>Transfer</button>
+          <button>Transfer</button>
         </ul>
       </div>
     );
@@ -40,7 +42,6 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
 
 Dashboard.propTypes = {
   setBalance: PropTypes.func,
-  transferToggle: PropTypes.func,
   account: PropTypes.any,
   contract: PropTypes.any,
   address: PropTypes.string,
@@ -49,7 +50,7 @@ Dashboard.propTypes = {
 const mapStateToProps = createSelector(
   makeSelectAccountData(),
   makeSelectContract(),
-  makeSelectAddress(),
+  makeAddressSelector(),
   (account, contract, address) => ({
     account,
     contract,
@@ -61,7 +62,6 @@ const mapStateToProps = createSelector(
 function mapDispatchToProps(dispatch) {
   return {
     setBalance: (newBal) => dispatch(setBalance(newBal)),
-    transferToggle: () => dispatch(transferToggle()),
   };
 }
 

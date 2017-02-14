@@ -3,12 +3,12 @@
  */
 import React from 'react';
 import { connect } from 'react-redux';
+import { createStructuredSelector } from 'reselect';
 import Card from 'components/Card'; // eslint-disable-line
 import * as LocalStorage from '../../services/localStorage';
 import { setCards } from '../Table/actions';
 import { makeCardSelector, makeStackSelector, makeLastAmountSelector, makeFoldedSelector } from './selectors';
 import { makeMyPosSelector, makeHandSelector, makeLastHandNettedSelector } from '../Table/selectors';
-import { makeSelectAddress } from '../AccountProvider/selectors';
 
 class Seat extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -43,20 +43,16 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
   }
 }
 
-const makeMapStateToProps = () => {
-  const mapStateToProps = (state) => ({
-    myAddress: makeSelectAddress(state),
-    hand: makeHandSelector(state),
-    lastHandNettedOnClient: makeLastHandNettedSelector(state),
-    myPos: makeMyPosSelector(state),
-    lastAmount: makeLastAmountSelector(state),
-    stack: makeStackSelector(state),
-    cards: makeCardSelector(state),
-    folded: makeFoldedSelector(state),
-  });
+const mapStateToProps = createStructuredSelector({
+  hand: makeHandSelector(),
+  lastHandNettedOnClient: makeLastHandNettedSelector(),
+  myPos: makeMyPosSelector(),
+  lastAmount: makeLastAmountSelector(),
+  stack: makeStackSelector(),
+  cards: makeCardSelector(),
+  folded: makeFoldedSelector(),
+});
 
-  return mapStateToProps;
-};
 
 export function mapDispatchToProps(dispatch) {
   return {
@@ -78,4 +74,4 @@ Seat.propTypes = {
   setCards: React.PropTypes.func,
 };
 
-export default connect(makeMapStateToProps)(Seat);
+export default connect(mapStateToProps)(Seat);
