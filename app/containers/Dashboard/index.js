@@ -6,7 +6,11 @@ import { createSelector } from 'reselect';
 
 import makeSelectAccountData, { makeSelectContract, makeSelectAddress } from '../AccountProvider/selectors';
 import messages from './messages';
+import Teleport from '../Teleport';
+import { Modal } from '../Teleport/modal';
 import { setBalance } from '../AccountProvider/actions';
+
+const openModal = () => Teleport.init(<Modal>Some text</Modal>);
 
 export class Dashboard extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
@@ -25,10 +29,16 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     return (
       <div>
         <FormattedMessage {...messages.header} />
-        <QRCode value={qrUrl} />
         <div>
-          {this.props.account.balance}
+          address: {this.props.address}
+          <QRCode value={qrUrl} />
         </div>
+        <div>
+          balance: {this.props.account.balance}
+        </div>
+        <ul>
+          <button onClick={openModal}>Transfer</button>
+        </ul>
       </div>
     );
   }
