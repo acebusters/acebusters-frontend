@@ -36,7 +36,7 @@ function mapDispatchToProps(dispatch) {
 
 const mapStateToProps = createSelector(
   makeSelectAccountData(),
-  (formState) => ({ formState })
+  (account) => ({ account })
 );
 
 export default connect(mapStateToProps, mapDispatchToProps)(AccountProvider);

@@ -6,29 +6,14 @@ import { createSelector } from 'reselect';
 
 const selectGlobal = (state) => state.get('global');
 
-const makeSelectCurrentUser = () => createSelector(
+const makeSelectTransferShow = () => createSelector(
   selectGlobal,
-  (globalState) => globalState.get('currentUser')
-);
-
-const makeSelectLoading = () => createSelector(
-  selectGlobal,
-  (globalState) => globalState.get('loading')
-);
-
-const makeSelectError = () => createSelector(
-  selectGlobal,
-  (globalState) => globalState.get('error')
+  (globalState) => globalState.get('transferShow')
 );
 
 const makeSelectSidebarCollapse = () => createSelector(
   selectGlobal,
   (globalState) => globalState.get('sidebarCollapse')
-);
-
-const makeSelectRepos = () => createSelector(
-  selectGlobal,
-  (globalState) => globalState.getIn(['userData', 'repositories'])
 );
 
 const makeSelectLocationState = () => {
@@ -49,10 +34,7 @@ const makeSelectLocationState = () => {
 
 export {
   selectGlobal,
-  makeSelectCurrentUser,
-  makeSelectLoading,
-  makeSelectError,
-  makeSelectRepos,
+  makeSelectTransferShow,
   makeSelectLocationState,
   makeSelectSidebarCollapse,
 };

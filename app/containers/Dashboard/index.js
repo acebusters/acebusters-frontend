@@ -6,11 +6,8 @@ import { createSelector } from 'reselect';
 
 import makeSelectAccountData, { makeSelectContract, makeSelectAddress } from '../AccountProvider/selectors';
 import messages from './messages';
-import Teleport from '../Teleport';
-import { Modal } from '../Teleport/modal';
 import { setBalance } from '../AccountProvider/actions';
-
-const openModal = () => Teleport.init(<Modal>Some text</Modal>);
+import { transferToggle } from '../App/actions';
 
 export class Dashboard extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
@@ -37,7 +34,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
           balance: {this.props.account.balance}
         </div>
         <ul>
-          <button onClick={openModal}>Transfer</button>
+          <button onClick={this.props.transferToggle}>Transfer</button>
         </ul>
       </div>
     );
@@ -46,6 +43,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
 
 Dashboard.propTypes = {
   setBalance: PropTypes.func,
+  transferToggle: PropTypes.func,
   account: PropTypes.any,
   contract: PropTypes.any,
   address: PropTypes.string,
@@ -66,6 +64,7 @@ const mapStateToProps = createSelector(
 function mapDispatchToProps(dispatch) {
   return {
     setBalance: (newBal) => dispatch(setBalance(newBal)),
+    transferToggle: () => dispatch(transferToggle()),
   };
 }
 

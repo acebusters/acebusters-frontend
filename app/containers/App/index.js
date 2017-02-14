@@ -9,9 +9,10 @@ import Content from 'components/Content';
 import Sidebar from 'components/Sidebar';
 import withProgressBar from 'components/ProgressBar';
 import makeSelectAccountData from '../AccountProvider/selectors';
-import { makeSelectSidebarCollapse } from './selectors';
+import { makeSelectSidebarCollapse, makeSelectTransferShow } from './selectors';
 import { setAuthState } from '../AccountProvider/actions';
-import { sidebarToggle } from './actions';
+import { sidebarToggle, transferToggle } from './actions';
+import Modal from './modal';
 import theme from '../../skin-blue';
 
 import {
@@ -77,35 +78,43 @@ const sb = () => ([
 
 export function App(props) {
   return (
-    <StyledDashboard>
-      <ThemeProvider theme={theme}>
-        <Header
-          loggedIn={props.account.loggedIn}
-          onClickLogout={props.handleClickLogout}
-          sidebarToggle={props.sidebarToggle}
-        />
-      </ThemeProvider>
-      {props.account.loggedIn && <ThemeProvider theme={theme}>
-        <Sidebar
-          fixed={props.fixed}
-          sidebarCollapse={props.sidebarCollapse}
-          sidebarMini={props.sidebarMini}
-        >
-          {sb()}
-        </Sidebar>
-      </ThemeProvider>}
-      <ThemeProvider theme={theme}>
-        <Content
-          fixed={props.fixed}
-          name="content-wrapper"
-          sidebarCollapse={props.sidebarCollapse}
-          sidebarMini={props.sidebarMini}
-        >
-          {React.Children.toArray(props.children)}
-          <Footer />
-        </Content>
-      </ThemeProvider>
-    </StyledDashboard>
+    <div>
+      <StyledDashboard>
+        <ThemeProvider theme={theme}>
+          <Header
+            loggedIn={props.account.loggedIn}
+            onClickLogout={props.handleClickLogout}
+            sidebarToggle={props.sidebarToggle}
+          />
+        </ThemeProvider>
+        {props.account.loggedIn && <ThemeProvider theme={theme}>
+          <Sidebar
+            fixed={props.fixed}
+            sidebarCollapse={props.sidebarCollapse}
+            sidebarMini={props.sidebarMini}
+          >
+            {sb()}
+          </Sidebar>
+        </ThemeProvider>}
+        <ThemeProvider theme={theme}>
+          <Content
+            fixed={props.fixed}
+            name="content-wrapper"
+            sidebarCollapse={props.sidebarCollapse}
+            sidebarMini={props.sidebarMini}
+          >
+            {React.Children.toArray(props.children)}
+            <Footer />
+          </Content>
+        </ThemeProvider>
+      </StyledDashboard>
+      <Modal isOpen={props.isModalOpen} transferToggle={props.transferToggle}>
+        <h3>My Modal</h3>
+        <div className="body">
+          <p>This is the modal&apos;s body.</p>
+        </div>
+      </Modal>
+    </div>
   );
 }
 
@@ -121,15 +130,18 @@ App.propTypes = {
   account: React.PropTypes.object,
   handleClickLogout: React.PropTypes.func,
   sidebarToggle: React.PropTypes.func,
+  transferToggle: React.PropTypes.func,
   fixed: React.PropTypes.bool,
   sidebarCollapse: React.PropTypes.bool,
   sidebarMini: React.PropTypes.bool,
+  isModalOpen: React.PropTypes.bool,
 };
 
 function mapDispatchToProps(dispatch) {
   return {
     handleClickLogout: () => dispatch(setAuthState({ loggedIn: false })),
     sidebarToggle: () => dispatch(sidebarToggle()),
+    transferToggle: () => dispatch(transferToggle()),
   };
 }
 
@@ -137,6 +149,7 @@ function mapDispatchToProps(dispatch) {
 const mapStateToProps = createStructuredSelector({
   account: makeSelectAccountData(),
   sidebarCollapse: makeSelectSidebarCollapse(),
+  isModalOpen: makeSelectTransferShow(),
 });
 
 // Wrap the component to inject dispatch and state into it
