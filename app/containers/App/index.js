@@ -2,6 +2,7 @@ import React from 'react';
 import styled, { ThemeProvider } from 'styled-components';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
+import { ModalContainer, ModalDialog } from 'react-modal-dialog';
 
 import Header from 'components/Header';
 import Footer from 'components/Footer';
@@ -13,7 +14,6 @@ import TransferDialog from '../TransferDialog';
 import { makeSelectSidebarCollapse, makeSelectTransferShow } from './selectors';
 import { setAuthState } from '../AccountProvider/actions';
 import { sidebarToggle, transferToggle } from './actions';
-import Modal from './modal';
 import theme from '../../skin-blue';
 
 import {
@@ -109,9 +109,14 @@ export function App(props) {
           </Content>
         </ThemeProvider>
       </StyledDashboard>
-      <Modal isOpen={props.isModalOpen} transferToggle={props.transferToggle}>
-        <TransferDialog />
-      </Modal>
+
+      { props.isModalOpen &&
+        <ModalContainer onClose={props.transferToggle}>
+          <ModalDialog onClose={props.transferToggle}>
+            <TransferDialog />
+          </ModalDialog>
+        </ModalContainer>
+      }
     </div>
   );
 }

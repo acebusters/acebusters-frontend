@@ -74,6 +74,7 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-const mapStateToProps = (state) => (state);
+const mapStateToProps = () => ({
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(reduxForm({ form: 'transfer', validate, warn })(TransferDialog));

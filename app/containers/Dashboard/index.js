@@ -13,9 +13,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
 
   componentDidMount() {
     this.props.contract.balanceOf(this.props.address, (err, bal) => {
-      if (err) {
-        return err;
-      }
+      // TODO(ace): check error
       this.props.setBalance(bal.toNumber());
     });
   }
