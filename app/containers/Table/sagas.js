@@ -5,9 +5,9 @@ import EthUtil from 'ethereumjs-util';
 import { PokerHelper, ReceiptCache } from 'poker-helper';
 import { call, put, takeLatest, select, take, fork } from 'redux-saga/effects';
 import { delay } from 'redux-saga';
-import { updateReceived, lineupReceived } from './actions';
-import { ABI_BET, apiBasePath } from '../../app.config';
-import { fetchTableState, pay, fetchLineup } from '../../services/table';
+import { updateReceived, lineupReceived, completeBet, completeFold, completeShow } from './actions';
+import { ABI_BET, checkABIs, apiBasePath } from '../../app.config';
+import { fetchTableState, pay, fetchLineup, show } from '../../services/table';
 
 const rc = new ReceiptCache();
 const pokerHelper = new PokerHelper(rc);
@@ -65,8 +65,8 @@ function* performDealingAction(action) {
   try {
     const holeCards = yield call(() => pay(handId, amount, privKey, tableAddr, ABI_BET, 'bet').then((res) => res.json()));
     yield put({ type: 'COMPLETE_BET', handId, amount, holeCards, privKey });
-  } catch (error) {
-    yield put({ type: 'FAILED_REQUEST', error });
+  } catch (err) {
+    yield put({ type: 'FAILED_REQUEST', err });
   }
 }
 
@@ -94,7 +94,7 @@ export function* poll(action) {
     const tableState = yield call(fetchTableState, action.tableAddr);
     yield put(updateReceived(tableState));
   } catch (err) {
-    // missing action
+    yield put({ type: 'FAILED_REQUEST', err });
   }
 }
 
@@ -103,7 +103,44 @@ export function* getLineup(action) {
     const lineup = yield call(fetchLineup, action.tableAddr, action.privKey);
     yield put(lineupReceived(lineup));
   } catch (err) {
-    // missing action
+    yield put({ type: 'FAILED_REQUEST', err });
+  }
+}
+
+export function* submitBet(action) {
+  try {
+    const cards = yield call(pay, action.handId, action.amount, action.privKey, action.tableAddr, ABI_BET, 'bet');
+    yield put(completeBet(cards, action.privKey));
+  } catch (err) {
+    yield put({ type: 'FAILED_REQUEST', err });
+  }
+}
+
+export function* submitFold(action) {
+  try {
+    const cards = yield call(pay, action.handId, action.amount, action.privKey, action.tableAddr, ABI_BET, 'bet');
+    yield put(completeFold(cards, action.privKey));
+  } catch (err) {
+    yield put({ type: 'FAILED_REQUEST', err });
+  }
+}
+
+export function* submitShow(action) {
+  try {
+    const distribution = yield call(show, action.handId, action.myMaxBet, action.cards, action.privKey, action.tableAddr);
+    yield put(completeShow(distribution));
+  } catch (err) {
+    yield put({ type: 'FAILED_REQUEST', err });
+  }
+}
+
+export function* submitCheck(action) {
+  const abi = checkABIs[action.state];
+  try {
+    const cards = yield call(pay, action.handId, action.amount, action.privKey, action.tableAddr, abi, abi[0].name);
+    yield put(completeBet(cards, action.privKey));
+  } catch (err) {
+    yield put({ type: 'FAILED_REQUEST', err });
   }
 }
 
@@ -119,6 +156,10 @@ function* tableSaga() {
   yield takeLatest('PERFORM_DEALING_ACTION', performDealingAction);
   yield takeLatest('START_POLLING', poll);
   yield takeLatest('GET_LINEUP', getLineup);
+  yield takeLatest('SUBMIT_BET', submitBet);
+  yield takeLatest('SUBMIT_FOLD', submitFold);
+  yield takeLatest('SUBMIT_CHECK', submitCheck);
+  yield takeLatest('SUBMIT_SHOW', submitShow);
   yield watchAndGet();
 }
 

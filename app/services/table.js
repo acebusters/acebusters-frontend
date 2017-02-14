@@ -26,8 +26,10 @@ export function pay(handId, amount, priv, tableAddr, abi, action) {
     const header = new Headers({ Authorization: receipt });
     const myInit = { headers: header, method: 'POST' };
     const request = new Request(`${apiBasePath}/table/${tableAddr}/pay`, myInit);
-    fetch(request).then((res) => {
-      resolve(res);
+    fetch(request).then((res) => res.json(), (err) => {
+      reject(err);
+    }).then((cards) => {
+      resolve(cards);
     }, (err) => {
       reject(err);
     });

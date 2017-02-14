@@ -7,7 +7,7 @@ import Button from 'components/Button';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
 import { getBalance, getTables, joinTable } from './actions';
-import { makeSelectAddress } from '../AccountProvider/selectors';
+import { makeAddressSelector } from '../AccountProvider/selectors';
 import { makeSelectLobby } from './selectors';
 
 
@@ -53,7 +53,7 @@ export function mapDispatchToProps(dispatch) {
 }
 
 const mapStateToProps = createStructuredSelector({
-  myAddress: makeSelectAddress(),
+  myAddress: makeAddressSelector(),
   lobby: makeSelectLobby(),
 });
 

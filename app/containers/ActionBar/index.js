@@ -2,11 +2,13 @@
  * Created by helge on 24.08.16.
  */
 import React from 'react';
+import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
 import { submitBet, submitFold, submitCheck, submitShow, updateAmount } from '../Table/actions';
 import { makeCardSelector } from '../Seat/selectors';
 import { makeSelectPrivKey } from '../AccountProvider/selectors';
-import { makePotSizeSelector, makeMyMaxBetSelector } from '../Table/selectors';
+import { makePotSizeSelector, makeMyMaxBetSelector, makeAmountSelector } from '../Table/selectors';
+import Button from '../../components/Button';
 
 class ActionBar extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -14,64 +16,69 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
     const actionBar = (
       <div className="actions">
         <div className="row">
-          <button
+          <Button
             className="btn btn-default btn-sm col-xs-4"
-            onClick={this.props.bet(this.props.hand.get('handId'),
-                                    parseInt(this.props.amount, 10),
-                                    this.props.privKey,
-                                    this.props.params.addr)}
-          >Bet
-          </button>
-          <button
+            onClick={() => this.props.bet(this.props.hand.get('handId'),
+                                          parseInt(this.props.amount, 10),
+                                          this.props.location.query.privKey,
+                                          this.props.params.id)}
+          >
+            Bet
+          </Button>
+          <Button
             className="btn btn-default btn-sm col-xs-4"
-            onClick={this.props.checkCall(this.props.hand.get('handId'),
-                                          this.props.myMaxBet,
-                                          this.props.maxBet,
-                                          this.props.privKey,
-                                          this.props.params.addr,
-                                          this.props.hand.get('state'),
-                                          this.props.amountToCall)}
+            onClick={() => this.props.checkCall(this.props.hand.get('handId'),
+                                                this.props.myMaxBet,
+                                                this.props.maxBet,
+                                                this.props.location.query.privKey,
+                                                this.props.params.id,
+                                                this.props.hand.get('state'),
+                                                this.props.amountToCall)}
           >
             { (this.props.amountToCall === 0) ? 'Check' : `Call ${this.props.amountToCall}` }
-          </button>
-          <button
+          </Button>
+          <Button
             className="btn btn-default btn-sm col-xs-4"
-            onClick={this.props.fold(this.props.hand.get('handId'),
-                                      this.props.myMaxBet,
-                                      this.props.privKey,
-                                      this.props.params.addr)}
+            onClick={() => this.props.fold(this.props.hand.get('handId'),
+                                           this.props.myMaxBet,
+                                           this.props.location.query.privKey,
+                                           this.props.params.id)}
           >
             Fold
-         </button>
+         </Button>
         </div>
         <div className="row">
-          <button
+          <Button
             className="btn btn-default btn-sm col-xs-4" value={'50000'}
-            onClick={this.props.bet(this.props.hand.get('handId'),
-                                    5000,
-              this.props.privKey,
-                                    this.props.params.addr)}
-          >POST SB
-          </button>
-          <button
+            onClick={() => this.props.bet(this.props.hand.get('handId'),
+                                          5000,
+                                          this.props.location.query.privKey,
+                                          this.props.params.id)}
+          >
+            POST SB
+          </Button>
+          <Button
             className="btn btn-default btn-sm col-xs-4" value={'100000'}
-            onClick={this.props.bet(this.props.hand.get('handId'),
-                                    10000,
-                                    this.props.privKey,
-                                    this.props.params.addr)}
-          >POST BB
-          </button>
-          <button
+            onClick={() => this.props.bet(this.props.hand.get('handId'),
+                                          10000,
+                                          this.props.location.query.privKey,
+                                          this.props.params.id)}
+          >
+            POST BB
+          </Button>
+          <Button
             className="btn btn-default btn-sm col-xs-4"
             onClick={() => this.props.show(this.props.hand.get('handId'),
                                            this.props.myMaxBet,
                                            this.props.cards,
-                                           this.props.privKey,
-                                           this.props.tableAddr)}
-          >SHOW
-          </button>
+                                           this.props.location.query.privKey,
+                                           this.props.params.id)}
+          >
+            SHOW
+          </Button>
           <input
             type="text" className="input-amount"
+            placeholder="Enter amount here"
             onChange={(e) => this.props.updateAmount(e)}
           />
         </div>
@@ -98,12 +105,13 @@ export function mapDispatchToProps(dispatch) {
   };
 }
 
-const mapStateToProps = (state) => ({
-  privKey: makeSelectPrivKey(state),
-  cards: makeCardSelector(state),
-  amount: state.get('amount'),
-  potSize: makePotSizeSelector(state),
-  myMaxBet: makeMyMaxBetSelector(state),
+
+const mapStateToProps = createStructuredSelector({
+  privKey: makeSelectPrivKey(),
+  cards: makeCardSelector(),
+  amount: makeAmountSelector(),
+  potSize: makePotSizeSelector(),
+  myMaxBet: makeMyMaxBetSelector(),
 });
 
 ActionBar.propTypes = {
@@ -111,12 +119,12 @@ ActionBar.propTypes = {
   lastHandNettedOnClient: React.PropTypes.number,  // eslint-disable-line
   amountToCall: React.PropTypes.number,
   params: React.PropTypes.object,
+  location: React.PropTypes.object,
   privKey: React.PropTypes.func,
-  amount: React.PropTypes.number,
+  amount: React.PropTypes.string,
   cards: React.PropTypes.array,
   myMaxBet: React.PropTypes.number,
   maxBet: React.PropTypes.number,
-  tableAddr: React.PropTypes.string,
   bet: React.PropTypes.func,
   fold: React.PropTypes.func,
   checkCall: React.PropTypes.func,

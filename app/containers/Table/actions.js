@@ -22,7 +22,6 @@ export const SUBMIT_CHECK = 'SUBMIT_CHECK';
 export const COMPLETE_BET = 'COMPLETE_BET';
 export const COMPLETE_FOLD = 'COMPLETE_FOLD';
 export const COMPLETE_SHOW = 'COMPLETE_SHOW';
-export const COMPLETE_CHECK = 'COMPLETE_CHECK';
 
 
 export function getLineup(tableAddr, privKey) {
@@ -49,22 +48,30 @@ export function updateAmount(amount) {
   return { type: UPDATE_AMOUNT, amount };
 }
 
-export function submitBet(amount) {
-  return { type: SUBMIT_BET, amount };
+export function submitBet(handId, amount, privKey, tableAddr) {
+  return { type: SUBMIT_BET, handId, amount, privKey, tableAddr };
 }
 
-export function submitFold(amount) {
-  return { type: SUBMIT_FOLD, amount };
+export function completeBet(holeCards, privKey) {
+  return { type: COMPLETE_BET, holeCards, privKey };
 }
 
-export function submitShow(amount) {
-  return { type: SUBMIT_SHOW, amount };
+export function submitFold(handId, amount, privKey, tableAddr) {
+  return { type: SUBMIT_FOLD, handId, amount, privKey, tableAddr };
 }
 
-export function submitCheck(amount) {
-  return { type: SUBMIT_CHECK, amount };
+export function completeFold() {
+  return { type: COMPLETE_FOLD };
 }
 
-export function stopPolling() {
-  return { type: STOP_POLLING };
+export function submitShow(handId, myMaxBet, cards, privKey, tableAddr) {
+  return { type: SUBMIT_SHOW, handId, myMaxBet, cards, privKey, tableAddr };
+}
+
+export function completeShow(distribution) {
+  return { type: COMPLETE_SHOW, distribution };
+}
+
+export function submitCheck(handId, myMaxBet, privKey, tableAddr, state) {
+  return { type: SUBMIT_CHECK, handId, myMaxBet, privKey, tableAddr, state };
 }

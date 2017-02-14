@@ -4,13 +4,9 @@ import { connect } from 'react-redux';
 import { FormattedMessage } from 'react-intl';
 import { createSelector } from 'reselect';
 
-import makeSelectAccountData, { makeSelectContract, makeSelectAddress } from '../AccountProvider/selectors';
+import makeSelectAccountData, { makeSelectContract, makeAddressSelector } from '../AccountProvider/selectors';
 import messages from './messages';
-import Teleport from '../Teleport';
-import { Modal } from '../Teleport/modal';
 import { setBalance } from '../AccountProvider/actions';
-
-const openModal = () => Teleport.init(<Modal>Some text</Modal>);
 
 export class Dashboard extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
@@ -37,7 +33,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
           balance: {this.props.account.balance}
         </div>
         <ul>
-          <button onClick={openModal}>Transfer</button>
+          <button>Transfer</button>
         </ul>
       </div>
     );
@@ -54,7 +50,7 @@ Dashboard.propTypes = {
 const mapStateToProps = createSelector(
   makeSelectAccountData(),
   makeSelectContract(),
-  makeSelectAddress(),
+  makeAddressSelector(),
   (account, contract, address) => ({
     account,
     contract,

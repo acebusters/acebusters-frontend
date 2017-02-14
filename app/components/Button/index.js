@@ -56,9 +56,9 @@ const StyledButton = styled.button`{
 }`;
 
 const Wrapper = styled.div`
-  width: 100%;
   text-align: center;
-  margin: 4em 0;
+  margin: 0.5em 0.5em;
+  float: left;
 `;
 
 function Button(props) {
