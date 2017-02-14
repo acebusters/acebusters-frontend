@@ -52,7 +52,6 @@ export function* dispatchDealingAction() {
   const bb = pokerHelper.nextActivePlayer(hand.get('lineup').toJS(), sb + 1);
   if (myPos === sb) { amount = 50000; }
   if (myPos === bb) { amount = 100000; }
-  console.log(amount);
   const tableAddr = state.get('tableAddr');
   yield put({ type: 'PERFORM_DEALING_ACTION', handId, amount, privKey, tableAddr });
 }

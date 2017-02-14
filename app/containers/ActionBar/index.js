@@ -3,17 +3,12 @@
  */
 import React from 'react';
 import { connect } from 'react-redux';
-import { submitBet, submitFold, submitCheck, submitShow, stopPolling, updateAmount } from '../Table/actions';
+import { submitBet, submitFold, submitCheck, submitShow, updateAmount } from '../Table/actions';
 import { makeCardSelector } from '../Seat/selectors';
 import { makeSelectPrivKey } from '../AccountProvider/selectors';
-import { makeIsMyTurnSelector, makePotSizeSelector, makeAmountToCallSelector,
-  makeHandSelector, makeLastHandNettedSelector, makeMyMaxBetSelector } from '../Table/selectors';
+import { makePotSizeSelector, makeMyMaxBetSelector } from '../Table/selectors';
 
 class ActionBar extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
-  stop() {
-    stopPolling();
-  }
 
   render() {
     const actionBar = (
@@ -75,12 +70,6 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
                                            this.props.tableAddr)}
           >SHOW
           </button>
-          <button
-            className="btn btn-default btn-sm col-xs-12"
-            onClick={() => this.stop()}
-          >
-            STOP POLLING
-          </button>
           <input
             type="text" className="input-amount"
             onChange={(e) => this.props.updateAmount(e)}
@@ -113,26 +102,23 @@ const mapStateToProps = (state) => ({
   privKey: makeSelectPrivKey(state),
   cards: makeCardSelector(state),
   amount: state.get('amount'),
-  hand: makeHandSelector(state),
-  lastHandNettedOnClient: makeLastHandNettedSelector(state),
-  isMyTurn: makeIsMyTurnSelector(state),
   potSize: makePotSizeSelector(state),
-  amountToCall: makeAmountToCallSelector(state),
   myMaxBet: makeMyMaxBetSelector(state),
 });
 
 ActionBar.propTypes = {
+  hand: React.PropTypes.object,
+  lastHandNettedOnClient: React.PropTypes.number,  // eslint-disable-line
+  amountToCall: React.PropTypes.number,
+  params: React.PropTypes.object,
   privKey: React.PropTypes.func,
   amount: React.PropTypes.number,
   cards: React.PropTypes.array,
-  hand: React.PropTypes.object,
   myMaxBet: React.PropTypes.number,
   maxBet: React.PropTypes.number,
   tableAddr: React.PropTypes.string,
-  amountToCall: React.PropTypes.number,
   bet: React.PropTypes.func,
   fold: React.PropTypes.func,
-  params: React.PropTypes.object,
   checkCall: React.PropTypes.func,
   show: React.PropTypes.func,
   updateAmount: React.PropTypes.func,

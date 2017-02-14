@@ -78,7 +78,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
                 </div>
               </div>
             </div>
-            <ActionBar params={this.props.params}></ActionBar>
+            <ActionBar {...this.props}></ActionBar>
           </div>
         </div>
       );
