@@ -9,7 +9,7 @@ import Footer from 'components/Footer';
 import Content from 'components/Content';
 import Sidebar from 'components/Sidebar';
 import withProgressBar from 'components/ProgressBar';
-import makeSelectAccountData from '../AccountProvider/selectors';
+import makeSelectAccountData, { makeSelectGravatar } from '../AccountProvider/selectors';
 import TransferDialog from '../TransferDialog';
 import { makeSelectSidebarCollapse, makeSelectTransferShow } from './selectors';
 import { setAuthState } from '../AccountProvider/actions';
@@ -45,10 +45,10 @@ const StyledDashboard = styled.div`
   `)}
 `;
 
-const sb = () => ([
+const sb = (props) => ([
   <Sidebar.UserPanel
     name="Alexander Pierce"
-    image="public/user2-160x160.jpg"
+    image={props.gravatarUrl}
     online
     key="1"
   />,
@@ -78,6 +78,7 @@ const sb = () => ([
 ]);
 
 export function App(props) {
+  console.dir(props);
   return (
     <div>
       <StyledDashboard>
@@ -86,6 +87,7 @@ export function App(props) {
             loggedIn={props.account.loggedIn}
             onClickLogout={props.handleClickLogout}
             sidebarToggle={props.sidebarToggle}
+            imageUrl={props.gravatarUrl}
           />
         </ThemeProvider>
         {props.account.loggedIn && <ThemeProvider theme={theme}>
@@ -94,7 +96,7 @@ export function App(props) {
             sidebarCollapse={props.sidebarCollapse}
             sidebarMini={props.sidebarMini}
           >
-            {sb()}
+            {sb(props)}
           </Sidebar>
         </ThemeProvider>}
         <ThemeProvider theme={theme}>
@@ -135,6 +137,7 @@ App.propTypes = {
   sidebarToggle: React.PropTypes.func,
   transferToggle: React.PropTypes.func,
   fixed: React.PropTypes.bool,
+  gravatarUrl: React.PropTypes.string,
   sidebarCollapse: React.PropTypes.bool,
   sidebarMini: React.PropTypes.bool,
   isModalOpen: React.PropTypes.bool,
@@ -153,6 +156,7 @@ const mapStateToProps = createStructuredSelector({
   account: makeSelectAccountData(),
   sidebarCollapse: makeSelectSidebarCollapse(),
   isModalOpen: makeSelectTransferShow(),
+  gravatarUrl: makeSelectGravatar(),
 });
 
 // Wrap the component to inject dispatch and state into it

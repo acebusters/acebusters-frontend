@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { browserHistory } from 'react-router';
 
 import Navbar from './Navbar';
 import Logo from './Logo';
@@ -42,20 +43,20 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
       />,
       <UserMenu
         name="Alexander Pierce"
-        image="public/user2-160x160.jpg"
+        image={this.props.imageUrl}
         profileAction={this.props.onClickLogout}
         signOutAction={this.props.onClickLogout}
         key="2"
       />,
     ]) : ([
       <NavItem
-        href="/register"
+        onClick={() => browserHistory.push('/register')}
         iconClass="fa fa-github"
         key="1"
         title="Register"
       />,
       <NavItem
-        href="/login"
+        onClick={() => browserHistory.push('/login')}
         iconClass="fa fa-github"
         key="2"
         title="Login"
@@ -90,6 +91,7 @@ Header.propTypes = {
   loggedIn: React.PropTypes.bool,
   logoOnClick: React.PropTypes.func,
   logoHref: React.PropTypes.string,
+  imageUrl: React.PropTypes.string,
   logoLg: React.PropTypes.element,
   logoSm: React.PropTypes.element,
   sidebarMini: React.PropTypes.bool,
