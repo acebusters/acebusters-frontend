@@ -17,6 +17,7 @@ import { syncHistoryWithStore } from 'react-router-redux';
 import FontFaceObserver from 'fontfaceobserver';
 import { useScroll } from 'react-router-scroll';
 import 'sanitize.css/sanitize.css';
+import { injectGlobal } from 'styled-components';
 
 // Import root app
 import App from 'containers/App';
@@ -44,6 +45,45 @@ import { translationMessages } from './i18n';
 
 // Import CSS reset and Global Styles
 import './global-styles';
+
+injectGlobal`
+  html {
+    font-family: sans-serif;
+    font-size: 10px;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+  }
+
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    display: block;
+    margin: 0;
+    line-height: 1.42857143;
+    color: #333;
+    background-color: #fff;
+    font-family: 'Source Sans Pro','Helvetica Neue',Helvetica,Arial,sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  html, body {
+    height: 100%;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body:after, body:before {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+`;
 
 // Import routes
 import createRoutes from './routes';

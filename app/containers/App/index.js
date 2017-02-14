@@ -78,7 +78,6 @@ const sb = (props) => ([
 ]);
 
 export function App(props) {
-  console.dir(props);
   return (
     <div>
       <StyledDashboard>

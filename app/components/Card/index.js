@@ -2,12 +2,17 @@
  * Created by helge on 24.08.16.
  */
 import React from 'react';
-import { suits, values } from '../../app.config';
+import { VectorCards } from 'ab-vector-cards';
+
+const values = ['2', '3', '4', '5', '6', '7', '8', '9', 't', 'j', 'q', 'k', 'a'];
+const suits = ['clubs', 'diamonds', 'hearts', 'spades'];
 
 function Card(props) {
-  const link = `../assets/img/cards/${values[props.cardNumber % 13]}_of_${suits[Math.floor(props.cardNumber / 13)]}.png`;
+  const suit = suits[Math.floor(props.cardNumber / 13)];
+  const value = values[props.cardNumber % 13];
+  const link = vc.getCardData(60, suit, value);
   return (
-    <img key={link} src={link} className="card" alt="" />
+    <img key={suit+value} src={link} className="card" alt="" />
   );
 }
 
