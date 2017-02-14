@@ -13,7 +13,7 @@ function Card(props) {
   const value = values[props.cardNumber % 13];
   const link = vc.getCardData(60, suit, value);
   return (
-    <img key={suit+value} src={link} className="card" alt="" />
+    <img key={suit + value} src={link} className="card" alt="" />
   );
 }
 
