@@ -43,8 +43,10 @@ export function show(handId, amount, holeCards, priv, tableAddr) {
     const data = JSON.stringify({ cards: holeCards });
     const myInit = { headers: header, body: data, method: 'POST' };
     const request = new Request(`${apiBasePath}/table/${tableAddr}/show`, myInit);
-    fetch(request).then((res) => {
-      resolve(res);
+    fetch(request).then((res) => res.json(), (err) => {
+      reject(err);
+    }).then((distribution) => {
+      resolve(distribution);
     }, (err) => {
       reject(err);
     });

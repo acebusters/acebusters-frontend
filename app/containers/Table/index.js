@@ -33,13 +33,13 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
   componentWillReceiveProps(nextProps) {
     if (this.props.hand && nextProps.lastHandNettedOnClient < this.props.hand.handId - 1) {
-      this.props.updateLastHand(nextProps.lastHandNettedOnClient + 1, this.props.params.addr);
+      this.props.updateLastHand(nextProps.lastHandNettedOnClient + 1, this.props.params.id);
     }
   }
 
   renderSeats() {
     const seats = [];
-    const lineup = this.props.lineup.toJS();
+    const lineup = this.props.lineup;
     for (let i = 0; i < lineup.length; i += 1) {
       const seat = (<Seat key={i} pos={i} {...this.props}> </Seat>);
       seats.push(seat);
@@ -49,7 +49,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
   renderBoard() {
     const board = [];
-    const cards = this.props.hand.get('cards').toJS();
+    const cards = this.props.hand.cards;
     if (cards && cards.length > 0) {
       for (let i = 0; i < cards.length; i += 1) {
         const card = (<Card key={i} cardNumber={cards[i]}></Card>);
@@ -66,7 +66,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       return (
         <div id="root" className="table-bg">
           <div className="status">
-            <H3>handstate: { this.props.hand.get('state') } </H3>
+            <H3>handstate: { this.props.hand.state } </H3>
             <H3>myAddress: { this.props.myAddress } </H3>
             <H3>isMyTurn: {(this.props.isMyTurn) ? 'yes' : 'no'} </H3>
             <H3>amount to call: { this.props.amountToCall} </H3>
@@ -113,7 +113,7 @@ const mapStateToProps = createStructuredSelector({
 Table.propTypes = {
   location: React.PropTypes.object,
   hand: React.PropTypes.object,
-  lineup: React.PropTypes.object,
+  lineup: React.PropTypes.array,
   myAddress: React.PropTypes.string,
   lastHandNettedOnClient: React.PropTypes.number,  // eslint-disable-line
   isMyTurn: React.PropTypes.bool,

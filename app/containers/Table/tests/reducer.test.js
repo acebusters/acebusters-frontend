@@ -1,6 +1,6 @@
 
 import EWT from 'ethereum-web-token';
-import { fromJS } from 'immutable';
+import { fromJS, Map } from 'immutable';
 import tableReducer from '../reducer';
 import * as TableActions from '../actions';
 
@@ -48,7 +48,7 @@ describe('table reducer tests', () => {
       address: P2_ADDR,
       last: new EWT(ABI_BET).bet(1, 50).sign(P2_KEY),
     }];
-    expect(tableReducer(fromJS({
+    expect(tableReducer(Map({
       hand: {
         cards: [],
         dealer: 0,
@@ -65,7 +65,7 @@ describe('table reducer tests', () => {
         handId: 0,
         lineup,
       },
-    })).toEqual(fromJS({
+    })).toEqual(Map({
       hand: {
         cards: [],
         dealer: 0,
@@ -73,61 +73,48 @@ describe('table reducer tests', () => {
         handId: 0,
         lineup,
       },
+      complete: false,
       lastRoundMaxBet: 50,
     }));
   });
 
   it('should not overwrite lineup', () => {
-    expect(tableReducer(fromJS({
+    const lineup = [{
+      address: P1_ADDR,
+      last: new EWT(ABI_BET).bet(1, 50).sign(P1_KEY),
+      amount: 3000,
+    }, {
+      address: P2_ADDR,
+      last: new EWT(ABI_BET).bet(1, 50).sign(P2_KEY),
+      amount: 3000,
+    }];
+
+    expect(tableReducer(Map({
       hand: {
         cards: [],
-        handId: 1,
         dealer: 1,
-        lineup: [{
-          address: P1_ADDR,
-          last: new EWT(ABI_BET).bet(1, 50).sign(P1_KEY),
-          amount: 3000,
-        }, {
-          address: P2_ADDR,
-          last: new EWT(ABI_BET).bet(1, 50).sign(P2_KEY),
-          amount: 3000,
-        }],
+        handId: 1,
         state: 'flop',
+        lineup,
       },
-      lastRoundMaxBet: 0,
     }), {
       type: TableActions.UPDATE_RECEIVED,
       tableState: {
         cards: [],
-        handId: 1,
         dealer: 1,
-        lineup: [{
-          address: P1_ADDR,
-          last: new EWT(ABI_BET).bet(1, 50).sign(P1_KEY),
-          amount: 3000,
-        }, {
-          address: P2_ADDR,
-          last: new EWT(ABI_BET).bet(1, 50).sign(P2_KEY),
-          amount: 3000,
-        }],
+        handId: 1,
         state: 'flop',
+        lineup,
       },
-    })).toEqual(fromJS({
+    })).toEqual(Map({
       hand: {
         cards: [],
-        handId: 1,
         dealer: 1,
-        lineup: [{
-          address: P1_ADDR,
-          last: new EWT(ABI_BET).bet(1, 50).sign(P1_KEY),
-          amount: 3000,
-        }, {
-          address: P2_ADDR,
-          last: new EWT(ABI_BET).bet(1, 50).sign(P2_KEY),
-          amount: 3000,
-        }],
+        handId: 1,
         state: 'flop',
+        lineup,
       },
+      complete: false,
       lastRoundMaxBet: 0,
     }));
   });
@@ -148,7 +135,7 @@ describe('table reducer tests', () => {
       address: P3_ADDR,
       last: new EWT(ABI_BET).bet(1, 150).sign(P3_KEY),
     }];
-    expect(tableReducer(fromJS({
+    expect(tableReducer(Map({
       hand: {
         cards: [],
         handId: 1,
@@ -166,7 +153,7 @@ describe('table reducer tests', () => {
         state: 'flop',
         lineup: lineup2,
       },
-    })).toEqual(fromJS({
+    })).toEqual(Map({
       hand: {
         cards: [],
         handId: 1,
@@ -175,11 +162,12 @@ describe('table reducer tests', () => {
         lineup: lineup2,
       },
       lastRoundMaxBet: 100,
+      complete: false,
     }));
   });
 
   it('should add amount into lineup', () => {
-    expect(tableReducer(fromJS({
+    expect(tableReducer(Map({
       hand: {
         cards: [],
         lineup: [],
@@ -192,7 +180,7 @@ describe('table reducer tests', () => {
         [new BigNumber(3000), new BigNumber(3000), new BigNumber(2000)],
         [0, 0, 0],
       ],
-    })).toEqual(fromJS({
+    })).toEqual(Map({
       hand: {
         cards: [],
         lineup: [{
@@ -216,7 +204,7 @@ describe('table reducer tests', () => {
     dists.push(EWT.concat(P3_ADDR, 10).toString('hex')); // rake
     dists.push(EWT.concat(P1_ADDR, 100).toString('hex'));
 
-    expect(tableReducer({
+    expect(tableReducer(Map({
       hand: {
         lineup: [{
           address: P1_ADDR,
@@ -228,7 +216,7 @@ describe('table reducer tests', () => {
         state: 'turn',
       },
       lastHandNettedOnClient: 0,
-    }, {
+    }), {
       type: TableActions.COMPLETE_HAND_QUERY,
       hand: {
         handId: 1,
@@ -241,7 +229,7 @@ describe('table reducer tests', () => {
         }],
         distribution: new EWT(ABI_DIST).distribution(1, 0, dists).sign(P1_KEY),
       },
-    })).toEqual({
+    })).toEqual(Map({
       hand: {
         lineup: [{
           address: P1_ADDR,
@@ -253,11 +241,11 @@ describe('table reducer tests', () => {
         state: 'turn',
       },
       lastHandNettedOnClient: 1,
-    });
+    }));
   });
 
   it('should add holeCards at right position into lineup', () => {
-    expect(tableReducer({
+    expect(tableReducer(Map({
       hand: {
         lineup: [{
           address: P1_ADDR,
@@ -265,13 +253,13 @@ describe('table reducer tests', () => {
           address: P2_ADDR,
         }],
       },
-    }, {
+    }), {
       type: TableActions.COMPLETE_BET,
       holeCards: {
         cards: [2, 3],
       },
       privKey: P1_KEY,
-    })).toEqual({
+    })).toEqual(Map({
       hand: {
         lineup: [{
           address: P1_ADDR,
@@ -280,18 +268,18 @@ describe('table reducer tests', () => {
           address: P2_ADDR,
         }],
       },
-    });
+    }));
   });
 
   it('should not overwrite holecards', () => {
-    const lineup2 = [{
+    const lineup = [{
       address: P1_ADDR,
       last: new EWT(ABI_BET).bet(1, 100).sign(P1_KEY),
     }, {
       address: P2_ADDR,
       last: new EWT(ABI_BET).bet(1, 100).sign(P2_KEY),
     }];
-    expect(tableReducer(fromJS({
+    expect(tableReducer(Map({
       hand: {
         cards: [],
         handId: 1,
@@ -302,17 +290,19 @@ describe('table reducer tests', () => {
         }, {
           address: P2_ADDR,
         }],
+        state: 'flop',
       },
+      lastRoundMaxBet: 100,
     }), {
       type: TableActions.UPDATE_RECEIVED,
       tableState: {
         cards: [],
         handId: 1,
         dealer: 1,
-        lineup: lineup2,
+        lineup,
         state: 'flop',
       },
-    })).toEqual(fromJS({
+    })).toEqual(Map({
       hand: {
         cards: [],
         handId: 1,
@@ -327,19 +317,20 @@ describe('table reducer tests', () => {
         }],
         state: 'flop',
       },
-      lastRoundMaxBet: 0,
+      lastRoundMaxBet: 100,
+      complete: false,
     }));
   });
 
   it('should update stack sizes when hand complete', () => {
-    const lineup2 = [{
+    const lineup = [{
       address: P1_ADDR,
       last: new EWT(ABI_SHOW).show(1, 100).sign(P1_KEY),
     }, {
       address: P2_ADDR,
       last: new EWT(ABI_FOLD).fold(1, 100).sign(P2_KEY),
     }];
-    expect(tableReducer(fromJS({
+    expect(tableReducer(Map({
       hand: {
         handId: 1,
         lineup: [{
@@ -350,14 +341,15 @@ describe('table reducer tests', () => {
         }],
         state: 'showdown',
       },
+      lastRoundMaxBet: 100,
     }), {
       type: TableActions.UPDATE_RECEIVED,
       tableState: {
         handId: 1,
-        lineup: lineup2,
+        lineup,
         state: 'showdown',
       },
-    })).toEqual(fromJS({
+    })).toEqual(Map({
       hand: {
         handId: 2,
         lineup: [{
@@ -368,12 +360,13 @@ describe('table reducer tests', () => {
         }],
         state: 'showdown',
       },
+      lastRoundMaxBet: 0,
       complete: true,
     }));
   });
 
   it('should handle next hand', () => {
-    expect(tableReducer(fromJS({
+    expect(tableReducer(Map({
       hand: {
         dealer: 1,
         state: 'showdown',
@@ -384,11 +377,15 @@ describe('table reducer tests', () => {
           address: P2_ADDR,
         }],
       },
+      lastRoundMaxBet: 0,
       complete: true,
+      performedDealing: true,
     }), {
       type: TableActions.NEXT_HAND,
-    })).toEqual(fromJS({
+    })).toEqual(Map({
       hand: {
+        cards: [],
+        distribution: '',
         dealer: 2,
         state: 'dealing',
         lineup: [{
@@ -398,6 +395,8 @@ describe('table reducer tests', () => {
         }],
       },
       lastRoundMaxBet: 0,
+      complete: false,
+      performedDealing: false,
     }));
   });
 });

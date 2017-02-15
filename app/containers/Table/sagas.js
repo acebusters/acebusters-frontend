@@ -31,25 +31,24 @@ export function* getHand(action) {
 
 export function* dispatchDealingAction() {
   const state = yield select();
-
   const hand = state.get('table').get('hand');
   const privKey = state.get('account').get('privKey');
-  const handId = hand.get('handId');
+  const handId = hand.handId;
   let amount = 0;
   const myAddr = selectAddress(privKey);
-  const dealer = hand.get('dealer');
-  const myPos = pokerHelper.getMyPos(hand.get('lineup').toJS(), myAddr);
-  const sb = pokerHelper.nextActivePlayer(hand.get('lineup').toJS(), dealer + 1);
+  const dealer = hand.dealer;
+  const myPos = pokerHelper.getMyPos(hand.lineup, myAddr);
+  const sb = pokerHelper.nextActivePlayer(hand.lineup, dealer + 1);
 
-  const whosTurn = pokerHelper.whosTurn(hand.toJS());
+  const whosTurn = pokerHelper.whosTurn(hand);
   if ((whosTurn === sb && myPos !== sb)
-        || (hand.get('state') !== 'dealing')
+        || (hand.state !== 'dealing')
         || (state.get('table').get('error'))
         || state.get('table').get('performedDealing')) {
     return;
   }
 
-  const bb = pokerHelper.nextActivePlayer(hand.get('lineup').toJS(), sb + 1);
+  const bb = pokerHelper.nextActivePlayer(hand.lineup, sb + 1);
   if (myPos === sb) { amount = 50000; }
   if (myPos === bb) { amount = 100000; }
   const tableAddr = state.get('tableAddr');
@@ -83,7 +82,7 @@ export function* watchAndGet() {
       }
     }
 
-    if (state.get('table').get('hand') && state.get('table').get('hand').get('state') === 'dealing') {
+    if (state.get('table').get('hand') && state.get('table').get('hand').state === 'dealing') {
       yield call(dispatchDealingAction);
     }
   }

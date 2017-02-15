@@ -37,8 +37,8 @@ const makeStackSelector = () => createSelector(
 const makeCardSelector = () => createSelector(
     [makeHandSelector(), makeMyPosSelector()],
     (hand, myPos) => {
-      if (hand && hand.get('lineup') && myPos) {
-        const lu = hand.get('lineup').toJS();
+      if (hand && hand.lineup && myPos) {
+        const lu = hand.lineup;
         const cards = (lu[myPos].cards) ? lu[myPos].cards : [0, 0];
         return cards;
       }

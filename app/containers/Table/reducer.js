@@ -2,7 +2,7 @@
  * Created by helge on 20.09.16.
  */
 import _ from 'lodash';
-import { fromJS, List } from 'immutable';
+import { Map } from 'immutable';
 import EWT from 'ethereum-web-token';
 import EthUtil from 'ethereumjs-util';
 import { PokerHelper, ReceiptCache } from 'poker-helper';
@@ -13,7 +13,7 @@ const rc = new ReceiptCache();
 const pokerHelper = new PokerHelper(rc);
 
 // The initial application state
-export const initialState = fromJS({
+export const initialState = Map({
   hand: {
     cards: [],
     dealer: 0,
@@ -37,22 +37,22 @@ export default function tableReducer(state = initialState, action) {
   let myPos;
   switch (action.type) {
     case TableActions.LINEUP_RECEIVED: {
-      let lineup = List([]);
+      let newLineup = [];
+      const currentLineup = state.getIn(['hand', 'lineup']);
       for (let i = 0; i < action.lineup[1].length; i += 1) {
-        let temp = fromJS({
+        const temp = {
           address: action.lineup[1][i],
           amount: action.lineup[2][i].toNumber(),
-        });
-
-        if (state.get('hand').get('lineup').size > 0) {
-          temp = state.merge(state.get('hand').get('lineup').get(i), lineup.get(i));
-        }
-
-        lineup = lineup.push(temp);
+        };
+        newLineup.push(temp);
       }
 
-      const newHand = state.get('hand').set('lineup', lineup);
+      if (currentLineup) {
+        newLineup = _.merge(currentLineup, newLineup);
+      }
 
+      const newHand = state.get('hand');
+      newHand.lineup = newLineup;
       return state
         .set('lastHandNettedOnClient', action.lineup[0].toNumber())
         .set('hand', newHand);
@@ -60,6 +60,7 @@ export default function tableReducer(state = initialState, action) {
 
     case TableActions.SET_CARDS: {
       update.hand = _.clone(state.hand);
+
       if (action.cards) {
         update.hand.lineup[action.pos].cards = action.cards;
       }
@@ -71,116 +72,121 @@ export default function tableReducer(state = initialState, action) {
     }
 
     case TableActions.COMPLETE_HAND_QUERY: {
-      update.hand = _.clone(state.hand);
+      const newHand = _.clone(state.get('hand'));
       action.hand.lineup.forEach((player) => {
         const lastReceipt = rc.get(player.last);
-        for (let i = 0; i < update.hand.lineup.length; i += 1) {
-          if (update.hand.lineup[i].address === lastReceipt.signer) {
-            update.hand.lineup[i].amount -= lastReceipt.values[1];
+        for (let i = 0; i < newHand.lineup.length; i += 1) {
+          if (newHand.lineup[i].address === lastReceipt.signer) {
+            newHand.lineup[i].amount -= lastReceipt.values[1];
           }
         }
       });
       const dists = rc.get(action.hand.distribution);
       for (let j = 0; j < dists.values[2].length; j += 1) {
         const dist = EWT.separate(dists.values[2][j]);
-        for (let i = 0; i < update.hand.lineup.length; i += 1) {
-          if (update.hand.lineup[i].address === dist.address) {
-            update.hand.lineup[i].amount += dist.amount;
+        for (let i = 0; i < newHand.lineup.length; i += 1) {
+          if (newHand.lineup[i].address === dist.address) {
+            newHand.lineup[i].amount += dist.amount;
           }
         }
       }
-      update.lastHandNettedOnClient = action.hand.handId;
-      return (!update) ? state : Object.assign({}, state, update);
+      return state
+        .set('lastHandNettedOnClient', action.hand.handId)
+        .set('hand', newHand);
     }
 
 
     case TableActions.COMPLETE_BET: {
-      myPos = pokerHelper.getMyPos(state.hand.lineup, getMyAddress(action.privKey));
-      const obj = _.clone(state);
-      if (action.holeCards.cards) { obj.hand.lineup[myPos].cards = action.holeCards.cards; }
-      return obj;
+      if (!action.holeCards.cards) return state;
+
+      myPos = pokerHelper.getMyPos(state.get('hand').lineup, getMyAddress(action.privKey));
+      const newHand = _.clone(state.get('hand'));
+      newHand.lineup[myPos].cards = action.holeCards.cards;
+
+      return state
+        .set('hand', newHand);
     }
 
-
     case TableActions.COMPLETE_FOLD: {
-      return (!update) ? state : Object.assign({}, state, update);
+      return state;
     }
 
     case TableActions.COMPLETE_SHOW: {
       update.showed = true;
-      return (!update) ? state : Object.assign({}, state, update);
+      return state
+        .set('showed', true);
     }
 
 
     case TableActions.STARTED_REQUEST: {
-      update.requestInProgress = true;
-      return (!update) ? state : Object.assign({}, state, update);
+      return state
+        .set('requestInProgress', true);
     }
 
 
     case TableActions.PERFORM_DEALING_ACTION: {
-      update.lineup = _.clone(state.lineup);
-      update.performedDealing = true;
-      return (!update) ? state : Object.assign({}, state, update);
+      return state
+        .set('performedDealing', true);
     }
 
     // Error Handling
     case TableActions.FAILED_REQUEST: {
-      const error = action.error;
-      update.requestInProgress = false;
-      update.error = error;
-      return (!update) ? state : Object.assign({}, state, update);
+      return state
+        .set('error', action.error)
+        .set('requestInProgress', false);
     }
 
     case TableActions.UPDATE_RECEIVED: {
       // handComplete stays true till SB posted to server
       const handComplete = pokerHelper.checkForNextHand(action.tableState);
-      update.hand = _.clone(state.get('hand').toJS());
-      const newState = state.toJS();
-      if (handComplete && newState.hand.handId === action.tableState.handId) {
-        update.complete = handComplete;
-        update.hand.lineup.forEach((player) => {
+      const newHand = _.clone(state.get('hand'));
+      let newLastRoundMaxBet = 0;
+      if (handComplete && state.get('hand').handId === action.tableState.handId) {
+        newHand.lineup.forEach((player) => {
           delete player.last; // eslint-disable-line
         });
-        update.hand.handId = action.tableState.handId + 1;
-      } else if (!newState.hand || !newState.hand.handId || newState.hand.handId <= action.tableState.handId) {
-        _.merge(update.hand.lineup, action.tableState.lineup);
-        update.lastRoundMaxBet = (newState.lastRoundMaxBet) ? newState.lastRoundMaxBet : 0;
-        if (newState.hand && newState.hand.state && action.tableState.state !== newState.hand.state && action.tableState.state !== 'dealing') {
+        newHand.handId = action.tableState.handId + 1;
+      } else if (!state.get('hand') || !state.get('hand').handId || state.get('hand').handId <= action.tableState.handId) {
+        _.merge(newHand.lineup, action.tableState.lineup);
+        newLastRoundMaxBet = (state.get('lastRoundMaxBet')) ? state.get('lastRoundMaxBet') : 0;
+        if (state.get('hand') && state.get('hand').state && action.tableState.state !== state.get('hand').state && action.tableState.state !== 'dealing') {
           const maxBet = pokerHelper.findMaxBet(action.tableState.lineup, action.tableState.dealer).amount;
-          update.lastRoundMaxBet = maxBet;
+          newLastRoundMaxBet = maxBet;
         }
-
-        update.hand.handId = action.tableState.handId;
-        update.hand.dealer = action.tableState.dealer;
-        update.hand.cards = action.tableState.cards;
-        update.hand.state = action.tableState.state;
+        newHand.handId = action.tableState.handId;
+        newHand.dealer = action.tableState.dealer;
+        newHand.cards = action.tableState.cards;
+        newHand.state = action.tableState.state;
       } else {
-        return fromJS(newState);
+        return state
+          .set('complete', handComplete);
       }
-      return fromJS(update);
+      return state
+        .set('complete', handComplete)
+        .set('lastRoundMaxBet', newLastRoundMaxBet)
+        .set('hand', newHand);
     }
 
     case TableActions.NEXT_HAND: {
-      const currentDealer = state.get('hand').get('dealer');
-      const currentLineup = state.get('hand').get('lineup').toJS();
+      const currentDealer = state.get('hand').dealer;
+      const currentLineup = state.get('hand').lineup;
       const newLineup = currentLineup.map((player) => {
         delete player.cards; // eslint-disable-line
         return player;
       });
 
-      const newHand = fromJS({
+      const newHand = {
         cards: [],
         distribution: '',
         dealer: currentDealer + 1,
         state: 'dealing',
         lineup: newLineup,
-      });
+      };
 
       return state
         .set('lastRoundMaxBet', 0)
-        .delete('complete')
-        .delete('performedDealing')
+        .set('complete', false)
+        .set('performedDealing', false)
         .set('hand', newHand);
     }
 
