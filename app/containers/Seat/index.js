@@ -7,8 +7,10 @@ import { createStructuredSelector } from 'reselect';
 import Card from 'components/Card'; // eslint-disable-line
 import * as LocalStorage from '../../services/localStorage';
 import { setCards } from '../Table/actions';
-import { makeCardSelector, makeStackSelector, makeLastAmountSelector, makeFoldedSelector } from './selectors';
+import { makeCardSelector, makeStackSelector, makeLastAmountSelector, makeFoldedSelector, makeWhosTurnSelector } from './selectors';
 import { makeMyPosSelector, makeHandSelector, makeLastHandNettedSelector } from '../Table/selectors';
+import { makeAddressSelector } from '../AccountProvider/selectors';
+import SeatComponent from '../../components/Seat';
 
 class Seat extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -31,12 +33,8 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
 
   render() {
     return (
-      <div className={`seat taken pos-${this.props.pos}${this.props.myPos === this.props.pos ? ' turn' : ''}`}>
-        <div className="player-name">{ this.props.myAddress }</div>
-        <div className="betting-amount"> { this.props.lastAmount } </div>
-        <div className="hole-cards row">
-          { (!this.props.folded) ? <div> <Card cardNumber={this.props.cards[0]} ></Card><Card cardNumber={this.props.cards[1]}></Card></div> : null }
-        </div>
+      <div>
+        <SeatComponent {...this.props}></SeatComponent>
         <div className="player-name">{ (this.props.lastHandNettedOnClient === this.props.hand.handId - 1) ? this.props.stack : null }</div>
       </div>
     );
@@ -46,7 +44,9 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
 const mapStateToProps = createStructuredSelector({
   hand: makeHandSelector(),
   lastHandNettedOnClient: makeLastHandNettedSelector(),
+  myAddress: makeAddressSelector(),
   myPos: makeMyPosSelector(),
+  whosTurn: makeWhosTurnSelector(),
   lastAmount: makeLastAmountSelector(),
   stack: makeStackSelector(),
   cards: makeCardSelector(),
@@ -62,15 +62,10 @@ export function mapDispatchToProps(dispatch) {
 
 Seat.propTypes = {
   pos: React.PropTypes.number,
-  tableAddr: React.PropTypes.string,
-  myAddress: React.PropTypes.string,
   hand: React.PropTypes.object,
+  tableAddr: React.PropTypes.string,
   lastHandNettedOnClient: React.PropTypes.number,
-  myPos: React.PropTypes.number,
-  lastAmount: React.PropTypes.number,
   stack: React.PropTypes.number,
-  cards: React.PropTypes.array,
-  folded: React.PropTypes.bool,
   setCards: React.PropTypes.func,
 };
 

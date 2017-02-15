@@ -64,7 +64,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       const seats = this.renderSeats();
       const board = this.renderBoard();
       return (
-        <div id="root" className="table-bg">
+        <div>
           <div className="status">
             <H3>handstate: { this.props.hand.state } </H3>
             <H3>myAddress: { this.props.myAddress } </H3>

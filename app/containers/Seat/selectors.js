@@ -2,8 +2,12 @@
  * Created by helge on 02.02.17.
  */
 import EWT from 'ethereum-web-token';
+import { PokerHelper, ReceiptCache } from 'poker-helper';
 import { createSelector } from 'reselect';
 import { makeHandSelector, makeMyPosSelector, tableStateSelector } from '../Table/selectors';
+
+const rc = new ReceiptCache();
+const pokerHelper = new PokerHelper(rc);
 
 const makeLastRoundMaxBetSelector = () => createSelector(
     tableStateSelector,
@@ -18,6 +22,11 @@ const makeLastReceiptSelector = () => createSelector(
 const makeLastAmountSelector = () => createSelector(
     makeLastReceiptSelector(),
     (lastReceipt) => (lastReceipt) ? lastReceipt.values[1] : 0
+);
+
+const makeWhosTurnSelector = () => createSelector(
+  makeHandSelector(),
+  (hand) => (hand) ? pokerHelper.whosTurn(hand) : null
 );
 
 const makeStackSelector = () => createSelector(
@@ -57,4 +66,5 @@ export {
     makeStackSelector,
     makeCardSelector,
     makeFoldedSelector,
+    makeWhosTurnSelector,
 };
