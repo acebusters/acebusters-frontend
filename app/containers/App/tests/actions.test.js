@@ -1,51 +1,19 @@
 import {
-  LOAD_REPOS,
-  LOAD_REPOS_SUCCESS,
-  LOAD_REPOS_ERROR,
+  TRANSFER_TOGGLE,
 } from '../constants';
 
 import {
-  loadRepos,
-  reposLoaded,
-  repoLoadingError,
+  transferToggle,
 } from '../actions';
 
 describe('App Actions', () => {
-  describe('loadRepos', () => {
+  describe('transferToggle', () => {
     it('should return the correct type', () => {
       const expectedResult = {
-        type: LOAD_REPOS,
+        type: TRANSFER_TOGGLE,
       };
 
-      expect(loadRepos()).toEqual(expectedResult);
-    });
-  });
-
-  describe('reposLoaded', () => {
-    it('should return the correct type and the passed repos', () => {
-      const fixture = ['Test'];
-      const username = 'test';
-      const expectedResult = {
-        type: LOAD_REPOS_SUCCESS,
-        repos: fixture,
-        username,
-      };
-
-      expect(reposLoaded(fixture, username)).toEqual(expectedResult);
-    });
-  });
-
-  describe('repoLoadingError', () => {
-    it('should return the correct type and the error', () => {
-      const fixture = {
-        msg: 'Something went wrong!',
-      };
-      const expectedResult = {
-        type: LOAD_REPOS_ERROR,
-        error: fixture,
-      };
-
-      expect(repoLoadingError(fixture)).toEqual(expectedResult);
+      expect(transferToggle()).toEqual(expectedResult);
     });
   });
 });
