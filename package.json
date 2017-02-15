@@ -208,8 +208,8 @@
       ".*\\.(css|less|styl|scss|sass)$": "<rootDir>/internals/mocks/cssModule.js",
       ".*\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/internals/mocks/image.js"
     },
-    "testRegex": "tests/.*\\.test\\.js$",
-    "rootDir": "app/containers/Table"
+    "setupTestFrameworkScriptFile": "<rootDir>/internals/testing/test-bundler.js",
+    "testRegex": "tests/.*\\.test\\.js$"
   },
   "dependencies": {
     "ab-vector-cards": "^0.2.0",
