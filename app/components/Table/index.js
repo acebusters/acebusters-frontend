@@ -14,12 +14,14 @@ function TableComponent(props) {
           {props.board}
         </Board>
       </PokerTable>
+      <div> { props.seats } </div>
     </TableWrapper>
   );
 }
 
 TableComponent.propTypes = {
   board: React.PropTypes.array,
+  seats: React.PropTypes.array,
 };
 
 export default TableComponent;

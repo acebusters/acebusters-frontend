@@ -9,9 +9,15 @@ const suits = ['clubs', 'diamonds', 'hearts', 'spades'];
 
 function Card(props) {
   const vc = new VectorCards();
+  let link;
   const suit = suits[Math.floor(props.cardNumber / 13)];
   const value = values[props.cardNumber % 13];
-  const link = vc.getCardData(60, suit, value);
+  if (props.cardNumber >= 0) {
+    link = vc.getCardData(60, suit, value);
+  } else {
+    link = vc.getBackData(60, '#7A7BB8', '#2E319C');
+  }
+
   return (
     <img key={suit + value} src={link} className="card" alt="" />
   );

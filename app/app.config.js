@@ -25,10 +25,5 @@ export const checkABIs = {
 export const ABI_SHOW = [{ name: 'show', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
 export const ABI_MUCK = [{ name: 'muck', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
 
-export const players = {
-  0x278a5de700e29faae8e40e366ec5012b5ec63d36ec77e8a2417154cc1d25383f: '0xf3beac30c498d9e26865f34fcaa57dbb935b0d74',
-  0x7bc8feb5e1ce2927480de19d8bc1dc6874678c016ae53a2eec6a6e9df717bfac: '0xe10f3d125e5f4c753a6456fc37123cf17c6900f2,',
-  0x71d2b12dad610fc929e0596b6e887dfb711eec286b7b8b0bdd742c0421a9c425: '0xc3ccb3902a164b83663947aff0284c6624f3fbf2',
-  0x94890218f2b0d04296f30aeafd13655eba4c5bbf1770273276fee52cbe3f2cb4: '0x82e8c6cf42c8d1ff9594b17a3f50e94a12cc860f',
-};
+export const seatPositions = [[-20, -10], [-15, 0]];
 

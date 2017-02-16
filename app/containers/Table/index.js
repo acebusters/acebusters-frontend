@@ -64,21 +64,16 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       const seats = this.renderSeats();
       const board = this.renderBoard();
       return (
-        <div id="root" className="table-bg">
-          <div className="status">
+        <div>
+          <div>
             <H3>handstate: { this.props.hand.state } </H3>
             <H3>myAddress: { this.props.myAddress } </H3>
             <H3>isMyTurn: {(this.props.isMyTurn) ? 'yes' : 'no'} </H3>
             <H3>amount to call: { this.props.amountToCall} </H3>
             <H3>pot: { this.props.potSize} </H3>
           </div>
-          <div className="table-container">
-            <div className="poker-table">
-              { seats }
-            </div>
-            <TableComponent {...this.props} board={board}></TableComponent>
-            <ActionBar {...this.props}></ActionBar>
-          </div>
+          <TableComponent {...this.props} board={board} seats={seats}></TableComponent>
+          <ActionBar {...this.props}></ActionBar>
         </div>
       );
     }

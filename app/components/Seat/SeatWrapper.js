@@ -11,7 +11,7 @@ import {
 
 export const SeatWrapper = styled.div`
   padding: 5em;
-  position: relative;
+  position: absolute;
 `;
 
 export const ImageContainer = styled.div`
