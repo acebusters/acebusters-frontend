@@ -5,6 +5,8 @@ import {
   SET_BALANCE,
   WEB3_CONNECTED,
   WEB3_DISCONNECTED,
+  WEB3_METHOD_SUCCESS,
+  WEB3_METHOD_ERROR,
 } from './constants';
 import * as storageService from '../../services/localStorage';
 
@@ -17,6 +19,10 @@ const isLoggedIn = () => {
 const initialState = fromJS({
   privKey: storageService.getItem('privKey'),
   email: storageService.getItem('email'),
+  web3: {
+    methods: {},
+    transactions: {},
+  },
   loggedIn: isLoggedIn(),
 });
 
@@ -26,6 +32,10 @@ function accountProviderReducer(state = initialState, action) {
     case WEB3_CONNECTED:
       return state;
     case WEB3_DISCONNECTED:
+      return state;
+    case WEB3_METHOD_SUCCESS:
+      return state.setIn(['web3', 'methods', action.key], fromJS(action.payload));
+    case WEB3_METHOD_ERROR:
       return state;
     case SET_BALANCE:
       return state.set('balance', action.newBal);

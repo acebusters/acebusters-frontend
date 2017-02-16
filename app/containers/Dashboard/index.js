@@ -1,30 +1,35 @@
 import React, { PropTypes } from 'react';
 import QRCode from 'qrcode.react';
-import { connect } from 'react-redux';
 import { FormattedMessage } from 'react-intl';
 import { createSelector } from 'reselect';
 
-import makeSelectAccountData, { makeSelectContract, makeAddressSelector } from '../AccountProvider/selectors';
+import makeSelectAccountData, { makeAddressSelector } from '../AccountProvider/selectors';
 import messages from './messages';
-import { setBalance } from '../AccountProvider/actions';
+import { transferToggle } from '../App/actions';
+import web3Connect from '../AccountProvider/web3Connect';
 
 export class Dashboard extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
-  componentDidMount() {
-    this.props.contract.balanceOf(this.props.address, (err, bal) => {
-      if (err) {
-        console.dir(err);
-        return;
-      }
-      this.props.setBalance(bal.toNumber());
-    });
+  constructor(props) {
+    super(props);
+    this.handleGetBlockNumber = this.handleGetBlockNumber.bind(this);
+  }
+
+  handleGetBlockNumber() {
+    this.props.web3Redux.web3.eth.getBlockNumber();
   }
 
   render() {
     const qrUrl = `ether:${this.props.address}`;
+    const web3 = this.props.web3Redux.web3;
     return (
       <div>
         <FormattedMessage {...messages.header} />
+        <div>
+          last block: {web3.eth.blockNumber()}
+          <br />
+          <button onClick={this.handleGetBlockNumber}>getBlockNumber</button>
+        </div>
         <div>
           address: {this.props.address}
           <QRCode value={qrUrl} />
@@ -32,28 +37,24 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
         <div>
           balance: {this.props.account.balance}
         </div>
-        <ul>
-          <button>Transfer</button>
-        </ul>
+        <button onClick={this.props.transferToggle}>Transfer</button>
       </div>
     );
   }
 }
 
 Dashboard.propTypes = {
-  setBalance: PropTypes.func,
+  transferToggle: PropTypes.func,
   account: PropTypes.any,
-  contract: PropTypes.any,
+  web3Redux: PropTypes.any,
   address: PropTypes.string,
 };
 
 const mapStateToProps = createSelector(
   makeSelectAccountData(),
-  makeSelectContract(),
   makeAddressSelector(),
-  (account, contract, address) => ({
+  (account, address) => ({
     account,
-    contract,
     address,
   })
 );
@@ -61,8 +62,8 @@ const mapStateToProps = createSelector(
 
 function mapDispatchToProps(dispatch) {
   return {
-    setBalance: (newBal) => dispatch(setBalance(newBal)),
+    transferToggle: () => dispatch(transferToggle()),
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);
+export default web3Connect(mapStateToProps, mapDispatchToProps)(Dashboard);
