@@ -1,4 +1,4 @@
-import { fromJS } from 'immutable';
+import Immutable, { fromJS } from 'immutable';
 
 import {
   SET_AUTH,
@@ -7,6 +7,8 @@ import {
   WEB3_DISCONNECTED,
   WEB3_METHOD_SUCCESS,
   WEB3_METHOD_ERROR,
+  CONTRACT_METHOD_SUCCESS,
+  CONTRACT_METHOD_ERROR,
 } from './constants';
 import * as storageService from '../../services/localStorage';
 
@@ -36,6 +38,13 @@ function accountProviderReducer(state = initialState, action) {
     case WEB3_METHOD_SUCCESS:
       return state.setIn(['web3', 'methods', action.key], fromJS(action.payload));
     case WEB3_METHOD_ERROR:
+      return state;
+    case CONTRACT_METHOD_SUCCESS:
+      if (state.get(action.address)) {
+        return state.setIn([action.address, action.key], fromJS(action.payload));
+      }
+      return state.set(action.address, Immutable.Map(action.key, action.payload));
+    case CONTRACT_METHOD_ERROR:
       return state;
     case SET_BALANCE:
       return state.set('balance', action.newBal);

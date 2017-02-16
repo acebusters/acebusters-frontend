@@ -6,6 +6,9 @@ import { SET_AUTH,
   WEB3_METHOD_CALL,
   WEB3_METHOD_SUCCESS,
   WEB3_METHOD_ERROR,
+  CONTRACT_METHOD_CALL,
+  CONTRACT_METHOD_SUCCESS,
+  CONTRACT_METHOD_ERROR,
 } from './constants';
 
 /**
@@ -54,4 +57,20 @@ export function web3MethodSuccess({ key, payload }) {
 
 export function web3MethodError({ key, payload }) {
   return { type: WEB3_METHOD_ERROR, key, payload };
+}
+
+export function contractMethodCall(payload) {
+  return { type: CONTRACT_METHOD_CALL, payload };
+}
+
+export function contractMethodSuccess({ address, key, payload }) {
+  return { type: CONTRACT_METHOD_SUCCESS, address, key, payload };
+}
+
+export function contractMethodError({ address, key, payload }) {
+  return { type: CONTRACT_METHOD_ERROR, address, key, payload };
+}
+
+export function contractTransactionCreate(payload) {
+  return { type: CONTRACT_METHOD_CALL, payload };
 }
