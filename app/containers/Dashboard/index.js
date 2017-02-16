@@ -1,23 +1,35 @@
 import React, { PropTypes } from 'react';
 import QRCode from 'qrcode.react';
-import { connect } from 'react-redux';
 import { FormattedMessage } from 'react-intl';
 import { createSelector } from 'reselect';
 
-import makeSelectAccountData, { makeSelectContract, makeAddressSelector } from '../AccountProvider/selectors';
+import makeSelectAccountData, { makeAddressSelector } from '../AccountProvider/selectors';
 import messages from './messages';
 import { transferToggle } from '../App/actions';
+import web3Connect from '../AccountProvider/web3Connect';
 
 export class Dashboard extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
-  componentDidMount() {
+  constructor(props) {
+    super(props);
+    this.handleGetBlockNumber = this.handleGetBlockNumber.bind(this);
+  }
+
+  handleGetBlockNumber() {
+    this.props.web3Redux.web3.eth.getBlockNumber();
   }
 
   render() {
     const qrUrl = `ether:${this.props.address}`;
+    const web3 = this.props.web3Redux.web3;
     return (
       <div>
         <FormattedMessage {...messages.header} />
+        <div>
+          last block: {web3.eth.blockNumber()}
+          <br />
+          <button onClick={this.handleGetBlockNumber}>getBlockNumber</button>
+        </div>
         <div>
           address: {this.props.address}
           <QRCode value={qrUrl} />
@@ -25,9 +37,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
         <div>
           balance: {this.props.account.balance}
         </div>
-        <ul>
-          <button onClick={this.props.transferToggle}>Transfer</button>
-        </ul>
+        <button onClick={this.props.transferToggle}>Transfer</button>
       </div>
     );
   }
@@ -36,16 +46,15 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
 Dashboard.propTypes = {
   transferToggle: PropTypes.func,
   account: PropTypes.any,
+  web3Redux: PropTypes.any,
   address: PropTypes.string,
 };
 
 const mapStateToProps = createSelector(
   makeSelectAccountData(),
-  makeSelectContract(),
   makeAddressSelector(),
-  (account, contract, address) => ({
+  (account, address) => ({
     account,
-    contract,
     address,
   })
 );
@@ -57,4 +66,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);
+export default web3Connect(mapStateToProps, mapDispatchToProps)(Dashboard);

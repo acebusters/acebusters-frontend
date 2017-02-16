@@ -3,6 +3,9 @@ import { SET_AUTH,
   WEB3_CONNECTED,
   WEB3_DISCONNECTED,
   SET_BALANCE,
+  WEB3_METHOD_CALL,
+  WEB3_METHOD_SUCCESS,
+  WEB3_METHOD_ERROR,
 } from './constants';
 
 /**
@@ -39,4 +42,16 @@ export function web3Disconnected() {
       isConnected: false,
     },
   };
+}
+
+export function web3MethodCall(payload) {
+  return { type: WEB3_METHOD_CALL, payload };
+}
+
+export function web3MethodSuccess({ key, payload }) {
+  return { type: WEB3_METHOD_SUCCESS, key, payload };
+}
+
+export function web3MethodError({ key, payload }) {
+  return { type: WEB3_METHOD_ERROR, key, payload };
 }
