@@ -11,4 +11,6 @@ export const InfoBox = styled.div`
   text-align: center;
   color: black;
   float: left;
+  overflow: hidden;
+  margin-left: 15%;
 `;

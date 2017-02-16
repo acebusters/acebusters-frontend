@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import {
   navy,
   orange,
+  gray,
 } from 'variables';
 
 export const SeatWrapper = styled.div`
@@ -15,10 +16,32 @@ export const SeatWrapper = styled.div`
 
 export const ImageContainer = styled.div`
   border-radius: 50%;
-  border: 4px solid ${(props) => (props.whosTurn === props.pos) ? orange : navy};
+  border: 4px solid ${(props) => {
+    if (props.whosTurn === props.pos) {
+      return orange;
+    }
+    if (props.lastAction === 'sitOut') {
+      return gray;
+    }
+    return navy;
+  }};
   width: 5.5em;
   height: 5.5em;
   background: #FFF;
+  text-align: center;
+  color: white;
+  position: absolute;
+  cursor: pointer;
+  z-index: 10;
+`;
+
+export const DealerButton = styled.div`
+  border-radius: 50%;
+  ${(props) => (!(props.hand.dealer === props.pos)) ? 'display: none;' : ''}
+  border: 4px solid ${(orange)}
+  width: 1.5em;
+  height: 1.5em;
+  background: ${(navy)};
   text-align: center;
   color: white;
   position: absolute;

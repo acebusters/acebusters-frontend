@@ -4,16 +4,18 @@
 
 import React from 'react';
 import Card from '../Card'; // eslint-disable-line
-import { SeatWrapper, ImageContainer, InfoContainer, CardContainer } from './SeatWrapper';
+import { SeatWrapper, ImageContainer, InfoContainer, CardContainer, DealerButton } from './SeatWrapper';
 import { InfoBox } from './Info';
 
 function SeatComponent(props) {
   return (
     <SeatWrapper>
-      <ImageContainer {...props}></ImageContainer>
+      <ImageContainer {...props}>
+        <DealerButton {...props}></DealerButton>
+      </ImageContainer>
       <InfoContainer>
-        <InfoBox>alias: </InfoBox>
-        <InfoBox>stack: {props.lastAmount}</InfoBox>
+        <InfoBox> { props.hand.lineup[props.pos].address.substring(0, 8) }</InfoBox>
+        <InfoBox> { props.lastAction } </InfoBox>
       </InfoContainer>
       <CardContainer>
         <Card cardNumber={props.cards[0]}></Card>
@@ -24,8 +26,10 @@ function SeatComponent(props) {
 }
 
 SeatComponent.propTypes = {
+  pos: React.PropTypes.number,
+  hand: React.PropTypes.object,
   cards: React.PropTypes.array,
-  lastAmount: React.PropTypes.number,
+  lastAction: React.PropTypes.string,
 };
 
 export default SeatComponent;

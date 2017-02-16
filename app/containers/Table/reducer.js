@@ -59,12 +59,13 @@ export default function tableReducer(state = initialState, action) {
     }
 
     case TableActions.SET_CARDS: {
-      update.hand = _.clone(state.hand);
+      const newHand = _.clone(state.get('hand'));
 
       if (action.cards) {
-        update.hand.lineup[action.pos].cards = action.cards;
+        newHand.lineup[action.pos].cards = action.cards;
       }
-      return (!update) ? state : Object.assign({}, state, update);
+      return state
+        .set('hand', newHand);
     }
 
     case TableActions.UPDATE_AMOUNT: {

@@ -1,13 +1,15 @@
 /**
  * Created by helge on 02.02.17.
  */
-import EWT from 'ethereum-web-token';
+
 import { PokerHelper, ReceiptCache } from 'poker-helper';
 import { createSelector } from 'reselect';
 import { makeHandSelector, makeMyPosSelector, tableStateSelector } from '../Table/selectors';
 
 const rc = new ReceiptCache();
 const pokerHelper = new PokerHelper(rc);
+
+const posSelector = (state, props) => (props) ? props.pos : null;
 
 const makeLastRoundMaxBetSelector = () => createSelector(
     tableStateSelector,
@@ -16,7 +18,7 @@ const makeLastRoundMaxBetSelector = () => createSelector(
 
 const makeLastReceiptSelector = () => createSelector(
     [makeHandSelector(), makeMyPosSelector()],
-    (hand, myPos) => (hand && hand.lineup && myPos && hand.lineup[myPos].last) ? EWT.parse(hand.lineup[myPos].last) : undefined
+    (hand, myPos) => (hand && hand.lineup && myPos && hand.lineup[myPos].last) ? rc.get(hand.lineup[myPos].last) : undefined
 );
 
 const makeLastAmountSelector = () => createSelector(
@@ -43,6 +45,11 @@ const makeStackSelector = () => createSelector(
     }
 );
 
+const makeLastActionSelector = () => createSelector(
+  [posSelector, makeHandSelector()],
+  (pos, hand) => (hand && hand.lineup[pos].last) ? rc.get(hand.lineup[pos].last).abi[0].name : null
+);
+
 const makeCardSelector = () => createSelector(
     [makeHandSelector(), makeMyPosSelector()],
     (hand, myPos) => {
@@ -67,4 +74,5 @@ export {
     makeCardSelector,
     makeFoldedSelector,
     makeWhosTurnSelector,
+    makeLastActionSelector,
 };

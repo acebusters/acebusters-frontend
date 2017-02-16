@@ -7,7 +7,7 @@ import { createStructuredSelector } from 'reselect';
 import Card from 'components/Card'; // eslint-disable-line
 import * as LocalStorage from '../../services/localStorage';
 import { setCards } from '../Table/actions';
-import { makeCardSelector, makeStackSelector, makeLastAmountSelector, makeFoldedSelector, makeWhosTurnSelector } from './selectors';
+import { makeCardSelector, makeLastAmountSelector, makeFoldedSelector, makeWhosTurnSelector, makeLastActionSelector } from './selectors';
 import { makeMyPosSelector, makeHandSelector, makeLastHandNettedSelector } from '../Table/selectors';
 import { makeAddressSelector } from '../AccountProvider/selectors';
 import SeatComponent from '../../components/Seat';
@@ -35,7 +35,6 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
     return (
       <div>
         <SeatComponent {...this.props}></SeatComponent>
-        <div className="player-name">{ (this.props.lastHandNettedOnClient === this.props.hand.handId - 1) ? this.props.stack : null }</div>
       </div>
     );
   }
@@ -48,9 +47,9 @@ const mapStateToProps = createStructuredSelector({
   myPos: makeMyPosSelector(),
   whosTurn: makeWhosTurnSelector(),
   lastAmount: makeLastAmountSelector(),
-  stack: makeStackSelector(),
   cards: makeCardSelector(),
   folded: makeFoldedSelector(),
+  lastAction: makeLastActionSelector(),
 });
 
 
@@ -64,9 +63,7 @@ Seat.propTypes = {
   pos: React.PropTypes.number,
   hand: React.PropTypes.object,
   tableAddr: React.PropTypes.string,
-  lastHandNettedOnClient: React.PropTypes.number,
-  stack: React.PropTypes.number,
   setCards: React.PropTypes.func,
 };
 
-export default connect(mapStateToProps)(Seat);
+export default connect(mapStateToProps, mapDispatchToProps)(Seat);

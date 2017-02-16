@@ -2,12 +2,14 @@ import { createSelector } from 'reselect';
 import { PokerHelper, ReceiptCache } from 'poker-helper';
 import { makeAddressSelector } from '../AccountProvider/selectors';
 
-
 const rc = new ReceiptCache();
 const pokerHelper = new PokerHelper(rc);
 
+// direct selectors to state
 const tableStateSelector = (state) => (state) ? state.get('table') : null;
 
+
+// other selectors
 const makeHandSelector = () => createSelector(
     tableStateSelector,
     (tableState) => (tableState) ? tableState.get('hand') : null
@@ -68,6 +70,7 @@ export {
     makeAmountSelector,
     makeLineupSelector,
     makeIsMyTurnSelector,
+    makeWhosTurnSelector,
     makeLastHandNettedSelector,
     makePotSizeSelector,
     makeAmountToCallSelector,

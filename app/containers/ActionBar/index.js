@@ -18,7 +18,7 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
         <div className="row">
           <Button
             className="btn btn-default btn-sm col-xs-4"
-            onClick={() => this.props.bet(this.props.hand.get('handId'),
+            onClick={() => this.props.bet(this.props.hand.handId,
                                           parseInt(this.props.amount, 10),
                                           this.props.location.query.privKey,
                                           this.props.params.id)}
@@ -27,19 +27,19 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
           </Button>
           <Button
             className="btn btn-default btn-sm col-xs-4"
-            onClick={() => this.props.checkCall(this.props.hand.get('handId'),
+            onClick={() => this.props.checkCall(this.props.hand.handId,
                                                 this.props.myMaxBet,
                                                 this.props.maxBet,
                                                 this.props.location.query.privKey,
                                                 this.props.params.id,
-                                                this.props.hand.get('state'),
+                                                this.props.hand.state,
                                                 this.props.amountToCall)}
           >
             { (this.props.amountToCall === 0) ? 'Check' : `Call ${this.props.amountToCall}` }
           </Button>
           <Button
             className="btn btn-default btn-sm col-xs-4"
-            onClick={() => this.props.fold(this.props.hand.get('handId'),
+            onClick={() => this.props.fold(this.props.hand.handId,
                                            this.props.myMaxBet,
                                            this.props.location.query.privKey,
                                            this.props.params.id)}
@@ -50,8 +50,8 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
         <div className="row">
           <Button
             className="btn btn-default btn-sm col-xs-4" value={'50000'}
-            onClick={() => this.props.bet(this.props.hand.get('handId'),
-                                          5000,
+            onClick={() => this.props.bet(this.props.hand.handId,
+                                          50000,
                                           this.props.location.query.privKey,
                                           this.props.params.id)}
           >
@@ -59,8 +59,8 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
           </Button>
           <Button
             className="btn btn-default btn-sm col-xs-4" value={'100000'}
-            onClick={() => this.props.bet(this.props.hand.get('handId'),
-                                          10000,
+            onClick={() => this.props.bet(this.props.hand.handId,
+                                          100000,
                                           this.props.location.query.privKey,
                                           this.props.params.id)}
           >
@@ -68,7 +68,7 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
           </Button>
           <Button
             className="btn btn-default btn-sm col-xs-4"
-            onClick={() => this.props.show(this.props.hand.get('handId'),
+            onClick={() => this.props.show(this.props.hand.handId,
                                            this.props.myMaxBet,
                                            this.props.cards,
                                            this.props.location.query.privKey,

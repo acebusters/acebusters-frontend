@@ -6,7 +6,7 @@ import { PokerHelper, ReceiptCache } from 'poker-helper';
 import { call, put, takeLatest, select, take, fork } from 'redux-saga/effects';
 import { delay } from 'redux-saga';
 import { updateReceived, lineupReceived, completeBet, completeFold, completeShow } from './actions';
-import { ABI_BET, checkABIs, apiBasePath } from '../../app.config';
+import { ABI_BET, ABI_FOLD, checkABIs, apiBasePath } from '../../app.config';
 import { fetchTableState, pay, fetchLineup, show } from '../../services/table';
 
 const rc = new ReceiptCache();
@@ -117,7 +117,7 @@ export function* submitBet(action) {
 
 export function* submitFold(action) {
   try {
-    const cards = yield call(pay, action.handId, action.amount, action.privKey, action.tableAddr, ABI_BET, 'bet');
+    const cards = yield call(pay, action.handId, action.amount, action.privKey, action.tableAddr, ABI_FOLD, 'fold');
     yield put(completeFold(cards, action.privKey));
   } catch (err) {
     yield put({ type: 'FAILED_REQUEST', err });
