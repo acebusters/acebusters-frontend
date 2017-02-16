@@ -1,4 +1,4 @@
-import Immutable, { fromJS } from 'immutable';
+import { fromJS } from 'immutable';
 
 import {
   SET_AUTH,
@@ -43,7 +43,7 @@ function accountProviderReducer(state = initialState, action) {
       if (state.get(action.address)) {
         return state.setIn([action.address, action.key], fromJS(action.payload));
       }
-      return state.set(action.address, Immutable.Map(action.key, action.payload));
+      return state.set(action.address, fromJS({ [action.key]: action.payload }));
     case CONTRACT_METHOD_ERROR:
       return state;
     case SET_BALANCE:

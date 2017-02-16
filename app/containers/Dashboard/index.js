@@ -63,7 +63,7 @@ Dashboard.propTypes = {
 
 const mapStateToProps = createSelector(
   makeAddressSelector(),
-  (account, address) => ({
+  (address) => ({
     address,
   })
 );
