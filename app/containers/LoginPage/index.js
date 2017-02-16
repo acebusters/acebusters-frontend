@@ -85,6 +85,7 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
         // ...tell account provider about login.
         dispatch(setAuthState({
           privKey: workerRsp.data.privKey,
+          email: values.get('email'),
           loggedIn: true,
         }));
         const { location } = this.props;

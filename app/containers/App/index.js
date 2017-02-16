@@ -3,6 +3,7 @@ import styled, { ThemeProvider } from 'styled-components';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import { ModalContainer, ModalDialog } from 'react-modal-dialog';
+import { browserHistory } from 'react-router';
 
 import Header from 'components/Header';
 import Footer from 'components/Footer';
@@ -71,6 +72,11 @@ const sb = (props) => ([
     />
   </Sidebar.Menu>,
   <Sidebar.Menu header="LABELS" key="4">
+    <Sidebar.Menu.Item
+      icon={{ color: 'danger' }}
+      onClick={props.handleClickDashboard}
+      title="Dashboard"
+    />
     <Sidebar.Menu.Item icon={{ color: 'danger' }} title="Danger" />
     <Sidebar.Menu.Item icon={{ color: 'warning' }} title="Warning" />
     <Sidebar.Menu.Item icon={{ color: 'information' }} title="Information" />
@@ -145,6 +151,7 @@ App.propTypes = {
 function mapDispatchToProps(dispatch) {
   return {
     handleClickLogout: () => dispatch(setAuthState({ loggedIn: false })),
+    handleClickDashboard: () => browserHistory.push('/dashboard'),
     sidebarToggle: () => dispatch(sidebarToggle()),
     transferToggle: () => dispatch(transferToggle()),
   };
