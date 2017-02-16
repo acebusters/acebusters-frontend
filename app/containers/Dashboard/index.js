@@ -3,30 +3,41 @@ import QRCode from 'qrcode.react';
 import { FormattedMessage } from 'react-intl';
 import { createSelector } from 'reselect';
 
-import makeSelectAccountData, { makeAddressSelector } from '../AccountProvider/selectors';
+import { makeAddressSelector } from '../AccountProvider/selectors';
 import messages from './messages';
 import { transferToggle } from '../App/actions';
 import web3Connect from '../AccountProvider/web3Connect';
+import { ABI_TOKEN_CONTRACT, tokenContractAddress } from '../../app.config';
 
 export class Dashboard extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   constructor(props) {
     super(props);
     this.handleGetBlockNumber = this.handleGetBlockNumber.bind(this);
+    this.handleGetBalance = this.handleGetBalance.bind(this);
+    this.web3 = props.web3Redux.web3;
+    this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(tokenContractAddress);
   }
 
   handleGetBlockNumber() {
     this.props.web3Redux.web3.eth.getBlockNumber();
   }
 
+  handleGetBalance() {
+    this.token.balanceOf.call('0x6b569b17c684db05cdef8ab738b4be700138f70a');
+  }
+
   render() {
     const qrUrl = `ether:${this.props.address}`;
-    const web3 = this.props.web3Redux.web3;
+    let balance = this.token.balanceOf('0x6b569b17c684db05cdef8ab738b4be700138f70a');
+    if (balance) {
+      balance = balance.toString();
+    }
     return (
       <div>
         <FormattedMessage {...messages.header} />
         <div>
-          last block: {web3.eth.blockNumber()}
+          last block: {this.web3.eth.blockNumber()}
           <br />
           <button onClick={this.handleGetBlockNumber}>getBlockNumber</button>
         </div>
@@ -35,7 +46,8 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
           <QRCode value={qrUrl} />
         </div>
         <div>
-          balance: {this.props.account.balance}
+          balance: {balance}
+          <button onClick={this.handleGetBalance}>getBalance</button>
         </div>
         <button onClick={this.props.transferToggle}>Transfer</button>
       </div>
@@ -45,16 +57,13 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
 
 Dashboard.propTypes = {
   transferToggle: PropTypes.func,
-  account: PropTypes.any,
   web3Redux: PropTypes.any,
   address: PropTypes.string,
 };
 
 const mapStateToProps = createSelector(
-  makeSelectAccountData(),
   makeAddressSelector(),
-  (account, address) => ({
-    account,
+  (address) => ({
     address,
   })
 );

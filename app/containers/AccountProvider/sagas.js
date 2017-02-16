@@ -2,12 +2,14 @@ import Web3 from 'web3';
 import { takeLatest, put, fork, take } from 'redux-saga/effects';
 
 import { ethNodeUrl } from '../../app.config';
-import { WEB3_CONNECT, WEB3_METHOD_CALL } from './constants';
+import { WEB3_CONNECT, WEB3_METHOD_CALL, CONTRACT_METHOD_CALL } from './constants';
 import {
   web3Connected,
   web3Disconnected,
   web3MethodSuccess,
   web3MethodError,
+  contractMethodSuccess,
+  contractMethodError,
 } from './actions';
 
 let web3Instance;
@@ -59,13 +61,27 @@ function callMethod({ method, args }) {
 function* web3MethodCallSaga() {
   while (true) { // eslint-disable-line no-constant-condition
     const call = yield take(WEB3_METHOD_CALL);
-    const { method, networkId, args, key } = call.payload;
+    const { method, args, key } = call.payload;
 
     try {
       const value = yield callMethod({ method, args });
       yield put(web3MethodSuccess({ key, payload: { value, updated: new Date() } }));
     } catch (err) {
-      yield put(web3MethodError({ networkId, key, err }));
+      yield put(web3MethodError({ key, err }));
+    }
+  }
+}
+
+function* contractMethodCallSaga() {
+  while (true) { // eslint-disable-line no-constant-condition
+    const call = yield take(CONTRACT_METHOD_CALL);
+    const { method, args, key, address } = call.payload;
+
+    try {
+      const value = yield callMethod({ method, args });
+      yield put(contractMethodSuccess({ address, key, payload: { value, updated: new Date() } }));
+    } catch (err) {
+      yield put(contractMethodError({ address, key, err }));
     }
   }
 }
@@ -74,6 +90,7 @@ function* web3MethodCallSaga() {
 export function* accountSaga() {
   yield takeLatest(WEB3_CONNECT, web3ConnectSaga);
   yield fork(web3MethodCallSaga);
+  yield fork(contractMethodCallSaga);
 }
 
 export default [

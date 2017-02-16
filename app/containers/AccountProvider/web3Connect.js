@@ -5,7 +5,7 @@ import { web3MethodCall } from './actions';
 import { SUPPORTED_WEB3_METHODS } from './constants';
 import { selectAccount } from './selectors';
 import { getWeb3 } from './sagas';
-// import generateContractApi from './generateContractApi';
+import generateContractApi from './generateContractApi';
 
 function degrade(fn, fallback) {
   try {
@@ -20,7 +20,7 @@ function getMethodKey({ groupName, methodName, args }) {
 }
 
 // returns the value of the gotten web3 method
-function generateWeb3Getter({ state, methodName, groupName }) {
+function generateWeb3Getter({ getState, methodName, groupName }) {
   if (methodName.indexOf('get') !== 0) {
     return null;
   }
@@ -30,11 +30,11 @@ function generateWeb3Getter({ state, methodName, groupName }) {
   const getter = {
     [getterName]: (...args) => {
       if (getterName.indexOf('transaction') === 0) {
-        return degrade(() => state.web3.transactions[args[0]].value);
+        return degrade(() => getState().getIn(['web3', 'transactions', args[0], 'value']));
       }
       return degrade(() => {
         const methodKey = getMethodKey({ groupName, methodName, args });
-        return state.getIn(['methods', methodKey, 'value']);
+        return getState().getIn(['web3', 'methods', methodKey, 'value']);
       });
     },
   };
@@ -59,13 +59,18 @@ function generateWeb3Methods(params) {
   };
 }
 
+// TODO should we scope this? this the right place to put it?
+let updatedState;
+function getCurrentState() { return updatedState; }
+
 function generateNetworkApi(state, dispatch) {
+  updatedState = state;
   // reduce the supported api into action creators and getters
   const web3 = Object.keys(SUPPORTED_WEB3_METHODS).reduce((o, groupName) => ({
     ...o,
     [groupName]: Object.keys(SUPPORTED_WEB3_METHODS[groupName]).reduce((o2, methodName) => ({
       ...o2,
-      ...generateWeb3Methods({ methodName, state, dispatch, groupName }),
+      ...generateWeb3Methods({ methodName, getState: getCurrentState, dispatch, groupName }),
     }),
     {}),
   }),
@@ -86,7 +91,7 @@ function generateNetworkApi(state, dispatch) {
     })
   );
   // custom contract creation api
-  // web3.eth.contract = generateContractApi({ web3, getState, dispatch, networkApi: networkApis[networkId] });
+  web3.eth.contract = generateContractApi({ web3, getState: getCurrentState, dispatch });
 
   return { web3 };
 }
@@ -94,7 +99,7 @@ function generateNetworkApi(state, dispatch) {
 export default function web3Connect(passedMapStateToProps, passedActions) {
   // allow user to map custom map
   function mapStateToProps(state) {
-    return { ...passedMapStateToProps(state), web3Redux: selectAccount(state).get('web3') };
+    return { ...passedMapStateToProps(state), web3Redux: selectAccount(state) };
   }
 
   function mapDispatchToProps(dispatch) {
