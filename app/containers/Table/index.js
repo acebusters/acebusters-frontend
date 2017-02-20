@@ -5,6 +5,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
+// config data
+import { SEAT_COORDS } from '../../app.config';
 // components and styles
 import Card from 'components/Card'; // eslint-disable-line
 import Seat from '../Seat'; // eslint-disable-line
@@ -14,9 +16,8 @@ import { poll, getLineup } from './actions';
 // selectors
 import { makeAddressSelector } from '../AccountProvider/selectors';
 import { makeIsMyTurnSelector, makePotSizeSelector, makeAmountToCallSelector,
-         makeHandSelector, makeLastHandNettedSelector, makeLineupSelector } from './selectors';
+         makeHandSelector, makeLastHandNettedSelector, makeLineupSelector, makeMyPosSelector } from './selectors';
 import TableComponent from '../../components/Table';
-import H3 from '../../components/H3';
 
 
 export class Table extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -40,8 +41,9 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   renderSeats() {
     const seats = [];
     const lineup = this.props.lineup;
+    const coordArray = SEAT_COORDS[lineup.length.toString()];
     for (let i = 0; i < lineup.length; i += 1) {
-      const seat = (<Seat key={i} pos={i} {...this.props}> </Seat>);
+      const seat = (<Seat key={i} pos={i} {...this.props} coords={coordArray[i]}> </Seat>);
       seats.push(seat);
     }
     return seats;
@@ -65,15 +67,8 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       const board = this.renderBoard();
       return (
         <div>
-          <div>
-            <H3>handstate: { this.props.hand.state } </H3>
-            <H3>myAddress: { this.props.myAddress } </H3>
-            <H3>isMyTurn: {(this.props.isMyTurn) ? 'yes' : 'no'} </H3>
-            <H3>amount to call: { this.props.amountToCall} </H3>
-            <H3>pot: { this.props.potSize} </H3>
-          </div>
           <TableComponent {...this.props} board={board} seats={seats}></TableComponent>
-          <ActionBar {...this.props}></ActionBar>
+          <ActionBar {...this.props} me={this.props.hand.lineup[this.props.myPos]}></ActionBar>
         </div>
       );
     }
@@ -97,6 +92,7 @@ const mapStateToProps = createStructuredSelector({
   lastHandNettedOnClient: makeLastHandNettedSelector(),
   isMyTurn: makeIsMyTurnSelector(),
   potSize: makePotSizeSelector(),
+  myPos: makeMyPosSelector(),
   amountToCall: makeAmountToCallSelector(),
 });
 
@@ -104,14 +100,11 @@ Table.propTypes = {
   location: React.PropTypes.object,
   hand: React.PropTypes.object,
   lineup: React.PropTypes.array,
-  myAddress: React.PropTypes.string,
   lastHandNettedOnClient: React.PropTypes.number,  // eslint-disable-line
-  isMyTurn: React.PropTypes.bool,
-  potSize: React.PropTypes.number,
-  amountToCall: React.PropTypes.number,
   params: React.PropTypes.object,
   updateLastHand: React.PropTypes.func,
   poll: React.PropTypes.func,
+  myPos: React.PropTypes.number,
   getLineup: React.PropTypes.func,
 };
 

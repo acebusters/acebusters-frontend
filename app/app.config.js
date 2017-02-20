@@ -25,5 +25,10 @@ export const checkABIs = {
 export const ABI_SHOW = [{ name: 'show', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
 export const ABI_MUCK = [{ name: 'muck', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
 
-export const seatPositions = [[-20, -10], [-15, 0]];
+export const SEAT_COORDS = {
+  2: [[0, 0], [0, 0]],
+  4: [[-13, -13], [-7, -24], [-7, -1], [5, -27]],
+  6: [[-20, -10], [-15, 0]],
+  10: [[-20, -10], [-15, 0]],
+};
 

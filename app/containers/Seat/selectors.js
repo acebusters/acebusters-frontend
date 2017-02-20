@@ -9,7 +9,7 @@ import { makeHandSelector, makeMyPosSelector, tableStateSelector } from '../Tabl
 const rc = new ReceiptCache();
 const pokerHelper = new PokerHelper(rc);
 
-const posSelector = (state, props) => (props) ? props.pos : null;
+const posSelector = (state, props) => (state && props) ? props.pos : null;
 
 const makeLastRoundMaxBetSelector = () => createSelector(
     tableStateSelector,
@@ -53,12 +53,12 @@ const makeLastActionSelector = () => createSelector(
 const makeCardSelector = () => createSelector(
     [makeHandSelector(), posSelector],
     (hand, pos) => {
+      let cards = [];
       if (hand && hand.lineup && pos) {
         const lu = hand.lineup;
-        const cards = (lu[pos].cards) ? lu[pos].cards : [-1, -1];
-        return cards;
+        cards = (lu[pos].cards) ? lu[pos].cards : [-1, -1];
       }
-      return [-1, -1];
+      return cards;
     }
 );
 
@@ -68,6 +68,7 @@ const makeFoldedSelector = () => createSelector(
 );
 
 export {
+    posSelector,
     makeLastReceiptSelector,
     makeLastAmountSelector,
     makeStackSelector,

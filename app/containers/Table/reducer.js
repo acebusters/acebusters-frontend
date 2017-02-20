@@ -156,9 +156,13 @@ export default function tableReducer(state = initialState, action) {
         }
         newHand.handId = action.tableState.handId;
         newHand.dealer = action.tableState.dealer;
-        newHand.cards = action.tableState.cards;
         newHand.state = action.tableState.state;
-        newHand.distribution = action.tableState.distribution;
+        if (action.tableState.cards) {
+          newHand.cards = action.tableState.cards;
+        }
+        if (action.tableState.distribution) {
+          newHand.distribution = action.tableState.distribution;
+        }
       } else {
         return state
           .set('complete', handComplete);

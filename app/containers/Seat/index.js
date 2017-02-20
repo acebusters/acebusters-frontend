@@ -4,7 +4,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import Card from 'components/Card'; // eslint-disable-line
 import * as LocalStorage from '../../services/localStorage';
 import { setCards } from '../Table/actions';
 import { makeCardSelector, makeLastAmountSelector, makeFoldedSelector, makeWhosTurnSelector, makeLastActionSelector } from './selectors';

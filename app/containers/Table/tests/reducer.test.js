@@ -104,7 +104,13 @@ describe('table reducer tests', () => {
         dealer: 1,
         handId: 1,
         state: 'flop',
-        lineup,
+        lineup: [{
+          address: P1_ADDR,
+          last: new EWT(ABI_BET).bet(1, 50).sign(P1_KEY),
+        }, {
+          address: P2_ADDR,
+          last: new EWT(ABI_BET).bet(1, 50).sign(P2_KEY),
+        }],
       },
     })).toEqual(Map({
       hand: {
@@ -296,7 +302,6 @@ describe('table reducer tests', () => {
     }), {
       type: TableActions.UPDATE_RECEIVED,
       tableState: {
-        cards: [],
         handId: 1,
         dealer: 1,
         lineup,

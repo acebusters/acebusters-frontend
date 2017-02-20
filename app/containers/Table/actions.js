@@ -65,6 +65,7 @@ export function completeFold() {
 }
 
 export function submitShow(handId, myMaxBet, cards, privKey, tableAddr) {
+  console.log(cards);
   return { type: SUBMIT_SHOW, handId, myMaxBet, cards, privKey, tableAddr };
 }
 

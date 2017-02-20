@@ -3,6 +3,7 @@
  */
 
 import styled from 'styled-components';
+
 import {
   navy,
   orange,
@@ -10,8 +11,9 @@ import {
 } from 'variables';
 
 export const SeatWrapper = styled.div`
-  padding: 5em;
   position: absolute;
+  left: ${(props) => props.coords[0]}em;
+  top: ${(props) => props.coords[1]}em;
 `;
 
 export const ImageContainer = styled.div`
@@ -50,7 +52,7 @@ export const DealerButton = styled.div`
 `;
 
 export const InfoContainer = styled.div`
-  width: 12em;
+  width: 9em;
   height: 5.5em;
   margin-left: 2.75em;
   border-radius: 25%;
@@ -64,6 +66,6 @@ export const CardContainer = styled.div`
   height: 5.5em;
   text-align: center;
   margin-top: -4em;
-  margin-left: 4em;
+  margin-left: 3em;
   ${(props) => (props.folded) ? 'display: none' : ''}
 `;

@@ -5,8 +5,10 @@
 import styled from 'styled-components';
 
 export const Board = styled.div`
-   height: 3em;
-   width: 100%;
-   margin-left: 10em;
-   margin-top: 5em;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 255px;
+  transform: translate(-50%, -50%);
 `;

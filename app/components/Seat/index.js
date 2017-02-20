@@ -9,7 +9,7 @@ import { InfoBox } from './Info';
 
 function SeatComponent(props) {
   return (
-    <SeatWrapper>
+    <SeatWrapper {...props}>
       <ImageContainer {...props}>
         <DealerButton {...props}></DealerButton>
       </ImageContainer>
