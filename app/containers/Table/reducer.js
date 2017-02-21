@@ -55,7 +55,9 @@ export default function tableReducer(state = initialState, action) {
       newHand.lineup = newLineup;
       return state
         .set('lastHandNettedOnClient', action.lineup[0].toNumber())
-        .set('hand', newHand);
+        .set('hand', newHand)
+        .set('tableAddr', action.tableAddr)
+        .set('privKey', action.privKey); // this should be removed once we can fetch the privKet from the account reducer
     }
 
     case TableActions.SET_CARDS: {
@@ -176,26 +178,21 @@ export default function tableReducer(state = initialState, action) {
     case TableActions.NEXT_HAND: {
       const currentDealer = state.get('hand').dealer;
       const currentLineup = state.get('hand').lineup;
+      const newHand = _.clone(state.get('hand'));
       const newLineup = currentLineup.map((player) => {
         delete player.cards; // eslint-disable-line
         return player;
       });
-
-      const newHand = {
-        cards: [],
-        distribution: '',
-        dealer: currentDealer + 1,
-        state: 'dealing',
-        lineup: newLineup,
-      };
-
+      newHand.lineup = newLineup;
+      newHand.state = 'dealing';
+      newHand.cards = [];
+      newHand.dealer = currentDealer + 1;
       return state
         .set('lastRoundMaxBet', 0)
         .set('complete', false)
         .set('performedDealing', false)
         .set('hand', newHand);
     }
-
 
     default:
       return state;

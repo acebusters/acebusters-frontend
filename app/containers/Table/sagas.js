@@ -32,14 +32,13 @@ export function* getHand(action) {
 export function* dispatchDealingAction() {
   const state = yield select();
   const hand = state.get('table').get('hand');
-  const privKey = state.get('account').get('privKey');
+  const privKey = state.get('table').get('privKey');
   const handId = hand.handId;
   let amount = 0;
   const myAddr = selectAddress(privKey);
   const dealer = hand.dealer;
   const myPos = pokerHelper.getMyPos(hand.lineup, myAddr);
   const sb = pokerHelper.nextActivePlayer(hand.lineup, dealer + 1);
-
   const whosTurn = pokerHelper.whosTurn(hand);
   if ((whosTurn === sb && myPos !== sb)
         || (hand.state !== 'dealing')
@@ -47,11 +46,10 @@ export function* dispatchDealingAction() {
         || state.get('table').get('performedDealing')) {
     return;
   }
-
   const bb = pokerHelper.nextActivePlayer(hand.lineup, sb + 1);
   if (myPos === sb) { amount = 50000; }
   if (myPos === bb) { amount = 100000; }
-  const tableAddr = state.get('tableAddr');
+  const tableAddr = state.get('table').get('tableAddr');
   yield put({ type: 'PERFORM_DEALING_ACTION', handId, amount, privKey, tableAddr });
 }
 
@@ -60,7 +58,7 @@ function* performDealingAction(action) {
   const amount = action.amount;
   const privKey = action.privKey;
   const tableAddr = action.tableAddr;
-
+  console.log(`performing dealing action ${handId}`);
   try {
     const holeCards = yield call(() => pay(handId, amount, privKey, tableAddr, ABI_BET, 'bet').then((res) => res.json()));
     yield put({ type: 'COMPLETE_BET', handId, amount, holeCards, privKey });
@@ -88,6 +86,13 @@ export function* watchAndGet() {
   }
 }
 
+export function* waitThenNextHand() {
+  // debounce by 500ms
+  yield call(delay, 2000);
+  yield put({ type: 'NEXT_HAND' });
+  yield call(delay, 2000);
+}
+
 export function* poll(action) {
   try {
     const tableState = yield call(fetchTableState, action.tableAddr);
@@ -100,7 +105,7 @@ export function* poll(action) {
 export function* getLineup(action) {
   try {
     const lineup = yield call(fetchLineup, action.tableAddr, action.privKey);
-    yield put(lineupReceived(lineup));
+    yield put(lineupReceived(lineup, action.privKey, action.tableAddr));
   } catch (err) {
     yield put({ type: 'FAILED_REQUEST', err });
   }
@@ -136,18 +141,11 @@ export function* submitShow(action) {
 export function* submitCheck(action) {
   const abi = checkABIs[action.state];
   try {
-    const cards = yield call(pay, action.handId, action.amount, action.privKey, action.tableAddr, abi, abi[0].name);
+    const cards = yield call(pay, action.handId, action.myMaxBet, action.privKey, action.tableAddr, abi, abi[0].name);
     yield put(completeBet(cards, action.privKey));
   } catch (err) {
     yield put({ type: 'FAILED_REQUEST', err });
   }
-}
-
-export function* waitThenNextHand() {
-  // debounce by 500ms
-  yield call(delay, 2000);
-  yield put({ type: 'NEXT_HAND' });
-  yield call(delay, 2000);
 }
 
 function* tableSaga() {

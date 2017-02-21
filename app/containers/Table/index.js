@@ -6,7 +6,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 // config data
-import { SEAT_COORDS } from '../../app.config';
+import { SEAT_COORDS, AMOUNT_COORDS } from '../../app.config';
 // components and styles
 import Card from 'components/Card'; // eslint-disable-line
 import Seat from '../Seat'; // eslint-disable-line
@@ -42,8 +42,9 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     const seats = [];
     const lineup = this.props.lineup;
     const coordArray = SEAT_COORDS[lineup.length.toString()];
+    const amountCoords = AMOUNT_COORDS[lineup.length.toString()];
     for (let i = 0; i < lineup.length; i += 1) {
-      const seat = (<Seat key={i} pos={i} {...this.props} coords={coordArray[i]}> </Seat>);
+      const seat = (<Seat key={i} pos={i} {...this.props} coords={coordArray[i]} amountCoords={amountCoords[i]}> </Seat>);
       seats.push(seat);
     }
     return seats;

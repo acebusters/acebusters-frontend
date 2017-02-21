@@ -12,12 +12,11 @@ import ActionBarComponent from '../../components/ActionBar';
 
 class ActionBar extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   render() {
-    console.log(this.props.me);
     return (
       <ActionBarComponent>
         <Button
           className="btn btn-default btn-sm col-xs-4"
-          onClick={() => this.props.bet(this.props.hand.get('handId'),
+          onClick={() => this.props.bet(this.props.hand.handId,
                                           parseInt(this.props.amount, 10),
                                           this.props.location.query.privKey,
                                           this.props.params.id)}

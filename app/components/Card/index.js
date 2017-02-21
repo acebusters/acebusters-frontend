@@ -17,14 +17,17 @@ function Card(props) {
   } else {
     link = vc.getBackData(60, '#7A7BB8', '#2E319C');
   }
-
-  return (
-    <img key={suit + value} src={link} className="card" alt="" />
-  );
+  if (!props.folded) {
+    return (
+      <img key={suit + value} src={link} className="card" alt="" />
+    );
+  }
+  return null;
 }
 
 Card.propTypes = {
   cardNumber: React.PropTypes.number,
+  folded: React.PropTypes.bool,
 };
 
 

@@ -390,7 +390,6 @@ describe('table reducer tests', () => {
     })).toEqual(Map({
       hand: {
         cards: [],
-        distribution: '',
         dealer: 2,
         state: 'dealing',
         lineup: [{

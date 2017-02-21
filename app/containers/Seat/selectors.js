@@ -17,8 +17,8 @@ const makeLastRoundMaxBetSelector = () => createSelector(
 );
 
 const makeLastReceiptSelector = () => createSelector(
-    [makeHandSelector(), makeMyPosSelector()],
-    (hand, myPos) => (hand && hand.lineup && myPos && hand.lineup[myPos].last) ? rc.get(hand.lineup[myPos].last) : undefined
+    [makeHandSelector(), posSelector],
+    (hand, pos) => (hand && hand.lineup && pos && hand.lineup[pos].last) ? rc.get(hand.lineup[pos].last) : undefined
 );
 
 const makeLastAmountSelector = () => createSelector(

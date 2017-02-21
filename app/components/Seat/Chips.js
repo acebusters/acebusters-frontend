@@ -3,7 +3,7 @@
  */
 import styled from 'styled-components';
 
-export const InfoBox = styled.div`
+export const Chips = styled.div`
   width: 80%;
   height: 50%;
   background: #FFF;

@@ -19,12 +19,12 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
             && nextProps.hand.lineup[this.props.pos]
             && nextProps.hand.lineup[this.props.pos].last // this will not exist in handComplete, so cards will not be saved by accident
             && nextProps.hand.lineup[this.props.pos].cards) {
-      const key = `${this.props.tableAddr}-${this.props.hand.handId}-${this.props.pos}`;
+      const key = `${this.props.params.id}-${this.props.hand.handId}-${this.props.pos}`;
       LocalStorage.setItem(key, nextProps.hand.lineup[this.props.pos].cards);
     }
 
     if (nextProps.hand && nextProps.hand.lineup && nextProps.hand.lineup[this.props.pos] && !nextProps.hand.lineup[this.props.pos].cards && !this.cards) {
-      const key = `${this.props.tableAddr}-${this.props.hand.handId}-${this.props.pos}`;
+      const key = `${this.props.params.id}-${this.props.hand.handId}-${this.props.pos}`;
       this.cards = LocalStorage.getItem(key);
       if (this.cards && this.cards.length === 2) { this.props.setCards(this.cards, this.props.pos); }
     }
@@ -61,7 +61,7 @@ export function mapDispatchToProps(dispatch) {
 Seat.propTypes = {
   pos: React.PropTypes.number,
   hand: React.PropTypes.object,
-  tableAddr: React.PropTypes.string,
+  params: React.PropTypes.object,
   setCards: React.PropTypes.func,
 };
 

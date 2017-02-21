@@ -10,8 +10,8 @@ import { TableHeader } from './TableHeader';
 function TableComponent(props) {
   return (
     <TableWrapper {...props}>
-      <TableHeader {...props}> { props.myAddress } , { props.hand.state }</TableHeader>
       <PokerTable>
+        <TableHeader {...props}> { props.myAddress } , { props.hand.state }, { props.potSize }, { props.amountToCall }</TableHeader>
         <Board board={props.board}>
           { props.board }
         </Board>
@@ -28,6 +28,8 @@ TableComponent.propTypes = {
   myAddress: React.PropTypes.string,
   board: React.PropTypes.array,
   seats: React.PropTypes.array,
+  potSize: React.PropTypes.number,
+  amountToCall: React.PropTypes.number,
 };
 
 export default TableComponent;

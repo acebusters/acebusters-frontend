@@ -40,8 +40,9 @@ export function updateReceived(tableState) {
   return { type: UPDATE_RECEIVED, tableState };
 }
 
-export function lineupReceived(lineup) {
-  return { type: LINEUP_RECEIVED, lineup };
+// privkey shpould be removed once we can fetch it from account reducer
+export function lineupReceived(lineup, privKey, tableAddr) {
+  return { type: LINEUP_RECEIVED, lineup, privKey, tableAddr };
 }
 
 export function updateAmount(amount) {
@@ -65,7 +66,6 @@ export function completeFold() {
 }
 
 export function submitShow(handId, myMaxBet, cards, privKey, tableAddr) {
-  console.log(cards);
   return { type: SUBMIT_SHOW, handId, myMaxBet, cards, privKey, tableAddr };
 }
 
