@@ -9,6 +9,9 @@ import {
   WEB3_METHOD_ERROR,
   CONTRACT_METHOD_SUCCESS,
   CONTRACT_METHOD_ERROR,
+  CONTRACT_TX_SEND,
+  CONTRACT_TX_SUCCESS,
+  CONTRACT_TX_ERROR,
 } from './constants';
 import * as storageService from '../../services/localStorage';
 
@@ -21,10 +24,7 @@ const isLoggedIn = () => {
 const initialState = fromJS({
   privKey: storageService.getItem('privKey'),
   email: storageService.getItem('email'),
-  web3: {
-    methods: {},
-    transactions: {},
-  },
+  lastNonce: 1,
   loggedIn: isLoggedIn(),
 });
 
@@ -41,11 +41,18 @@ function accountProviderReducer(state = initialState, action) {
       return state;
     case CONTRACT_METHOD_SUCCESS:
       if (state.get(action.address)) {
-        return state.setIn([action.address, action.key], fromJS(action.payload));
+        return state.setIn([action.address, 'methods', action.key], fromJS(action.payload));
       }
-      return state.set(action.address, fromJS({ [action.key]: action.payload }));
+      return state.setIn([action.address, 'methods'], fromJS({ [action.key]: action.payload }));
     case CONTRACT_METHOD_ERROR:
       return state;
+    case CONTRACT_TX_SEND:
+      newState = state.setIn([action.payload.dest, 'pending', action.payload.nonce, 'call'], action.payload.key);
+      return newState.set('lastNonce', action.payload.nonce);
+    case CONTRACT_TX_SUCCESS:
+      return state.setIn([action.address, 'pending', action.nonce, 'txHash'], action.txHash);
+    case CONTRACT_TX_ERROR:
+      return state.setIn([action.address, 'pending', action.nonce, 'error'], action.error);
     case SET_BALANCE:
       return state.set('balance', action.newBal);
     case SET_AUTH:

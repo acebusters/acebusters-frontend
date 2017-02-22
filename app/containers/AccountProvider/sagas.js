@@ -1,8 +1,15 @@
 import Web3 from 'web3';
+import ethUtil from 'ethereumjs-util';
 import { takeLatest, put, fork, take } from 'redux-saga/effects';
+import fetch from 'isomorphic-fetch';
 
 import { ethNodeUrl } from '../../app.config';
-import { WEB3_CONNECT, WEB3_METHOD_CALL, CONTRACT_METHOD_CALL } from './constants';
+import {
+  WEB3_CONNECT,
+  WEB3_METHOD_CALL,
+  CONTRACT_METHOD_CALL,
+  CONTRACT_TX_SEND,
+} from './constants';
 import {
   web3Connected,
   web3Disconnected,
@@ -10,6 +17,8 @@ import {
   web3MethodError,
   contractMethodSuccess,
   contractMethodError,
+  contractTxSuccess,
+  contractTxError,
 } from './actions';
 
 let web3Instance;
@@ -86,11 +95,78 @@ function* contractMethodCallSaga() {
   }
 }
 
+const workerUrl = 'https://khengvfg6c.execute-api.eu-west-1.amazonaws.com/v0';
+
+function sendTx(signer, nonceAndDest, data, r, s, v) {
+  return new Promise((resolve, reject) => {
+    const bodyStr = JSON.stringify({ signer, nonceAndDest, data, r, s, v });
+    fetch(`${workerUrl}/forward`, {
+      method: 'post',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: bodyStr,
+    }).then((rsp) => {
+      rsp.json().then((response) => {
+        if (rsp.status >= 200 && rsp.status < 300) {
+          resolve(response);
+        } else {
+          reject({
+            status: rsp.status,
+            message: response,
+          });
+        }
+      });
+    }).catch((error) => {
+      reject(error);
+    });
+  });
+}
+
+function* contractTransactionSendSaga() {
+  while (true) { // eslint-disable-line no-constant-condition
+    // get transaction data.
+    const send = yield take(CONTRACT_TX_SEND);
+    const { nonce, dest, data, privKey } = send.payload;
+    const dataHex = data.replace('0x', '');
+    const destHex = dest.replace('0x', '');
+    const privHex = privKey.replace('0x', '');
+
+    // sign the receipt.
+    const payload = new Buffer(32 + dataHex.length);
+    payload.fill(0);
+    payload.writeUInt32BE(nonce, 8);
+    payload.write(destHex, 12, 20, 'hex');
+    payload.write(dataHex, 32);
+    const priv = new Buffer(privHex, 'hex');
+    const signer = `0x${ethUtil.privateToAddress(priv).toString('hex')}`;
+    const hash = ethUtil.sha3(payload);
+    const sig = ethUtil.ecsign(hash, priv);
+
+    // send it.
+    try {
+      const value = yield sendTx(
+        signer,
+        `0x${payload.toString('hex', 0, 32)}`,
+        data,
+        `0x${sig.r.toString('hex')}`,
+        `0x${sig.s.toString('hex')}`,
+        sig.v);
+      yield put(contractTxSuccess({ address: dest, nonce, txHash: value.txHash }));
+    } catch (err) {
+      const error = (err.message) ? err.message : err;
+      yield put(contractTxError({ address: dest, nonce, error }));
+    }
+  }
+}
+
 // The root saga is what is sent to Redux's middleware.
 export function* accountSaga() {
   yield takeLatest(WEB3_CONNECT, web3ConnectSaga);
   yield fork(web3MethodCallSaga);
   yield fork(contractMethodCallSaga);
+  yield fork(contractTransactionSendSaga);
 }
 
 export default [
