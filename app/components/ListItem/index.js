@@ -1,11 +1,18 @@
 import React from 'react';
 import styled from 'styled-components';
 
+const Tr = styled.tr`
+  &:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+`;
+
 const Th = styled.th`
   text-align: left;
   color: #464a4c;
-  background-color: #eceeef;
 `;
+
+//   background-color: #eceeef;
 
 const Td = styled.td`
   padding: 0.75rem;
@@ -15,11 +22,11 @@ const Td = styled.td`
 
 function ListItem(props) {
   return (
-    <tr>
+    <Tr>
       <Th>{props.nonce}</Th>
       <Td key={'data'}>{props.item.data}</Td>
-      <Td key={'hash'}>{props.item.txHash}</Td>
-    </tr>
+      <Td key={'hash'}>{(props.item.txHash) ? (props.item.txHash) : props.item.error}</Td>
+    </Tr>
   );
 }
 

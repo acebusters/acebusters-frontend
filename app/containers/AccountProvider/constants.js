@@ -17,6 +17,8 @@ export const CONTRACT_TX_SEND = 'acebusters/AccountProvider/CONTRACT_TX_SEND';
 export const CONTRACT_TX_SUCCESS = 'acebusters/AccountProvider/CONTRACT_TX_SUCCESS';
 export const CONTRACT_TX_ERROR = 'acebusters/AccountProvider/CONTRACT_TX_ERROR';
 
+export const CONTRACT_EVENT = 'acebusters/AccountProvider/CONTRACT_EVENT';
+
 export const SUPPORTED_WEB3_METHODS = {
   net: {
     getListening: {},

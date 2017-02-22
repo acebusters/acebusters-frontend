@@ -20,6 +20,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     this.handleIssue = this.handleIssue.bind(this);
     this.web3 = props.web3Redux.web3;
     this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(tokenContractAddress);
+    this.test = this.web3.eth.contract([{"constant":false,"inputs":[{"name":"amount","type":"uint256"}],"name":"issue","outputs":[{"name":"success","type":"bool"}],"payable":false,"type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"name":"sender","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Issuance","type":"event"}]).at("0x2be115cf6a5f853358052fd4c6563993086d2e8d");
   }
 
   handleGetBlockNumber() {
@@ -31,7 +32,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
   }
 
   handleIssue() {
-    this.token.issue.sendTransaction(2000);
+    this.test.issue.sendTransaction(2000);
   }
 
   render() {
@@ -42,7 +43,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     }
     return (
       <div>
-        <FormattedMessage {...messages.header} />
+        <h1><FormattedMessage {...messages.header} /></h1>
         <div>
           last block: {this.web3.eth.blockNumber()}
           <br />
@@ -58,6 +59,11 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
           <button onClick={this.handleIssue}>issue</button>
         </div>
         <button onClick={this.props.transferToggle}>Transfer</button>
+
+        <h2><FormattedMessage {...messages.pending} /></h2>
+        <List items={this.props.account['0xc5fe8ed3c565fdcad79c7b85d68378aa4b68699e']} />
+
+        <h2><FormattedMessage {...messages.included} /></h2>
         <List items={this.props.account['0xc5fe8ed3c565fdcad79c7b85d68378aa4b68699e']} />
       </div>
     );

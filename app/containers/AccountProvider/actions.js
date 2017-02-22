@@ -12,6 +12,7 @@ import { SET_AUTH,
   CONTRACT_TX_SEND,
   CONTRACT_TX_SUCCESS,
   CONTRACT_TX_ERROR,
+  CONTRACT_EVENT,
 } from './constants';
 
 /**
@@ -84,4 +85,8 @@ export function contractTxSuccess({ address, nonce, txHash }) {
 
 export function contractTxError({ address, nonce, error }) {
   return { type: CONTRACT_TX_ERROR, address, nonce, error };
+}
+
+export function contractEvent({ event }) {
+  return { type: CONTRACT_EVENT, event };
 }

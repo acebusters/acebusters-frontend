@@ -8,6 +8,8 @@ import {
   screenXsMax,
   screenSmMin,
   navbarHeight,
+  sidebarWidth,
+  sidebarMiniWidth,
   transitionSpeed,
   transitionFn,
 } from 'variables';
@@ -39,6 +41,7 @@ const Content = styled.div`
   background-color: transparent;
 
   min-height: 100%;
+  margin-left: ${(props) => (props.topNav ? '0' : sidebarWidth)};
   z-index: 800;
 
   -webkit-transition: ${transitionSpeed} ${transitionFn}, width ${transitionSpeed} ${transitionFn};
@@ -53,8 +56,10 @@ const Content = styled.div`
   /* sidebar on large screens */
   @media (min-width: ${screenSmMin}) {
     ${(props) => ((props.sidebarCollapse && props.sidebarMini) && `
+      margin-left: ${sidebarMiniWidth} !important;
       z-index: 840;
     `)}
+    ${(props) => ((props.sidebarCollapse && !props.sidebarMini) && 'margin-left: 0;')}
   }
   /* sidebar on small screens */
   @media (max-width: ${screenXsMax}) {

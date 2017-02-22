@@ -9,8 +9,6 @@ import { ABI_TOKEN_CONTRACT, tokenContractAddress } from '../../app.config';
  */
 const selectAccount = (state) => state.get('account');
 
-const selectPrivKey = (state, props) => props.location.query.privKey;
-
 /**
  * Other specific selectors
  */
@@ -20,10 +18,10 @@ const makeSelectAccountData = () => createSelector(
 );
 
 const makeAddressSelector = () => createSelector(
-  selectPrivKey,
-  (privKey) => {
-    if (privKey) {
-      const privKeyBuffer = new Buffer(privKey.replace('0x', ''), 'hex');
+  selectAccount,
+  (account) => {
+    if (account) {
+      const privKeyBuffer = new Buffer(account.get('privKey').replace('0x', ''), 'hex');
       return `0x${EthUtil.privateToAddress(privKeyBuffer).toString('hex')}`;
     }
     return null;
@@ -70,6 +68,7 @@ const makeSelectPrivKey = () => createSelector(
 export default makeSelectAccountData;
 export {
   selectAccount,
+  makeSelectAccountData,
   makeAddressSelector,
   makeSelectContract,
   makeSelectPrivKey,

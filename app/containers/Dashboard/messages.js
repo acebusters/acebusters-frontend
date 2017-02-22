@@ -8,6 +8,14 @@ import { defineMessages } from 'react-intl';
 export default defineMessages({
   header: {
     id: 'app.containers.Dashboard.header',
-    defaultMessage: 'This is Dashboard container !',
+    defaultMessage: 'Account Dashboard',
+  },
+  pending: {
+    id: 'app.containers.Dashboard.pending',
+    defaultMessage: 'Pending Transactions:',
+  },
+  included: {
+    id: 'app.containers.Dashboard.included',
+    defaultMessage: 'Mined Transactions:',
   },
 });
