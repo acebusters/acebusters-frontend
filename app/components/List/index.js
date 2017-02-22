@@ -1,34 +1,66 @@
 import React from 'react';
+import styled from 'styled-components';
+import ListItem from '../ListItem';
 
-import Ul from './Ul';
-import Wrapper from './Wrapper';
+const Table = styled.table`
+  border-collapse: collapse;
+  background-color: transparent;
+`;
+
+const TableStyled = styled(Table)`
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 1rem;
+  & th {
+    padding: 0.75rem;
+    vertical-align: top;
+    border-top: 1px solid #eceeef;
+  }
+  & thead th {
+    vertical-align: bottom;
+    border-bottom: 2px solid #eceeef;
+  }
+  & tbody + tbody {
+    border-top: 2px solid #eceeef;
+  }
+  & & {
+    background-color: #fff;
+  }
+`;
+
+const TableStriped = styled(TableStyled)`
+  & tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+`;
 
 function List(props) {
-  const ComponentToRender = props.component;
-  let content = (<div></div>);
+  let content = (<tr></tr>);
 
   // If we have items, render them
-  if (props.items) {
-    content = props.items.map((item, index) => (
-      <ComponentToRender key={`item-${index}`} item={item} />
+  if (props.items.pending) {
+    content = Object.keys(props.items.pending).map((key) => (
+      <ListItem key={key} nonce={key} item={props.items.pending[key]} />
     ));
-  } else {
-    // Otherwise render a single component
-    content = (<ComponentToRender />);
   }
-
   return (
-    <Wrapper>
-      <Ul>
+    <TableStriped>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>data</th>
+          <th>TxHash</th>
+        </tr>
+      </thead>
+      <tbody>
         {content}
-      </Ul>
-    </Wrapper>
+      </tbody>
+    </TableStriped>
   );
 }
 
 List.propTypes = {
-  component: React.PropTypes.func.isRequired,
-  items: React.PropTypes.array,
+  items: React.PropTypes.any,
 };
 
 export default List;

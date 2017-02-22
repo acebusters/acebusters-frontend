@@ -3,11 +3,13 @@ import QRCode from 'qrcode.react';
 import { FormattedMessage } from 'react-intl';
 import { createSelector } from 'reselect';
 
-import { makeAddressSelector } from '../AccountProvider/selectors';
+import { makeAddressSelector, makeSelectAccountData } from '../AccountProvider/selectors';
 import messages from './messages';
 import { transferToggle } from '../App/actions';
 import web3Connect from '../AccountProvider/web3Connect';
 import { ABI_TOKEN_CONTRACT, tokenContractAddress } from '../../app.config';
+
+import List from '../../components/List';
 
 export class Dashboard extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
@@ -15,6 +17,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     super(props);
     this.handleGetBlockNumber = this.handleGetBlockNumber.bind(this);
     this.handleGetBalance = this.handleGetBalance.bind(this);
+    this.handleIssue = this.handleIssue.bind(this);
     this.web3 = props.web3Redux.web3;
     this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(tokenContractAddress);
   }
@@ -25,6 +28,10 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
 
   handleGetBalance() {
     this.token.balanceOf.call('0x6b569b17c684db05cdef8ab738b4be700138f70a');
+  }
+
+  handleIssue() {
+    this.token.issue.sendTransaction(2000);
   }
 
   render() {
@@ -48,8 +55,10 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
         <div>
           balance: {balance}
           <button onClick={this.handleGetBalance}>getBalance</button>
+          <button onClick={this.handleIssue}>issue</button>
         </div>
         <button onClick={this.props.transferToggle}>Transfer</button>
+        <List items={this.props.account['0xc5fe8ed3c565fdcad79c7b85d68378aa4b68699e']} />
       </div>
     );
   }
@@ -59,12 +68,14 @@ Dashboard.propTypes = {
   transferToggle: PropTypes.func,
   web3Redux: PropTypes.any,
   address: PropTypes.string,
+  account: PropTypes.any,
 };
 
 const mapStateToProps = createSelector(
-  makeAddressSelector(),
-  (address) => ({
+  makeAddressSelector(), makeSelectAccountData(),
+  (address, account) => ({
     address,
+    account,
   })
 );
 

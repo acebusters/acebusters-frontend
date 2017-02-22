@@ -9,6 +9,9 @@ import { SET_AUTH,
   CONTRACT_METHOD_CALL,
   CONTRACT_METHOD_SUCCESS,
   CONTRACT_METHOD_ERROR,
+  CONTRACT_TX_SEND,
+  CONTRACT_TX_SUCCESS,
+  CONTRACT_TX_ERROR,
 } from './constants';
 
 /**
@@ -71,6 +74,14 @@ export function contractMethodError({ address, key, payload }) {
   return { type: CONTRACT_METHOD_ERROR, address, key, payload };
 }
 
-export function contractTransactionCreate(payload) {
-  return { type: CONTRACT_METHOD_CALL, payload };
+export function contractTxSend(payload) {
+  return { type: CONTRACT_TX_SEND, payload };
+}
+
+export function contractTxSuccess({ address, nonce, txHash }) {
+  return { type: CONTRACT_TX_SUCCESS, address, nonce, txHash };
+}
+
+export function contractTxError({ address, nonce, error }) {
+  return { type: CONTRACT_TX_ERROR, address, nonce, error };
 }

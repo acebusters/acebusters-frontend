@@ -1,5 +1,5 @@
 import { bindActionCreators } from 'redux';
-import { contractMethodCall, contractTransactionCreate } from './actions';
+import { contractMethodCall, contractTxSend } from './actions';
 import { getWeb3 } from './sagas';
 
 function degrade(fn, fallback) {
@@ -27,15 +27,19 @@ function generateContractInstanceApi({ abi, address, getState, dispatch }) {
       call: (...args) => contractMethodCall({
         args, address, key: getMethodKey({ methodName, args }), method: contractInstance[methodName].call,
       }),
-      sendTransaction: (...args) => contractTransactionCreate({
-        args, address, key: getMethodKey({ methodName, args }), method: contractInstance[methodName].sendTransaction,
+      sendTransaction: (...args) => contractTxSend({
+        key: getMethodKey({ methodName, args }),
+        nonce: getState().get('lastNonce') + 1,
+        dest: address,
+        data: contractInstance[methodName].getData(args),
+        privKey: getState().get('privKey'),
       }),
     }, dispatch);
     // base getter
     const contractMethod = (...args) => (
       degrade(() => {
         const methodKey = getMethodKey({ methodName, args });
-        return getState().getIn([address, methodKey, 'value']);
+        return getState().getIn([address, 'methods', methodKey, 'value']);
       })
     );
     // add actions to base getter
