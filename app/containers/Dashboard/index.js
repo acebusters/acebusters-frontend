@@ -7,7 +7,7 @@ import { makeAddressSelector, makeSelectAccountData } from '../AccountProvider/s
 import messages from './messages';
 import { transferToggle } from '../App/actions';
 import web3Connect from '../AccountProvider/web3Connect';
-import { ABI_TOKEN_CONTRACT, tokenContractAddress } from '../../app.config';
+import { ABI_TOKEN_CONTRACT, ABI_ACCOUNT_FACTORY, tokenContractAddress, accountFactoryAddress } from '../../app.config';
 
 import List from '../../components/List';
 
@@ -17,10 +17,10 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     super(props);
     this.handleGetBlockNumber = this.handleGetBlockNumber.bind(this);
     this.handleGetBalance = this.handleGetBalance.bind(this);
-    this.handleIssue = this.handleIssue.bind(this);
+    this.handleTransfer = this.handleTransfer.bind(this);
     this.web3 = props.web3Redux.web3;
     this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(tokenContractAddress);
-    this.test = this.web3.eth.contract([{"constant":false,"inputs":[{"name":"amount","type":"uint256"}],"name":"issue","outputs":[{"name":"success","type":"bool"}],"payable":false,"type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"name":"sender","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Issuance","type":"event"}]).at("0x2be115cf6a5f853358052fd4c6563993086d2e8d");
+    this.accountFactory = this.web3.eth.contract(ABI_ACCOUNT_FACTORY).at(accountFactoryAddress);
   }
 
   handleGetBlockNumber() {
@@ -28,16 +28,22 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
   }
 
   handleGetBalance() {
-    this.token.balanceOf.call('0x6b569b17c684db05cdef8ab738b4be700138f70a');
+    this.accountFactory.signerToProxy.callPromise(this.props.address).then((res) => {
+      this.proxyAddress = res;
+      this.token.balanceOf.call(res);
+    }, (err) => {
+      // error case;
+      console.log(err);
+    });
   }
 
-  handleIssue() {
-    this.test.issue.sendTransaction(2000);
+  handleTransfer() {
+    this.token.transfer.sendTransaction('0x297d02da6733fc66d260dd6956cff04d2d030855', 2000);
   }
 
   render() {
     const qrUrl = `ether:${this.props.address}`;
-    let balance = this.token.balanceOf('0x6b569b17c684db05cdef8ab738b4be700138f70a');
+    let balance = this.token.balanceOf(this.proxyAddress);
     if (balance) {
       balance = balance.toString();
     }
@@ -50,13 +56,16 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
           <button onClick={this.handleGetBlockNumber}>getBlockNumber</button>
         </div>
         <div>
+          ProxyAddress: { this.proxyAddress }
+        </div>
+        <div>
           address: {this.props.address}
           <QRCode value={qrUrl} />
         </div>
         <div>
           balance: {balance}
           <button onClick={this.handleGetBalance}>getBalance</button>
-          <button onClick={this.handleIssue}>issue</button>
+          <button onClick={this.handleTransfer}>Transfer</button>
         </div>
         <button onClick={this.props.transferToggle}>Transfer</button>
 

@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import { submitBet, submitFold, submitCheck, submitShow, updateAmount } from '../Table/actions';
 import { makeSelectPrivKey } from '../AccountProvider/selectors';
 import { makePotSizeSelector, makeMyMaxBetSelector, makeAmountSelector } from '../Table/selectors';
+import { makeStackSelector } from '../Seat/selectors';
 import Button from '../../components/Button';
 import ActionBarComponent from '../../components/ActionBar';
 
@@ -73,10 +74,13 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
           SHOW
         </Button>
         <input
-          type="text" className="input-amount"
-          placeholder="Enter amount here"
+          type="range"
+          min="50000" // small blind amount
+          step="50000" // small blind amount
+          max={this.props.stackSize}
           onChange={(e) => this.props.updateAmount(e)}
         />
+        <div>{this.props.amount}</div>
       </ActionBarComponent>
     );
   }
@@ -104,6 +108,7 @@ const mapStateToProps = createStructuredSelector({
   amount: makeAmountSelector(),
   potSize: makePotSizeSelector(),
   myMaxBet: makeMyMaxBetSelector(),
+  stackSize: makeStackSelector(),
 });
 
 ActionBar.propTypes = {
@@ -123,6 +128,7 @@ ActionBar.propTypes = {
   checkCall: React.PropTypes.func,
   show: React.PropTypes.func,
   updateAmount: React.PropTypes.func,
+  stackSize: React.PropTypes.number,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ActionBar);

@@ -22,29 +22,44 @@ function generateContractInstanceApi({ abi, address, getState, dispatch }) {
     // skip if we're not dealing with a function
     if (definition.type !== 'function') { return o; }
     const methodName = definition.name;
-    // // buid the actions
+    // build the actions
     const actions = bindActionCreators({
+      // dispatches action to read contract method results and write into store
       call: (...args) => contractMethodCall({
         args, address, key: getMethodKey({ methodName, args }), method: contractInstance[methodName].call,
       }),
+      // creates receipt for to invoke contract through account controller
       sendTransaction: (...args) => contractTxSend({
         key: getMethodKey({ methodName, args }),
         nonce: getState().get('lastNonce') + 1,
         dest: address,
-        data: contractInstance[methodName].getData(args),
+        data: contractInstance[methodName].getData(...args),
         privKey: getState().get('privKey'),
       }),
     }, dispatch);
     // base getter
+    // reads cached contract method call from state
     const contractMethod = (...args) => (
       degrade(() => {
         const methodKey = getMethodKey({ methodName, args });
         return getState().getIn([address, 'methods', methodKey, 'value']);
       })
     );
+    // calls contract method without changing state
+    const callPromise = (...args) => (
+      new Promise((resolve, reject) => {
+        contractInstance[methodName].call(...args, (err, value) => {
+          if (err) {
+            return reject(err);
+          }
+          return resolve(value);
+        });
+      })
+    );
     // add actions to base getter
     contractMethod.call = actions.call;
     contractMethod.sendTransaction = actions.sendTransaction;
+    contractMethod.callPromise = callPromise;
     // // reduce with added actions
     return { ...o, [methodName]: contractMethod };
   }, {});

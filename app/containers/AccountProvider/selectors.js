@@ -70,6 +70,7 @@ export {
   selectAccount,
   makeSelectAccountData,
   makeAddressSelector,
+  makeSelectAccountData,
   makeSelectContract,
   makeSelectPrivKey,
   makeSelectEmail,

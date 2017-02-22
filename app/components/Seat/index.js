@@ -8,7 +8,6 @@ import { SeatWrapper, ImageContainer, InfoContainer, CardContainer, DealerButton
 import { InfoBox, ActionBox } from './Info';
 
 function SeatComponent(props) {
-  console.log(props.folded);
   return (
     <SeatWrapper {...props}>
       <ImageContainer {...props}>

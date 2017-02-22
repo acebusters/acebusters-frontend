@@ -64,7 +64,7 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
     ]);
 
     return (
-      <StyledHeader fixed={this.props.fixed} >
+      <StyledHeader fixed={this.props.fixed} id="header">
         <Logo
           collapse={this.props.sidebarCollapse}
           sidebarMini={this.props.sidebarMini}

@@ -12,8 +12,8 @@ import {
 
 export const SeatWrapper = styled.div`
   position: absolute;
-  left: ${(props) => props.coords[0]}em;
-  top: ${(props) => props.coords[1]}em;
+  left: ${(props) => props.coords[0]}%;
+  top: ${(props) => props.coords[1]}%;
 `;
 
 export const ImageContainer = styled.div`
