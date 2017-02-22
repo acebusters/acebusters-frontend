@@ -7,7 +7,7 @@ import { makeAddressSelector, makeSelectAccountData } from '../AccountProvider/s
 import messages from './messages';
 import { transferToggle } from '../App/actions';
 import web3Connect from '../AccountProvider/web3Connect';
-import { ABI_TOKEN_CONTRACT, tokenContractAddress } from '../../app.config';
+import { ABI_TOKEN_CONTRACT, ABI_ACCOUNT_FACTORY, tokenContractAddress, accountFactoryAddress } from '../../app.config';
 
 import List from '../../components/List';
 
@@ -20,6 +20,9 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     this.handleIssue = this.handleIssue.bind(this);
     this.web3 = props.web3Redux.web3;
     this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(tokenContractAddress);
+    this.accountFactory = this.web3.eth.contract(ABI_ACCOUNT_FACTORY).at(accountFactoryAddress);
+    console.dir(this.accountFactory);
+    this.accountFactory.signerToProxy.call(props.address);
   }
 
   handleGetBlockNumber() {
@@ -27,7 +30,8 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
   }
 
   handleGetBalance() {
-    this.token.balanceOf.call('0x6b569b17c684db05cdef8ab738b4be700138f70a');
+    const proxyAddress = this.accountFactory.signerToProxy(this.props.address);
+    this.token.balanceOf.call(proxyAddress);
   }
 
   handleIssue() {
@@ -36,7 +40,9 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
 
   render() {
     const qrUrl = `ether:${this.props.address}`;
-    let balance = this.token.balanceOf('0x6b569b17c684db05cdef8ab738b4be700138f70a');
+    console.dir(this.accountFactory);
+    const proxyAddress = this.accountFactory.signerToProxy(this.props.address);
+    let balance = this.token.balanceOf(proxyAddress);
     if (balance) {
       balance = balance.toString();
     }
