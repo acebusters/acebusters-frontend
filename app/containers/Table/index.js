@@ -68,8 +68,8 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       const board = this.renderBoard();
       return (
         <div>
-          <TableComponent {...this.props} board={board} seats={seats}></TableComponent>
-          <ActionBar {...this.props} me={this.props.hand.lineup[this.props.myPos]}></ActionBar>
+          <TableComponent {...this.props} board={board} seats={seats} ></TableComponent>
+          {/* <ActionBar {...this.props} me={this.props.hand.lineup[this.props.myPos]}></ActionBar>*/}
         </div>
       );
     }
@@ -105,7 +105,6 @@ Table.propTypes = {
   params: React.PropTypes.object,
   updateLastHand: React.PropTypes.func,
   poll: React.PropTypes.func,
-  myPos: React.PropTypes.number,
   getLineup: React.PropTypes.func,
 };
 

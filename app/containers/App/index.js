@@ -6,7 +6,6 @@ import { ModalContainer, ModalDialog } from 'react-modal-dialog';
 import { browserHistory } from 'react-router';
 
 import Header from 'components/Header';
-import Footer from 'components/Footer';
 import Content from 'components/Content';
 import Sidebar from 'components/Sidebar';
 import withProgressBar from 'components/ProgressBar';
@@ -112,7 +111,6 @@ export function App(props) {
             sidebarMini={props.sidebarMini}
           >
             {React.Children.toArray(props.children)}
-            <Footer />
           </Content>
         </ThemeProvider>
       </StyledDashboard>

@@ -3,23 +3,32 @@
  */
 
 import React from 'react';
-import { TableWrapper, PokerTable, SeatsWrapper } from './TableWrapper';
+import sizeMe from 'react-sizeme';
+import { GamePlay, TableInfo, TableArea, TableContainer, PokerTable, TableAndChairs } from './TableWrapper';
 import { Board } from './Board';
 import { TableHeader } from './TableHeader';
+import { computedStyles } from '../../app.config';
 
 function TableComponent(props) {
   return (
-    <TableWrapper {...props}>
-      <PokerTable>
-        <TableHeader {...props}> { props.myAddress } , { props.hand.state }, { props.potSize }, { props.amountToCall }</TableHeader>
-        <Board board={props.board}>
-          { props.board }
-        </Board>
-      </PokerTable>
-      <SeatsWrapper>
-        { props.seats }
-      </SeatsWrapper>
-    </TableWrapper>
+    <GamePlay id="game-play" {...props} computedStyles={computedStyles}>
+      <TableInfo id="table-info">
+        <TableHeader> { props.myAddress } , { props.hand.state }, { props.potSize }, { props.amountToCall } </TableHeader>
+      </TableInfo>
+      <TableArea id="table-area" computedStyles={computedStyles}>
+        <TableContainer id="table-container">
+          <TableAndChairs id="table-and-chairs" computedStyles={computedStyles}>
+            <PokerTable id="poker-table">
+              { props.seats }
+              <Board id="board" board={props.board}>
+                { props.board }
+              </Board>
+            </PokerTable>
+          </TableAndChairs>
+
+        </TableContainer>
+      </TableArea>
+    </GamePlay>
   );
 }
 
@@ -32,4 +41,4 @@ TableComponent.propTypes = {
   amountToCall: React.PropTypes.number,
 };
 
-export default TableComponent;
+export default sizeMe()(TableComponent);

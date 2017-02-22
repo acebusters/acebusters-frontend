@@ -7,7 +7,7 @@ import { ActionBarWrapper } from './ActionBarWrapper';
 
 function ActionBarComponent(props) {
   return (
-    <ActionBarWrapper {...props}></ActionBarWrapper>
+    <ActionBarWrapper {...props} id="action-bar"></ActionBarWrapper>
   );
 }
 

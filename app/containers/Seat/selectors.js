@@ -4,17 +4,12 @@
 
 import { PokerHelper, ReceiptCache } from 'poker-helper';
 import { createSelector } from 'reselect';
-import { makeHandSelector, makeMyPosSelector, tableStateSelector } from '../Table/selectors';
+import { makeHandSelector, makeMyPosSelector } from '../Table/selectors';
 
 const rc = new ReceiptCache();
 const pokerHelper = new PokerHelper(rc);
 
 const posSelector = (state, props) => (state && props) ? props.pos : null;
-
-const makeLastRoundMaxBetSelector = () => createSelector(
-    tableStateSelector,
-    (tableState) => (tableState) ? tableState.lastRoundMaxBet : null
-);
 
 const makeLastReceiptSelector = () => createSelector(
     [makeHandSelector(), posSelector],
@@ -32,13 +27,10 @@ const makeWhosTurnSelector = () => createSelector(
 );
 
 const makeStackSelector = () => createSelector(
-    [makeHandSelector(), makeMyPosSelector(), makeLastAmountSelector(), makeLastRoundMaxBetSelector()],
-    (hand, myPos, lastAmount, lastRoundMaxBet) => {
-      if (hand && myPos && lastAmount && lastRoundMaxBet) {
-        let stack = hand.lineup[myPos].amount - lastAmount;
-        if (lastRoundMaxBet && lastRoundMaxBet > 0) {
-          stack -= lastRoundMaxBet;
-        }
+    [makeHandSelector(), makeMyPosSelector(), makeLastAmountSelector()],
+    (hand, myPos, lastAmount) => {
+      if (hand && myPos && lastAmount !== undefined) {
+        const stack = hand.lineup[myPos].amount - lastAmount;
         return stack;
       }
       return null;

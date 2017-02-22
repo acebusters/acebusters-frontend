@@ -27,15 +27,44 @@ export const ABI_MUCK = [{ name: 'muck', type: 'function', inputs: [{ type: 'uin
 
 export const SEAT_COORDS = {
   2: [[0, 0], [0, 0]],
-  4: [[5, -27], [-7, -24], [-13, -13], [-7, -1]],
+  4: [[37, -25], [99, 42], [37, 102], [-20, 42]],
   6: [[-20, -10], [-15, 0]],
   10: [[-20, -10], [-15, 0]],
 };
 
 export const AMOUNT_COORDS = {
   2: [[0, 0], [0, 0]],
-  4: [[3, 8], [9, 8], [13, 2], [10, -3]],
+  4: [[0, 100], [-160, 0], [0, -100], [125, 0]],
   6: [[-20, -10], [-15, 0]],
   10: [[-20, -10], [-15, 0]],
+};
+
+export const computedStyles = () => {
+  const computed = {};
+  computed.d = window.innerWidth;
+  computed.b = (document.getElementById('table-info')) ? document.getElementById('table-info').clientWidth : 0;
+  computed.h = 1.6;
+  computed.a = 0.96;
+  computed.e = 100;
+  computed.f = computed.d - computed.b - computed.e;
+  computed.g = window.innerHeight;
+  computed.z = (document.getElementById('action-bar')) ? document.getElementById('action-bar').clientHeight : 0;
+  computed.y = this.g - this.z;
+  computed.computeSize = () => {
+    let k;
+    let c;
+    const obj = {};
+    if (computed.y < computed.f / computed.h) {
+      k = computed.y * computed.a;
+      c = k * computed.h;
+    } else {
+      c = computed.f * computed.a;
+      k = (c / computed.h);
+    }
+    obj.width = c;
+    obj.height = k;
+    return obj;
+  };
+  return computed;
 };
 
