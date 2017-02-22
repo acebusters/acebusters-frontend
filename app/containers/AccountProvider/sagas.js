@@ -134,16 +134,15 @@ function* contractTransactionSendSaga() {
     const privHex = privKey.replace('0x', '');
 
     // sign the receipt.
-    const payload = new Buffer(32 + dataHex.length);
+    const payload = new Buffer(32 + (dataHex.length / 2));
     payload.fill(0);
     payload.writeUInt32BE(nonce, 8);
     payload.write(destHex, 12, 20, 'hex');
-    payload.write(dataHex, 32);
+    payload.write(dataHex, 32, 'hex');
     const priv = new Buffer(privHex, 'hex');
     const signer = `0x${ethUtil.privateToAddress(priv).toString('hex')}`;
     const hash = ethUtil.sha3(payload);
     const sig = ethUtil.ecsign(hash, priv);
-
     // send it.
     try {
       const value = yield sendTx(

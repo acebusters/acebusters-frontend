@@ -17,12 +17,10 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     super(props);
     this.handleGetBlockNumber = this.handleGetBlockNumber.bind(this);
     this.handleGetBalance = this.handleGetBalance.bind(this);
-    this.handleIssue = this.handleIssue.bind(this);
+    this.handleTransfer = this.handleTransfer.bind(this);
     this.web3 = props.web3Redux.web3;
     this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(tokenContractAddress);
     this.accountFactory = this.web3.eth.contract(ABI_ACCOUNT_FACTORY).at(accountFactoryAddress);
-    console.dir(this.accountFactory);
-    this.accountFactory.signerToProxy.call(props.address);
   }
 
   handleGetBlockNumber() {
@@ -30,19 +28,22 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
   }
 
   handleGetBalance() {
-    const proxyAddress = this.accountFactory.signerToProxy(this.props.address);
-    this.token.balanceOf.call(proxyAddress);
+    this.accountFactory.signerToProxy.callPromise(this.props.address).then((res) => {
+      this.proxyAddress = res;
+      this.token.balanceOf.call(res);
+    }, (err) => {
+      // error case;
+      console.log(err);
+    });
   }
 
-  handleIssue() {
-    this.token.issue.sendTransaction(2000);
+  handleTransfer() {
+    this.token.transfer.sendTransaction('0x297d02da6733fc66d260dd6956cff04d2d030855', 2000);
   }
 
   render() {
     const qrUrl = `ether:${this.props.address}`;
-    console.dir(this.accountFactory);
-    const proxyAddress = this.accountFactory.signerToProxy(this.props.address);
-    let balance = this.token.balanceOf(proxyAddress);
+    let balance = this.token.balanceOf(this.proxyAddress);
     if (balance) {
       balance = balance.toString();
     }
@@ -55,13 +56,16 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
           <button onClick={this.handleGetBlockNumber}>getBlockNumber</button>
         </div>
         <div>
+          ProxyAddress: { this.proxyAddress }
+        </div>
+        <div>
           address: {this.props.address}
           <QRCode value={qrUrl} />
         </div>
         <div>
           balance: {balance}
           <button onClick={this.handleGetBalance}>getBalance</button>
-          <button onClick={this.handleIssue}>issue</button>
+          <button onClick={this.handleTransfer}>Transfer</button>
         </div>
         <button onClick={this.props.transferToggle}>Transfer</button>
         <List items={this.props.account['0xc5fe8ed3c565fdcad79c7b85d68378aa4b68699e']} />
