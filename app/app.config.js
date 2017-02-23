@@ -6,7 +6,7 @@ export const apiBasePath = 'https://evm4rumeob.execute-api.eu-west-1.amazonaws.c
 export const ethNode = 'http://geth.ocolin.com:8545';
 export const ethNodeUrl = 'http://geth.ocolin.com:8545';
 export const tokenContractAddress = '0x7c08ca8bef208ac8be8cd03ad15fbef643dd355c';
-export const accountFactoryAddress = '0x297622d34794164495c388387596908635b3d005';
+export const accountFactoryAddress = '0x6da7c04b2533c1c35e072de3003794b34e06727d';
 export const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'jack', 'queen', 'king', 'ace'];
 export const suits = ['clubs', 'diamonds', 'hearts', 'spades'];
 
