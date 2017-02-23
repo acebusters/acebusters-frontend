@@ -20,7 +20,7 @@ const makeSelectAccountData = () => createSelector(
 const makeAddressSelector = () => createSelector(
   selectAccount,
   (account) => {
-    if (account) {
+    if (account && account.get('privKey')) {
       const privKeyBuffer = new Buffer(account.get('privKey').replace('0x', ''), 'hex');
       return `0x${EthUtil.privateToAddress(privKeyBuffer).toString('hex')}`;
     }

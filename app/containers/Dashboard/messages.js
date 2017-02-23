@@ -16,6 +16,6 @@ export default defineMessages({
   },
   included: {
     id: 'app.containers.Dashboard.included',
-    defaultMessage: 'Mined Transactions:',
+    defaultMessage: 'Transaction History:',
   },
 });

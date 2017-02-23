@@ -55,12 +55,20 @@ function accountProviderReducer(state = initialState, action) {
     case CONTRACT_TX_ERROR:
       return state.setIn([action.address, 'pending', action.nonce, 'error'], action.error);
     case CONTRACT_EVENT:
-      newState.getIn([action.event.address, 'pending']).forEach((value, key) => {
-        if (value.get('txHash') === action.event.transactionHash) {
-          newState = newState.deleteIn([action.event.address, 'pending', key]);
-        }
-      });
+      if (newState.getIn([action.event.address, 'pending'])) {
+        newState.getIn([action.event.address, 'pending']).forEach((value, key) => {
+          if (value.get('txHash') === action.event.transactionHash) {
+            newState = newState.deleteIn([action.event.address, 'pending', key]);
+          }
+        });
+      }
       newState = newState.setIn([action.event.address, 'transactions', action.event.transactionHash, 'blockNumber'], action.event.blockNumber);
+
+      if (action.event.event === 'Transfer') {
+        newState = newState.setIn([action.event.address, 'transactions', action.event.transactionHash, 'from'], action.event.args.from);
+        newState = newState.setIn([action.event.address, 'transactions', action.event.transactionHash, 'to'], action.event.args.to);
+        newState = newState.setIn([action.event.address, 'transactions', action.event.transactionHash, 'value'], action.event.args.value.toString());
+      }
       return newState;
     case SET_BALANCE:
       return state.set('balance', action.newBal);

@@ -47,6 +47,13 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     if (balance) {
       balance = balance.toString();
     }
+    let listPending = [];
+    let listTxns = [];
+    if (this.props.account[tokenContractAddress]) {
+      listPending = pendingToList(this.props.account[tokenContractAddress].pending);
+      listTxns = txnsToList(this.props.account[tokenContractAddress].transactions);
+    }
+
     return (
       <div>
         <h1><FormattedMessage {...messages.header} /></h1>
@@ -70,14 +77,30 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
         <button onClick={this.props.transferToggle}>Transfer</button>
 
         <h2><FormattedMessage {...messages.pending} /></h2>
-        <List items={this.props.account[tokenContractAddress]} />
+        <List items={listPending} headers={['#', 'data', 'txHash']} />
 
         <h2><FormattedMessage {...messages.included} /></h2>
-        <List items={this.props.account[tokenContractAddress]} />
+        <List items={listTxns} headers={['txHash', 'from', 'to', 'amount']} />
       </div>
     );
   }
 }
+
+const pendingToList = (pending) => {
+  let list = [];
+  if (pending) {
+    list = Object.keys(pending).map((key) => [key, pending[key].call, pending[key].txHash]);
+  }
+  return list;
+};
+
+const txnsToList = (txns) => {
+  let list = [];
+  if (txns) {
+    list = Object.keys(txns).map((key) => [key, txns[key].from, txns[key].to, txns[key].value]);
+  }
+  return list;
+};
 
 Dashboard.propTypes = {
   transferToggle: PropTypes.func,

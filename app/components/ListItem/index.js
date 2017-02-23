@@ -21,18 +21,24 @@ const Td = styled.td`
 `;
 
 function ListItem(props) {
+  let data = (<td></td>);
+  if (props.values) {
+    data = props.values.map((val, i) => {
+      if (i === 0) {
+        return (<Th key={i}>{val}</Th>);
+      }
+      return (<Td key={i}>{val}</Td>);
+    });
+  }
   return (
     <Tr>
-      <Th>{props.nonce}</Th>
-      <Td key={'data'}>{props.item.data}</Td>
-      <Td key={'hash'}>{(props.item.txHash) ? (props.item.txHash) : props.item.error}</Td>
+      {data}
     </Tr>
   );
 }
 
 ListItem.propTypes = {
-  item: React.PropTypes.any,
-  nonce: React.PropTypes.any,
+  values: React.PropTypes.array,
 };
 
 export default ListItem;

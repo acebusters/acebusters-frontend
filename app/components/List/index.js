@@ -36,20 +36,25 @@ const TableStriped = styled(TableStyled)`
 
 function List(props) {
   let content = (<tr></tr>);
+  let headers = (<th></th>);
 
   // If we have items, render them
-  if (props.items && props.items.pending) {
-    content = Object.keys(props.items.pending).map((key) => (
-      <ListItem key={key} nonce={key} item={props.items.pending[key]} />
+  if (props.items) {
+    content = props.items.map((item) => (
+      <ListItem key={item} values={item} />
+    ));
+  }
+
+  if (props.headers) {
+    headers = props.headers.map((header) => (
+      <th key={header} > {header} </th>
     ));
   }
   return (
     <TableStriped>
       <thead>
         <tr>
-          <th>#</th>
-          <th>data</th>
-          <th>TxHash</th>
+          {headers}
         </tr>
       </thead>
       <tbody>
@@ -61,6 +66,7 @@ function List(props) {
 
 List.propTypes = {
   items: React.PropTypes.any,
+  headers: React.PropTypes.any,
 };
 
 export default List;

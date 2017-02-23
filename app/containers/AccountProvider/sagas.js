@@ -4,13 +4,23 @@ import { takeLatest, put, fork, take, call, cancelled } from 'redux-saga/effects
 import { eventChannel, END } from 'redux-saga';
 import fetch from 'isomorphic-fetch';
 
-import { ethNodeUrl, ABI_TOKEN_CONTRACT, tokenContractAddress } from '../../app.config';
+import {
+  ethNodeUrl,
+  ABI_TOKEN_CONTRACT,
+  ABI_CONTROLLER,
+  tokenContractAddress,
+  ABI_ACCOUNT_FACTORY,
+  accountFactoryAddress,
+} from '../../app.config';
+
 import {
   WEB3_CONNECT,
   WEB3_METHOD_CALL,
   CONTRACT_METHOD_CALL,
   CONTRACT_TX_SEND,
+  SET_AUTH,
 } from './constants';
+
 import {
   web3Connected,
   web3Disconnected,
@@ -44,11 +54,24 @@ const getPeerCount = (web3) => (
   })
 );
 
+const getAccount = (web3, signer) => (
+  new Promise((resolve, reject) => {
+    const factoryContract = web3.eth.contract(ABI_ACCOUNT_FACTORY).at(accountFactoryAddress);
+    factoryContract.getAccount.call(signer, (e, a) => {
+      if (e) {
+        reject('login error');
+      }
+      resolve(a);
+    });
+  })
+);
+
 function* web3ConnectSaga() {
   try {
     yield getPeerCount(getWeb3());
     yield put(web3Connected({ isConnected: true }));
-    yield fork(ethEventListenerSaga);
+    const tokenContract = web3Instance.eth.contract(ABI_TOKEN_CONTRACT).at(tokenContractAddress);
+    yield fork(ethEventListenerSaga, tokenContract);
   } catch (err) {
     yield put(web3Disconnected({ isConnected: false, error: err }));
   }
@@ -94,6 +117,21 @@ function* contractMethodCallSaga() {
       yield put(contractMethodSuccess({ address, key, payload: { value, updated: new Date() } }));
     } catch (err) {
       yield put(contractMethodError({ address, key, err }));
+    }
+  }
+}
+
+function* accountLoginSaga() {
+  while (true) { // eslint-disable-line no-constant-condition
+    const req = yield take(SET_AUTH);
+    const { privKey, loggedIn } = req.newAuthState;
+    if (loggedIn) {
+      const privKeyBuffer = new Buffer(privKey.replace('0x', ''), 'hex');
+      const signer = `0x${ethUtil.privateToAddress(privKeyBuffer).toString('hex')}`;
+
+      const res = yield getAccount(web3Instance, signer);
+      const controllerContract = web3Instance.eth.contract(ABI_CONTROLLER).at(res[1]);
+      yield fork(ethEventListenerSaga, controllerContract);
     }
   }
 }
@@ -164,24 +202,23 @@ function* contractTransactionSendSaga() {
 }
 
 
-const ethEvent = (web3) => eventChannel((emitter) => {
-  const token = web3.eth.contract(ABI_TOKEN_CONTRACT).at(tokenContractAddress);
-  const tokenEvents = token.allEvents({ fromBlock: 'latest' });
-  tokenEvents.watch((error, results) => {
+const ethEvent = (contract) => eventChannel((emitter) => {
+  const contractEvents = contract.allEvents({ fromBlock: 'latest' });
+  contractEvents.watch((error, results) => {
     if (error) {
       emitter(END);
-      tokenEvents.stopWatching();
+      contractEvents.stopWatching();
       return;
     }
     emitter(results);
   });
   return () => {
-    tokenEvents.stopWatching();
+    contractEvents.stopWatching();
   };
 });
 
-export function* ethEventListenerSaga() {
-  const chan = yield call(ethEvent, web3Instance);
+export function* ethEventListenerSaga(contract) {
+  const chan = yield call(ethEvent, contract);
   try {
     while (true) { // eslint-disable-line no-constant-condition
       const event = yield take(chan);
@@ -199,6 +236,7 @@ export function* ethEventListenerSaga() {
 export function* accountSaga() {
   yield takeLatest(WEB3_CONNECT, web3ConnectSaga);
   yield fork(web3MethodCallSaga);
+  yield fork(accountLoginSaga);
   yield fork(contractMethodCallSaga);
   yield fork(contractTransactionSendSaga);
 }
