@@ -3,30 +3,34 @@
  */
 // react + redux
 import React from 'react';
-import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 // config data
-import { SEAT_COORDS, AMOUNT_COORDS } from '../../app.config';
+import { SEAT_COORDS, AMOUNT_COORDS, ABI_TABLE } from '../../app.config';
 // components and styles
 import Card from 'components/Card'; // eslint-disable-line
 import Seat from '../Seat'; // eslint-disable-line
 import ActionBar from '../ActionBar'; // eslint-disable-line
 // actions
-import { poll, getLineup } from './actions';
+import { poll, lineupReceived } from './actions';
 // selectors
-import { makeAddressSelector } from '../AccountProvider/selectors';
+import { makeAddressSelector, makeSelectPrivKey } from '../AccountProvider/selectors';
 import { makeIsMyTurnSelector, makePotSizeSelector, makeAmountToCallSelector,
          makeHandSelector, makeLastHandNettedSelector, makeLineupSelector, makeMyPosSelector } from './selectors';
 import TableComponent from '../../components/Table';
+import web3Connect from '../AccountProvider/web3Connect';
 
 
 export class Table extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   constructor(props) {
     super(props);
-    const privKey = this.props.location.query.privKey;
     const tableAddr = this.props.params.id;
-    this.props.getLineup(tableAddr, privKey);
+    this.web3 = props.web3Redux.web3;
+    this.table = this.web3.eth.contract(ABI_TABLE).at(tableAddr);
+    this.table.getLineup.callPromise((lineup) => {
+      props.lineupReceived(lineup);
+    });
+
     setInterval(() => {
       this.props.poll(tableAddr);
     }, 3000);
@@ -41,6 +45,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   renderSeats() {
     const seats = [];
     const lineup = this.props.lineup;
+    this.table.getLineup();
     const coordArray = SEAT_COORDS[lineup.length.toString()];
     const amountCoords = AMOUNT_COORDS[lineup.length.toString()];
     for (let i = 0; i < lineup.length; i += 1) {
@@ -82,7 +87,7 @@ export function mapDispatchToProps(dispatch) {
   return {
     updateLastHand: (handId, tableAddr) => dispatch({ type: 'GET_HAND_REQUESTED', payload: { handId, tableAddr } }),
     poll: (tableAddr) => dispatch(poll(tableAddr)),
-    getLineup: (tableAddr, priv) => dispatch(getLineup(tableAddr, priv)),
+    lineupReceived: (lineup) => dispatch(lineupReceived(lineup)),
   };
 }
 
@@ -94,19 +99,20 @@ const mapStateToProps = createStructuredSelector({
   isMyTurn: makeIsMyTurnSelector(),
   potSize: makePotSizeSelector(),
   myPos: makeMyPosSelector(),
+  privKey: makeSelectPrivKey(),
   amountToCall: makeAmountToCallSelector(),
 });
 
 Table.propTypes = {
-  location: React.PropTypes.object,
   hand: React.PropTypes.object,
   lineup: React.PropTypes.array,
   lastHandNettedOnClient: React.PropTypes.number,  // eslint-disable-line
   params: React.PropTypes.object,
   updateLastHand: React.PropTypes.func,
+  lineupReceived: React.PropTypes.func,
   poll: React.PropTypes.func,
-  getLineup: React.PropTypes.func,
+  web3Redux: React.PropTypes.any,
 };
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(Table);
+export default web3Connect(mapStateToProps, mapDispatchToProps)(Table);

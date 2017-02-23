@@ -38,7 +38,7 @@ function List(props) {
   let content = (<tr></tr>);
 
   // If we have items, render them
-  if (props.items.pending) {
+  if (props.items && props.items.pending) {
     content = Object.keys(props.items.pending).map((key) => (
       <ListItem key={key} nonce={key} item={props.items.pending[key]} />
     ));

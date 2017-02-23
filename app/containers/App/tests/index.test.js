@@ -2,7 +2,6 @@ import React from 'react';
 import { shallow } from 'enzyme';
 
 import Header from 'components/Header';
-import Footer from 'components/Footer';
 import { App } from '../index';
 
 describe('<App />', () => {
@@ -21,12 +20,5 @@ describe('<App />', () => {
       </App>
     );
     expect(renderedComponent.contains(children)).toBe(true);
-  });
-
-  it('should render the footer', () => {
-    const renderedComponent = shallow(
-      <App account={{ account: { loggedIn: true } }} />
-    );
-    expect(renderedComponent.find(Footer).length).toBe(1);
   });
 });

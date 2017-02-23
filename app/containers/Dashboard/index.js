@@ -70,10 +70,10 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
         <button onClick={this.props.transferToggle}>Transfer</button>
 
         <h2><FormattedMessage {...messages.pending} /></h2>
-        <List items={this.props.account['0xc5fe8ed3c565fdcad79c7b85d68378aa4b68699e']} />
+        <List items={this.props.account[tokenContractAddress]} />
 
         <h2><FormattedMessage {...messages.included} /></h2>
-        <List items={this.props.account['0xc5fe8ed3c565fdcad79c7b85d68378aa4b68699e']} />
+        <List items={this.props.account[tokenContractAddress]} />
       </div>
     );
   }

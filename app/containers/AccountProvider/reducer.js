@@ -26,13 +26,6 @@ const initialState = fromJS({
   privKey: storageService.getItem('privKey'),
   email: storageService.getItem('email'),
   lastNonce: 0,
-  '0xc5fe8ed3c565fdcad79c7b85d68378aa4b68699e': {
-    pending: {
-      1: { data: 'send([2000, "0x123"])', txHash: '0x6019e766698d45aed16c1891f3edda08184b2b3babd92c0dc7a06a9b6d27140a' },
-      2: { data: 'send([3000, "0x345"])', txHash: '0x51fda47ac9113cdd7068e9bb7dec55cb170d1ca694afd442f77a56add4b3c86b' },
-      3: { data: 'send([4000, "0x345"])', error: 'Error: invalid nonec' },
-    },
-  },
   loggedIn: isLoggedIn(),
 });
 
@@ -62,20 +55,13 @@ function accountProviderReducer(state = initialState, action) {
     case CONTRACT_TX_ERROR:
       return state.setIn([action.address, 'pending', action.nonce, 'error'], action.error);
     case CONTRACT_EVENT:
-      let pendingTxNonce = 0;
-      const pendingTx = state.getIn([action.event.address, 'pending']);
-      if (pendingTx) {
-        pendingTx.map((value, key) => {
-          if (value.txHash === action.event.transactionHash) {
-            pendingTxNonce = key;
-          }
-          return value;
-        });
-      }
-      if (pendingTxNonce) {
-        return state.deleteIn([action.event.address, 'pending', pendingTxNonce]);
-      }
-      return state;
+      newState.getIn([action.event.address, 'pending']).forEach((value, key) => {
+        if (value.get('txHash') === action.event.transactionHash) {
+          newState = newState.deleteIn([action.event.address, 'pending', key]);
+        }
+      });
+      newState = newState.setIn([action.event.address, 'transactions', action.event.transactionHash, 'blockNumber'], action.event.blockNumber);
+      return newState;
     case SET_BALANCE:
       return state.set('balance', action.newBal);
     case SET_AUTH:

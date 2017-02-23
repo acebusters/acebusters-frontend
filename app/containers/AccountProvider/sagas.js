@@ -4,7 +4,7 @@ import { takeLatest, put, fork, take, call, cancelled } from 'redux-saga/effects
 import { eventChannel, END } from 'redux-saga';
 import fetch from 'isomorphic-fetch';
 
-import { ethNodeUrl } from '../../app.config';
+import { ethNodeUrl, ABI_TOKEN_CONTRACT, tokenContractAddress } from '../../app.config';
 import {
   WEB3_CONNECT,
   WEB3_METHOD_CALL,
@@ -165,19 +165,18 @@ function* contractTransactionSendSaga() {
 
 
 const ethEvent = (web3) => eventChannel((emitter) => {
-  const test = web3.eth.contract([{ constant: false, inputs: [{ name: 'amount', type: 'uint256' }], name: 'issue', outputs: [{ name: 'success', type: 'bool' }], payable: false, type: 'function' }, { anonymous: false, inputs: [{ indexed: true, name: 'sender', type: 'address' }, { indexed: false, name: 'value', type: 'uint256' }], name: 'Issuance', type: 'event' }]).at('0x2be115cf6a5f853358052fd4c6563993086d2e8d');
-  const testEvents = test.allEvents({ fromBlock: 'latest' });
-  testEvents.watch((error, results) => {
+  const token = web3.eth.contract(ABI_TOKEN_CONTRACT).at(tokenContractAddress);
+  const tokenEvents = token.allEvents({ fromBlock: 'latest' });
+  tokenEvents.watch((error, results) => {
     if (error) {
       emitter(END);
-      testEvents.stopWatching();
+      tokenEvents.stopWatching();
       return;
     }
     emitter(results);
   });
-
   return () => {
-    testEvents.stopWatching();
+    tokenEvents.stopWatching();
   };
 });
 
@@ -186,6 +185,7 @@ export function* ethEventListenerSaga() {
   try {
     while (true) { // eslint-disable-line no-constant-condition
       const event = yield take(chan);
+      console.dir(event);
       yield put(contractEvent({ event }));
     }
   } finally {

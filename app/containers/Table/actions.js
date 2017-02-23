@@ -24,8 +24,8 @@ export const COMPLETE_FOLD = 'COMPLETE_FOLD';
 export const COMPLETE_SHOW = 'COMPLETE_SHOW';
 
 
-export function getLineup(tableAddr, privKey) {
-  return { type: GET_LINEUP, tableAddr, privKey };
+export function getLineup(tableAddr) {
+  return { type: GET_LINEUP, tableAddr };
 }
 
 export function setCards(cards, pos) {
@@ -40,9 +40,8 @@ export function updateReceived(tableState) {
   return { type: UPDATE_RECEIVED, tableState };
 }
 
-// privkey shpould be removed once we can fetch it from account reducer
-export function lineupReceived(lineup, privKey, tableAddr) {
-  return { type: LINEUP_RECEIVED, lineup, privKey, tableAddr };
+export function lineupReceived(lineup) {
+  return { type: LINEUP_RECEIVED, lineup };
 }
 
 export function updateAmount(amount) {

@@ -32,7 +32,7 @@ export function* getHand(action) {
 export function* dispatchDealingAction() {
   const state = yield select();
   const hand = state.get('table').get('hand');
-  const privKey = state.get('table').get('privKey');
+  const privKey = state.get('account').get('privKey');
   const handId = hand.handId;
   let amount = 0;
   const myAddr = selectAddress(privKey);
@@ -104,7 +104,7 @@ export function* poll(action) {
 
 export function* getLineup(action) {
   try {
-    const lineup = yield call(fetchLineup, action.tableAddr, action.privKey);
+    const lineup = yield call(fetchLineup, action.tableAddr);
     yield put(lineupReceived(lineup, action.privKey, action.tableAddr));
   } catch (err) {
     yield put({ type: 'FAILED_REQUEST', err });

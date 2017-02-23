@@ -55,9 +55,7 @@ export default function tableReducer(state = initialState, action) {
       newHand.lineup = newLineup;
       return state
         .set('lastHandNettedOnClient', action.lineup[0].toNumber())
-        .set('hand', newHand)
-        .set('tableAddr', action.tableAddr)
-        .set('privKey', action.privKey); // this should be removed once we can fetch the privKet from the account reducer
+        .set('hand', newHand);
     }
 
     case TableActions.SET_CARDS: {

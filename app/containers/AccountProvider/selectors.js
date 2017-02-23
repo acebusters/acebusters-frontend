@@ -68,7 +68,6 @@ const makeSelectPrivKey = () => createSelector(
 export default makeSelectAccountData;
 export {
   selectAccount,
-  makeSelectAccountData,
   makeAddressSelector,
   makeSelectAccountData,
   makeSelectContract,

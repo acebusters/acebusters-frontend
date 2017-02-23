@@ -3,7 +3,6 @@
  */
 
 import React from 'react';
-import sizeMe from 'react-sizeme';
 import { GamePlay, TableInfo, TableArea, TableContainer, PokerTable, TableAndChairs } from './TableWrapper';
 import { Board } from './Board';
 import { TableHeader } from './TableHeader';
@@ -41,4 +40,4 @@ TableComponent.propTypes = {
   amountToCall: React.PropTypes.number,
 };
 
-export default sizeMe()(TableComponent);
+export default TableComponent;
