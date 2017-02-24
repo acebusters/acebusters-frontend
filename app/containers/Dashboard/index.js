@@ -42,8 +42,8 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
   }
 
   render() {
-    const qrUrl = `ether:${this.props.address}`;
-    let balance = this.token.balanceOf(this.proxyAddress);
+    const qrUrl = `ether:${this.props.account.proxy}`;
+    let balance = this.token.balanceOf(this.props.account.proxy);
     if (balance) {
       balance = balance.toString();
     }
@@ -66,7 +66,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
           ProxyAddress: { this.proxyAddress }
         </div>
         <div>
-          address: {this.props.address}
+          address: {this.props.account.proxy}
           <QRCode value={qrUrl} />
         </div>
         <div>

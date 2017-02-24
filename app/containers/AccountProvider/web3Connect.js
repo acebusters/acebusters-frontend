@@ -1,8 +1,7 @@
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
-import { web3MethodCall } from './actions';
-import { SUPPORTED_WEB3_METHODS } from './constants';
+import { web3MethodCall, SUPPORTED_WEB3_METHODS } from './actions';
 import { selectAccount } from './selectors';
 import { getWeb3 } from './sagas';
 import generateContractApi from './generateContractApi';

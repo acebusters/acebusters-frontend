@@ -1,6 +1,6 @@
 import Web3 from 'web3';
 import ethUtil from 'ethereumjs-util';
-import { takeLatest, put, fork, take, call, cancelled } from 'redux-saga/effects';
+import { takeLatest, select, put, fork, take, call, cancelled } from 'redux-saga/effects';
 import { eventChannel, END } from 'redux-saga';
 import fetch from 'isomorphic-fetch';
 
@@ -19,13 +19,12 @@ import {
   CONTRACT_METHOD_CALL,
   CONTRACT_TX_SEND,
   SET_AUTH,
-} from './constants';
-
-import {
+  WEB3_CONNECTED,
   web3Connected,
   web3Disconnected,
   web3MethodSuccess,
   web3MethodError,
+  accountLoaded,
   contractMethodSuccess,
   contractMethodError,
   contractTxSuccess,
@@ -122,15 +121,41 @@ function* contractMethodCallSaga() {
 }
 
 function* accountLoginSaga() {
+  let initialLoad = true;
   while (true) { // eslint-disable-line no-constant-condition
-    const req = yield take(SET_AUTH);
+    let req;
+    // load account data when page is loaded,
+    // and user is already logged in from session storage
+    if (initialLoad) {
+      initialLoad = false;
+      const results = yield [select(), take(WEB3_CONNECTED)];
+      const privKey = results[0].get('account').get('privKey');
+      if (privKey !== undefined && privKey.length > 32) {
+        req = { newAuthState: { privKey, loggedIn: true } };
+      } else {
+        continue; // eslint-disable-line no-continue
+      }
+    } else {
+      // or wait for user login success to happen
+      req = yield take(SET_AUTH);
+    }
     const { privKey, loggedIn } = req.newAuthState;
     if (loggedIn) {
       const privKeyBuffer = new Buffer(privKey.replace('0x', ''), 'hex');
       const signer = `0x${ethUtil.privateToAddress(privKeyBuffer).toString('hex')}`;
 
+      // this reads account data from the account factory
       const res = yield getAccount(web3Instance, signer);
-      const controllerContract = web3Instance.eth.contract(ABI_CONTROLLER).at(res[1]);
+      const proxy = res[0];
+      const controller = res[1];
+      const lastNonce = res[2].toNumber();
+
+      // write data into the state
+      yield put(accountLoaded({ proxy, controller, lastNonce }));
+
+      // start listen on the account controller for events
+      // mostly auth errors
+      const controllerContract = web3Instance.eth.contract(ABI_CONTROLLER).at(controller);
       yield fork(ethEventListenerSaga, controllerContract);
     }
   }
