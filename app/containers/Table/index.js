@@ -83,11 +83,11 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 }
 
 
-export function mapDispatchToProps(dispatch) {
+export function mapDispatchToProps() {
   return {
-    updateLastHand: (handId, tableAddr) => dispatch({ type: 'GET_HAND_REQUESTED', payload: { handId, tableAddr } }),
-    poll: (tableAddr) => dispatch(poll(tableAddr)),
-    lineupReceived: (lineup) => dispatch(lineupReceived(lineup)),
+    updateLastHand: (handId, tableAddr) => ({ type: 'GET_HAND_REQUESTED', payload: { handId, tableAddr } }),
+    poll: (tableAddr) => (poll(tableAddr)),
+    lineupReceived: (lineup) => (lineupReceived(lineup)),
   };
 }
 

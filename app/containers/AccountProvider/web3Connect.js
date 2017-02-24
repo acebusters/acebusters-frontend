@@ -103,7 +103,7 @@ export default function web3Connect(passedMapStateToProps, passedActions) {
   }
 
   function mapDispatchToProps(dispatch) {
-    return { dispatch, ...bindActionCreators(passedActions, dispatch) };
+    return { dispatch, ...bindActionCreators(passedActions(), dispatch) };
   }
 
   function mergeProps(stateProps, dispatchProps, ownProps) {
