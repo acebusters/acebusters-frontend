@@ -1,6 +1,6 @@
 import { fromJS } from 'immutable';
 import accountProviderReducer from '../reducer';
-import { CONTRACT_EVENT } from '../constants';
+import { CONTRACT_EVENT } from '../actions';
 const BigNumber = require('bignumber.js');
 
 describe('account reducer tests', () => {

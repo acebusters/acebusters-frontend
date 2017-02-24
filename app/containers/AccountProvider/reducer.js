@@ -2,7 +2,6 @@ import { fromJS } from 'immutable';
 
 import {
   SET_AUTH,
-  SET_BALANCE,
   WEB3_CONNECTED,
   WEB3_DISCONNECTED,
   WEB3_METHOD_SUCCESS,
@@ -13,7 +12,8 @@ import {
   CONTRACT_TX_SUCCESS,
   CONTRACT_TX_ERROR,
   CONTRACT_EVENT,
-} from './constants';
+  ACCOUNT_LOADED,
+} from './actions';
 import * as storageService from '../../services/localStorage';
 
 const isLoggedIn = () => {
@@ -36,6 +36,8 @@ function accountProviderReducer(state = initialState, action) {
       return state;
     case WEB3_DISCONNECTED:
       return state;
+    case ACCOUNT_LOADED:
+      return state.set('proxy', action.data.proxy).set('controller', action.data.controller).set('lastNonce', action.data.lastNonce);
     case WEB3_METHOD_SUCCESS:
       return state.setIn(['web3', 'methods', action.key], fromJS(action.payload));
     case WEB3_METHOD_ERROR:
@@ -70,8 +72,6 @@ function accountProviderReducer(state = initialState, action) {
         newState = newState.setIn([action.event.address, 'transactions', action.event.transactionHash, 'value'], action.event.args.value.toString());
       }
       return newState;
-    case SET_BALANCE:
-      return state.set('balance', action.newBal);
     case SET_AUTH:
       if (!action.newAuthState.loggedIn) {
         newState = state

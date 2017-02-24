@@ -1,19 +1,57 @@
-import { SET_AUTH,
-  WEB3_CONNECT,
-  WEB3_CONNECTED,
-  WEB3_DISCONNECTED,
-  SET_BALANCE,
-  WEB3_METHOD_CALL,
-  WEB3_METHOD_SUCCESS,
-  WEB3_METHOD_ERROR,
-  CONTRACT_METHOD_CALL,
-  CONTRACT_METHOD_SUCCESS,
-  CONTRACT_METHOD_ERROR,
-  CONTRACT_TX_SEND,
-  CONTRACT_TX_SUCCESS,
-  CONTRACT_TX_ERROR,
-  CONTRACT_EVENT,
-} from './constants';
+export const SET_AUTH = 'acebusters/AccountProvider/SET_AUTH';
+export const ACCOUNT_LOADED = 'acebusters/AccountProvider/ACCOUNT_LOADED';
+
+export const WEB3_CONNECT = 'acebusters/AccountProvider/WEB3_CONNECT';
+export const WEB3_CONNECTED = 'acebusters/AccountProvider/WEB3_CONNECTED';
+export const WEB3_DISCONNECTED = 'acebusters/AccountProvider/WEB3_DISCONNECTED';
+
+export const WEB3_METHOD_CALL = 'acebusters/AccountProvider/WEB3_METHOD_CALL';
+export const WEB3_METHOD_SUCCESS = 'acebusters/AccountProvider/WEB3_METHOD_SUCCESS';
+export const WEB3_METHOD_ERROR = 'acebusters/AccountProvider/WEB3_METHOD_ERROR';
+
+export const CONTRACT_METHOD_CALL = 'acebusters/AccountProvider/CONTRACT_METHOD_CALL';
+export const CONTRACT_METHOD_SUCCESS = 'acebusters/AccountProvider/CONTRACT_METHOD_SUCCESS';
+export const CONTRACT_METHOD_ERROR = 'acebusters/AccountProvider/CONTRACT_METHOD_ERROR';
+
+export const CONTRACT_TX_SEND = 'acebusters/AccountProvider/CONTRACT_TX_SEND';
+export const CONTRACT_TX_SUCCESS = 'acebusters/AccountProvider/CONTRACT_TX_SUCCESS';
+export const CONTRACT_TX_ERROR = 'acebusters/AccountProvider/CONTRACT_TX_ERROR';
+
+export const CONTRACT_EVENT = 'acebusters/AccountProvider/CONTRACT_EVENT';
+
+export const SUPPORTED_WEB3_METHODS = {
+  net: {
+    getListening: {},
+    getPeerCount: {},
+  },
+  version: {
+    getNode: {},
+    getNetwork: {},
+    getEthereum: {},
+    getWhisper: {},
+  },
+  eth: {
+    getBalance: {},
+    getCode: {},
+    getTransactionCount: {},
+    getStorageAt: {},
+    getSyncing: {},
+    getCoinbase: {},
+    getMining: {},
+    getHashrate: {},
+    getGasPrice: {},
+    getAccounts: {},
+    getBlockNumber: {},
+    getBlock: {},
+    getBlockTransactionCount: {},
+    getUncle: {},
+    // getTransactionFromBlock: {},
+    // getTransaction: { actionCreator: getTransaction },
+    // getTransactionReceipt: { actionCreator: getTransaction },
+    // sendTransaction: { actionCreator: createTransaction },
+    // sendRawTransaction: { actionCreator: createTransaction },
+  },
+};
 
 /**
  * Sets the authentication state of the application
@@ -23,8 +61,8 @@ export function setAuthState(newAuthState) {
   return { type: SET_AUTH, newAuthState };
 }
 
-export function setBalance(newBal) {
-  return { type: SET_BALANCE, newBal };
+export function accountLoaded(data) {
+  return { type: ACCOUNT_LOADED, data };
 }
 
 export function web3Connect() {
