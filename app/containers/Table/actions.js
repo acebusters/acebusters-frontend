@@ -5,7 +5,6 @@
 
 export const START_POLLING = 'START_POLLING';
 export const STOP_POLLING = 'STOP_POLLING';
-export const GET_LINEUP = 'GET_LINEUP';
 export const COMPLETE_HAND_QUERY = 'COMPLETE_HAND_QUERY';
 export const NEXT_HAND = 'NEXT_HAND';
 export const SET_CARDS = 'SET_CARDS';
@@ -22,11 +21,6 @@ export const SUBMIT_CHECK = 'SUBMIT_CHECK';
 export const COMPLETE_BET = 'COMPLETE_BET';
 export const COMPLETE_FOLD = 'COMPLETE_FOLD';
 export const COMPLETE_SHOW = 'COMPLETE_SHOW';
-
-
-export function getLineup(tableAddr) {
-  return { type: GET_LINEUP, tableAddr };
-}
 
 export function setCards(cards, pos) {
   return { type: SET_CARDS, cards, pos };

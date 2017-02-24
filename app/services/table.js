@@ -3,8 +3,7 @@
  */
 
 import EWT from 'ethereum-web-token';
-import { ethNode, ABI_SHOW, apiBasePath } from '../app.config';
-import Provider from '../provider';
+import { ABI_SHOW, apiBasePath } from '../app.config';
 
 
 export function fetchTableState(tableAddr) {
@@ -49,20 +48,6 @@ export function show(handId, amount, holeCards, priv, tableAddr) {
       resolve(distribution);
     }, (err) => {
       reject(err);
-    });
-  });
-}
-
-export function fetchLineup(tableAddr, privKey) {
-  const provider = new Provider(ethNode, privKey);
-  const table = provider.getTable(tableAddr);
-
-  return new Promise((resolve, reject) => {
-    table.getLineup((error, response) => {
-      if (error) {
-        reject(error);
-      }
-      resolve(response);
     });
   });
 }
