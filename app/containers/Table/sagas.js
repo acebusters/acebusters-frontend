@@ -5,9 +5,9 @@ import EthUtil from 'ethereumjs-util';
 import { PokerHelper, ReceiptCache } from 'poker-helper';
 import { call, put, takeLatest, select, take, fork } from 'redux-saga/effects';
 import { delay } from 'redux-saga';
-import { updateReceived, lineupReceived, completeBet, completeFold, completeShow } from './actions';
+import { updateReceived, completeBet, completeFold, completeShow } from './actions';
 import { ABI_BET, ABI_FOLD, checkABIs, apiBasePath } from '../../app.config';
-import { fetchTableState, pay, fetchLineup, show } from '../../services/table';
+import { fetchTableState, pay, show } from '../../services/table';
 
 const rc = new ReceiptCache();
 const pokerHelper = new PokerHelper(rc);
@@ -102,15 +102,6 @@ export function* poll(action) {
   }
 }
 
-export function* getLineup(action) {
-  try {
-    const lineup = yield call(fetchLineup, action.tableAddr);
-    yield put(lineupReceived(lineup, action.privKey, action.tableAddr));
-  } catch (err) {
-    yield put({ type: 'FAILED_REQUEST', err });
-  }
-}
-
 export function* submitBet(action) {
   try {
     const cards = yield call(pay, action.handId, action.amount, action.privKey, action.tableAddr, ABI_BET, 'bet');
@@ -152,7 +143,6 @@ function* tableSaga() {
   yield takeLatest('GET_HAND_REQUESTED', getHand);
   yield takeLatest('PERFORM_DEALING_ACTION', performDealingAction);
   yield takeLatest('START_POLLING', poll);
-  yield takeLatest('GET_LINEUP', getLineup);
   yield takeLatest('SUBMIT_BET', submitBet);
   yield takeLatest('SUBMIT_FOLD', submitFold);
   yield takeLatest('SUBMIT_CHECK', submitCheck);
