@@ -19,7 +19,7 @@ export const SeatWrapper = styled.div`
 export const ImageContainer = styled.div`
   border-radius: 50%;
   border: 4px solid ${(props) => {
-    if (props.whosTurn === props.pos) {
+    if (props.whosTurn === props.pos && props.open) {
       return orange;
     }
     if (props.lastAction === 'sitOut') {
@@ -31,9 +31,8 @@ export const ImageContainer = styled.div`
   height: 5.5em;
   background: #FFF;
   text-align: center;
-  color: white;
   position: absolute;
-  cursor: pointer;
+  ${(props) => (props.open) ? 'cursor: pointer' : ''};
   z-index: 10;
 `;
 
@@ -47,7 +46,6 @@ export const DealerButton = styled.div`
   text-align: center;
   color: white;
   position: absolute;
-  cursor: pointer;
   z-index: 10;
 `;
 

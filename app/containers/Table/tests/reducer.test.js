@@ -1,6 +1,6 @@
 
 import EWT from 'ethereum-web-token';
-import { fromJS, Map } from 'immutable';
+import { Map } from 'immutable';
 import tableReducer from '../reducer';
 import * as TableActions from '../actions';
 
@@ -23,7 +23,7 @@ const P2_KEY = '0x99e69145c6e7f44ba04d579faac9ef4ce5e942dc02b96a9d42b5fcb03e5087
 const P3_ADDR = '0xdd7acad75b52bd206777a36bc41a3b65ad1c44fc';
 const P3_KEY = '0x33de976dfb8bdf2dc3115801e514b902c4c913c351b6549947758a8b9d981722';
 
-const initialState = fromJS({
+const initialState = Map({
   hand: {
     cards: [],
     dealer: 0,
@@ -33,6 +33,7 @@ const initialState = fromJS({
     state: '',
   },
   complete: false,
+  lastRoundMaxBet: 0,
 });
 
 describe('table reducer tests', () => {
@@ -402,5 +403,15 @@ describe('table reducer tests', () => {
       complete: false,
       performedDealing: false,
     }));
+  });
+
+  it('should return initial state if received hand does not exist', () => {
+    expect(tableReducer(initialState, {
+      type: TableActions.UPDATE_RECEIVED,
+      tableState: {
+        handId: 0,
+        dealer: 0,
+      },
+    })).toEqual(initialState);
   });
 });

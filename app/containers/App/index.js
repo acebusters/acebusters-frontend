@@ -60,7 +60,6 @@ const sb = (props) => ([
       title="Layout Options"
     >
       <Sidebar.Menu.Item title="Top Navigation" />
-      <Sidebar.Menu.Item title="Boxed" href="/boxed" />
       <Sidebar.Menu.Item title="Fixed" />
       <Sidebar.Menu.Item title="Collapsed Sidebar" />
     </Sidebar.Menu.Item>
@@ -72,13 +71,15 @@ const sb = (props) => ([
   </Sidebar.Menu>,
   <Sidebar.Menu header="LABELS" key="4">
     <Sidebar.Menu.Item
-      icon={{ color: 'danger' }}
+      icon={{ color: 'information' }}
       onClick={props.handleClickDashboard}
       title="Dashboard"
     />
-    <Sidebar.Menu.Item icon={{ color: 'danger' }} title="Danger" />
-    <Sidebar.Menu.Item icon={{ color: 'warning' }} title="Warning" />
-    <Sidebar.Menu.Item icon={{ color: 'information' }} title="Information" />
+    <Sidebar.Menu.Item
+      icon={{ color: 'information' }}
+      onClick={props.handleClickLobby}
+      title="Lobby"
+    />
   </Sidebar.Menu>,
 ]);
 
@@ -150,6 +151,7 @@ function mapDispatchToProps(dispatch) {
   return {
     handleClickLogout: () => dispatch(setAuthState({ loggedIn: false })),
     handleClickDashboard: () => browserHistory.push('/dashboard'),
+    handleClickLobby: () => browserHistory.push('/lobby'),
     sidebarToggle: () => dispatch(sidebarToggle()),
     transferToggle: () => dispatch(transferToggle()),
   };

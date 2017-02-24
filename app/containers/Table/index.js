@@ -5,7 +5,7 @@
 import React from 'react';
 import { createStructuredSelector } from 'reselect';
 // config data
-import { SEAT_COORDS, AMOUNT_COORDS, ABI_TABLE } from '../../app.config';
+import { SEAT_COORDS, AMOUNT_COORDS, ABI_TABLE, ABI_TOKEN_CONTRACT, tokenContractAddress } from '../../app.config';
 // components and styles
 import Card from 'components/Card'; // eslint-disable-line
 import Seat from '../Seat'; // eslint-disable-line
@@ -13,7 +13,7 @@ import ActionBar from '../ActionBar'; // eslint-disable-line
 // actions
 import { poll, lineupReceived } from './actions';
 // selectors
-import { makeAddressSelector, makeSelectPrivKey } from '../AccountProvider/selectors';
+import { makeAddressSelector, makeSelectPrivKey, makeProxyAddr } from '../AccountProvider/selectors';
 import { makeIsMyTurnSelector, makePotSizeSelector, makeAmountToCallSelector,
          makeHandSelector, makeLastHandNettedSelector, makeLineupSelector, makeMyPosSelector } from './selectors';
 import TableComponent from '../../components/Table';
@@ -22,16 +22,18 @@ import web3Connect from '../AccountProvider/web3Connect';
 
 export class Table extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
-  constructor(props) {
-    super(props);
+  componentDidMount() {
+    // start polling data
     const tableAddr = this.props.params.id;
-    this.web3 = props.web3Redux.web3;
+    this.web3 = this.props.web3Redux.web3;
     this.table = this.web3.eth.contract(ABI_TABLE).at(tableAddr);
-    this.table.getLineup.callPromise((lineup) => {
-      props.lineupReceived(lineup);
+    this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(tokenContractAddress);
+    // getting initial lineup from contract
+    this.table.getLineup.callPromise().then((lineup) => {
+      this.props.lineupReceived(lineup);
     });
 
-    setInterval(() => {
+    this.interval = setInterval(() => {
       this.props.poll(tableAddr);
     }, 3000);
   }
@@ -42,14 +44,35 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     }
   }
 
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
+  join(pos, open) {
+    if (!open) return;
+    this.token.allowance.callPromise().then((res) =>
+      // amount to be spend
+       res);
+  }
+
   renderSeats() {
     const seats = [];
     const lineup = this.props.lineup;
-    this.table.getLineup();
     const coordArray = SEAT_COORDS[lineup.length.toString()];
     const amountCoords = AMOUNT_COORDS[lineup.length.toString()];
+
     for (let i = 0; i < lineup.length; i += 1) {
-      const seat = (<Seat key={i} pos={i} {...this.props} coords={coordArray[i]} amountCoords={amountCoords[i]}> </Seat>);
+      const open = (lineup[i].address.indexOf('0x0000000000000000000000000000000000000000') > -1);
+      const seat = (
+        <Seat
+          key={i}
+          pos={i} {...this.props}
+          coords={coordArray[i]}
+          amountCoords={amountCoords[i]}
+          open={open}
+          onClick={() => this.join(i, open)}
+        >
+        </Seat>);
       seats.push(seat);
     }
     return seats;
@@ -74,7 +97,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       return (
         <div>
           <TableComponent {...this.props} board={board} seats={seats} ></TableComponent>
-          {/* <ActionBar {...this.props} me={this.props.hand.lineup[this.props.myPos]}></ActionBar>*/}
         </div>
       );
     }
@@ -101,6 +123,7 @@ const mapStateToProps = createStructuredSelector({
   myPos: makeMyPosSelector(),
   privKey: makeSelectPrivKey(),
   amountToCall: makeAmountToCallSelector(),
+  proxyAddr: makeProxyAddr(),
 });
 
 Table.propTypes = {

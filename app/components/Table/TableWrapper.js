@@ -63,7 +63,7 @@ export const TableContainer = styled.div`
 export const TableAndChairs = styled.div`
   ${(props) => `height:${ props.computedStyles().computeSize().height}px`};
   ${(props) => `width:${ props.computedStyles().computeSize().width}px`};
-  margin-top: ${() => (document.getElementById('header')) ? document.getElementById('header').clientHeight + 250 : 0}px;
+  margin-top: ${() => (document.getElementById('header')) ? document.getElementById('header').clientHeight : 0}px;
   position: relative;
   top: 50%;
   transform: translateY(-50%);

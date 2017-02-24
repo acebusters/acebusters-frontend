@@ -61,6 +61,11 @@ const makeSelectPrivKey = () => createSelector(
   (account) => account.get('privKey')
 );
 
+const makeProxyAddr = () => createSelector(
+  selectAccount,
+  (account) => account.get('proxyAddress')
+);
+
 
 /**
  * Default selector used by AccountProvider
@@ -72,6 +77,7 @@ export {
   makeSelectAccountData,
   makeSelectContract,
   makeSelectPrivKey,
+  makeProxyAddr,
   makeSelectEmail,
   makeSelectGravatar,
 };

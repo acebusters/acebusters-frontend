@@ -4,8 +4,8 @@
 import styled from 'styled-components';
 
 export const ActionBarWrapper = styled.div`
-  position: relative;
-  margin-top: 10em;
+  position: fixed;
+  bottom: 0;
 `;
 
 export const ActionsButtons = styled.div`

@@ -19,7 +19,7 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
           className="btn btn-default btn-sm col-xs-4"
           onClick={() => this.props.bet(this.props.hand.handId,
                                           parseInt(this.props.amount, 10),
-                                          this.props.location.query.privKey,
+                                          this.props.privKey,
                                           this.props.params.id)}
         >
           Bet
@@ -29,7 +29,7 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
           onClick={() => this.props.checkCall(this.props.hand.handId,
                                               this.props.myMaxBet,
                                               this.props.maxBet,
-                                              this.props.location.query.privKey,
+                                              this.props.privKey,
                                               this.props.params.id,
                                               this.props.hand.state,
                                               this.props.amountToCall)}
@@ -40,7 +40,7 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
           className="btn btn-default btn-sm col-xs-4"
           onClick={() => this.props.fold(this.props.hand.handId,
                                          this.props.myMaxBet,
-                                         this.props.location.query.privKey,
+                                         this.props.privKey,
                                          this.props.params.id)}
         >
           Fold
@@ -49,7 +49,7 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
           className="btn btn-default btn-sm col-xs-4" value={'50000'}
           onClick={() => this.props.bet(this.props.hand.handId,
                                         50000,
-                                        this.props.location.query.privKey,
+                                        this.props.privKey,
                                         this.props.params.id)}
         >
           POST SB
@@ -58,7 +58,7 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
           className="btn btn-default btn-sm col-xs-4" value={'100000'}
           onClick={() => this.props.bet(this.props.hand.handId,
                                          100000,
-                                         this.props.location.query.privKey,
+                                         this.props.privKey,
                                          this.props.params.id)}
         >
           POST BB
@@ -68,7 +68,7 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
           onClick={() => this.props.show(this.props.hand.handId,
                                           this.props.myMaxBet,
                                           this.props.me.cards,
-                                          this.props.location.query.privKey,
+                                          this.props.privKey,
                                           this.props.params.id)}
         >
           SHOW
@@ -116,8 +116,7 @@ ActionBar.propTypes = {
   lastHandNettedOnClient: React.PropTypes.number,  // eslint-disable-line
   amountToCall: React.PropTypes.number,
   params: React.PropTypes.object,
-  location: React.PropTypes.object,
-  privKey: React.PropTypes.func,
+  privKey: React.PropTypes.string,
   amount: React.PropTypes.string,
   cards: React.PropTypes.array,
   myMaxBet: React.PropTypes.number,

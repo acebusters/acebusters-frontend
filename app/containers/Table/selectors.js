@@ -16,8 +16,13 @@ const makeHandSelector = () => createSelector(
 );
 
 const makeLineupSelector = () => createSelector(
-  makeHandSelector(),
-  (hand) => (hand.lineup) ? hand.lineup : null
+  tableStateSelector,
+  (table) => {
+    if (table.get('hand')) {
+      console.dir(table.get('hand').lineup);
+    }
+    return (table.get('hand').lineup) ? table.get('hand').lineup : null;
+  }
 );
 
 const makeAmountSelector = () => createSelector(

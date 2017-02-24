@@ -46,16 +46,14 @@ function generateContractInstanceApi({ abi, address, getState, dispatch }) {
       })
     );
     // calls contract method without changing state
-    const callPromise = (...args) => (
-      new Promise((resolve, reject) => {
-        contractInstance[methodName].call(...args, (err, value) => {
-          if (err) {
-            return reject(err);
-          }
-          return resolve(value);
-        });
-      })
-    );
+    const callPromise = (...args) => new Promise((resolve, reject) => {
+      contractInstance[methodName].call(...args, (err, value) => {
+        if (err) {
+          return reject(err);
+        }
+        return resolve(value);
+      });
+    });
     // add actions to base getter
     contractMethod.call = actions.call;
     contractMethod.sendTransaction = actions.sendTransaction;

@@ -53,6 +53,7 @@ export default function tableReducer(state = initialState, action) {
 
       const newHand = state.get('hand');
       newHand.lineup = newLineup;
+
       return state
         .set('lastHandNettedOnClient', action.lineup[0].toNumber())
         .set('hand', newHand);
@@ -118,7 +119,6 @@ export default function tableReducer(state = initialState, action) {
         .set('showed', true);
     }
 
-
     case TableActions.STARTED_REQUEST: {
       return state
         .set('requestInProgress', true);
@@ -139,7 +139,7 @@ export default function tableReducer(state = initialState, action) {
 
     case TableActions.UPDATE_RECEIVED: {
       // handComplete stays true till SB posted to server
-      const handComplete = pokerHelper.checkForNextHand(action.tableState);
+      const handComplete = (action.tableState.lineup) ? pokerHelper.checkForNextHand(action.tableState) : false;
       const newHand = _.clone(state.get('hand'));
       let newLastRoundMaxBet = 0;
       if (handComplete && state.get('hand').handId === action.tableState.handId) {
@@ -147,7 +147,7 @@ export default function tableReducer(state = initialState, action) {
           delete player.last; // eslint-disable-line
         });
         newHand.handId = action.tableState.handId + 1;
-      } else if (!state.get('hand') || !state.get('hand').handId || state.get('hand').handId <= action.tableState.handId) {
+      } else if (action.tableState.lineup && (!state.get('hand') || !state.get('hand').handId || state.get('hand').handId <= action.tableState.handId)) {
         _.merge(newHand.lineup, action.tableState.lineup);
         newLastRoundMaxBet = (state.get('lastRoundMaxBet')) ? state.get('lastRoundMaxBet') : 0;
         if (state.get('hand') && state.get('hand').state && action.tableState.state !== state.get('hand').state && action.tableState.state !== 'dealing') {
@@ -163,9 +163,6 @@ export default function tableReducer(state = initialState, action) {
         if (action.tableState.distribution) {
           newHand.distribution = action.tableState.distribution;
         }
-      } else {
-        return state
-          .set('complete', handComplete);
       }
       return state
         .set('complete', handComplete)

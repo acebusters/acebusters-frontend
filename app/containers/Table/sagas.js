@@ -32,13 +32,16 @@ export function* getHand(action) {
 export function* dispatchDealingAction() {
   const state = yield select();
   const hand = state.get('table').get('hand');
+  if (!hand.lineup) {
+    return;
+  }
   const privKey = state.get('account').get('privKey');
   const handId = hand.handId;
-  let amount = 0;
   const myAddr = selectAddress(privKey);
   const dealer = hand.dealer;
   const myPos = pokerHelper.getMyPos(hand.lineup, myAddr);
   const sb = pokerHelper.nextActivePlayer(hand.lineup, dealer + 1);
+  let amount = 0;
   const whosTurn = pokerHelper.whosTurn(hand);
   if ((whosTurn === sb && myPos !== sb)
         || (hand.state !== 'dealing')
@@ -58,7 +61,6 @@ function* performDealingAction(action) {
   const amount = action.amount;
   const privKey = action.privKey;
   const tableAddr = action.tableAddr;
-  console.log(`performing dealing action ${handId}`);
   try {
     const holeCards = yield call(() => pay(handId, amount, privKey, tableAddr, ABI_BET, 'bet').then((res) => res.json()));
     yield put({ type: 'COMPLETE_BET', handId, amount, holeCards, privKey });

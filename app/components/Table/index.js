@@ -3,18 +3,17 @@
  */
 
 import React from 'react';
-import { GamePlay, TableInfo, TableArea, TableContainer, PokerTable, TableAndChairs } from './TableWrapper';
+import { GamePlay, TableArea, TableContainer, PokerTable, TableAndChairs } from './TableWrapper';
 import { Board } from './Board';
 import { TableHeader } from './TableHeader';
 import { computedStyles } from '../../app.config';
+import ActionBar from '../../containers/ActionBar';
 
 function TableComponent(props) {
   return (
     <GamePlay id="game-play" {...props} computedStyles={computedStyles}>
-      <TableInfo id="table-info">
-        <TableHeader> { props.myAddress } , { props.hand.state }, { props.potSize }, { props.amountToCall } </TableHeader>
-      </TableInfo>
       <TableArea id="table-area" computedStyles={computedStyles}>
+        <TableHeader> { props.myAddress } , { props.hand.state }, { props.potSize }, { props.amountToCall } </TableHeader>
         <TableContainer id="table-container">
           <TableAndChairs id="table-and-chairs" computedStyles={computedStyles}>
             <PokerTable id="poker-table">
@@ -24,9 +23,9 @@ function TableComponent(props) {
               </Board>
             </PokerTable>
           </TableAndChairs>
-
         </TableContainer>
       </TableArea>
+      <ActionBar {...props} me={props.hand.lineup[props.myPos]}></ActionBar>
     </GamePlay>
   );
 }
@@ -38,6 +37,7 @@ TableComponent.propTypes = {
   seats: React.PropTypes.array,
   potSize: React.PropTypes.number,
   amountToCall: React.PropTypes.number,
+  myPos: React.PropTypes.number,
 };
 
 export default TableComponent;
