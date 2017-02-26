@@ -107,6 +107,7 @@ const Sidebar = ({
     fixed={fixed}
     collapse={sidebarCollapse}
     mini={sidebarMini}
+    id="sidebar"
   >
     <StyledSection name="sidebar-wrapper">
       {renderChildren(children, sidebarCollapse)}

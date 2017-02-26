@@ -63,6 +63,7 @@ function generateContractInstanceApi({ abi, address, getState, dispatch }) {
   }, {});
   // decorate
   api.address = address;
+  api.allEvents = contractInstance.allEvents;
   return api;
 }
 

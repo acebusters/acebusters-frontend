@@ -55,11 +55,11 @@ containerGen.runActions({
   wantHeaders: true,
   wantActionsAndReducer: true,
   wantSagas: true,
-  wantMessages: true
+  wantMessages: true,
 })
   .then(checkForErrors)
   .then(removeTestsDirFrom('containers/RbGeneratedContainerPureComponent'))
-  .catch(reportErrorsFor('container/PureComponent'));
+  .catch(reportErrorsFor('Container/PureComponent'));
 
 const ContainerComponent = containerGen.runActions({
   name: 'RbGeneratedContainerComponent',
@@ -67,16 +67,16 @@ const ContainerComponent = containerGen.runActions({
   wantHeaders: true,
   wantActionsAndReducer: true,
   wantSagas: true,
-  wantMessages: true
+  wantMessages: true,
 })
   .then(checkForErrors)
   .then(removeTestsDirFrom('containers/RbGeneratedContainerComponent'))
-  .catch(reportErrorsFor('container/Component'));
+  .catch(reportErrorsFor('Container/Component'));
 
 const routeGen = plop.getGenerator('route');
 
 ContainerComponent
-  .then(() => routeGen.runActions({ component: 'RbGeneratedContainerComponent', path: '/generated-route-container' })
+  .then(() => routeGen.runActions({ component: 'RbGeneratedContainerComponent', path: '/generated-route-Container' })
     .then(checkForErrors)
     .catch(reportErrorsFor('route/Container'))
 );

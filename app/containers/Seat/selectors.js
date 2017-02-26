@@ -13,7 +13,7 @@ const posSelector = (state, props) => (state && props) ? props.pos : null;
 
 const makeLastReceiptSelector = () => createSelector(
     [makeHandSelector(), posSelector],
-    (hand, pos) => (hand && hand.lineup && pos && hand.lineup[pos].last) ? rc.get(hand.lineup[pos].last) : undefined
+    (hand, pos) => (hand && hand.lineup && pos && hand.lineup[pos]) ? rc.get(hand.lineup[pos].last) : undefined
 );
 
 const makeLastAmountSelector = () => createSelector(
@@ -39,7 +39,7 @@ const makeStackSelector = () => createSelector(
 
 const makeLastActionSelector = () => createSelector(
   [posSelector, makeHandSelector()],
-  (pos, hand) => (hand && hand.lineup[pos].last) ? rc.get(hand.lineup[pos].last).abi[0].name : null
+  (pos, hand) => (hand && hand.lineup[pos].last && hand.lineup[pos].last.abi) ? rc.get(hand.lineup[pos].last).abi[0].name : null
 );
 
 const makeCardSelector = () => createSelector(

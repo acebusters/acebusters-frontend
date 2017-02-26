@@ -8,6 +8,6 @@ import { defineMessages } from 'react-intl';
 export default defineMessages({
   header: {
     id: 'app.containers.ConfirmPage.header',
-    defaultMessage: 'This is ConfirmPage container !',
+    defaultMessage: 'This is ConfirmPage Container !',
   },
 });

@@ -23,7 +23,7 @@ module.exports = {
     default: 'Button',
     validate: (value) => {
       if ((/.+/).test(value)) {
-        return componentExists(value) ? 'A component or container with this name already exists' : true;
+        return componentExists(value) ? 'A component or Container with this name already exists' : true;
       }
 
       return 'The name is required';
@@ -35,7 +35,7 @@ module.exports = {
     message: 'Do you want i18n messages (i.e. will this component use text)?',
   }],
   actions: (data) => {
-    // Generate index.js and index.tests.js
+    // Generate FormInline.js and index.tests.js
     let componentTemplate;
 
     switch (data.type) {
@@ -58,7 +58,7 @@ module.exports = {
 
     const actions = [{
       type: 'add',
-      path: '../../app/components/{{properCase name}}/index.js',
+      path: '../../app/components/{{properCase name}}/FormInline.js',
       templateFile: componentTemplate,
       abortOnFail: true,
     }, {

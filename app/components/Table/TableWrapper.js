@@ -10,8 +10,19 @@ import {
 
 export const GamePlay = styled.div`
   position: absolute;
-  top: 0px;
-  left: 0px;
+  ${() => {
+    if (document.getElementById('header')) {
+      return `top:${document.getElementById('header').clientHeight}px`;
+    }
+    return 'top: 0px';
+  }};
+  ${() => {
+    console.log(window.innerWidth);
+    if (document.getElementById('sidebar') && window.innerWidth > 765) {
+      return `left:${document.getElementById('sidebar').clientWidth}px`;
+    }
+    return 'left: 0px';
+  }};
   bottom: 0px;
   width: 100%;
 `;
@@ -54,19 +65,18 @@ export const TableArea = styled.div`
 export const TableContainer = styled.div`
   ${() => {
     const height = (document.getElementById('action-bar')) ? document.getElementById('action-bar').clientHeight : 0;
-    return `height:${ window.screen.availHeight - height}px`;
+    return `height:${ window.innerHeight - height}px`;
   }};
   width: inherit;
-  height: 100%;
 `;
 
 export const TableAndChairs = styled.div`
   ${(props) => `height:${ props.computedStyles().computeSize().height}px`};
   ${(props) => `width:${ props.computedStyles().computeSize().width}px`};
-  margin-top: ${() => (document.getElementById('header')) ? document.getElementById('header').clientHeight : 0}px;
-  position: relative;
-  top: 50%;
-  transform: translateY(-50%);
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 `;
 
 export const PokerTable = styled.div`

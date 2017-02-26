@@ -13,7 +13,7 @@ import ActionBar from '../ActionBar'; // eslint-disable-line
 // actions
 import { poll, lineupReceived } from './actions';
 // selectors
-import { makeAddressSelector, makeSelectPrivKey, makeProxyAddr } from '../AccountProvider/selectors';
+import { makeAddressSelector, makeSelectPrivKey, makeSelectProxyAddr } from '../AccountProvider/selectors';
 import { makeIsMyTurnSelector, makePotSizeSelector, makeAmountToCallSelector,
          makeHandSelector, makeLastHandNettedSelector, makeLineupSelector, makeMyPosSelector } from './selectors';
 import TableComponent from '../../components/Table';
@@ -24,35 +24,56 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
   componentDidMount() {
     // start polling data
-    const tableAddr = this.props.params.id;
+    this.tableAddr = this.props.params.id;
     this.web3 = this.props.web3Redux.web3;
-    this.table = this.web3.eth.contract(ABI_TABLE).at(tableAddr);
+    this.table = this.web3.eth.contract(ABI_TABLE).at(this.tableAddr);
     this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(tokenContractAddress);
     // getting initial lineup from contract
     this.table.getLineup.callPromise().then((lineup) => {
       this.props.lineupReceived(lineup);
     });
+    // register event listener for table
+    this.tableEvents = this.table.allEvents({ fromBlock: 'latest' });
+    this.tableEvents.watch((error, results) => {
+      if (error) {
+        console.log(error);
+        return;
+      }
+      // dispatch action according to event type
+      console.log(results);
+    });
+
+    this.tokenEvents = this.token.allEvents({ fromBlock: 'latest' });
+    this.tokenEvents.watch((error, results) => {
+      if (error) {
+        console.log(error);
+        return;
+      }
+      // dispatch action according to event type
+      console.log(results);
+    });
 
     this.interval = setInterval(() => {
-      this.props.poll(tableAddr);
+      this.props.poll(this.tableAddr);
     }, 3000);
   }
 
   componentWillReceiveProps(nextProps) {
     if (this.props.hand && nextProps.lastHandNettedOnClient < this.props.hand.handId - 1) {
-      this.props.updateLastHand(nextProps.lastHandNettedOnClient + 1, this.props.params.id);
+      this.props.updateLastHand(nextProps.lastHandNettedOnClient + 1, this.tableAddr);
     }
   }
 
   componentWillUnmount() {
     clearInterval(this.interval);
+    this.tableEvents.stopWatching();
+    this.tokenEvents.stopWatching();
   }
 
   join(pos, open) {
     if (!open) return;
-    this.token.allowance.callPromise().then((res) =>
-      // amount to be spend
-       res);
+    this.token.approve.sendTransaction(this.tableAddr, 100000);
+    this.table.join.sendTransaction(10000, this.props.myAddress, pos, '');
   }
 
   renderSeats() {
@@ -95,9 +116,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       const seats = this.renderSeats();
       const board = this.renderBoard();
       return (
-        <div>
-          <TableComponent {...this.props} board={board} seats={seats} ></TableComponent>
-        </div>
+        <TableComponent {...this.props} board={board} seats={seats} ></TableComponent>
       );
     }
     return null;
@@ -123,7 +142,7 @@ const mapStateToProps = createStructuredSelector({
   myPos: makeMyPosSelector(),
   privKey: makeSelectPrivKey(),
   amountToCall: makeAmountToCallSelector(),
-  proxyAddr: makeProxyAddr(),
+  proxyAddr: makeSelectProxyAddr(),
 });
 
 Table.propTypes = {
@@ -135,6 +154,7 @@ Table.propTypes = {
   lineupReceived: React.PropTypes.func,
   poll: React.PropTypes.func,
   web3Redux: React.PropTypes.any,
+  myAddress: React.PropTypes.string,
 };
 
 

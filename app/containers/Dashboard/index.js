@@ -10,6 +10,10 @@ import web3Connect from '../AccountProvider/web3Connect';
 import { ABI_TOKEN_CONTRACT, ABI_ACCOUNT_FACTORY, tokenContractAddress, accountFactoryAddress } from '../../app.config';
 
 import List from '../../components/List';
+import Label from '../../components/Label';
+import Container from '../../components/Container';
+import Button from '../../components/Button';
+import Form from '../../components/Form';
 
 export class Dashboard extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
@@ -53,35 +57,38 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
       listPending = pendingToList(this.props.account[tokenContractAddress].pending);
       listTxns = txnsToList(this.props.account[tokenContractAddress].transactions);
     }
-
     return (
-      <div>
+      <Container>
         <h1><FormattedMessage {...messages.header} /></h1>
-        <div>
-          last block: {this.web3.eth.blockNumber()}
-          <br />
-          <button onClick={this.handleGetBlockNumber}>getBlockNumber</button>
-        </div>
-        <div>
-          ProxyAddress: { this.proxyAddress }
-        </div>
-        <div>
-          address: {this.props.account.proxy}
-          <QRCode value={qrUrl} />
-        </div>
-        <div>
-          balance: {balance}
-          <button onClick={this.handleGetBalance}>getBalance</button>
-          <button onClick={this.handleTransfer}>Transfer</button>
-        </div>
-        <button onClick={this.props.transferToggle}>Transfer</button>
+        <Form>
+          <Label>Last Block {this.web3.eth.blockNumber()}</Label>
+          <Form>
+            <Button size="small" onClick={this.handleGetBlockNumber}>Get Block #</Button>
+          </Form>
+        </Form>
+        <Form>
+          <Label>ProxyAddress: { this.proxyAddress }</Label>
+        </Form>
 
+        <Form>
+          <Label>Address: {this.props.account.proxy}</Label>
+          <QRCode value={qrUrl} size={50} />
+        </Form>
+        <Form>
+          <Label>Balance: {balance}</Label>
+          <Form>
+            <Button onClick={this.handleGetBalance} size="small">Refresh Balance</Button>
+            <Button onClick={this.handleTransfer} size="small">Transfer</Button>
+            <Button onClick={this.props.transferToggle} size="small">Transfer</Button>
+          </Form>
+        </Form>
+        <hr />
         <h2><FormattedMessage {...messages.pending} /></h2>
         <List items={listPending} headers={['#', 'data', 'txHash']} />
-
         <h2><FormattedMessage {...messages.included} /></h2>
         <List items={listTxns} headers={['txHash', 'from', 'to', 'amount']} />
-      </div>
+
+      </Container>
     );
   }
 }

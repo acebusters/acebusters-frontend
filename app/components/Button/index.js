@@ -12,7 +12,21 @@ import styled from 'styled-components';
 const A = styled.a`{
   display: inline-block;
   box-sizing: border-box;
-  padding: 0.25em 2em;
+  ${(props) => {
+    switch (props.size) {
+      case 'small':
+        return 'padding: 0.0125em 1em;font-size: 14px';
+      case 'medium':
+        return 'padding: 0.25em 2em;font-size: 16px';
+      case 'large':
+        return 'padding: 0.5em 4em:font-size: 16px';
+      default:
+        return 'padding: 0.25em 2em:font-size: 18px';
+    }
+  }}
+  &:first-child {
+    margin-left: 0.1em;
+  }
   text-decoration: none;
   border-radius: 4px;
   -webkit-font-smoothing: antialiased;
@@ -35,8 +49,19 @@ const A = styled.a`{
 const StyledButton = styled.button`{
   display: inline-block;
   box-sizing: border-box;
-  padding: 0.25em 2em;
   text-decoration: none;
+  ${(props) => {
+    switch (props.size) {
+      case 'small':
+        return 'padding: 0.2em 0.4em;font-size: 14px';
+      case 'medium':
+        return 'padding: 0.25em 2em;font-size: 16px';
+      case 'large':
+        return 'padding: 0.5em 4em;font-size: 16px';
+      default:
+        return 'padding: 0.25em 2em;font-size: 18px';
+    }
+  }}
   border-radius: 4px;
   -webkit-font-smoothing: antialiased;
   -webkit-touch-callout: none;
@@ -56,15 +81,15 @@ const StyledButton = styled.button`{
 }`;
 
 const Wrapper = styled.div`
-  text-align: center;
-  margin: 0.5em 0.5em;
+  text-align: center;  
   float: left;
+  
 `;
 
 function Button(props) {
   // Render an anchor tag
   let button = (
-    <A href={props.href} onClick={props.onClick}>
+    <A href={props.href} onClick={props.onClick} size={props.size}>
       {Children.toArray(props.children)}
     </A>
   );
@@ -72,14 +97,14 @@ function Button(props) {
   // If the Button has a handleRoute prop, we want to render a button
   if (props.handleRoute) {
     button = (
-      <StyledButton onClick={props.handleRoute}>
+      <StyledButton onClick={props.handleRoute} size={props.size}>
         {Children.toArray(props.children)}
       </StyledButton>
     );
   }
 
   return (
-    <Wrapper>
+    <Wrapper {...props}>
       {button}
     </Wrapper>
   );
@@ -89,6 +114,7 @@ Button.propTypes = {
   handleRoute: PropTypes.func,
   href: PropTypes.string,
   onClick: PropTypes.func,
+  size: PropTypes.string,
   children: PropTypes.node.isRequired,
 };
 

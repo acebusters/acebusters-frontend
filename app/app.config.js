@@ -33,7 +33,7 @@ export const SEAT_COORDS = {
   2: [[0, 0], [0, 0]],
   4: [[37, -25], [99, 42], [37, 102], [-20, 42]],
   6: [[-20, -10], [-15, 0]],
-  10: [[-20, -10], [-15, 0], [-15, 0], [-15, 0], [-15, 0], [-15, 0], [-15, 0], [-15, 0], [-15, 0], [-15, 0]],
+  10: [[10, -28], [100, 72], [12, 102], [-12, 72], [-12, 0], [75, 102], [75, -28], [100, 0], [44, -30], [44, 102]],
 };
 
 export const AMOUNT_COORDS = {
@@ -51,18 +51,19 @@ export const computedStyles = () => {
   computed.a = 0.96;
   computed.e = 100;
   computed.f = computed.d - computed.b - computed.e;
+  computed.l = computed.f;
   computed.g = window.innerHeight;
   computed.z = (document.getElementById('action-bar')) ? document.getElementById('action-bar').clientHeight : 0;
-  computed.y = this.g - this.z;
+  computed.y = computed.g - computed.z;
   computed.computeSize = () => {
     let k;
     let c;
     const obj = {};
-    if (computed.y < computed.f / computed.h) {
+    if (computed.y < computed.l / computed.h) {
       k = computed.y * computed.a;
       c = k * computed.h;
     } else {
-      c = computed.f * computed.a;
+      c = computed.l * computed.a;
       k = (c / computed.h);
     }
     obj.width = c;
