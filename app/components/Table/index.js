@@ -13,7 +13,7 @@ function TableComponent(props) {
   return (
     <GamePlay id="game-play" {...props} computedStyles={computedStyles}>
       <TableArea id="table-area" computedStyles={computedStyles}>
-        <TableHeader> { props.myAddress } , { props.hand.state }, { props.potSize }, { props.amountToCall } </TableHeader>
+        <TableHeader> { props.myAddress } , { props.hand.state }, { props.potSize }, { props.amountToCall }, { props.sb }, { props.bb } </TableHeader>
         <TableContainer id="table-container">
           <TableAndChairs id="table-and-chairs" computedStyles={computedStyles}>
             <PokerTable id="poker-table">
@@ -38,6 +38,8 @@ TableComponent.propTypes = {
   potSize: React.PropTypes.number,
   amountToCall: React.PropTypes.number,
   myPos: React.PropTypes.number,
+  sb: React.PropTypes.number,
+  bb: React.PropTypes.number,
 };
 
 export default TableComponent;

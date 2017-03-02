@@ -17,7 +17,6 @@ export const GamePlay = styled.div`
     return 'top: 0px';
   }};
   ${() => {
-    console.log(window.innerWidth);
     if (document.getElementById('sidebar') && window.innerWidth > 765) {
       return `left:${document.getElementById('sidebar').clientWidth}px`;
     }

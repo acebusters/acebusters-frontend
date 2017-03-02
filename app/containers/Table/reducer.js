@@ -16,12 +16,13 @@ const pokerHelper = new PokerHelper(rc);
 export const initialState = Map({
   hand: {
     cards: [],
-    dealer: 0,
+    dealer: null,
     distribution: '',
     handId: 0,
     lineup: [],
     state: '',
   },
+  modalStack: [],
   complete: false,
 });
 
@@ -53,10 +54,19 @@ export default function tableReducer(state = initialState, action) {
 
       const newHand = state.get('hand');
       newHand.lineup = newLineup;
-
       return state
         .set('lastHandNettedOnClient', action.lineup[0].toNumber())
+        .set('tableAddr', action.tableAddr)
         .set('hand', newHand);
+    }
+
+    case TableActions.SMALL_BLIND_RECEIVED: {
+      return state
+        .set('smallBlind', action.sb);
+    }
+
+    case TableActions.TABLE_JOINED: {
+      return state;
     }
 
     case TableActions.SET_CARDS: {
@@ -124,6 +134,20 @@ export default function tableReducer(state = initialState, action) {
         .set('requestInProgress', true);
     }
 
+    case TableActions.ADD_TO_MODAL: {
+      const newStack = state.get('modalStack').slice();
+      newStack.push(action.node);
+      return state
+        .set('modalStack', newStack);
+    }
+
+    case TableActions.DISMISS_FROM_MODAL: {
+      const newStack = state.get('modalStack').slice();
+      newStack.pop();
+      return state
+        .set('modalStack', newStack);
+    }
+
 
     case TableActions.PERFORM_DEALING_ACTION: {
       return state
@@ -138,10 +162,16 @@ export default function tableReducer(state = initialState, action) {
     }
 
     case TableActions.UPDATE_RECEIVED: {
+      // figure out when to rerender
+      // if (!action.tableState.lineup) {
+      //   return state;
+      // }
       // handComplete stays true till SB posted to server
-      const handComplete = (action.tableState.lineup) ? pokerHelper.checkForNextHand(action.tableState) : false;
+      const handComplete = (action.tableState.lineup) ? pokerHelper.checkForNextHand(action.tableState) : true;
       const newHand = _.clone(state.get('hand'));
+
       let newLastRoundMaxBet = 0;
+
       if (handComplete && state.get('hand').handId === action.tableState.handId) {
         newHand.lineup.forEach((player) => {
           delete player.last; // eslint-disable-line

@@ -104,7 +104,7 @@ function Button(props) {
   }
 
   return (
-    <Wrapper {...props}>
+    <Wrapper>
       {button}
     </Wrapper>
   );

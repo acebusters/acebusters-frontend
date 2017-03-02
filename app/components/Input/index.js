@@ -11,6 +11,8 @@ const Input = styled.input`
   font-size: 14px;
   line-height: 1.42857143;
   color: #555;
+  ${($props) => `type:${$props.placeholder}`};
+  float:left;
   background-color: #fff;
   background-image: none;
   border: 1px solid #ccc;

@@ -32,9 +32,7 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
 
   render() {
     return (
-      <div>
-        <SeatComponent {...this.props}></SeatComponent>
-      </div>
+      <SeatComponent {...this.props}></SeatComponent>
     );
   }
 }

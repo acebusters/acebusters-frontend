@@ -71,8 +71,8 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
         </Form>
 
         <Form>
-          <Label>Address: {this.props.account.proxy}</Label>
-          <QRCode value={qrUrl} size={50} />
+          <h3> Your private key</h3>
+          <QRCode value={qrUrl} size={120} />
         </Form>
         <Form>
           <Label>Balance: {balance}</Label>

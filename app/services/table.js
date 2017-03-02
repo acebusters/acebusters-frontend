@@ -35,6 +35,39 @@ export function pay(handId, amount, priv, tableAddr, abi, action) {
   });
 }
 
+export function leave(handId, amount, priv, tableAddr, abi, action) {
+  return new Promise((resolve, reject) => {
+    const receipt = new EWT(abi)[action](handId, amount).sign(priv);
+    const header = new Headers({ Authorization: receipt });
+    const myInit = { headers: header, method: 'POST' };
+    const request = new Request(`${apiBasePath}/table/${tableAddr}/leave`, myInit);
+    fetch(request).then((res) => res.json(), (err) => {
+      reject(err);
+    }).then((cards) => {
+      resolve(cards);
+    }, (err) => {
+      reject(err);
+    });
+  });
+}
+
+export function netting(payload, tableAddr, handId) {
+  return new Promise((resolve, reject) => {
+    const header = new Headers({ 'Content-Type': 'application/json' });
+    const data = JSON.stringify({ nettingSig: payload });
+    const myInit = { headers: header, body: data, method: 'POST' };
+    const request = new Request(`${apiBasePath}/table/${tableAddr}/${handId}/netting`, myInit);
+    fetch(request).then((res) => res.json(), (err) => {
+      reject(err);
+    }).then((distribution) => {
+      resolve(distribution);
+    }, (err) => {
+      reject(err);
+    });
+  });
+}
+
+
 export function show(handId, amount, holeCards, priv, tableAddr) {
   return new Promise((resolve, reject) => {
     const receipt = new EWT(ABI_SHOW).show(handId, amount).sign(priv);

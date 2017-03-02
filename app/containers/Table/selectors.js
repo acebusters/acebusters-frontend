@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 import { PokerHelper, ReceiptCache } from 'poker-helper';
-import { makeAddressSelector } from '../AccountProvider/selectors';
+import { makeSelectProxyAddr } from '../AccountProvider/selectors';
 
 const rc = new ReceiptCache();
 const pokerHelper = new PokerHelper(rc);
@@ -20,6 +20,11 @@ const makeLineupSelector = () => createSelector(
   (table) => (table.get('hand').lineup) ? table.get('hand').lineup : null
 );
 
+const makeSbSelector = () => createSelector(
+  tableStateSelector,
+  (tableState) => (tableState.get('smallBlind'))
+);
+
 const makeAmountSelector = () => createSelector(
   tableStateSelector,
   (tableState) => (tableState) ? tableState.get('amount') : null
@@ -31,7 +36,7 @@ const makeLastHandNettedSelector = () => createSelector(
 );
 
 const makeMyPosSelector = () => createSelector(
-    [makeLineupSelector(), makeAddressSelector()],
+    [makeLineupSelector(), makeSelectProxyAddr()],
     (lineup, myAddress) => (lineup && myAddress) ? pokerHelper.getMyPos(lineup, myAddress) : null
 );
 
@@ -51,7 +56,7 @@ const makeMaxBetSelector = () => createSelector(
 );
 
 const makeMyMaxBetSelector = () => createSelector(
-    [makeLineupSelector(), makeAddressSelector()],
+    [makeLineupSelector(), makeSelectProxyAddr()],
     (lineup, myAddress) => (lineup && myAddress) ? pokerHelper.getMyMaxBet(lineup, myAddress) : 0
 );
 
@@ -63,6 +68,16 @@ const makeAmountToCallSelector = () => createSelector(
 const makePotSizeSelector = () => createSelector(
     makeLineupSelector(),
     (lineup) => (lineup) ? pokerHelper.calculatePotsize(lineup) : 0
+);
+
+const makeModalStackSelector = () => createSelector(
+  tableStateSelector,
+  (tableState) => tableState.get('modalStack')
+);
+
+const makeNetRequestSelector = () => createSelector(
+  tableStateSelector,
+  (tableState) => tableState.get('hand').netting
 );
 
 export {
@@ -78,5 +93,8 @@ export {
     makeHandSelector,
     makeMaxBetSelector,
     makeMyMaxBetSelector,
+    makeModalStackSelector,
+    makeNetRequestSelector,
+    makeSbSelector,
 };
 

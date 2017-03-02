@@ -11,9 +11,9 @@ function SeatComponent(props) {
   let seat = null;
   if (props.open) {
     seat = (
-      <SeatWrapper {...props}>
-        <ImageContainer {...props}>
-          OPEN
+      <SeatWrapper coords={props.coords}>
+        <ImageContainer whosTurn={props.whosTurn} open={props.open} onClick={props.onClick} >
+          { !props.myPos ? 'JOIN' : 'EMPTY' }
         </ImageContainer>
       </SeatWrapper>
       );

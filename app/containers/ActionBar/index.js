@@ -4,7 +4,16 @@
 import React from 'react';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
-import { submitBet, submitFold, submitCheck, submitShow, updateAmount } from '../Table/actions';
+
+import {
+  submitBet,
+  submitFold,
+  submitCheck,
+  submitShow,
+  updateAmount,
+  leaveRequest,
+} from '../Table/actions';
+
 import { makeSelectPrivKey } from '../AccountProvider/selectors';
 import { makePotSizeSelector, makeMyMaxBetSelector, makeAmountSelector } from '../Table/selectors';
 import { makeStackSelector } from '../Seat/selectors';
@@ -73,6 +82,15 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
         >
           SHOW
         </Button>
+        <Button
+          className="btn btn-default btn-sm col-xs-4"
+          onClick={() => this.props.leave(this.props.hand.handId + 1,
+                          0,
+                          this.props.privKey,
+                          this.props.params.id)}
+        >
+          LEAVE
+        </Button>
         <input
           type="range"
           min="50000" // small blind amount
@@ -89,6 +107,7 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
 export function mapDispatchToProps(dispatch) {
   return {
     bet: (handId, amount, privKey, tableAddr) => dispatch(submitBet(handId, amount, privKey, tableAddr)),
+    leave: (handId, amount, privKey, tableAddr) => dispatch(leaveRequest(handId, amount, privKey, tableAddr)),
     fold: (handId, amount, privKey, tableAddr) => dispatch(submitFold(handId, amount, privKey, tableAddr)),
     show: (handId, myMaxBet, cards, privKey, tableAddr) => dispatch(submitShow(handId, myMaxBet, cards, privKey, tableAddr)),
     checkCall: (handId, myMaxBet, maxBet, privKey, tableAddr, state, amountToCall) => {
@@ -127,6 +146,7 @@ ActionBar.propTypes = {
   checkCall: React.PropTypes.func,
   show: React.PropTypes.func,
   updateAmount: React.PropTypes.func,
+  leave: React.PropTypes.func,
   stackSize: React.PropTypes.number,
 };
 
