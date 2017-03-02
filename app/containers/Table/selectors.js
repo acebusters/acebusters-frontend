@@ -20,11 +20,6 @@ const makeLineupSelector = () => createSelector(
   (table) => (table.get('hand').lineup) ? table.get('hand').lineup : null
 );
 
-const makeSbSelector = () => createSelector(
-  tableStateSelector,
-  (tableState) => (tableState.get('smallBlind'))
-);
-
 const makeAmountSelector = () => createSelector(
   tableStateSelector,
   (tableState) => (tableState) ? tableState.get('amount') : null
@@ -95,6 +90,5 @@ export {
     makeMyMaxBetSelector,
     makeModalStackSelector,
     makeNetRequestSelector,
-    makeSbSelector,
 };
 

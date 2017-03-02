@@ -12,8 +12,13 @@ import Label from 'components/Label'; // eslint-disable-line
 import Input from 'components/Input'; // eslint-disable-line
 import Seat from '../Seat'; // eslint-disable-line
 // config data
-import { SEAT_COORDS, AMOUNT_COORDS, ABI_TABLE, ABI_TOKEN_CONTRACT, tokenContractAddress } from '../../app.config';
-
+import {
+  SEAT_COORDS,
+  AMOUNT_COORDS,
+  ABI_TABLE,
+  ABI_TOKEN_CONTRACT,
+  tokenContractAddress,
+} from '../../app.config';
 // actions
 import {
   poll,
@@ -21,7 +26,6 @@ import {
   addToModal,
   dissmissFromModal,
   processNetting,
-  smallBlindReceived,
 } from './actions';
 // selectors
 import {
@@ -40,7 +44,6 @@ import {
   makeMyPosSelector,
   makeModalStackSelector,
   makeNetRequestSelector,
-  makeSbSelector,
 } from './selectors';
 
 import TableComponent from '../../components/Table';
@@ -51,7 +54,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
   constructor(props) {
     super(props);
-    this.tableAddr = props.params.id;
+    this.tableAddr = props.params.tableAddr;
     this.web3 = props.web3Redux.web3;
     this.table = this.web3.eth.contract(ABI_TABLE).at(this.tableAddr);
     this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(tokenContractAddress);
@@ -60,9 +63,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     window.onresize = this.handleResize;
     // register event listener for table
     this.tableEvents = this.table.allEvents({ fromBlock: 'latest' });
-    this.table.smallBlind.callPromise().then((res) => {
-      this.props.smallBlindReceived(res.toNumber());
-    });
+    this.table.smallBlind.call();
 
     this.tableEvents.watch((error, result) => {
       if (error) {
@@ -241,9 +242,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     const modalContent = this.props.modalStack[this.props.modalStack.length - 1];
     const seats = this.renderSeats();
     const board = this.renderBoard();
+    const sb = (this.table.smallBlind()) ? this.table.smallBlind().toNumber() : 0;
     return (
       <div>
-        <TableComponent {...this.props} board={board} seats={seats}></TableComponent>
+        <TableComponent {...this.props} sb={sb} board={board} seats={seats}></TableComponent>
         { modalContent &&
           <ModalContainer>
             <ModalDialog>
@@ -265,7 +267,6 @@ export function mapDispatchToProps() {
     addToModal: (node) => (addToModal(node)),
     dismissFromModal: () => (dissmissFromModal()),
     processNetting: (netRequest, handId, privKey, tableAddr) => (processNetting(netRequest, handId, privKey, tableAddr)),
-    smallBlindReceived: (sb) => (smallBlindReceived(sb)),
   };
 }
 
@@ -282,7 +283,6 @@ const mapStateToProps = createStructuredSelector({
   proxyAddr: makeSelectProxyAddr(),
   modalStack: makeModalStackSelector(),
   netRequest: makeNetRequestSelector(),
-  smallBlind: makeSbSelector(),
 });
 
 Table.propTypes = {
@@ -301,7 +301,6 @@ Table.propTypes = {
   dismissFromModal: React.PropTypes.func,
   processNetting: React.PropTypes.func,
   netRequest: React.PropTypes.func,
-  smallBlindReceived: React.PropTypes.func,
 };
 
 

@@ -11,7 +11,6 @@ export const FAILED_REQUEST = 'FAILED_REQUEST';
 export const STARTED_REQUEST = 'STARTED_REQUEST';
 export const UPDATE_RECEIVED = 'UPDATE_RECEIVED';
 export const LINEUP_RECEIVED = 'LINEUP_RECEIVED';
-export const SMALL_BLIND_RECEIVED = 'SMALL_BLIND_RECEIVED';
 export const ADD_TO_MODAL = 'ADD_TO_MODAL';
 export const DISMISS_FROM_MODAL = 'DISMISS_FROM_MODAL';
 export const PROCESS_NETTING = 'PROCESS_NETTING';
@@ -38,10 +37,6 @@ export function poll(tableAddr) {
 
 export function updateReceived(tableState) {
   return { type: UPDATE_RECEIVED, tableState };
-}
-
-export function smallBlindReceived(sb) {
-  return { type: SMALL_BLIND_RECEIVED, sb };
 }
 
 export function lineupReceived(lineup, tableAddr) {

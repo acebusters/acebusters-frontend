@@ -1,6 +1,6 @@
 
 import EWT from 'ethereum-web-token';
-import { Map } from 'immutable';
+import { Map, List } from 'immutable';
 import tableReducer from '../reducer';
 import * as TableActions from '../actions';
 
@@ -21,26 +21,24 @@ const P2_KEY = '0x99e69145c6e7f44ba04d579faac9ef4ce5e942dc02b96a9d42b5fcb03e5087
 
 // secretSeed: 'stadium today then top toward crack faint similar mosquito hunt thing sibling'
 const P3_ADDR = '0xdd7acad75b52bd206777a36bc41a3b65ad1c44fc';
-const P3_KEY = '0x33de976dfb8bdf2dc3115801e514b902c4c913c351b6549947758a8b9d981722';
+// const P3_KEY = '0x33de976dfb8bdf2dc3115801e514b902c4c913c351b6549947758a8b9d981722';
 
-const initialState = Map({
-  hand: {
-    cards: [],
-    dealer: 0,
-    distribution: '',
-    handId: 0,
-    lineup: [],
-    state: '',
-  },
-  complete: false,
-  lastRoundMaxBet: 0,
-});
+// Expecting a structure of the state like this:
+
+  // [tableAddr]: {
+  //   handId: 0,
+  //   cards: [],
+  //   dealer: 0,
+  //   distribution: '',
+  //   lineup: [],
+  //   state: '',
+  //   amounts: [],
+  //   holeCards: [],
+  //   lastRoundMaxBet: 0,
+  // }
+  //
 
 describe('table reducer tests', () => {
-  it('should return the default state', () => {
-    expect(tableReducer(initialState, {})).toEqual(initialState);
-  });
-
   it('should recalculate lastRoundMaxBet if state changed', () => {
     const lineup = [{
       address: P1_ADDR,
@@ -49,182 +47,119 @@ describe('table reducer tests', () => {
       address: P2_ADDR,
       last: new EWT(ABI_BET).bet(1, 50).sign(P2_KEY),
     }];
-    expect(tableReducer(Map({
-      hand: {
-        cards: [],
+    const before = Map({
+      '0x1234': Map({
+        handId: 0,
         dealer: 0,
         state: 'flop',
-        handId: 0,
-        lineup,
-      },
-    }), {
+        lineup: List([Map(lineup[0]), Map(lineup[1])]),
+      }),
+    });
+    const after = before
+      .setIn(['0x1234', 'state'], 'turn')
+      .setIn(['0x1234', 'lastRoundMaxBet'], 50);
+    expect(tableReducer(before, {
       type: TableActions.UPDATE_RECEIVED,
+      tableAddr: '0x1234',
       tableState: {
-        cards: [],
+        handId: 0,
         dealer: 0,
         state: 'turn',
-        handId: 0,
         lineup,
       },
-    })).toEqual(Map({
-      hand: {
-        cards: [],
-        dealer: 0,
-        state: 'turn',
-        handId: 0,
-        lineup,
-      },
-      complete: false,
-      lastRoundMaxBet: 50,
-    }));
-  });
-
-  it('should not overwrite lineup', () => {
-    const lineup = [{
-      address: P1_ADDR,
-      last: new EWT(ABI_BET).bet(1, 50).sign(P1_KEY),
-      amount: 3000,
-    }, {
-      address: P2_ADDR,
-      last: new EWT(ABI_BET).bet(1, 50).sign(P2_KEY),
-      amount: 3000,
-    }];
-
-    expect(tableReducer(Map({
-      hand: {
-        cards: [],
-        dealer: 1,
-        handId: 1,
-        state: 'flop',
-        lineup,
-      },
-    }), {
-      type: TableActions.UPDATE_RECEIVED,
-      tableState: {
-        cards: [],
-        dealer: 1,
-        handId: 1,
-        state: 'flop',
-        lineup: [{
-          address: P1_ADDR,
-          last: new EWT(ABI_BET).bet(1, 50).sign(P1_KEY),
-        }, {
-          address: P2_ADDR,
-          last: new EWT(ABI_BET).bet(1, 50).sign(P2_KEY),
-        }],
-      },
-    })).toEqual(Map({
-      hand: {
-        cards: [],
-        dealer: 1,
-        handId: 1,
-        state: 'flop',
-        lineup,
-      },
-      complete: false,
-      lastRoundMaxBet: 0,
-    }));
+    })).toEqual(after);
   });
 
   it('should not recalculate lastRoundMaxBet if state did not change', () => {
-    const lineup = [{
-      address: P2_ADDR,
-      last: new EWT(ABI_BET).bet(1, 100).sign(P2_KEY),
-    }, {
-      address: P3_ADDR,
-      last: new EWT(ABI_BET).bet(1, 100).sign(P3_KEY),
-    }];
+    const bet1 = new EWT(ABI_BET).bet(1, 100).sign(P1_KEY);
+    const before = Map({
+      '0x1234': Map({
+        handId: 1,
+        dealer: 1,
+        state: 'flop',
+        lineup: List([Map({
+          address: P1_ADDR,
+          last: bet1,
+        }), Map({
+          address: P2_ADDR,
+          last: new EWT(ABI_BET).bet(1, 100).sign(P2_KEY),
+        })]),
+        lastRoundMaxBet: 100,
+      }),
+    });
 
-    const lineup2 = [{
-      address: P2_ADDR,
-      last: new EWT(ABI_BET).bet(1, 100).sign(P2_KEY),
-    }, {
-      address: P3_ADDR,
-      last: new EWT(ABI_BET).bet(1, 150).sign(P3_KEY),
-    }];
-    expect(tableReducer(Map({
-      hand: {
-        cards: [],
-        handId: 1,
-        dealer: 1,
-        state: 'flop',
-        lineup,
-      },
-      lastRoundMaxBet: 100,
-    }), {
+    const newBet = new EWT(ABI_BET).bet(1, 150).sign(P2_KEY);
+    const after = before.setIn(['0x1234', 'lineup', 1, 'last'], newBet);
+    expect(tableReducer(before, {
       type: TableActions.UPDATE_RECEIVED,
+      tableAddr: '0x1234',
       tableState: {
-        cards: [],
         handId: 1,
         dealer: 1,
         state: 'flop',
-        lineup: lineup2,
+        lineup: [{
+          address: P1_ADDR,
+          last: bet1,
+        }, {
+          address: P2_ADDR,
+          last: newBet,
+        }],
       },
-    })).toEqual(Map({
-      hand: {
-        cards: [],
-        handId: 1,
-        dealer: 1,
-        state: 'flop',
-        lineup: lineup2,
-      },
-      lastRoundMaxBet: 100,
-      complete: false,
-    }));
+    })).toEqual(after);
   });
 
   it('should add amount into lineup', () => {
-    expect(tableReducer(Map({
-      hand: {
-        cards: [],
-        lineup: [],
-      },
-    }), {
+    const before = Map({
+      '0x1234': Map({
+      }),
+    });
+    expect(tableReducer(before, {
       type: TableActions.LINEUP_RECEIVED,
+      tableAddr: '0x1234',
       lineup: [
         new BigNumber(0),
         [P1_ADDR, P2_ADDR, P3_ADDR],
         [new BigNumber(3000), new BigNumber(3000), new BigNumber(2000)],
-        [0, 0, 0],
+        [new BigNumber(0), new BigNumber(0), new BigNumber(0)],
       ],
     })).toEqual(Map({
-      hand: {
-        cards: [],
-        lineup: [{
+      '0x1234': Map({
+        lineup: List([Map({
           address: P1_ADDR,
-          amount: 3000,
-        }, {
+        }), Map({
           address: P2_ADDR,
-          amount: 3000,
-        }, {
+        }), Map({
           address: P3_ADDR,
-          amount: 2000,
-        }],
-      },
-      lastHandNettedOnClient: 0,
-    })
-    );
+        })]),
+        amounts: List([3000, 3000, 2000]),
+        lastHandNettedOnClient: 0,
+      }),
+    }));
   });
 
   it('should calculate stack for one hand', () => {
     const dists = [];
     dists.push(EWT.concat(P3_ADDR, 10).toString('hex')); // rake
     dists.push(EWT.concat(P1_ADDR, 100).toString('hex'));
-
-    expect(tableReducer(Map({
-      hand: {
-        lineup: [{
+    const before = Map({
+      '0x1234': Map({
+        lineup: List([Map({
           address: P1_ADDR,
-          amount: 3000,
-        }, {
+        }), Map({
           address: P2_ADDR,
-          amount: 3000,
-        }],
+        })]),
+        amounts: List([3000, 3000]),
         state: 'turn',
-      },
-      lastHandNettedOnClient: 0,
-    }), {
+        lastHandNettedOnClient: 0,
+      }),
+    });
+    const after = before
+      .setIn(['0x1234', 'amounts', 0], 3050)
+      .setIn(['0x1234', 'amounts', 1], 2950)
+      .setIn(['0x1234', 'lastHandNettedOnClient'], 1);
+    expect(tableReducer(before, {
       type: TableActions.COMPLETE_HAND_QUERY,
+      tableAddr: '0x1234',
       hand: {
         handId: 1,
         lineup: [{
@@ -236,19 +171,7 @@ describe('table reducer tests', () => {
         }],
         distribution: new EWT(ABI_DIST).distribution(1, 0, dists).sign(P1_KEY),
       },
-    })).toEqual(Map({
-      hand: {
-        lineup: [{
-          address: P1_ADDR,
-          amount: 3050,
-        }, {
-          address: P2_ADDR,
-          amount: 2950,
-        }],
-        state: 'turn',
-      },
-      lastHandNettedOnClient: 1,
-    }));
+    })).toEqual(after);
   });
 
   it('should add holeCards at right position into lineup', () => {
@@ -403,15 +326,5 @@ describe('table reducer tests', () => {
       complete: false,
       performedDealing: false,
     }));
-  });
-
-  it('should return initial state if received hand does not exist', () => {
-    expect(tableReducer(initialState, {
-      type: TableActions.UPDATE_RECEIVED,
-      tableState: {
-        handId: 0,
-        dealer: 0,
-      },
-    })).toEqual(initialState);
   });
 });
