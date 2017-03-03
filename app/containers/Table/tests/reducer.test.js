@@ -40,11 +40,11 @@ describe('table reducer tests', () => {
     }];
     const before = fromJS({
       [tableAddr]: {
-        handId: 0,
-        dealer: 0,
-        state: 'flop',
-        lineup,
-      },
+        0: {
+          dealer: 0,
+          state: 'flop',
+          lineup,
+        } },
     });
 
     // execute action
@@ -57,8 +57,8 @@ describe('table reducer tests', () => {
 
     // check state after execution
     const after = before
-      .setIn([tableAddr, 'state'], 'turn')
-      .setIn([tableAddr, 'lastRoundMaxBet'], 50);
+      .setIn([tableAddr, '0', 'state'], 'turn')
+      .setIn([tableAddr, '0', 'lastRoundMaxBet'], 50);
     expect(nextState).toEqual(after);
   });
 
@@ -67,18 +67,19 @@ describe('table reducer tests', () => {
     const bet1 = new EWT(ABI_BET).bet(1, 100).sign(P1_KEY);
     const before = fromJS({
       [tableAddr]: {
-        handId: 1,
-        dealer: 1,
-        state: 'flop',
-        lineup: [{
-          address: P1_ADDR,
-          last: bet1,
-        }, {
-          address: P2_ADDR,
-          last: new EWT(ABI_BET).bet(1, 100).sign(P2_KEY),
-        }],
-        lastRoundMaxBet: 100,
-      },
+        1: {
+          dealer: 1,
+          state: 'flop',
+          lineup: [{
+            address: P1_ADDR,
+            last: bet1,
+          }, {
+            address: P2_ADDR,
+            time: 0,
+            last: new EWT(ABI_BET).bet(1, 100).sign(P2_KEY),
+          }],
+          lastRoundMaxBet: 100,
+        } },
     });
 
     // execute action
@@ -92,12 +93,15 @@ describe('table reducer tests', () => {
         last: bet1,
       }, {
         address: P2_ADDR,
+        time: 1,
         last: newBet,
       }],
     }));
 
     // check state after execution
-    const after = before.setIn([tableAddr, 'lineup', 1, 'last'], newBet);
+    const after = before
+      .setIn([tableAddr, '1', 'lineup', 1, 'last'], newBet)
+      .setIn([tableAddr, '1', 'lineup', 1, 'time'], 1);
     expect(nextState).toEqual(after);
   });
 
@@ -113,21 +117,23 @@ describe('table reducer tests', () => {
       [P1_ADDR, P2_ADDR, P3_ADDR],
       [new BigNumber(3000), new BigNumber(3000), new BigNumber(2000)],
       [new BigNumber(0), new BigNumber(0), new BigNumber(0)],
-    ]));
+    ], new BigNumber(0)));
 
     // check state after execution
     expect(nextState).toEqual(fromJS({
       [tableAddr]: {
-        lineup: [{
-          address: P1_ADDR,
-        }, {
-          address: P2_ADDR,
-        }, {
-          address: P3_ADDR,
-        }],
-        amounts: [3000, 3000, 2000],
-        lastHandNettedOnClient: 0,
-      },
+        data: {
+          seats: [{
+            address: P1_ADDR,
+          }, {
+            address: P2_ADDR,
+          }, {
+            address: P3_ADDR,
+          }],
+          amounts: [3000, 3000, 2000],
+          lastHandNetted: 0,
+          smallBlind: 0,
+        } },
     }));
   });
 
@@ -174,19 +180,20 @@ describe('table reducer tests', () => {
     // set up previous state
     const before = fromJS({
       tableAddr: {
-        lineup: [{
-          address: P1_ADDR,
-        }, {
-          address: P2_ADDR,
-        }],
-      },
+        2: {
+          lineup: [{
+            address: P1_ADDR,
+          }, {
+            address: P2_ADDR,
+          }],
+        } },
     });
 
     // execute action
-    const nextState = tableReducer(before, completeBet(tableAddr, [2, 3]));
+    const nextState = tableReducer(before, completeBet(tableAddr, 2, [2, 3]));
 
     // check state after execution
-    const after = before.setIn([tableAddr, 'holeCards'], List([2, 3]));
+    const after = before.setIn([tableAddr, '2', 'holeCards'], List([2, 3]));
     expect(nextState).toEqual(after);
   });
 

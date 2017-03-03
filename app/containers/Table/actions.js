@@ -30,8 +30,8 @@ export function handRequest(tableAddr, handId) {
   return { type: HAND_REQUEST, tableAddr, handId };
 }
 
-export function setCards(tableAddr, cards, pos) {
-  return { type: SET_CARDS, tableAddr, cards, pos };
+export function setCards(tableAddr, handId, cards, pos) {
+  return { type: SET_CARDS, tableAddr, handId, cards, pos };
 }
 
 export function poll(tableAddr) {
@@ -43,8 +43,8 @@ export function updateReceived(tableAddr, hand) {
   return { type: UPDATE_RECEIVED, tableAddr, hand };
 }
 
-export function lineupReceived(tableAddr, lineup) {
-  return { type: LINEUP_RECEIVED, tableAddr, lineup };
+export function lineupReceived(tableAddr, lineup, smallBlind) {
+  return { type: LINEUP_RECEIVED, tableAddr, lineup, smallBlind };
 }
 
 export function addToModal(node) {
@@ -73,8 +73,8 @@ export function submitBet(tableAddr, handId, amount, privKey) {
   return { type: SUBMIT_BET, tableAddr, handId, amount, privKey };
 }
 
-export function completeBet(tableAddr, holeCards) {
-  return { type: COMPLETE_BET, tableAddr, holeCards };
+export function completeBet(tableAddr, handId, holeCards) {
+  return { type: COMPLETE_BET, tableAddr, handId, holeCards };
 }
 
 export function submitFold(tableAddr, handId, amount, privKey) {

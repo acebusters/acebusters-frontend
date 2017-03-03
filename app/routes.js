@@ -87,7 +87,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: '/table/:tableAddr',
+      path: '/table/:tableAddr/hand/:handId',
       name: 'table',
       childRoutes: [],
       getComponent(nextState, cb) {

@@ -109,7 +109,7 @@ export function* poll(action) {
 export function* submitBet(action) {
   try {
     const cards = yield call(pay, action.handId, action.amount, action.privKey, action.tableAddr, ABI_BET, 'bet');
-    yield put(completeBet(cards, action.privKey));
+    yield put(completeBet(action.tableAddr, action.handId, cards));
   } catch (err) {
     yield put({ type: 'FAILED_REQUEST', err });
   }
@@ -137,7 +137,7 @@ export function* submitCheck(action) {
   const abi = checkABIs[action.state];
   try {
     const cards = yield call(pay, action.handId, action.myMaxBet, action.privKey, action.tableAddr, abi, abi[0].name);
-    yield put(completeBet(cards, action.privKey));
+    yield put(completeBet(action.tableAddr, action.handId, cards));
   } catch (err) {
     yield put({ type: 'FAILED_REQUEST', err });
   }
@@ -161,7 +161,7 @@ export function* submitSignedNetting(action) {
 export function* submitLeave(action) {
   try {
     const cards = yield call(leave, action.handId, action.amount, action.privKey, action.tableAddr, ABI_LEAVE, 'leave');
-    yield put(completeBet(cards, action.privKey));
+    yield put(completeBet(action.tableAddr, action.handId, cards));
   } catch (err) {
     yield put({ type: 'FAILED_REQUEST', err });
   }

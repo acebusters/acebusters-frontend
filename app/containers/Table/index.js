@@ -49,6 +49,15 @@ import {
 import TableComponent from '../../components/Table';
 import web3Connect from '../AccountProvider/web3Connect';
 
+const getTableData = function (table, props) {
+  const lineup = table.getLineup.callPromise();
+  const sb = table.smallBlind.callPromise();
+  return Promise.all([lineup, sb]).then((rsp) => {
+    props.lineupReceived(table.address, rsp[0], rsp[1]);
+    return Promise.resolve();
+  });
+};
+
 
 export class Table extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -69,9 +78,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     // this.tokenEvents.watch(this.watchToken);
 
     // getting initial lineup from contract
-    this.table.getLineup.callPromise().then((lineup) => {
-      props.lineupReceived(this.table.address, lineup);
-      // start polling the oracle
+    getTableData(this.table, props).then(() => {
       this.interval = setInterval(() => {
         props.poll(this.tableAddr);
       }, 3000);
@@ -266,7 +273,7 @@ export function mapDispatchToProps() {
   return {
     updateLastHand: (tableAddr, handId) => (handRequest(tableAddr, handId)),
     poll: (tableAddr) => (poll(tableAddr)),
-    lineupReceived: (tableAddr, lineup) => (lineupReceived(tableAddr, lineup)),
+    lineupReceived: (tableAddr, lineup, smallBlind) => (lineupReceived(tableAddr, lineup, smallBlind)),
     addToModal: (node) => (addToModal(node)),
     dismissFromModal: () => (dissmissFromModal()),
     processNetting: (netRequest, handId, privKey, tableAddr) => (processNetting(netRequest, handId, privKey, tableAddr)),
@@ -292,7 +299,6 @@ Table.propTypes = {
   lineup: React.PropTypes.object,
   params: React.PropTypes.object,
   updateLastHand: React.PropTypes.func,
-  lineupReceived: React.PropTypes.func,
   privKey: React.PropTypes.string,
   poll: React.PropTypes.func,
   web3Redux: React.PropTypes.any,

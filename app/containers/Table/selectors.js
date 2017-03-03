@@ -8,15 +8,29 @@ const pokerHelper = new PokerHelper(rc);
 // direct selectors to state
 const tableStateSelector = (state, props) => (state && props) ? state.getIn(['table', props.params.tableAddr]) : null;
 
+const handSelector = (state, props) => (state && props) ? state.getIn(['table', props.params.tableAddr, props.params.handId.toString()]) : null;
+
 // other selectors
 const makeHandSelector = () => createSelector(
-  tableStateSelector,
-  (tableState) => tableState
+  handSelector,
+  (hand) => hand
 );
 
 const makeLineupSelector = () => createSelector(
-  makeHandSelector(),
-  (table) => (table && table.get) ? table.get('lineup') : null
+  [handSelector, tableStateSelector],
+  (hand, table) => {
+    // we have no table yet
+    if (!table || !table.get('data')) {
+      return null;
+    }
+
+    // we have table, but no hand
+    if (!hand || !hand.get('lineup')) {
+      return table.getIn(['data', 'seats']);
+    }
+    // if we have a hand, just get the hand
+    return hand.get('lineup');
+  }
 );
 
 const makeAmountSelector = () => createSelector(
