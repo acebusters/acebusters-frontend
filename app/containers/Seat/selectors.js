@@ -12,25 +12,25 @@ const pokerHelper = new PokerHelper(rc);
 const posSelector = (state, props) => (state && props) ? props.pos : null;
 
 const makeLastReceiptSelector = () => createSelector(
-    [makeHandSelector(), posSelector],
-    (hand, pos) => (hand && hand.lineup && pos && hand.lineup[pos]) ? rc.get(hand.lineup[pos].last) : undefined
+    [makeHandSelector, posSelector],
+    (hand, pos) => (hand && hand.getIn && hand.getIn(['lineup', pos])) ? rc.get(hand.getIn(['lineup', pos, 'last'])).toJS() : undefined
 );
 
 const makeLastAmountSelector = () => createSelector(
-    makeLastReceiptSelector(),
-    (lastReceipt) => (lastReceipt) ? lastReceipt.values[1] : 0
+    makeLastReceiptSelector,
+    (lastReceipt) => (lastReceipt && lastReceipt.values) ? lastReceipt.values[1] : 0
 );
 
 const makeWhosTurnSelector = () => createSelector(
-  makeHandSelector(),
-  (hand) => (hand) ? pokerHelper.whosTurn(hand) : null
+  makeHandSelector,
+  (hand) => (hand && hand.toJS) ? pokerHelper.whosTurn(hand.toJS()) : null
 );
 
 const makeStackSelector = () => createSelector(
-    [makeHandSelector(), makeMyPosSelector(), makeLastAmountSelector()],
+    [makeHandSelector, makeMyPosSelector, makeLastAmountSelector],
     (hand, myPos, lastAmount) => {
-      if (hand && myPos && lastAmount !== undefined) {
-        const stack = hand.lineup[myPos].amount - lastAmount;
+      if (hand && hand.getIn && myPos && lastAmount !== undefined) {
+        const stack = hand.getIn(['amounts', myPos]) - lastAmount;
         return stack;
       }
       return null;
@@ -38,12 +38,17 @@ const makeStackSelector = () => createSelector(
 );
 
 const makeLastActionSelector = () => createSelector(
-  [posSelector, makeHandSelector()],
-  (pos, hand) => (hand && hand.lineup[pos].last && hand.lineup[pos].last.abi) ? rc.get(hand.lineup[pos].last).abi[0].name : null
+  [posSelector, makeHandSelector],
+  (pos, hand) => {
+    if (hand && hand.getIn && hand.getIn(['lineup', pos, 'last'])) {
+      return rc.get(hand.getIn(['lineup', pos, 'last'])).abi[0].name;
+    }
+    return null;
+  }
 );
 
 const makeCardSelector = () => createSelector(
-    [makeHandSelector(), posSelector],
+    [makeHandSelector, posSelector],
     (hand, pos) => {
       let cards = [];
       if (hand && hand.lineup && pos) {
@@ -55,8 +60,8 @@ const makeCardSelector = () => createSelector(
 );
 
 const makeFoldedSelector = () => createSelector(
-    makeLastReceiptSelector(),
-    (lastReceipt) => (lastReceipt) ? lastReceipt.abi[0].name === 'fold' : false
+    makeLastReceiptSelector,
+    (lastReceipt) => (lastReceipt && lastReceipt.abi) ? lastReceipt.abi[0].name === 'fold' : false
 );
 
 export {

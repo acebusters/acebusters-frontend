@@ -5,7 +5,23 @@ import EthUtil from 'ethereumjs-util';
 import { PokerHelper, ReceiptCache } from 'poker-helper';
 import { call, put, takeLatest, select, fork } from 'redux-saga/effects';
 import { delay } from 'redux-saga';
-import { updateReceived, completeBet, completeFold, completeShow } from './actions';
+import {
+  updateReceived,
+  completeBet,
+  completeFold,
+  completeShow,
+  completeHandQuery,
+  HAND_REQUEST,
+  PERFORM_DEALING_ACTION,
+  START_POLLING,
+  SUBMIT_BET,
+  SUBMIT_FOLD,
+  SUBMIT_CHECK,
+  SUBMIT_SHOW,
+  PROCESS_NETTING,
+  LEAVE_REQUEST,
+  UPDATE_RECEIVED,
+} from './actions';
 import { ABI_BET, ABI_FOLD, ABI_LEAVE, checkABIs, apiBasePath } from '../../app.config';
 import {
   fetchTableState,
@@ -18,12 +34,17 @@ import {
 const rc = new ReceiptCache();
 const pokerHelper = new PokerHelper(rc);
 
-export function* getHand(action) {
-  const header = new Headers({ 'Content-Type': 'application/json' });
-  const myInit = { headers: header, method: 'GET' };
-  const request = new Request(`${apiBasePath}/table/${action.payload.tableAddr}/hand/${action.payload.handId}`, myInit);
+export function* getHand({ tableAddr, handId }) {
+  const header = new Headers({
+    'Content-Type': 'application/json',
+  });
+  const myInit = {
+    headers: header,
+    method: 'GET',
+  };
+  const request = new Request(`${apiBasePath}/table/${tableAddr}/hand/${handId}`, myInit);
   const lastHand = yield call(() => fetch(request).then((res) => res.json()));
-  yield put({ type: 'COMPLETE_HAND_QUERY', hand: lastHand });
+  yield put(completeHandQuery(tableAddr, lastHand));
 }
 
 export function* dispatchDealingAction() {
@@ -79,7 +100,7 @@ export function* waitThenNextHand() {
 export function* poll(action) {
   try {
     const tableState = yield call(fetchTableState, action.tableAddr);
-    yield put(updateReceived(tableState, action.sb));
+    yield put(updateReceived(action.tableAddr, tableState));
   } catch (err) {
     yield put({ type: 'FAILED_REQUEST', err });
   }
@@ -149,25 +170,26 @@ export function* submitLeave(action) {
 export function* updateHandler() {
   const state = yield select();
   if (state.get('table').get('complete')) {
+    // const handComplete = pokerHelper.checkForNextHand(action.tableState);
     yield fork(waitThenNextHand);
   }
 
   if (state.get('table').get('hand') && state.get('table').get('hand').state === 'dealing') {
-    yield call(dispatchDealingAction);
+    // yield call(dispatchDealingAction);
   }
 }
 
 function* tableSaga() {
-  yield takeLatest('GET_HAND_REQUESTED', getHand);
-  yield takeLatest('PERFORM_DEALING_ACTION', performDealingAction);
-  yield takeLatest('START_POLLING', poll);
-  yield takeLatest('SUBMIT_BET', submitBet);
-  yield takeLatest('SUBMIT_FOLD', submitFold);
-  yield takeLatest('SUBMIT_CHECK', submitCheck);
-  yield takeLatest('SUBMIT_SHOW', submitShow);
-  yield takeLatest('PROCESS_NETTING', submitSignedNetting);
-  yield takeLatest('LEAVE_REQUEST', submitLeave);
-  yield takeLatest('UPDATE_RECEIVED', updateHandler);
+  yield takeLatest(HAND_REQUEST, getHand);
+  yield takeLatest(PERFORM_DEALING_ACTION, performDealingAction);
+  yield takeLatest(START_POLLING, poll);
+  yield takeLatest(SUBMIT_BET, submitBet);
+  yield takeLatest(SUBMIT_FOLD, submitFold);
+  yield takeLatest(SUBMIT_CHECK, submitCheck);
+  yield takeLatest(SUBMIT_SHOW, submitShow);
+  yield takeLatest(PROCESS_NETTING, submitSignedNetting);
+  yield takeLatest(LEAVE_REQUEST, submitLeave);
+  yield takeLatest(UPDATE_RECEIVED, updateHandler);
 }
 
 export default [

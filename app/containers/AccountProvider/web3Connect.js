@@ -97,8 +97,8 @@ function generateNetworkApi(state, dispatch) {
 
 export default function web3Connect(passedMapStateToProps, passedActions) {
   // allow user to map custom map
-  function mapStateToProps(state) {
-    return { ...passedMapStateToProps(state), web3Redux: selectAccount(state) };
+  function mapStateToProps(state, props) {
+    return { ...passedMapStateToProps(state, props), web3Redux: selectAccount(state) };
   }
 
   function mapDispatchToProps(dispatch) {

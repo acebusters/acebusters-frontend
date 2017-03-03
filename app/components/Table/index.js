@@ -25,13 +25,14 @@ function TableComponent(props) {
           </TableAndChairs>
         </TableContainer>
       </TableArea>
-      <ActionBar {...props} me={props.hand.lineup[props.myPos]}></ActionBar>
+      <ActionBar {...props} me={props.lineup[props.myPos]}></ActionBar>
     </GamePlay>
   );
 }
 
 TableComponent.propTypes = {
   hand: React.PropTypes.object,
+  lineup: React.PropTypes.any,
   myAddress: React.PropTypes.string,
   board: React.PropTypes.array,
   seats: React.PropTypes.array,

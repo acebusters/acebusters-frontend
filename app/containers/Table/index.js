@@ -26,6 +26,7 @@ import {
   addToModal,
   dissmissFromModal,
   processNetting,
+  handRequest,
 } from './actions';
 // selectors
 import {
@@ -39,7 +40,6 @@ import {
   makePotSizeSelector,
   makeAmountToCallSelector,
   makeHandSelector,
-  makeLastHandNettedSelector,
   makeLineupSelector,
   makeMyPosSelector,
   makeModalStackSelector,
@@ -54,112 +54,33 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
   constructor(props) {
     super(props);
+    this.watchTable = this.watchTable.bind(this);
+    this.watchToken = this.watchToken.bind(this);
     this.tableAddr = props.params.tableAddr;
     this.web3 = props.web3Redux.web3;
     this.table = this.web3.eth.contract(ABI_TABLE).at(this.tableAddr);
     this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(tokenContractAddress);
-    // getting initial lineup from contract
-    this.getLineup();
-    window.onresize = this.handleResize;
+
     // register event listener for table
     this.tableEvents = this.table.allEvents({ fromBlock: 'latest' });
-    this.table.smallBlind.call();
-
-    this.tableEvents.watch((error, result) => {
-      if (error) {
-        const errorElement = (<p>{error}/</p>);
-        this.props.addToModal(errorElement);
-        return;
-      }
-
-      // dispatch action according to event type
-      switch (result.event) {
-        case 'Join': {
-          // update lineup when join successful
-          this.getLineup();
-          break;
-        }
-
-        case 'NettingRequest': {
-          // disptach action to sign netting request
-          this.props.processNetting(this.props.netRequest,
-            this.props.hand.handId, this.props.privKey, this.props.params.id);
-          break;
-        }
-
-        case 'Error': {
-          let msg = 'Up Something went wrong';
-          const errorCode = result.args.errorCode.toNumber();
-
-          if (errorCode === 1) {
-            msg = 'Wrong Amount';
-          }
-
-          if (errorCode === 2) {
-            msg = 'Not enough Moniezz';
-          }
-
-          if (errorCode === 3) {
-            msg = 'You are already in lineup';
-          }
-
-          if (errorCode === 4) {
-            msg = 'Sorry the Seat is taken';
-          }
-
-          const errorElement = (
-            <div>
-              <h2>{msg}</h2>
-              <Button onClick={() => this.props.dismissFromModal()}>Cancel</Button>
-            </div>);
-
-          this.props.addToModal(errorElement);
-          break;
-        }
-
-        default: {
-          break;
-        }
-      }
-    });
+    // this.tableEvents.watch(this.watchTable);
 
     this.tokenEvents = this.token.allEvents({ fromBlock: 'latest' });
-    this.tokenEvents.watch((error, result) => {
-      if (error) {
-        const errorElement = (<p>{errorElement}/</p>);
-        this.props.addToModal(errorElement);
-        return;
-      }
+    // this.tokenEvents.watch(this.watchToken);
 
-      // dispatch action according to event type
-      switch (result.event) {
-        case 'Approval': {
-          console.log('approved');
-          break;
-        }
-        case 'Transfer': {
-          console.log('transferred');
-          break;
-        }
-        case 'Issuance': {
-          console.log('issued');
-          break;
-        }
-
-        default: {
-          break;
-        }
-      }
+    // getting initial lineup from contract
+    this.table.getLineup.callPromise().then((lineup) => {
+      props.lineupReceived(this.table.address, lineup);
+      // start polling the oracle
+      this.interval = setInterval(() => {
+        props.poll(this.tableAddr);
+      }, 3000);
     });
-
-    this.interval = setInterval(() => {
-      props.poll(this.tableAddr);
-    }, 3000);
   }
 
   componentWillReceiveProps(nextProps) {
     if (this.props.hand && nextProps.lastHandNettedOnClient < this.props.hand.handId - 1) {
-      this.props.updateLastHand(nextProps.lastHandNettedOnClient + 1, this.tableAddr);
+      this.props.updateLastHand(this.tableAddr, nextProps.lastHandNettedOnClient + 1);
     }
   }
 
@@ -169,14 +90,90 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.tokenEvents.stopWatching();
   }
 
-  getLineup() {
-    this.table.getLineup.callPromise().then((lineup) => {
-      this.props.lineupReceived(lineup, this.tableAddr);
-    });
+  watchTable(error, result) {
+    if (error) {
+      const errorElement = (<p>{error}/</p>);
+      this.props.addToModal(errorElement);
+      return;
+    }
+
+    // dispatch action according to event type
+    switch (result.event) {
+      case 'Join': {
+        // update lineup when join successful
+        this.getLineup();
+        break;
+      }
+
+      case 'NettingRequest': {
+        // disptach action to sign netting request
+        this.props.processNetting(this.props.netRequest,
+          this.props.hand.handId, this.props.privKey, this.props.params.id);
+        break;
+      }
+
+      case 'Error': {
+        let msg = 'Up Something went wrong';
+        const errorCode = result.args.errorCode.toNumber();
+
+        if (errorCode === 1) {
+          msg = 'Wrong Amount';
+        }
+
+        if (errorCode === 2) {
+          msg = 'Not enough Moniezz';
+        }
+
+        if (errorCode === 3) {
+          msg = 'You are already in lineup';
+        }
+
+        if (errorCode === 4) {
+          msg = 'Sorry the Seat is taken';
+        }
+
+        const errorElement = (
+          <div>
+            <h2>{msg}</h2>
+            <Button onClick={() => this.props.dismissFromModal()}>Cancel</Button>
+          </div>);
+
+        this.props.addToModal(errorElement);
+        break;
+      }
+
+      default: {
+        break;
+      }
+    }
   }
 
-  handleResize() {
-    // dispatch resize window action
+  watchToken(error, result) {
+    if (error) {
+      const errorElement = (<p>{errorElement}/</p>);
+      this.props.addToModal(errorElement);
+      return;
+    }
+
+    // dispatch action according to event type
+    switch (result.event) {
+      case 'Approval': {
+        console.log('approved');
+        break;
+      }
+      case 'Transfer': {
+        console.log('transferred');
+        break;
+      }
+      case 'Issuance': {
+        console.log('issued');
+        break;
+      }
+
+      default: {
+        break;
+      }
+    }
   }
 
   updateAmount(e) {
@@ -204,7 +201,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
   renderSeats() {
     const seats = [];
-    const lineup = this.props.lineup;
+    const lineup = (this.props.lineup) ? this.props.lineup.toJS() : null;
+    if (!lineup) {
+      return (<div></div>);
+    }
     const coordArray = SEAT_COORDS[lineup.length.toString()];
     const amountCoords = AMOUNT_COORDS[lineup.length.toString()];
 
@@ -227,7 +227,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
   renderBoard() {
     const board = [];
-    const cards = this.props.hand.cards;
+    if (!this.props.hand) {
+      return (<div></div>);
+    }
+    const cards = this.props.hand.get('cards');
     if (cards && cards.length > 0) {
       for (let i = 0; i < cards.length; i += 1) {
         const card = (<Card key={i} cardNumber={cards[i]}></Card>);
@@ -245,7 +248,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     const sb = (this.table.smallBlind()) ? this.table.smallBlind().toNumber() : 0;
     return (
       <div>
-        <TableComponent {...this.props} sb={sb} board={board} seats={seats}></TableComponent>
+        { this.props.hand && <TableComponent {...this.props} sb={sb} board={board} seats={seats}></TableComponent> }
         { modalContent &&
           <ModalContainer>
             <ModalDialog>
@@ -261,9 +264,9 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
 export function mapDispatchToProps() {
   return {
-    updateLastHand: (handId, tableAddr) => ({ type: 'GET_HAND_REQUESTED', payload: { handId, tableAddr } }),
+    updateLastHand: (tableAddr, handId) => (handRequest(tableAddr, handId)),
     poll: (tableAddr) => (poll(tableAddr)),
-    lineupReceived: (lineup, tableAddr) => (lineupReceived(lineup, tableAddr)),
+    lineupReceived: (tableAddr, lineup) => (lineupReceived(tableAddr, lineup)),
     addToModal: (node) => (addToModal(node)),
     dismissFromModal: () => (dissmissFromModal()),
     processNetting: (netRequest, handId, privKey, tableAddr) => (processNetting(netRequest, handId, privKey, tableAddr)),
@@ -274,7 +277,6 @@ const mapStateToProps = createStructuredSelector({
   hand: makeHandSelector(),
   myAddress: makeAddressSelector(),
   lineup: makeLineupSelector(),
-  lastHandNettedOnClient: makeLastHandNettedSelector(),
   isMyTurn: makeIsMyTurnSelector(),
   potSize: makePotSizeSelector(),
   myPos: makeMyPosSelector(),
@@ -287,8 +289,7 @@ const mapStateToProps = createStructuredSelector({
 
 Table.propTypes = {
   hand: React.PropTypes.object,
-  lineup: React.PropTypes.array,
-  lastHandNettedOnClient: React.PropTypes.number,  // eslint-disable-line
+  lineup: React.PropTypes.object,
   params: React.PropTypes.object,
   updateLastHand: React.PropTypes.func,
   lineupReceived: React.PropTypes.func,
