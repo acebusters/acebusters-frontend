@@ -6,8 +6,21 @@ import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import * as LocalStorage from '../../services/localStorage';
 import { setCards } from '../Table/actions';
-import { makeCardSelector, makeLastAmountSelector, makeFoldedSelector, makeWhosTurnSelector, makeLastActionSelector } from './selectors';
-import { makeMyPosSelector, makeHandSelector, makeLastHandNettedSelector } from '../Table/selectors';
+import {
+  makeCardSelector,
+  makeLastAmountSelector,
+  makeFoldedSelector,
+  makeWhosTurnSelector,
+  makeLastActionSelector,
+} from './selectors';
+
+import {
+  makeMyPosSelector,
+  makeHandSelector,
+  makeLastHandNettedSelector,
+  makeLineupSelector,
+} from '../Table/selectors';
+
 import { makeAddressSelector } from '../AccountProvider/selectors';
 import SeatComponent from '../../components/Seat';
 
@@ -39,6 +52,7 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
 
 const mapStateToProps = createStructuredSelector({
   hand: makeHandSelector(),
+  lineup: makeLineupSelector(),
   lastHandNettedOnClient: makeLastHandNettedSelector(),
   myAddress: makeAddressSelector(),
   myPos: makeMyPosSelector(),

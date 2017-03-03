@@ -47,8 +47,11 @@ export function lineupReceived(tableAddr, lineup, smallBlind) {
   return { type: LINEUP_RECEIVED, tableAddr, lineup, smallBlind };
 }
 
+export function nextHand(tableAddr, handId) {
+  return { type: NEXT_HAND, tableAddr, handId };
+}
+
 export function addToModal(node) {
-  console.log('Add');
   return { type: ADD_TO_MODAL, node };
 }
 
@@ -61,7 +64,6 @@ export function leaveRequest(tableAddr, handId, amount, privKey) {
 }
 
 export function dissmissFromModal() {
-  console.log('Dismiss');
   return { type: DISMISS_FROM_MODAL };
 }
 

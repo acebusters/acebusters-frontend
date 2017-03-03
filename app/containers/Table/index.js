@@ -72,10 +72,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
     // register event listener for table
     this.tableEvents = this.table.allEvents({ fromBlock: 'latest' });
-    // this.tableEvents.watch(this.watchTable);
+    this.tableEvents.watch(this.watchTable);
 
     this.tokenEvents = this.token.allEvents({ fromBlock: 'latest' });
-    // this.tokenEvents.watch(this.watchToken);
+    this.tokenEvents.watch(this.watchToken);
 
     // getting initial lineup from contract
     getTableData(this.table, props).then(() => {
@@ -253,6 +253,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     const seats = this.renderSeats();
     const board = this.renderBoard();
     const sb = (this.table.smallBlind()) ? this.table.smallBlind().toNumber() : 0;
+    console.dir(modalContent);
     return (
       <div>
         { this.props.hand && <TableComponent {...this.props} sb={sb} board={board} seats={seats}></TableComponent> }

@@ -18,6 +18,7 @@ function SeatComponent(props) {
       </SeatWrapper>
       );
   } else {
+    console.dir(props.lineup);
     seat = (
       <SeatWrapper {...props}>
         <ImageContainer {...props}>
@@ -25,8 +26,8 @@ function SeatComponent(props) {
           <div>{ props.lastAction } </div>
         </ImageContainer>
         <InfoContainer>
-          <InfoBox> { props.hand.lineup[props.pos].address.substring(0, 8) }</InfoBox>
-          <InfoBox> { props.hand.lineup[props.pos].amount } </InfoBox>
+          <InfoBox> { props.lineup.getIn([props.pos, 'address']).substring(0, 8) }</InfoBox>
+          <InfoBox> { props.lineup.getIn([props.pos, 'amount']) } </InfoBox>
           <ActionBox {...props}> { (props.lastAmount > 0) ? props.lastAmount : '' }</ActionBox>
         </InfoContainer>
         <CardContainer>

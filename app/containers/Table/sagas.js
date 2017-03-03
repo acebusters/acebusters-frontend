@@ -6,6 +6,7 @@ import { PokerHelper, ReceiptCache } from 'poker-helper';
 import { call, put, takeLatest, select, fork } from 'redux-saga/effects';
 import { delay } from 'redux-saga';
 import {
+  nextHand,
   updateReceived,
   completeBet,
   completeFold,
@@ -167,11 +168,14 @@ export function* submitLeave(action) {
   }
 }
 
-export function* updateHandler() {
+export function* updateHandler(action) {
   const state = yield select();
   if (state.get('table').get('complete')) {
-    // const handComplete = pokerHelper.checkForNextHand(action.tableState);
-    yield fork(waitThenNextHand);
+    const handComplete = pokerHelper.checkForNextHand(action.hand);
+    if (handComplete) {
+      yield put(nextHand(action.tableAddr, action.hand.handId + 1));
+      yield fork(waitThenNextHand);
+    }
   }
 
   if (state.get('table').get('hand') && state.get('table').get('hand').state === 'dealing') {

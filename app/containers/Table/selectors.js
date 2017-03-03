@@ -10,6 +10,8 @@ const tableStateSelector = (state, props) => (state && props) ? state.getIn(['ta
 
 const handSelector = (state, props) => (state && props) ? state.getIn(['table', props.params.tableAddr, props.params.handId.toString()]) : null;
 
+const viewStateSelector = (state) => (state) ? state.get('table') : null;
+
 // other selectors
 const makeHandSelector = () => createSelector(
   handSelector,
@@ -79,8 +81,11 @@ const makePotSizeSelector = () => createSelector(
 );
 
 const makeModalStackSelector = () => createSelector(
-  tableStateSelector,
-  (tableState) => (tableState && tableState.get && tableState.get('modalStack')) ? tableState.get('modalStack').toJS() : []
+  viewStateSelector,
+  (viewState) => {
+    console.dir(viewState);
+    return (viewState && viewState.get('modalStack')) ? viewState.get('modalStack').toJS() : [];
+  }
 );
 
 const makeNetRequestSelector = () => createSelector(

@@ -98,15 +98,16 @@ export default function tableReducer(state = initialState, action) {
     }
 
     case TableActions.ADD_TO_MODAL: {
-      const newStack = state.get('modalStack').slice();
-      newStack.push(action.node);
+      let newStack = state.get('modalStack');
+      newStack = newStack.push(action.node);
+      console.log(newStack);
       return state
         .set('modalStack', newStack);
     }
 
     case TableActions.DISMISS_FROM_MODAL: {
-      const newStack = state.get('modalStack').slice();
-      newStack.pop();
+      let newStack = state.get('modalStack');
+      newStack = newStack.pop();
       return state
         .set('modalStack', newStack);
     }
