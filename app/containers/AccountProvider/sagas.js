@@ -219,7 +219,7 @@ function* contractTransactionSendSaga(args) {
       `0x${sig.r.toString('hex')}`,
       `0x${sig.s.toString('hex')}`,
       sig.v);
-    yield put(contractTxSuccess({ address: dest, nonce, txHash: value.txHash }));
+    yield put(contractTxSuccess({ address: dest, nonce, txHash: value.txHash, key: args.payload.key }));
   } catch (err) {
     const error = (err.message) ? err.message : err;
     yield put(contractTxError({ address: dest, nonce, error }));

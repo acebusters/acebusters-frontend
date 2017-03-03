@@ -1,6 +1,9 @@
 /**
  * Created by helge on 20.09.16.
  */
+
+import { createFormAction } from '../../services/reduxFormSaga';
+
 export const START_POLLING = 'START_POLLING';
 export const COMPLETE_HAND_QUERY = 'COMPLETE_HAND_QUERY';
 export const HAND_REQUEST = 'HAND_REQUEST';
@@ -12,6 +15,8 @@ export const ADD_TO_MODAL = 'ADD_TO_MODAL';
 export const DISMISS_FROM_MODAL = 'DISMISS_FROM_MODAL';
 export const PROCESS_NETTING = 'PROCESS_NETTING';
 export const LEAVE_REQUEST = 'LEAVE_REQUEST';
+export const JOIN_TABLE = 'JOIN_TABLE';
+export const JOIN_APPROVED = 'JOIN_APPROVED';
 export const PERFORM_DEALING_ACTION = 'PERFORM_DEALING_ACTION';
 export const UPDATE_AMOUNT = 'UPDATE_AMOUNT';
 export const SUBMIT_BET = 'SUBMIT_BET';
@@ -65,6 +70,12 @@ export function leaveRequest(tableAddr, handId, amount, privKey) {
 
 export function dissmissFromModal() {
   return { type: DISMISS_FROM_MODAL };
+}
+
+export const join = createFormAction(JOIN_TABLE);
+
+export function joinApproved(payload) {
+  return { type: JOIN_APPROVED, payload };
 }
 
 export function updateAmount(tableAddr, amount) {

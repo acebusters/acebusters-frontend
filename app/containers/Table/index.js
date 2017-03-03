@@ -201,9 +201,9 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   join(pos, amount) {
-    console.log(pos, amount);
+    // this.props.joinRequest(this.token, this.table, this.tableAddr, amount);
     this.token.approve.sendTransaction(this.tableAddr, amount);
-    this.table.join.sendTransaction(amount, this.props.myAddress, pos, '');
+    // this.table.join.sendTransaction(amount, this.props.myAddress, pos, '');
   }
 
   renderSeats() {
@@ -253,7 +253,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     const seats = this.renderSeats();
     const board = this.renderBoard();
     const sb = (this.table.smallBlind()) ? this.table.smallBlind().toNumber() : 0;
-    console.dir(modalContent);
     return (
       <div>
         { this.props.hand && <TableComponent {...this.props} sb={sb} board={board} seats={seats}></TableComponent> }
@@ -277,6 +276,7 @@ export function mapDispatchToProps() {
     lineupReceived: (tableAddr, lineup, smallBlind) => (lineupReceived(tableAddr, lineup, smallBlind)),
     addToModal: (node) => (addToModal(node)),
     dismissFromModal: () => (dissmissFromModal()),
+    // joinRequest: (tokenContract, tableContract) => (joinRequest()),
     processNetting: (netRequest, handId, privKey, tableAddr) => (processNetting(netRequest, handId, privKey, tableAddr)),
   };
 }
@@ -303,7 +303,6 @@ Table.propTypes = {
   privKey: React.PropTypes.string,
   poll: React.PropTypes.func,
   web3Redux: React.PropTypes.any,
-  myAddress: React.PropTypes.string,
   modalStack: React.PropTypes.array,
   addToModal: React.PropTypes.func,
   dismissFromModal: React.PropTypes.func,

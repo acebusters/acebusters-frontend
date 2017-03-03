@@ -112,6 +112,10 @@ export default function tableReducer(state = initialState, action) {
         .set('modalStack', newStack);
     }
 
+    case TableActions.JOIN_TABLE: {
+      return state;
+    }
+
     case TableActions.UPDATE_RECEIVED: {
       const table = state.get(action.tableAddr);
 

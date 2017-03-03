@@ -117,8 +117,8 @@ export function contractTxSend(payload) {
   return { type: CONTRACT_TX_SEND, payload };
 }
 
-export function contractTxSuccess({ address, nonce, txHash }) {
-  return { type: CONTRACT_TX_SUCCESS, address, nonce, txHash };
+export function contractTxSuccess({ key, address, nonce, txHash }) {
+  return { type: CONTRACT_TX_SUCCESS, key, address, nonce, txHash };
 }
 
 export function contractTxError({ address, nonce, error }) {
