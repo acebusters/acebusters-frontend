@@ -54,8 +54,9 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
 
   handleBet(values, dispatch) {
     const amount = parseInt(values.get('amount'), 10);
+    console.log(amount);
     return this.table.bet(this.props.params.handId, amount).catch((err) => {
-      throw new SubmissionError({ _error: `Bet failed with error code ${err}.` });
+      throw new SubmissionError({ _error: `Bet failed with error ${err}.` });
     }).then((data) => {
       console.dir(data);
       dispatch(setCards(this.props.params.tableAddr, this.props.params.handId, data.cards));
@@ -80,7 +81,7 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
       }
     }
     return call.catch((err) => {
-      throw new SubmissionError({ _error: `Check failed with error code ${err}.` });
+      throw new SubmissionError({ _error: `Check failed with error ${err}.` });
     });
   }
 
@@ -88,21 +89,21 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
     const amount = this.props.myMaxBet;
     const cards = this.props.me.cards;
     return this.table.show(this.props.params.handId, amount, cards).catch((err) => {
-      throw new SubmissionError({ _error: `Show failed with error code ${err}.` });
+      throw new SubmissionError({ _error: `Show failed with error ${err}.` });
     });
   }
 
   handleFold() {
     const amount = this.props.myMaxBet;
     return this.table.fold(this.props.params.handId, amount).catch((err) => {
-      throw new SubmissionError({ _error: `Fold failed with error code ${err}.` });
+      throw new SubmissionError({ _error: `Fold failed with error ${err}.` });
     });
   }
 
   handleLeave() {
     const exitHand = this.props.params.handId + 1;
     return this.table.leave(exitHand).catch((err) => {
-      throw new SubmissionError({ _error: `Leave failed with error code ${err}.` });
+      throw new SubmissionError({ _error: `Leave failed with error ${err}.` });
     });
   }
 
