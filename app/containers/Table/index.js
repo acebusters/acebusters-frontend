@@ -252,7 +252,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     const modalContent = this.props.modalStack[this.props.modalStack.length - 1];
     const seats = this.renderSeats();
     const board = this.renderBoard();
-    const sb = (this.props.data.get('smallBlind')) ? this.props.data.get('smallBlind').toNumber() : 0;
+    const sb = (this.props.data && this.props.data.get('smallBlind')) ? this.props.data.get('smallBlind') : 0;
     return (
       <div>
         { this.props.hand && <TableComponent {...this.props} sb={sb} board={board} seats={seats}></TableComponent> }
