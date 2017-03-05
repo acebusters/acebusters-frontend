@@ -71,10 +71,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
     // register event listener for table
     this.tableEvents = this.table.allEvents({ fromBlock: 'latest' });
-    this.tableEvents.watch(this.watchTable);
+    // this.tableEvents.watch(this.watchTable);
 
     this.tokenEvents = this.token.allEvents({ fromBlock: 'latest' });
-    this.tokenEvents.watch(this.watchToken);
+    // this.tokenEvents.watch(this.watchToken);
 
     // getting initial lineup from contract
     getTableData(this.table, props).then(() => {
@@ -97,7 +97,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   handleJoin(pos, amount) {
-    console.log(pos, amount, this.props.signerAddr, pos);
     this.token.approve.sendTransaction(this.tableAddr, amount);
     this.table.join.sendTransaction(amount, this.props.signerAddr, pos, '');
   }
@@ -113,7 +112,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     switch (result.event) {
       case 'Join': {
         // update lineup when join successful
-        this.getLineup();
+        this.table.getLineup.call();
         break;
       }
 

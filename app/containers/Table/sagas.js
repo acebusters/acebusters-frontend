@@ -7,31 +7,17 @@ import { call, put, takeLatest, select, fork } from 'redux-saga/effects';
 import { delay } from 'redux-saga';
 import {
   nextHand,
+  setCards,
   updateReceived,
-  completeBet,
-  completeFold,
-  completeShow,
   completeHandQuery,
   HAND_REQUEST,
   PERFORM_DEALING_ACTION,
   START_POLLING,
-  SUBMIT_BET,
-  SUBMIT_FOLD,
-  SUBMIT_CHECK,
-  SUBMIT_SHOW,
-  PROCESS_NETTING,
-  LEAVE_REQUEST,
   UPDATE_RECEIVED,
 } from './actions';
 
-import { ABI_BET, ABI_FOLD, ABI_LEAVE, checkABIs, apiBasePath } from '../../app.config';
-import {
-  fetchTableState,
-  pay,
-  show,
-  leave,
-  netting,
-} from '../../services/table';
+import { apiBasePath } from '../../app.config';
+import TableService, { fetchTableState } from '../../services/tableService';
 
 const rc = new ReceiptCache();
 const pokerHelper = new PokerHelper(rc);
@@ -76,19 +62,17 @@ export function* dispatchDealingAction() {
 
   const tableAddr = state.get('table').get('tableAddr');
   const privKey = state.get('account').get('privKey');
-  yield put({ type: 'PERFORM_DEALING_ACTION', handId, amount, privKey, tableAddr });
+  yield put({ type: PERFORM_DEALING_ACTION, handId, amount, privKey, tableAddr });
 }
 
 function* performDealingAction(action) {
-  const handId = action.handId;
-  const amount = action.amount;
-  const privKey = action.privKey;
-  const tableAddr = action.tableAddr;
+  const table = new TableService(action.tableAddr, action.privKey);
   try {
-    const holeCards = yield call(() => pay(handId, amount, privKey, tableAddr, ABI_BET, 'bet').then((res) => res.json()));
-    yield put({ type: 'COMPLETE_BET', handId, amount, holeCards, privKey });
+    const holeCards = yield table.bet(action.handId, action.amount);
+    yield put(setCards(action.tableAddr, action.handId, holeCards));
   } catch (err) {
-    yield put({ type: 'FAILED_REQUEST', err });
+    // TODO: handle;
+    console.dir(err);
   }
 }
 
@@ -104,46 +88,11 @@ export function* poll(action) {
     const tableState = yield call(fetchTableState, action.tableAddr);
     yield put(updateReceived(action.tableAddr, tableState));
   } catch (err) {
-    yield put({ type: 'FAILED_REQUEST', err });
+    // TODO: handle;
+    console.dir(err);
   }
 }
 
-export function* submitBet(action) {
-  try {
-    const cards = yield call(pay, action.handId, action.amount, action.privKey, action.tableAddr, ABI_BET, 'bet');
-    yield put(completeBet(action.tableAddr, action.handId, cards));
-  } catch (err) {
-    yield put({ type: 'FAILED_REQUEST', err });
-  }
-}
-
-export function* submitFold(action) {
-  try {
-    const cards = yield call(pay, action.handId, action.amount, action.privKey, action.tableAddr, ABI_FOLD, 'fold');
-    yield put(completeFold(cards, action.privKey));
-  } catch (err) {
-    yield put({ type: 'FAILED_REQUEST', err });
-  }
-}
-
-export function* submitShow(action) {
-  try {
-    const distribution = yield call(show, action.handId, action.myMaxBet, action.cards, action.privKey, action.tableAddr);
-    yield put(completeShow(distribution));
-  } catch (err) {
-    yield put({ type: 'FAILED_REQUEST', err });
-  }
-}
-
-export function* submitCheck(action) {
-  const abi = checkABIs[action.state];
-  try {
-    const cards = yield call(pay, action.handId, action.myMaxBet, action.privKey, action.tableAddr, abi, abi[0].name);
-    yield put(completeBet(action.tableAddr, action.handId, cards));
-  } catch (err) {
-    yield put({ type: 'FAILED_REQUEST', err });
-  }
-}
 
 export function* submitSignedNetting(action) {
   try {
@@ -154,24 +103,18 @@ export function* submitSignedNetting(action) {
     const hash = EthUtil.sha3(payload);
     const sig = EthUtil.ecsign(hash, priv);
     payload = sig.r.toString('hex') + sig.s.toString('hex') + sig.v.toString(16);
-    yield put(netting(payload, action.tableAddr, action.handId));
+
+    const table = new TableService(action.tableAddr, action.privKey);
+    yield table.net(action.handId, payload);
   } catch (err) {
-    yield put({ type: 'FAILED_REQUEST', err });
+    // TODO: handle;
+    console.dir(err);
   }
 }
 
-export function* submitLeave(action) {
-  try {
-    const cards = yield call(leave, action.handId, action.amount, action.privKey, action.tableAddr, ABI_LEAVE, 'leave');
-    yield put(completeBet(action.tableAddr, action.handId, cards));
-  } catch (err) {
-    yield put({ type: 'FAILED_REQUEST', err });
-  }
-}
 
 export function* updateHandler(action) {
-  const state = yield select();
-  if (state.get('table').get('complete')) {
+  if (action.hand && action.hand.lineup) {
     const handComplete = pokerHelper.checkForNextHand(action.hand);
     if (handComplete) {
       yield put(nextHand(action.tableAddr, action.hand.handId + 1));
@@ -179,7 +122,8 @@ export function* updateHandler(action) {
     }
   }
 
-  if (state.get('table').get('hand') && state.get('table').get('hand').state === 'dealing') {
+  if (action.hand.state === 'dealing') {
+    console.log('perform dealing action');
     // yield call(dispatchDealingAction);
   }
 }
@@ -189,12 +133,6 @@ function* tableSaga() {
   yield takeLatest(HAND_REQUEST, getHand);
   yield takeLatest(PERFORM_DEALING_ACTION, performDealingAction);
   yield takeLatest(START_POLLING, poll);
-  yield takeLatest(SUBMIT_BET, submitBet);
-  yield takeLatest(SUBMIT_FOLD, submitFold);
-  yield takeLatest(SUBMIT_CHECK, submitCheck);
-  yield takeLatest(SUBMIT_SHOW, submitShow);
-  yield takeLatest(PROCESS_NETTING, submitSignedNetting);
-  yield takeLatest(LEAVE_REQUEST, submitLeave);
   yield takeLatest(UPDATE_RECEIVED, updateHandler);
 }
 

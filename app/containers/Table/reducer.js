@@ -82,19 +82,6 @@ export default function tableReducer(state = initialState, action) {
       }
       return newState.setIn([action.tableAddr, 'lastHandNettedOnClient'], action.hand.handId);
     }
-    case TableActions.COMPLETE_BET: {
-      return state.setIn([action.tableAddr, action.handId.toString(), 'holeCards'], List(action.holeCards));
-    }
-    case TableActions.COMPLETE_FOLD: {
-      return state;
-    }
-    case TableActions.COMPLETE_SHOW: {
-      return state.set('showed', true);
-    }
-
-    case TableActions.JOIN_TABLE: {
-      return state;
-    }
 
     case TableActions.UPDATE_RECEIVED: {
       const table = state.get(action.tableAddr);
