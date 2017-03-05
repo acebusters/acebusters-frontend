@@ -3,7 +3,7 @@ import QRCode from 'qrcode.react';
 import { FormattedMessage } from 'react-intl';
 import { createStructuredSelector } from 'reselect';
 
-import { makeAddressSelector, makeSelectAccountData } from '../AccountProvider/selectors';
+import { makeSelectAccountData } from '../AccountProvider/selectors';
 import messages from './messages';
 import { modalAdd } from '../App/actions';
 import web3Connect from '../AccountProvider/web3Connect';
@@ -103,7 +103,6 @@ Dashboard.propTypes = {
 };
 
 const mapStateToProps = createStructuredSelector({
-  address: makeAddressSelector(),
   account: makeSelectAccountData(),
 });
 

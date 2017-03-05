@@ -37,13 +37,8 @@ class JoinDialog extends React.Component { // eslint-disable-line react/prefer-s
   }
 
   handleSubmit(values) {
-    console.dir(values);
-    return values;
-
-  // join(pos, amount) {
-  //   this.token.approve.sendTransaction(this.tableAddr, amount);
-  //   this.table.join.sendTransaction(amount, this.props.myAddress, pos, '');
-  // }
+    const amount = parseInt(values.get('amount'), 10);
+    this.props.handleJoin(this.props.pos, amount);
   }
 
   render() {
@@ -66,6 +61,8 @@ class JoinDialog extends React.Component { // eslint-disable-line react/prefer-s
 JoinDialog.propTypes = {
   submitting: PropTypes.bool,
   handleSubmit: PropTypes.func,
+  handleJoin: PropTypes.func,
+  pos: PropTypes.any,
   error: PropTypes.any,
 };
 

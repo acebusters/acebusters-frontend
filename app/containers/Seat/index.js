@@ -21,7 +21,6 @@ import {
   makeLineupSelector,
 } from '../Table/selectors';
 
-import { makeAddressSelector } from '../AccountProvider/selectors';
 import SeatComponent from '../../components/Seat';
 
 class Seat extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -54,7 +53,6 @@ const mapStateToProps = createStructuredSelector({
   hand: makeHandSelector(),
   lineup: makeLineupSelector(),
   lastHandNettedOnClient: makeLastHandNettedSelector(),
-  myAddress: makeAddressSelector(),
   myPos: makeMyPosSelector(),
   whosTurn: makeWhosTurnSelector(),
   lastAmount: makeLastAmountSelector(),

@@ -10,7 +10,6 @@ import {
   submitFold,
   submitCheck,
   submitShow,
-  updateAmount,
   leaveRequest,
 } from '../Table/actions';
 
@@ -96,7 +95,8 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
           min="50000" // small blind amount
           step="50000" // small blind amount
           max={this.props.stackSize}
-          onChange={(e) => this.props.updateAmount(e)}
+          // TODO: use redux form here
+          // onChange={(e) => this.props.updateAmount(e)}
         />
         <div>{this.props.amount}</div>
       </ActionBarComponent>
@@ -117,7 +117,6 @@ export function mapDispatchToProps(dispatch) {
         dispatch(submitBet(handId, myMaxBet, privKey, tableAddr));
       }
     },
-    updateAmount: (e) => dispatch(updateAmount(e.target.value)),
   };
 }
 
@@ -145,7 +144,6 @@ ActionBar.propTypes = {
   fold: React.PropTypes.func,
   checkCall: React.PropTypes.func,
   show: React.PropTypes.func,
-  updateAmount: React.PropTypes.func,
   leave: React.PropTypes.func,
   stackSize: React.PropTypes.number,
 };

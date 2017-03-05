@@ -28,6 +28,7 @@ import {
 } from './actions';
 // selectors
 import {
+  makeSignerAddrSelector,
   makeSelectPrivKey,
   makeSelectProxyAddr,
 } from '../AccountProvider/selectors';
@@ -62,6 +63,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     super(props);
     this.watchTable = this.watchTable.bind(this);
     this.watchToken = this.watchToken.bind(this);
+    this.handleJoin = this.handleJoin.bind(this);
     this.tableAddr = props.params.tableAddr;
     this.web3 = props.web3Redux.web3;
     this.table = this.web3.eth.contract(ABI_TABLE).at(this.tableAddr);
@@ -92,6 +94,12 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     clearInterval(this.interval);
     this.tableEvents.stopWatching();
     this.tokenEvents.stopWatching();
+  }
+
+  handleJoin(pos, amount) {
+    console.log(pos, amount, this.props.signerAddr, pos);
+    this.token.approve.sendTransaction(this.tableAddr, amount);
+    this.table.join.sendTransaction(amount, this.props.signerAddr, pos, '');
   }
 
   watchTable(error, result) {
@@ -200,7 +208,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           onClick={() => {
             if (open) {
               this.props.modalAdd((
-                <JoinDialog pos={i} />
+                <JoinDialog pos={i} handleJoin={this.handleJoin} />
               ));
             }
             return null;
@@ -259,6 +267,7 @@ const mapStateToProps = createStructuredSelector({
   potSize: makePotSizeSelector(),
   myPos: makeMyPosSelector(),
   privKey: makeSelectPrivKey(),
+  signerAddr: makeSignerAddrSelector(),
   amountToCall: makeAmountToCallSelector(),
   proxyAddr: makeSelectProxyAddr(),
   netRequest: makeNetRequestSelector(),
@@ -270,6 +279,7 @@ Table.propTypes = {
   params: React.PropTypes.object,
   updateLastHand: React.PropTypes.func,
   privKey: React.PropTypes.string,
+  signerAddr: React.PropTypes.string,
   poll: React.PropTypes.func,
   web3Redux: React.PropTypes.any,
   data: React.PropTypes.any,

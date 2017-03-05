@@ -7,8 +7,7 @@ import Button from 'components/Button';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
-import { getBalance, getTables } from './actions';
-import { makeAddressSelector } from '../AccountProvider/selectors';
+import { getTables } from './actions';
 import { makeSelectLobby } from './selectors';
 
 
@@ -16,7 +15,6 @@ class LobbyComponent extends React.PureComponent {  // eslint-disable-line
 
   constructor(props) {
     super(props);
-    this.props.getBalance(this.props.myAddress);
     this.props.getTables();
   }
 
@@ -53,20 +51,16 @@ class LobbyComponent extends React.PureComponent {  // eslint-disable-line
 export function mapDispatchToProps(dispatch) {
   return {
     getTables: () => dispatch(getTables()),
-    getBalance: (myAddress) => dispatch(getBalance(myAddress)),
   };
 }
 
 const mapStateToProps = createStructuredSelector({
-  myAddress: makeAddressSelector(),
   lobby: makeSelectLobby(),
 });
 
 LobbyComponent.propTypes = {
-  myAddress: React.PropTypes.any,
   lobby: React.PropTypes.object,
   getTables: React.PropTypes.func,
-  getBalance: React.PropTypes.func,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(LobbyComponent);
