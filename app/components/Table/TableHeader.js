@@ -3,8 +3,8 @@
  */
 import styled from 'styled-components';
 
+//    margin-top: 10em;
 export const TableHeader = styled.div`
    position: relative;
-   margin-top: 10em;
-   text-align: center;
+   text-align: left;
 `;

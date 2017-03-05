@@ -100,7 +100,6 @@ export default function tableReducer(state = initialState, action) {
     case TableActions.ADD_TO_MODAL: {
       let newStack = state.get('modalStack');
       newStack = newStack.push(action.node);
-      console.log(newStack);
       return state
         .set('modalStack', newStack);
     }

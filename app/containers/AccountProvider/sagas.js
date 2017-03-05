@@ -1,6 +1,6 @@
 import Web3 from 'web3';
 import ethUtil from 'ethereumjs-util';
-import { takeLatest, select, put, fork, take, call, cancelled, takeEvery } from 'redux-saga/effects';
+import { takeLatest, select, actionChannel, put, fork, take, call, cancelled } from 'redux-saga/effects';
 import { eventChannel, END } from 'redux-saga';
 import fetch from 'isomorphic-fetch';
 
@@ -191,38 +191,41 @@ function sendTx(signer, nonceAndDest, data, r, s, v) {
   });
 }
 
-function* contractTransactionSendSaga(args) {
-  if (!args) return;
-  // get transaction data.
-  console.dir(args);
-  const { nonce, dest, data, privKey } = args.payload;
-  const dataHex = data.replace('0x', '');
-  const destHex = dest.replace('0x', '');
-  const privHex = privKey.replace('0x', '');
+function* contractTransactionSendSaga() {
+  const txChan = yield actionChannel(CONTRACT_TX_SEND);
+  while (true) { // eslint-disable-line no-constant-condition
+    const req = yield take(txChan);
+    const { dest, key, data, privKey } = req.payload;
+    const dataHex = data.replace('0x', '');
+    const destHex = dest.replace('0x', '');
+    const privHex = privKey.replace('0x', '');
 
-  // sign the receipt.
-  const payload = new Buffer(32 + (dataHex.length / 2));
-  payload.fill(0);
-  payload.writeUInt32BE(nonce, 8);
-  payload.write(destHex, 12, 20, 'hex');
-  payload.write(dataHex, 32, 'hex');
-  const priv = new Buffer(privHex, 'hex');
-  const signer = `0x${ethUtil.privateToAddress(priv).toString('hex')}`;
-  const hash = ethUtil.sha3(payload);
-  const sig = ethUtil.ecsign(hash, priv);
-  // send it.
-  try {
-    const value = yield sendTx(
-      signer,
-      `0x${payload.toString('hex', 0, 32)}`,
-      data,
-      `0x${sig.r.toString('hex')}`,
-      `0x${sig.s.toString('hex')}`,
-      sig.v);
-    yield put(contractTxSuccess({ address: dest, nonce, txHash: value.txHash, key: args.payload.key }));
-  } catch (err) {
-    const error = (err.message) ? err.message : err;
-    yield put(contractTxError({ address: dest, nonce, error }));
+    const state = yield select();
+    const nonce = state.get('account').get('lastNonce') + 1;
+    // sign the receipt.
+    const payload = new Buffer(32 + (dataHex.length / 2));
+    payload.fill(0);
+    payload.writeUInt32BE(nonce, 8);
+    payload.write(destHex, 12, 20, 'hex');
+    payload.write(dataHex, 32, 'hex');
+    const priv = new Buffer(privHex, 'hex');
+    const signer = `0x${ethUtil.privateToAddress(priv).toString('hex')}`;
+    const hash = ethUtil.sha3(payload);
+    const sig = ethUtil.ecsign(hash, priv);
+    // send it.
+    try {
+      const value = yield sendTx(
+        signer,
+        `0x${payload.toString('hex', 0, 32)}`,
+        data,
+        `0x${sig.r.toString('hex')}`,
+        `0x${sig.s.toString('hex')}`,
+        sig.v);
+      yield put(contractTxSuccess({ address: dest, nonce, txHash: value.txHash, key }));
+    } catch (err) {
+      const error = (err.message) ? err.message : err;
+      yield put(contractTxError({ address: dest, nonce, error }));
+    }
   }
 }
 
@@ -246,7 +249,6 @@ export function* ethEventListenerSaga(contract) {
   const chan = yield call(ethEvent, contract);
   try {
     const event = yield take(chan);
-    console.dir(event);
     yield put(contractEvent({ event }));
   } finally {
     if (yield cancelled()) {
@@ -262,7 +264,6 @@ export function* accountSaga() {
   yield fork(accountLoginSaga);
   yield fork(contractMethodCallSaga);
   yield fork(contractTransactionSendSaga);
-  yield takeEvery(CONTRACT_TX_SEND, contractTransactionSendSaga);
 }
 
 export default [

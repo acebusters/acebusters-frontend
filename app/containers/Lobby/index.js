@@ -22,7 +22,7 @@ class LobbyComponent extends React.PureComponent {  // eslint-disable-line
 
 
   showTable(table) {
-    browserHistory.push(`/table/${table}`);
+    browserHistory.push(`/table/${table}/hand/0`);
   }
 
   render() {

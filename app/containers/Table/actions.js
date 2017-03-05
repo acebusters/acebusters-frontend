@@ -2,8 +2,6 @@
  * Created by helge on 20.09.16.
  */
 
-import { createFormAction } from '../../services/reduxFormSaga';
-
 export const START_POLLING = 'START_POLLING';
 export const COMPLETE_HAND_QUERY = 'COMPLETE_HAND_QUERY';
 export const HAND_REQUEST = 'HAND_REQUEST';
@@ -70,12 +68,6 @@ export function leaveRequest(tableAddr, handId, amount, privKey) {
 
 export function dissmissFromModal() {
   return { type: DISMISS_FROM_MODAL };
-}
-
-export const join = createFormAction(JOIN_TABLE);
-
-export function joinApproved(payload) {
-  return { type: JOIN_APPROVED, payload };
 }
 
 export function updateAmount(tableAddr, amount) {

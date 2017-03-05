@@ -25,7 +25,6 @@ const isLoggedIn = () => {
 const initialState = fromJS({
   privKey: storageService.getItem('privKey'),
   email: storageService.getItem('email'),
-  lastNonce: 0,
   loggedIn: isLoggedIn(),
 });
 
@@ -50,10 +49,14 @@ function accountProviderReducer(state = initialState, action) {
     case CONTRACT_METHOD_ERROR:
       return state;
     case CONTRACT_TX_SEND:
-      newState = state.setIn([action.payload.dest, 'pending', action.payload.nonce, 'call'], action.payload.key);
-      return newState.set('lastNonce', action.payload.nonce);
+      return state.setIn([action.payload.dest, 'pending', action.payload.nonce, 'call'], action.payload.key);
+
     case CONTRACT_TX_SUCCESS:
-      return state.setIn([action.address, 'pending', action.nonce, 'txHash'], action.txHash);
+      // the nonce is only increased after the call was successfull.
+      // in the account saga we use a channel, so no 2 requests are submitted
+      // at the same time and no nonce can be reused by accident.
+      return state.set('lastNonce', action.nonce)
+        .setIn([action.address, 'pending', action.nonce, 'txHash'], action.txHash);
     case CONTRACT_TX_ERROR:
       return state.setIn([action.address, 'pending', action.nonce, 'error'], action.error);
     case CONTRACT_EVENT:

@@ -36,6 +36,7 @@ import {
 } from '../AccountProvider/selectors';
 
 import {
+  makeTableDataSelector,
   makeIsMyTurnSelector,
   makePotSizeSelector,
   makeAmountToCallSelector,
@@ -49,7 +50,7 @@ import {
 import TableComponent from '../../components/Table';
 import web3Connect from '../AccountProvider/web3Connect';
 
-const getTableData = function (table, props) {
+const getTableData = (table, props) => {
   const lineup = table.getLineup.callPromise();
   const sb = table.smallBlind.callPromise();
   return Promise.all([lineup, sb]).then((rsp) => {
@@ -201,9 +202,8 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   join(pos, amount) {
-    // this.props.joinRequest(this.token, this.table, this.tableAddr, amount);
     this.token.approve.sendTransaction(this.tableAddr, amount);
-    // this.table.join.sendTransaction(amount, this.props.myAddress, pos, '');
+    this.table.join.sendTransaction(amount, this.props.myAddress, pos, '');
   }
 
   renderSeats() {
@@ -252,7 +252,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     const modalContent = this.props.modalStack[this.props.modalStack.length - 1];
     const seats = this.renderSeats();
     const board = this.renderBoard();
-    const sb = (this.table.smallBlind()) ? this.table.smallBlind().toNumber() : 0;
+    const sb = (this.props.data.get('smallBlind')) ? this.props.data.get('smallBlind').toNumber() : 0;
     return (
       <div>
         { this.props.hand && <TableComponent {...this.props} sb={sb} board={board} seats={seats}></TableComponent> }
@@ -276,13 +276,13 @@ export function mapDispatchToProps() {
     lineupReceived: (tableAddr, lineup, smallBlind) => (lineupReceived(tableAddr, lineup, smallBlind)),
     addToModal: (node) => (addToModal(node)),
     dismissFromModal: () => (dissmissFromModal()),
-    // joinRequest: (tokenContract, tableContract) => (joinRequest()),
     processNetting: (netRequest, handId, privKey, tableAddr) => (processNetting(netRequest, handId, privKey, tableAddr)),
   };
 }
 
 const mapStateToProps = createStructuredSelector({
   hand: makeHandSelector(),
+  data: makeTableDataSelector(),
   myAddress: makeAddressSelector(),
   lineup: makeLineupSelector(),
   isMyTurn: makeIsMyTurnSelector(),
@@ -301,8 +301,10 @@ Table.propTypes = {
   params: React.PropTypes.object,
   updateLastHand: React.PropTypes.func,
   privKey: React.PropTypes.string,
+  myAddress: React.PropTypes.string,
   poll: React.PropTypes.func,
   web3Redux: React.PropTypes.any,
+  data: React.PropTypes.any,
   modalStack: React.PropTypes.array,
   addToModal: React.PropTypes.func,
   dismissFromModal: React.PropTypes.func,

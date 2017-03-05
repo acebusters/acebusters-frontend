@@ -18,7 +18,6 @@ function SeatComponent(props) {
       </SeatWrapper>
       );
   } else {
-    console.dir(props.lineup);
     seat = (
       <SeatWrapper {...props}>
         <ImageContainer {...props}>

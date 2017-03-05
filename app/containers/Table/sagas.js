@@ -6,14 +6,12 @@ import { PokerHelper, ReceiptCache } from 'poker-helper';
 import { call, put, takeLatest, select, fork } from 'redux-saga/effects';
 import { delay } from 'redux-saga';
 import {
-  join,
   nextHand,
   updateReceived,
   completeBet,
   completeFold,
   completeShow,
   completeHandQuery,
-  JOIN_APPROVED,
   HAND_REQUEST,
   PERFORM_DEALING_ACTION,
   START_POLLING,
@@ -26,7 +24,6 @@ import {
   UPDATE_RECEIVED,
 } from './actions';
 
-import { CONTRACT_TX_SUCCESS } from '../AccountProvider/actions';
 import { ABI_BET, ABI_FOLD, ABI_LEAVE, checkABIs, apiBasePath } from '../../app.config';
 import {
   fetchTableState,
@@ -187,19 +184,6 @@ export function* updateHandler(action) {
   }
 }
 
-export function* handleJoin(action) {
-  if (action.key.indexOf('approve') > -1) {
-    yield put({ type: JOIN_APPROVED, payload: 'Join Request Successful' });
-  } else {
-    yield put({ type: join.FAILURE, payload: 'Join Request failed' });
-  }
-}
-
-export function* joinTable(action) {
-  // do transaction on table contract here
-  console.dir(action);
-}
-
 
 function* tableSaga() {
   yield takeLatest(HAND_REQUEST, getHand);
@@ -212,8 +196,6 @@ function* tableSaga() {
   yield takeLatest(PROCESS_NETTING, submitSignedNetting);
   yield takeLatest(LEAVE_REQUEST, submitLeave);
   yield takeLatest(UPDATE_RECEIVED, updateHandler);
-  yield takeLatest(CONTRACT_TX_SUCCESS, handleJoin);
-  yield takeLatest(JOIN_APPROVED, joinTable);
 }
 
 export default [
