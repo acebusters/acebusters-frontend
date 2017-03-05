@@ -1,8 +1,5 @@
 import {
   TRANSFER_TOGGLE,
-} from '../constants';
-
-import {
   transferToggle,
 } from '../actions';
 

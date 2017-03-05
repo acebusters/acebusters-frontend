@@ -10,8 +10,6 @@ const tableStateSelector = (state, props) => (state && props) ? state.getIn(['ta
 
 const handSelector = (state, props) => (state && props) ? state.getIn(['table', props.params.tableAddr, props.params.handId.toString()]) : null;
 
-const viewStateSelector = (state) => (state) ? state.get('table') : null;
-
 // other selectors
 const makeHandSelector = () => createSelector(
   handSelector,
@@ -85,11 +83,6 @@ const makePotSizeSelector = () => createSelector(
   (lineup) => (lineup && lineup.toJS) ? pokerHelper.calculatePotsize(lineup.toJS()) : 0
 );
 
-const makeModalStackSelector = () => createSelector(
-  viewStateSelector,
-  (viewState) => (viewState && viewState.get('modalStack')) ? viewState.get('modalStack').toJS() : []
-);
-
 const makeNetRequestSelector = () => createSelector(
   tableStateSelector,
   (tableState) => (tableState && tableState.get) ? tableState.get('netting') : null
@@ -109,7 +102,6 @@ export {
     makeHandSelector,
     makeMaxBetSelector,
     makeMyMaxBetSelector,
-    makeModalStackSelector,
     makeNetRequestSelector,
 };
 

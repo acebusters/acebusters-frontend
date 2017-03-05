@@ -5,8 +5,6 @@
 import React from 'react';
 import { createStructuredSelector } from 'reselect';
 // components and styles
-import { ModalContainer, ModalDialog } from 'react-modal-dialog';
-import Button from 'components/Button';
 import Card from 'components/Card'; // eslint-disable-line
 import Label from 'components/Label'; // eslint-disable-line
 import Input from 'components/Input'; // eslint-disable-line
@@ -19,18 +17,17 @@ import {
   ABI_TOKEN_CONTRACT,
   tokenContractAddress,
 } from '../../app.config';
+
+import { modalAdd } from '../App/actions';
 // actions
 import {
   poll,
   lineupReceived,
-  addToModal,
-  dissmissFromModal,
   processNetting,
   handRequest,
 } from './actions';
 // selectors
 import {
-  makeAddressSelector,
   makeSelectPrivKey,
   makeSelectProxyAddr,
 } from '../AccountProvider/selectors';
@@ -43,11 +40,11 @@ import {
   makeHandSelector,
   makeLineupSelector,
   makeMyPosSelector,
-  makeModalStackSelector,
   makeNetRequestSelector,
 } from './selectors';
 
 import TableComponent from '../../components/Table';
+import JoinDialog from '..//JoinDialog';
 import web3Connect from '../AccountProvider/web3Connect';
 
 const getTableData = (table, props) => {
@@ -58,7 +55,6 @@ const getTableData = (table, props) => {
     return Promise.resolve();
   });
 };
-
 
 export class Table extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -101,7 +97,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   watchTable(error, result) {
     if (error) {
       const errorElement = (<p>{error}/</p>);
-      this.props.addToModal(errorElement);
+      this.props.modalAdd(errorElement);
       return;
     }
 
@@ -143,10 +139,9 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
         const errorElement = (
           <div>
             <h2>{msg}</h2>
-            <Button onClick={() => this.props.dismissFromModal()}>Cancel</Button>
           </div>);
 
-        this.props.addToModal(errorElement);
+        this.props.modalAdd(errorElement);
         break;
       }
 
@@ -159,7 +154,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   watchToken(error, result) {
     if (error) {
       const errorElement = (<p>{errorElement}/</p>);
-      this.props.addToModal(errorElement);
+      this.props.modalAdd(errorElement);
       return;
     }
 
@@ -184,28 +179,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     }
   }
 
-  updateAmount(e) {
-    this.setState({ joinAmount: parseInt(e.target.value, 0) });
-  }
-
-  openJoinDialog(pos, open) {
-    if (!open) return;
-    const content = (
-      <div>
-        <Label>Please Select Amount to Join</Label>
-        <Input placeholder="amount" type="number" onChange={(e) => this.updateAmount(e)} />
-        <Button onClick={() => this.join(pos, this.state.joinAmount)}>Join</Button>
-        <Button onClick={() => this.props.dismissFromModal()}>Cancel</Button>
-      </div>
-    );
-    this.props.addToModal(content);
-  }
-
-  join(pos, amount) {
-    this.token.approve.sendTransaction(this.tableAddr, amount);
-    this.table.join.sendTransaction(amount, this.props.myAddress, pos, '');
-  }
-
   renderSeats() {
     const seats = [];
     const lineup = (this.props.lineup) ? this.props.lineup.toJS() : null;
@@ -224,7 +197,14 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           coords={coordArray[i]}
           amountCoords={amountCoords[i]}
           open={open}
-          onClick={() => this.openJoinDialog(i, open)}
+          onClick={() => {
+            if (open) {
+              this.props.modalAdd((
+                <JoinDialog pos={i} />
+              ));
+            }
+            return null;
+          }}
         >
         </Seat>);
       seats.push(seat);
@@ -249,20 +229,12 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
   render() {
     // Get last Modal Element
-    const modalContent = this.props.modalStack[this.props.modalStack.length - 1];
     const seats = this.renderSeats();
     const board = this.renderBoard();
     const sb = (this.props.data && this.props.data.get('smallBlind')) ? this.props.data.get('smallBlind') : 0;
     return (
       <div>
         { this.props.hand && <TableComponent {...this.props} sb={sb} board={board} seats={seats}></TableComponent> }
-        { modalContent &&
-          <ModalContainer>
-            <ModalDialog>
-              { modalContent }
-            </ModalDialog>
-          </ModalContainer>
-        }
       </div>
     );
   }
@@ -274,8 +246,7 @@ export function mapDispatchToProps() {
     updateLastHand: (tableAddr, handId) => (handRequest(tableAddr, handId)),
     poll: (tableAddr) => (poll(tableAddr)),
     lineupReceived: (tableAddr, lineup, smallBlind) => (lineupReceived(tableAddr, lineup, smallBlind)),
-    addToModal: (node) => (addToModal(node)),
-    dismissFromModal: () => (dissmissFromModal()),
+    modalAdd: (node) => (modalAdd(node)),
     processNetting: (netRequest, handId, privKey, tableAddr) => (processNetting(netRequest, handId, privKey, tableAddr)),
   };
 }
@@ -283,7 +254,6 @@ export function mapDispatchToProps() {
 const mapStateToProps = createStructuredSelector({
   hand: makeHandSelector(),
   data: makeTableDataSelector(),
-  myAddress: makeAddressSelector(),
   lineup: makeLineupSelector(),
   isMyTurn: makeIsMyTurnSelector(),
   potSize: makePotSizeSelector(),
@@ -291,7 +261,6 @@ const mapStateToProps = createStructuredSelector({
   privKey: makeSelectPrivKey(),
   amountToCall: makeAmountToCallSelector(),
   proxyAddr: makeSelectProxyAddr(),
-  modalStack: makeModalStackSelector(),
   netRequest: makeNetRequestSelector(),
 });
 
@@ -301,13 +270,10 @@ Table.propTypes = {
   params: React.PropTypes.object,
   updateLastHand: React.PropTypes.func,
   privKey: React.PropTypes.string,
-  myAddress: React.PropTypes.string,
   poll: React.PropTypes.func,
   web3Redux: React.PropTypes.any,
   data: React.PropTypes.any,
-  modalStack: React.PropTypes.array,
-  addToModal: React.PropTypes.func,
-  dismissFromModal: React.PropTypes.func,
+  modalAdd: React.PropTypes.func,
   processNetting: React.PropTypes.func,
   netRequest: React.PropTypes.func,
 };

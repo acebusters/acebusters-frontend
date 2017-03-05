@@ -29,7 +29,6 @@ const pokerHelper = new PokerHelper(rc);
   //   }
   //   [handId+1]: {}
   // },
-  // modalStack: [],
   //
   // TODO: write selector for stack size
   //
@@ -37,7 +36,7 @@ const pokerHelper = new PokerHelper(rc);
   //
 
 // The initial application state
-export const initialState = fromJS({ modalStack: [] });
+export const initialState = fromJS({});
 
 export default function tableReducer(state = initialState, action) {
   switch (action.type) {
@@ -57,10 +56,6 @@ export default function tableReducer(state = initialState, action) {
 
     case TableActions.SET_CARDS: {
       return state.setIn([action.tableAddr, action.handId, 'holeCards'], action.cards);
-    }
-
-    case TableActions.UPDATE_AMOUNT: {
-      return state.set('amount', action.amount);
     }
 
     case TableActions.COMPLETE_HAND_QUERY: {
@@ -95,20 +90,6 @@ export default function tableReducer(state = initialState, action) {
     }
     case TableActions.COMPLETE_SHOW: {
       return state.set('showed', true);
-    }
-
-    case TableActions.ADD_TO_MODAL: {
-      let newStack = state.get('modalStack');
-      newStack = newStack.push(action.node);
-      return state
-        .set('modalStack', newStack);
-    }
-
-    case TableActions.DISMISS_FROM_MODAL: {
-      let newStack = state.get('modalStack');
-      newStack = newStack.pop();
-      return state
-        .set('modalStack', newStack);
     }
 
     case TableActions.JOIN_TABLE: {

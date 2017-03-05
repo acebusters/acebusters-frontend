@@ -5,12 +5,13 @@ import { createStructuredSelector } from 'reselect';
 
 import { makeAddressSelector, makeSelectAccountData } from '../AccountProvider/selectors';
 import messages from './messages';
-import { transferToggle } from '../App/actions';
+import { modalAdd } from '../App/actions';
 import web3Connect from '../AccountProvider/web3Connect';
 import { ABI_TOKEN_CONTRACT, tokenContractAddress } from '../../app.config';
 
 import List from '../../components/List';
 import Label from '../../components/Label';
+import TransferDialog from '../TransferDialog';
 import Container from '../../components/Container';
 import Button from '../../components/Button';
 import Form from '../../components/Form';
@@ -59,7 +60,13 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
         <Form>
           <Form>
             <Button onClick={this.handleGetBalance} size="small">Refresh Balance</Button>
-            <Button onClick={this.props.transferToggle} size="small">Transfer</Button>
+            <Button
+              onClick={() => {
+                this.props.modalAdd((
+                  <TransferDialog />
+              ));
+              }} size="small"
+            >Transfer</Button>
           </Form>
         </Form>
         <hr />
@@ -90,7 +97,7 @@ const txnsToList = (txns) => {
 };
 
 Dashboard.propTypes = {
-  transferToggle: PropTypes.func,
+  modalAdd: PropTypes.func,
   web3Redux: PropTypes.any,
   account: PropTypes.any,
 };
@@ -101,9 +108,9 @@ const mapStateToProps = createStructuredSelector({
 });
 
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps() {
   return {
-    transferToggle: () => dispatch(transferToggle()),
+    modalAdd: (node) => (modalAdd(node)),
   };
 }
 

@@ -1,24 +1,34 @@
 import { fromJS } from 'immutable';
 
 import {
-  TRANSFER_TOGGLE,
+  MODAL_ADD,
+  MODAL_DISMISS,
   SIDEBAR_TOGGLE,
-} from './constants';
+} from './actions';
 
 // The initial state of the App
 const initialState = fromJS({
   sidebarCollapse: true,
-  transferShow: false,
+  modalStack: [],
 });
 
 function appReducer(state = initialState, action) {
   switch (action.type) {
-    case TRANSFER_TOGGLE:
-      return state
-        .set('transferShow', !state.get('transferShow'));
     case SIDEBAR_TOGGLE:
       return state
         .set('sidebarCollapse', !state.get('sidebarCollapse'));
+    case MODAL_ADD: {
+      let newStack = state.get('modalStack');
+      newStack = newStack.push(action.node);
+      return state
+        .set('modalStack', newStack);
+    }
+    case MODAL_DISMISS: {
+      let newStack = state.get('modalStack');
+      newStack = newStack.pop();
+      return state
+        .set('modalStack', newStack);
+    }
     default:
       return state;
   }

@@ -10,10 +10,13 @@ import Content from 'components/Content';
 import Sidebar from 'components/Sidebar';
 import withProgressBar from 'components/ProgressBar';
 import makeSelectAccountData, { makeSelectGravatar } from '../AccountProvider/selectors';
-import TransferDialog from '../TransferDialog';
-import { makeSelectSidebarCollapse, makeSelectTransferShow } from './selectors';
+import {
+  makeSelectSidebarCollapse,
+  makeSelectTransferShow,
+  makeModalStackSelector,
+} from './selectors';
 import { setAuthState } from '../AccountProvider/actions';
-import { sidebarToggle, transferToggle } from './actions';
+import { sidebarToggle, modalDismiss } from './actions';
 import theme from '../../skin-blue';
 
 import {
@@ -84,6 +87,7 @@ const sb = (props) => ([
 ]);
 
 export function App(props) {
+  const modalContent = props.modalStack[props.modalStack.length - 1];
   return (
     <div>
       <StyledDashboard>
@@ -116,10 +120,10 @@ export function App(props) {
         </ThemeProvider>
       </StyledDashboard>
 
-      { props.isModalOpen &&
-        <ModalContainer onClose={props.transferToggle}>
-          <ModalDialog onClose={props.transferToggle}>
-            <TransferDialog />
+      { modalContent &&
+        <ModalContainer onClose={props.modalDismiss}>
+          <ModalDialog onClose={props.modalDismiss}>
+            { modalContent }
           </ModalDialog>
         </ModalContainer>
       }
@@ -139,12 +143,12 @@ App.propTypes = {
   account: React.PropTypes.object,
   handleClickLogout: React.PropTypes.func,
   sidebarToggle: React.PropTypes.func,
-  transferToggle: React.PropTypes.func,
+  modalDismiss: React.PropTypes.func,
   fixed: React.PropTypes.bool,
   gravatarUrl: React.PropTypes.string,
   sidebarCollapse: React.PropTypes.bool,
   sidebarMini: React.PropTypes.bool,
-  isModalOpen: React.PropTypes.bool,
+  modalStack: React.PropTypes.array,
 };
 
 function mapDispatchToProps(dispatch) {
@@ -153,7 +157,7 @@ function mapDispatchToProps(dispatch) {
     handleClickDashboard: () => browserHistory.push('/dashboard'),
     handleClickLobby: () => browserHistory.push('/lobby'),
     sidebarToggle: () => dispatch(sidebarToggle()),
-    transferToggle: () => dispatch(transferToggle()),
+    modalDismiss: () => dispatch(modalDismiss()),
   };
 }
 
@@ -163,6 +167,7 @@ const mapStateToProps = createStructuredSelector({
   sidebarCollapse: makeSelectSidebarCollapse(),
   isModalOpen: makeSelectTransferShow(),
   gravatarUrl: makeSelectGravatar(),
+  modalStack: makeModalStackSelector(),
 });
 
 // Wrap the component to inject dispatch and state into it

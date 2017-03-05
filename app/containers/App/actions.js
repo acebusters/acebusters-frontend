@@ -1,13 +1,16 @@
-import {
-  TRANSFER_TOGGLE,
-  SIDEBAR_TOGGLE,
-} from './constants';
-
-
-export function transferToggle() {
-  return { type: TRANSFER_TOGGLE };
-}
+export const SIDEBAR_TOGGLE = 'boilerplate/App/SIDEBAR_TOGGLE';
+export const DEFAULT_LOCALE = 'en';
+export const MODAL_ADD = 'acebusters/App/MODAL_ADD';
+export const MODAL_DISMISS = 'acebusters/App/MODAL_DISMISS';
 
 export function sidebarToggle() {
   return { type: SIDEBAR_TOGGLE };
+}
+
+export function modalAdd(node) {
+  return { type: MODAL_ADD, node };
+}
+
+export function modalDismiss() {
+  return { type: MODAL_DISMISS };
 }

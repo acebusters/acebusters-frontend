@@ -9,14 +9,11 @@ export const NEXT_HAND = 'NEXT_HAND';
 export const SET_CARDS = 'SET_CARDS';
 export const UPDATE_RECEIVED = 'UPDATE_RECEIVED';
 export const LINEUP_RECEIVED = 'LINEUP_RECEIVED';
-export const ADD_TO_MODAL = 'ADD_TO_MODAL';
-export const DISMISS_FROM_MODAL = 'DISMISS_FROM_MODAL';
 export const PROCESS_NETTING = 'PROCESS_NETTING';
 export const LEAVE_REQUEST = 'LEAVE_REQUEST';
 export const JOIN_TABLE = 'JOIN_TABLE';
 export const JOIN_APPROVED = 'JOIN_APPROVED';
 export const PERFORM_DEALING_ACTION = 'PERFORM_DEALING_ACTION';
-export const UPDATE_AMOUNT = 'UPDATE_AMOUNT';
 export const SUBMIT_BET = 'SUBMIT_BET';
 export const SUBMIT_FOLD = 'SUBMIT_FOLD';
 export const SUBMIT_SHOW = 'SUBMIT_SHOW';
@@ -54,24 +51,12 @@ export function nextHand(tableAddr, handId) {
   return { type: NEXT_HAND, tableAddr, handId };
 }
 
-export function addToModal(node) {
-  return { type: ADD_TO_MODAL, node };
-}
-
 export function processNetting(tableAddr, netRequest, handId, privKey) {
   return { type: PROCESS_NETTING, tableAddr, netRequest, handId, privKey };
 }
 
 export function leaveRequest(tableAddr, handId, amount, privKey) {
   return { type: LEAVE_REQUEST, tableAddr, handId, amount, privKey };
-}
-
-export function dissmissFromModal() {
-  return { type: DISMISS_FROM_MODAL };
-}
-
-export function updateAmount(tableAddr, amount) {
-  return { type: UPDATE_AMOUNT, tableAddr, amount };
 }
 
 export function submitBet(tableAddr, handId, amount, privKey) {
