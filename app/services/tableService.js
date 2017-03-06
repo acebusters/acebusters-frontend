@@ -64,9 +64,9 @@ TableService.prototype.pay = function (receipt) {
   });
 };
 
-TableService.prototype.leave = function (handId, amount) {
+TableService.prototype.leave = function (handId) {
   return new Promise((resolve, reject) => {
-    const receipt = new EWT(ABI_LEAVE).leave(handId, amount).sign(this.privKey);
+    const receipt = new EWT(ABI_LEAVE).leave(handId, 0).sign(this.privKey);
     const header = new Headers({ Authorization: receipt });
     const myInit = { headers: header, method: 'POST' };
     const request = new Request(`${this.apiBasePath}/table/${this.tableAddr}/leave`, myInit);
