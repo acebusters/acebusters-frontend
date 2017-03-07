@@ -23,6 +23,7 @@ import {
   lineupReceived,
   processNetting,
   handRequest,
+  resizeTable,
 } from './actions';
 // selectors
 import {
@@ -40,6 +41,7 @@ import {
   makeLineupSelector,
   makeMyPosSelector,
   makeNetRequestSelector,
+  makeComputedSelector,
 } from './selectors';
 
 import TableComponent from '../../components/Table';
@@ -62,11 +64,14 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.watchTable = this.watchTable.bind(this);
     this.watchToken = this.watchToken.bind(this);
     this.handleJoin = this.handleJoin.bind(this);
+    this.handleResize = this.handleResize.bind(this);
     this.tableAddr = props.params.tableAddr;
     this.web3 = props.web3Redux.web3;
     this.table = this.web3.eth.contract(ABI_TABLE).at(this.tableAddr);
     this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(tokenContractAddress);
 
+    // set initial size && resizing table
+    window.onresize = this.handleResize;
     // register event listener for table
     this.tableEvents = this.table.allEvents({ fromBlock: 'latest' });
     // this.tableEvents.watch(this.watchTable);
@@ -82,6 +87,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     });
   }
 
+  componentWillMount() {
+    this.handleResize();
+  }
+
   componentWillReceiveProps(nextProps) {
     if (this.props.hand && nextProps.lastHandNettedOnClient < this.props.hand.handId - 1) {
       this.props.updateLastHand(this.tableAddr, nextProps.lastHandNettedOnClient + 1);
@@ -94,9 +103,49 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.tokenEvents.stopWatching();
   }
 
+  computeStyles = (windowWidth, windowHeight, infoHeight, actionBarHeight) => {
+    const computed = {};
+    computed.d = windowWidth;
+    computed.b = infoHeight;
+    computed.h = 1.6;
+    computed.a = 0.96;
+    computed.e = 100;
+    computed.f = computed.d - computed.b - computed.e;
+    computed.l = computed.f;
+    computed.g = windowHeight;
+    computed.z = actionBarHeight;
+    computed.y = computed.g - computed.z;
+    computed.computeSize = () => {
+      let k;
+      let c;
+      const obj = {};
+      if (computed.y < computed.l / computed.h) {
+        k = computed.y * computed.a;
+        c = k * computed.h;
+      } else {
+        c = computed.l * computed.a;
+        k = (c / computed.h);
+      }
+      obj.width = c;
+      obj.height = k;
+      return obj;
+    };
+    return computed;
+  };
+
   handleJoin(pos, amount) {
     this.token.approve.sendTransaction(this.tableAddr, amount);
     this.table.join.sendTransaction(amount, this.props.signerAddr, pos, '');
+  }
+
+  handleResize() {
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    const infoHeight = (document.getElementById('table-info')) ? document.getElementById('table-info').clientWidth : 0;
+    const actionBarHeight = (document.getElementById('action-bar')) ? document.getElementById('action-bar').clientHeight : 0;
+    if (this.props) {
+      this.props.resizeTable(this.computeStyles(windowWidth, windowHeight, infoHeight, actionBarHeight));
+    }
   }
 
   watchTable(error, result) {
@@ -239,7 +288,15 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     const sb = (this.props.data && this.props.data.get('smallBlind')) ? this.props.data.get('smallBlind') : 0;
     return (
       <div>
-        { this.props.hand && <TableComponent {...this.props} sb={sb} board={board} seats={seats}></TableComponent> }
+        { this.props.hand &&
+        <TableComponent
+          {...this.props}
+          sb={sb} board={board}
+          seats={seats}
+          computedStyles={this.props.computedStyles}
+        >
+        </TableComponent
+        > }
       </div>
     );
   }
@@ -253,6 +310,7 @@ export function mapDispatchToProps() {
     lineupReceived: (tableAddr, lineup, smallBlind) => (lineupReceived(tableAddr, lineup, smallBlind)),
     modalAdd: (node) => (modalAdd(node)),
     processNetting: (netRequest, handId, privKey, tableAddr) => (processNetting(netRequest, handId, privKey, tableAddr)),
+    resizeTable: (computed) => (resizeTable(computed)),
   };
 }
 
@@ -268,6 +326,7 @@ const mapStateToProps = createStructuredSelector({
   amountToCall: makeAmountToCallSelector(),
   proxyAddr: makeSelectProxyAddr(),
   netRequest: makeNetRequestSelector(),
+  computedStyles: makeComputedSelector(),
 });
 
 Table.propTypes = {
@@ -280,9 +339,11 @@ Table.propTypes = {
   poll: React.PropTypes.func,
   web3Redux: React.PropTypes.any,
   data: React.PropTypes.any,
+  computedStyles: React.PropTypes.object,
   modalAdd: React.PropTypes.func,
   processNetting: React.PropTypes.func,
   netRequest: React.PropTypes.func,
+  resizeTable: React.PropTypes.func,
 };
 
 

@@ -7,12 +7,12 @@ export const COMPLETE_HAND_QUERY = 'COMPLETE_HAND_QUERY';
 export const HAND_REQUEST = 'HAND_REQUEST';
 export const NEXT_HAND = 'NEXT_HAND';
 export const SET_CARDS = 'SET_CARDS';
+export const RESIZE_TABLE = 'RESIZE_TABLE';
 export const UPDATE_RECEIVED = 'UPDATE_RECEIVED';
 export const LINEUP_RECEIVED = 'LINEUP_RECEIVED';
 export const PROCESS_NETTING = 'PROCESS_NETTING';
 export const LEAVE_REQUEST = 'LEAVE_REQUEST';
 export const JOIN_TABLE = 'JOIN_TABLE';
-export const JOIN_APPROVED = 'JOIN_APPROVED';
 export const PERFORM_DEALING_ACTION = 'PERFORM_DEALING_ACTION';
 
 export function completeHandQuery(tableAddr, hand) {
@@ -31,6 +31,9 @@ export function poll(tableAddr) {
   return { type: START_POLLING, tableAddr };
 }
 
+export function resizeTable(computedStyles) {
+  return { type: RESIZE_TABLE, computedStyles };
+}
 
 export function updateReceived(tableAddr, hand) {
   return { type: UPDATE_RECEIVED, tableAddr, hand };
