@@ -14,7 +14,7 @@ import Label from '../../components/Label';
 import TransferDialog from '../TransferDialog';
 import Container from '../../components/Container';
 import Button from '../../components/Button';
-import Form from '../../components/Form';
+import FormGroup from '../../components/Form/FormGroup';
 
 export class Dashboard extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
@@ -50,25 +50,23 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
       <Container>
         <h1><FormattedMessage {...messages.header} /></h1>
         <Label>Last Block {this.web3.eth.blockNumber()}</Label>
-        <Form>
+        <FormGroup>
           <Button size="small" onClick={this.handleGetBlockNumber}>Get Block #</Button>
-        </Form>
+        </FormGroup>
         <h3> Your address:</h3>
         <p> { this.props.account.proxy } </p>
         <QRCode value={qrUrl} size={120} />
         <p>Balance: {balance}</p>
-        <Form>
-          <Form>
-            <Button onClick={this.handleGetBalance} size="small">Refresh Balance</Button>
-            <Button
-              onClick={() => {
-                this.props.modalAdd((
-                  <TransferDialog />
-              ));
-              }} size="small"
-            >Transfer</Button>
-          </Form>
-        </Form>
+        <FormGroup>
+          <Button onClick={this.handleGetBalance} size="small">Refresh Balance</Button>
+          <Button
+            onClick={() => {
+              this.props.modalAdd((
+                <TransferDialog />
+            ));
+            }} size="small"
+          >Transfer</Button>
+        </FormGroup>
         <hr />
         <h2><FormattedMessage {...messages.pending} /></h2>
         <List items={listPending} headers={['#', 'data', 'txHash']} />

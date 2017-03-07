@@ -8,6 +8,7 @@ export function sidebarToggle() {
 }
 
 export function modalAdd(node) {
+  console.dir(node);
   return { type: MODAL_ADD, node };
 }
 

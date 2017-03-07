@@ -2,10 +2,17 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
 import { Form, Field, reduxForm, SubmissionError, propTypes, change, formValueSelector } from 'redux-form/immutable';
-
+import Input from '../../components/Input';
+import Label from '../../components/Label';
+import FormGroup from '../../components/Form/FormGroup';
+import Button from '../../components/Button';
+import Container from '../../components/Container';
+import ErrorMessage from '../../components/ErrorMessage';
 import account from '../../services/account';
 import { workerError, walletImported, login } from './actions';
 import { setAuthState } from '../AccountProvider/actions';
+import Radial from '../../components/RadialProgress';
+import H2 from '../../components/H2';
 
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
 
@@ -32,13 +39,11 @@ const warn = () => {
 
 /* eslint-disable react/prop-types */
 const renderField = ({ input, label, type, meta: { touched, error, warning } }) => (
-  <div>
-    <label htmlFor={input.name}>{label}</label>
-    <div>
-      <input {...input} placeholder={label} type={type} />
-      {touched && ((error && <span>{error}</span>) || (warning && <span>{warning}</span>))}
-    </div>
-  </div>
+  <FormGroup>
+    <Label htmlFor={input.name}>{label}</Label>
+    <Input {...input} placeholder={label} type={type} />
+    {touched && ((error && <ErrorMessage error={error}></ErrorMessage>) || (warning && <ErrorMessage error={warning}></ErrorMessage>))}
+  </FormGroup>
 );
 /* eslint-enable react/prop-types */
 
@@ -46,7 +51,7 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
 
   constructor(props) {
     super(props);
-
+    console.dir(props);
     this.handleWorkerMessage = this.handleWorkerMessage.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -54,6 +59,7 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
   componentDidMount() {
     window.addEventListener('message', this.handleWorkerMessage, false);
   }
+
   componentWillUnmount() {
     window.removeEventListener('message', this.handleWorkerMessage);
   }
@@ -130,18 +136,19 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
     const workerPath = this.props.workerPath + encodeURIComponent(location.origin);
     const { error, handleSubmit, submitting } = this.props;
     return (
-      <div>
-        <Form onSubmit={handleSubmit(this.handleSubmit)}>
-          <Field name="email" type="text" component={renderField} label="Email" />
-          <Field name="password" type="password" component={renderField} label="Password" />
-          {error && <strong>{error}</strong>}
-          <div>
-            <button type="submit" disabled={submitting}>Login</button>
-          </div>
-        </Form>
-        <div> progress: {this.props.progress} % </div>
-        <iframe src={workerPath} style={{ display: 'none' }} onLoad={(event) => { this.frame = event.target; }} />
-      </div>
+      <Container>
+        <H2>Log into your account!</H2>
+        <div>
+          <Form onSubmit={handleSubmit(this.handleSubmit)}>
+            <Field name="email" type="text" component={renderField} label="Email" />
+            <Field name="password" type="password" component={renderField} label="Password" />
+            {error && <strong>{error}</strong>}
+            <Button type="submit" disabled={submitting}>Login</Button>
+          </Form>
+          <Radial> progress: {this.props.progress} % </Radial>
+          <iframe src={workerPath} style={{ display: 'none' }} onLoad={(event) => { this.frame = event.target; }} />
+        </div>
+      </Container>
     );
   }
 }
@@ -160,6 +167,7 @@ LoginPage.propTypes = {
   location: React.PropTypes.any,
   isWorkerInitialized: React.PropTypes.bool,
   progress: React.PropTypes.any,
+  modalAdd: React.PropTypes.func,
 };
 
 

@@ -2,6 +2,10 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Form, Field, reduxForm } from 'redux-form/immutable';
 import { FormattedMessage } from 'react-intl';
+import Label from '../../components/Label';
+import Input from '../../components/Input';
+import Button from '../../components/Button';
+import FormGroup from '../../components/Form/FormGroup';
 
 import messages from './messages';
 
@@ -20,13 +24,11 @@ const warn = () => {
 
 /* eslint-disable react/prop-types */
 const renderField = ({ input, label, type, meta: { touched, error, warning } }) => (
-  <div>
-    <label htmlFor={input.name}>{label}</label>
-    <div>
-      <input {...input} placeholder={label} type={type} />
-      {touched && ((error && <span>{error}</span>) || (warning && <span>{warning}</span>))}
-    </div>
-  </div>
+  <FormGroup>
+    <Label htmlFor={input.name}>{label}</Label>
+    <Input {...input} placeholder={label} type={type} />
+    {touched && ((error && <span>{error}</span>) || (warning && <span>{warning}</span>))}
+  </FormGroup>
 );
 /* eslint-enable react/prop-types */
 
@@ -50,7 +52,7 @@ class JoinDialog extends React.Component { // eslint-disable-line react/prefer-s
           <Field name="amount" component={renderField} type="number" placeholder="amount" />
           {error && <strong>{error}</strong>}
           <div>
-            <button type="submit" disabled={submitting}>Submit</button>
+            <Button type="submit" disabled={submitting}>Submit</Button>
           </div>
         </Form>
       </div>

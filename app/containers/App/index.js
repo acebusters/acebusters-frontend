@@ -88,6 +88,7 @@ const sb = (props) => ([
 
 export function App(props) {
   const modalContent = props.modalStack[props.modalStack.length - 1];
+  console.dir(modalContent);
   return (
     <div>
       <StyledDashboard>

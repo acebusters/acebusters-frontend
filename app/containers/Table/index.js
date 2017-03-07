@@ -6,8 +6,6 @@ import React from 'react';
 import { createStructuredSelector } from 'reselect';
 // components and styles
 import Card from 'components/Card'; // eslint-disable-line
-import Label from 'components/Label'; // eslint-disable-line
-import Input from 'components/Input'; // eslint-disable-line
 import Seat from '../Seat'; // eslint-disable-line
 // config data
 import {
@@ -45,7 +43,7 @@ import {
 } from './selectors';
 
 import TableComponent from '../../components/Table';
-import JoinDialog from '..//JoinDialog';
+import JoinDialog from '../JoinDialog';
 import web3Connect from '../AccountProvider/web3Connect';
 
 const getTableData = (table, props) => {
