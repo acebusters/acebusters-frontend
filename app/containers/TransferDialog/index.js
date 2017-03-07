@@ -84,7 +84,8 @@ class TransferDialog extends React.Component { // eslint-disable-line react/pref
   }
 
   handleSubmit(values) {
-    return values;
+    const amount = parseInt(values.get('amount'), 10);
+    this.props.handleTransfer(values.get('address'), amount);
   }
 
   render() {
@@ -108,6 +109,7 @@ class TransferDialog extends React.Component { // eslint-disable-line react/pref
 TransferDialog.propTypes = {
   submitting: PropTypes.bool,
   handleSubmit: PropTypes.func,
+  handleTransfer: PropTypes.func,
   error: PropTypes.any,
 };
 

@@ -22,6 +22,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     super(props);
     this.handleGetBlockNumber = this.handleGetBlockNumber.bind(this);
     this.handleGetBalance = this.handleGetBalance.bind(this);
+    this.handleTransfer = this.handleTransfer.bind(this);
     this.web3 = props.web3Redux.web3;
     this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(tokenContractAddress);
   }
@@ -32,6 +33,12 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
 
   handleGetBalance() {
     this.token.balanceOf.call(this.props.account.proxy);
+  }
+
+  handleTransfer(to, amount) {
+    console.log(to, amount);
+    this.token.transfer.sendTransaction(to, amount);
+    return true;
   }
 
   render() {
@@ -63,7 +70,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
             <Button
               onClick={() => {
                 this.props.modalAdd((
-                  <TransferDialog />
+                  <TransferDialog handleTransfer={this.handleTransfer} />
               ));
               }} size="small"
             >Transfer</Button>
