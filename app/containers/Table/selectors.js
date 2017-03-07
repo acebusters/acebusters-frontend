@@ -8,6 +8,8 @@ const pokerHelper = new PokerHelper(rc);
 // direct selectors to state
 const tableStateSelector = (state, props) => (state && props) ? state.getIn(['table', props.params.tableAddr]) : null;
 
+const tableViewSelector = (state) => (state) ? state.get('table') : null;
+
 const handSelector = (state, props) => (state && props) ? state.getIn(['table', props.params.tableAddr, props.params.handId.toString()]) : null;
 
 // other selectors
@@ -88,6 +90,11 @@ const makeNetRequestSelector = () => createSelector(
   (tableState) => (tableState && tableState.get) ? tableState.get('netting') : null
 );
 
+const makeComputedSelector = () => createSelector(
+  tableViewSelector,
+  (tableState) => (tableState && tableState.get) ? tableState.get('computedStyles') : null
+);
+
 export {
     tableStateSelector,
     makeTableDataSelector,
@@ -103,5 +110,6 @@ export {
     makeMaxBetSelector,
     makeMyMaxBetSelector,
     makeNetRequestSelector,
+    makeComputedSelector,
 };
 

@@ -40,33 +40,3 @@ export const AMOUNT_COORDS = {
   10: [[-20, -10], [-15, 0], [-20, -10], [-15, 0], [-15, 0], [-15, 0], [-15, 0], [-15, 0], [-15, 0], [-15, 0], [-15, 0], [-15, 0]],
 };
 
-export const computedStyles = () => {
-  const computed = {};
-  computed.d = window.innerWidth;
-  computed.b = (document.getElementById('table-info')) ? document.getElementById('table-info').clientWidth : 0;
-  computed.h = 1.6;
-  computed.a = 0.96;
-  computed.e = 100;
-  computed.f = computed.d - computed.b - computed.e;
-  computed.l = computed.f;
-  computed.g = window.innerHeight;
-  computed.z = (document.getElementById('action-bar')) ? document.getElementById('action-bar').clientHeight : 0;
-  computed.y = computed.g - computed.z;
-  computed.computeSize = () => {
-    let k;
-    let c;
-    const obj = {};
-    if (computed.y < computed.l / computed.h) {
-      k = computed.y * computed.a;
-      c = k * computed.h;
-    } else {
-      c = computed.l * computed.a;
-      k = (c / computed.h);
-    }
-    obj.width = c;
-    obj.height = k;
-    return obj;
-  };
-  return computed;
-};
-

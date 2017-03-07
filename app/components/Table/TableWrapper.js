@@ -48,7 +48,7 @@ export const TableInfo = styled.div`
 `;
 
 export const TableArea = styled.div`
-  ${(props) => `width:${props.computedStyles().f}px`};
+  ${(props) => `width:${props.computedStyles.f}px`}
   margin: 0;
   padding: 0;
   border: 0;
@@ -70,8 +70,8 @@ export const TableContainer = styled.div`
 `;
 
 export const TableAndChairs = styled.div`
-  ${(props) => `height:${ props.computedStyles().computeSize().height}px`};
-  ${(props) => `width:${ props.computedStyles().computeSize().width}px`};
+  ${(props) => `height:${ props.computedStyles.computeSize().height}px`};
+  ${(props) => `width:${ props.computedStyles.computeSize().width}px`};
   position: absolute;
   top: 25%;
   left: 50%;

@@ -10,6 +10,9 @@ const Container = styled.div`
   margin-left: auto;
   padding-right: 15px;
   padding-left: 15px;
+  @media (min-width: 768px) {
+    width: 750px;
+  }
 `;
 
 export default Container;

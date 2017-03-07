@@ -83,6 +83,10 @@ export default function tableReducer(state = initialState, action) {
       return newState.setIn([action.tableAddr, 'lastHandNettedOnClient'], action.hand.handId);
     }
 
+    case TableActions.RESIZE_TABLE: {
+      return state.set('computedStyles', action.computedStyles);
+    }
+
     case TableActions.UPDATE_RECEIVED: {
       const table = state.get(action.tableAddr);
 
