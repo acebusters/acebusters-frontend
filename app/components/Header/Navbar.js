@@ -2,8 +2,6 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import ToggleButton from './ToggleButton';
-
 import {
   transitionSpeed,
   transitionFn,
@@ -81,11 +79,7 @@ const StyledNavbar = styled.nav`
 const Navbar = (props) => (
   <StyledNavbar
     topNav={props.topNav}
-    sidebarMini={props.sidebarMini}
-    collapse={props.collapse}
   >
-    {props.loggedIn && <ToggleButton name="sidebar-toggle" className="fa fa-bars" onClick={props.toggle} />}
-
     <StyledNavbarMenu>
       <StyledNavbarMenuList name="navbar-menu-wrapper">
         {props.children}
@@ -96,11 +90,7 @@ const Navbar = (props) => (
 
 Navbar.propTypes = {
   children: React.PropTypes.node,
-  toggle: React.PropTypes.func.isRequired,
   topNav: React.PropTypes.bool,
-  sidebarMini: React.PropTypes.bool,
-  collapse: React.PropTypes.bool,
-  loggedIn: React.PropTypes.bool,
 };
 
 export default Navbar;

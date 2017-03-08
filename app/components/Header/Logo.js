@@ -69,21 +69,15 @@ const SmallLogo = styled.span`
   }
 `;
 
-const Logo = ({ href = '/', onClick, logoLg, logoSm, sidebarMini, collapse }) => (
-  onClick ?
-    <StyledLogo sidebarMini={sidebarMini} collapse={collapse} name="navbar-logo" onClick={onClick} href={null} >
-      <LargeLogo sidebarMini={sidebarMini} collapse={collapse} name="navbar-logo-lg">{logoLg}</LargeLogo>
-      <SmallLogo sidebarMini={sidebarMini} collapse={collapse} name="navbar-logo-sm">{logoSm}</SmallLogo>
-    </StyledLogo> :
-    <StyledLogo sidebarMini={sidebarMini} collapse={collapse} name="navbar-logo" href={href} >
-      <LargeLogo sidebarMini={sidebarMini} collapse={collapse} name="navbar-logo-lg">{logoLg}</LargeLogo>
-      <SmallLogo sidebarMini={sidebarMini} collapse={collapse} name="navbar-logo-sm">{logoSm}</SmallLogo>
-    </StyledLogo>
-);
+const Logo = ({ href, logoLg, logoSm, sidebarMini, collapse }) => (
+  <StyledLogo sidebarMini={sidebarMini} collapse={collapse} name="navbar-logo" href={href}>
+    <LargeLogo sidebarMini={sidebarMini} collapse={collapse} name="navbar-logo-lg">{logoLg}</LargeLogo>
+    <SmallLogo sidebarMini={sidebarMini} collapse={collapse} name="navbar-logo-sm">{logoSm}</SmallLogo>
+  </StyledLogo>
+    );
 
 Logo.propTypes = {
   href: React.PropTypes.string,
-  onClick: React.PropTypes.func,
   logoLg: React.PropTypes.element,
   logoSm: React.PropTypes.element,
   sidebarMini: React.PropTypes.bool,

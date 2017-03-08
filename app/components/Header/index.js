@@ -36,48 +36,49 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
   render() {
     const navButtons = this.props.loggedIn ? ([
       <NavItem
-        href="https://github.com"
-        iconClass="fa fa-github"
-        key="1"
-        title="Github"
+        iconClass="fa fa-dashboard"
+        onClick={() => browserHistory.push('/dashboard')}
+        key="2"
+        title="Dashboard"
+      />,
+      <NavItem
+        iconClass="fa fa-group"
+        onClick={() => browserHistory.push('/lobby')}
+        key="3"
+        title="Lobby"
       />,
       <UserMenu
         name="Alexander Pierce"
         image={this.props.imageUrl}
-        profileAction={this.props.onClickLogout}
+        profileAction={() => browserHistory.push('/dashboard')}
         signOutAction={this.props.onClickLogout}
-        key="2"
+        key="4"
       />,
     ]) : ([
       <NavItem
         onClick={() => browserHistory.push('/register')}
-        iconClass="fa fa-github"
+        iconClass="fa fa-user-plus"
         key="1"
         title="Register"
       />,
       <NavItem
         onClick={() => browserHistory.push('/login')}
-        iconClass="fa fa-github"
+        iconClass="fa fa-sign-in"
         key="2"
         title="Login"
       />,
     ]);
 
+    console.log(this.props.logoHref);
     return (
       <StyledHeader fixed={this.props.fixed} id="header">
         <Logo
-          collapse={this.props.sidebarCollapse}
-          sidebarMini={this.props.sidebarMini}
-          onClick={this.props.logoOnClick}
           href={this.props.logoHref}
           logoLg={this.props.logoLg}
           logoSm={this.props.logoSm}
         />
         <Navbar
           loggedIn={this.props.loggedIn}
-          toggle={this.props.sidebarToggle}
-          collapse={this.props.sidebarCollapse}
-          sidebarMini={this.props.sidebarMini}
         >
           {navButtons}
         </Navbar>
@@ -89,14 +90,10 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
 Header.propTypes = {
   fixed: React.PropTypes.bool,
   loggedIn: React.PropTypes.bool,
-  logoOnClick: React.PropTypes.func,
   logoHref: React.PropTypes.string,
   imageUrl: React.PropTypes.string,
   logoLg: React.PropTypes.element,
   logoSm: React.PropTypes.element,
-  sidebarMini: React.PropTypes.bool,
-  sidebarCollapse: React.PropTypes.bool,
-  sidebarToggle: React.PropTypes.func.isRequired,
   onClickLogout: React.PropTypes.func,
 };
 
