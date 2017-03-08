@@ -25,7 +25,6 @@ export default function createRoutes(store) {
   */
   const checkAuth = (nextState, replace) => {
     const { loggedIn } = selectAccount(store.getState()).toJS();
-
     if (!loggedIn) {
       replace({
         pathname: '/login',
@@ -39,11 +38,32 @@ export default function createRoutes(store) {
   return [
     {
       path: '/',
-      name: 'features',
+      name: 'default',
+      onEnter: (nextState, replace) => {
+        replace({
+          pathname: '/lobby',
+          state: { nextPathname: nextState.location.pathname },
+        });
+      },
+    }, {
+      path: '/lobby',
+      name: 'lobby',
       getComponent(nextState, cb) {
-        import('containers/FeaturePage')
-          .then(loadModule(cb))
-          .catch(errorLoading);
+        const importModules = Promise.all([
+          import('containers/Lobby/reducer'),
+          import('containers/Lobby/sagas'),
+          import('containers/Lobby'),
+        ]);
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('lobby', reducer.default);
+          injectSagas(sagas.default);
+
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
       },
     }, {
       onEnter: checkAuth,
@@ -66,26 +86,6 @@ export default function createRoutes(store) {
           importModules.catch(errorLoading);
         },
       }],
-    }, {
-      path: '/lobby',
-      name: 'lobby',
-      getComponent(nextState, cb) {
-        const importModules = Promise.all([
-          import('containers/Lobby/reducer'),
-          import('containers/Lobby/sagas'),
-          import('containers/Lobby'),
-        ]);
-        const renderRoute = loadModule(cb);
-
-        importModules.then(([reducer, sagas, component]) => {
-          injectReducer('lobby', reducer.default);
-          injectSagas(sagas.default);
-
-          renderRoute(component);
-        });
-
-        importModules.catch(errorLoading);
-      },
     }, {
       path: '/table/:tableAddr/hand/:handId',
       name: 'table',

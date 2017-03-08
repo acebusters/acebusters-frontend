@@ -6,6 +6,7 @@ import styled from 'styled-components';
 
 const Wrapper = styled.div`
   ${(props) => {
+    // console.log(props.progress);
     if (props.progress < 50) {
       return `background-image: linear-gradient(90deg, #ffffff 50%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0)), 
       linear-gradient(${90 + (props.progress * 3.6)}deg, #00c5ef 50%, #ffffff 50%, #ffffff);`;
@@ -57,6 +58,7 @@ const Percentage = styled.div`
 `;
 
 function Radial(props) {
+  console.log('rendering');
   return (
     <Wrapper progress={props.progress}>
       <Progress>
@@ -69,7 +71,7 @@ function Radial(props) {
 }
 
 Radial.propTypes = {
-  progress: React.PropTypes.number,
+  progress: React.PropTypes.any,
   msg: React.PropTypes.string,
 };
 

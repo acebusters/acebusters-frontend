@@ -10,6 +10,7 @@ import Container from '../../components/Container';
 import ErrorMessage from '../../components/ErrorMessage';
 import account from '../../services/account';
 import { workerError, walletImported, login } from './actions';
+import { modalAdd, modalDismiss } from '../App/actions';
 import { setAuthState } from '../AccountProvider/actions';
 import Radial from '../../components/RadialProgress';
 import H2 from '../../components/H2';
@@ -51,7 +52,6 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
 
   constructor(props) {
     super(props);
-    console.dir(props);
     this.handleWorkerMessage = this.handleWorkerMessage.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -64,7 +64,12 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
     window.removeEventListener('message', this.handleWorkerMessage);
   }
 
+  handleChange() {
+    console.log('Hello World');
+  }
+
   handleSubmit(values, dispatch) {
+    this.props.modalAdd(<Radial progress={this.props.progress} onChange={this.handleChange}></Radial>);
     return account.login(values.get('email')).catch((err) => {
       const errMsg = 'Login failed!';
       if (err === 404) {
@@ -87,6 +92,7 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
         // If worker failed, ...
         throw new SubmissionError({ _error: `error, Login failed due to worker error: ${workerErr}` });
       }).then((workerRsp) => {
+        this.props.modalDismiss();
         // If worker success, ...
         // ...tell account provider about login.
         dispatch(setAuthState({
@@ -95,7 +101,7 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
           loggedIn: true,
         }));
         const { location } = this.props;
-        let nextPath = '/features';
+        let nextPath = '/lobby';
         if (location.state && location.state.nextPathname) {
           nextPath = location.state.nextPathname;
         }
@@ -145,7 +151,6 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
             {error && <strong>{error}</strong>}
             <Button type="submit" disabled={submitting}>Login</Button>
           </Form>
-          <Radial> progress: {this.props.progress} % </Radial>
           <iframe src={workerPath} style={{ display: 'none' }} onLoad={(event) => { this.frame = event.target; }} />
         </div>
       </Container>
@@ -168,6 +173,7 @@ LoginPage.propTypes = {
   isWorkerInitialized: React.PropTypes.bool,
   progress: React.PropTypes.any,
   modalAdd: React.PropTypes.func,
+  modalStack: React.PropTypes.array,
 };
 
 
@@ -177,6 +183,8 @@ function mapDispatchToProps(dispatch) {
     onWorkerInitialized: () => dispatch(change('login', 'isWorkerInitialized', true)),
     onWorkerProgress: (percent) => dispatch(change('login', 'workerProgress', percent)),
     onWalletImported: (data) => dispatch(walletImported(data)),
+    modalAdd: (node) => dispatch(modalAdd(node)),
+    modalDismiss: () => dispatch(modalDismiss()),
   };
 }
 
