@@ -3,7 +3,6 @@ import { fromJS } from 'immutable';
 import {
   MODAL_ADD,
   MODAL_DISMISS,
-  SIDEBAR_TOGGLE,
 } from './actions';
 
 // The initial state of the App
@@ -14,9 +13,6 @@ const initialState = fromJS({
 
 function appReducer(state = initialState, action) {
   switch (action.type) {
-    case SIDEBAR_TOGGLE:
-      return state
-        .set('sidebarCollapse', !state.get('sidebarCollapse'));
     case MODAL_ADD: {
       let newStack = state.get('modalStack');
       newStack = newStack.push(action.node);

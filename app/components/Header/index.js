@@ -69,7 +69,6 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
       />,
     ]);
 
-    console.log(this.props.logoHref);
     return (
       <StyledHeader fixed={this.props.fixed} id="header">
         <Logo

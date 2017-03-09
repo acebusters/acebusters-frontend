@@ -12,8 +12,8 @@ import account from '../../services/account';
 import { workerError, walletImported, login } from './actions';
 import { modalAdd, modalDismiss } from '../App/actions';
 import { setAuthState } from '../AccountProvider/actions';
-import Radial from '../../components/RadialProgress';
 import H2 from '../../components/H2';
+import Progress from '../LoginProgressModal';
 
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
 
@@ -64,12 +64,8 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
     window.removeEventListener('message', this.handleWorkerMessage);
   }
 
-  handleChange() {
-    console.log('Hello World');
-  }
-
   handleSubmit(values, dispatch) {
-    this.props.modalAdd(<Radial progress={this.props.progress} onChange={this.handleChange}></Radial>);
+    this.props.modalAdd(<Progress />);
     return account.login(values.get('email')).catch((err) => {
       const errMsg = 'Login failed!';
       if (err === 404) {
@@ -197,6 +193,7 @@ const mapStateToProps = (state) => ({
   progress: selector(state, 'workerProgress'),
   isWorkerInitialized: selector(state, 'isWorkerInitialized'),
 });
+
 
 // Wrap the component to inject dispatch and state into it
 export default connect(mapStateToProps, mapDispatchToProps)(reduxForm({ form: 'login', validate, warn })(LoginPage));
