@@ -5,6 +5,7 @@ import React from 'react';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
 import { Field, reduxForm, SubmissionError } from 'redux-form/immutable';
+import Grid from 'grid-styled';
 
 import { makeSelectPrivKey } from '../AccountProvider/selectors';
 import { makePotSizeSelector, makeMyMaxBetSelector, makeAmountSelector } from '../Table/selectors';
@@ -12,6 +13,7 @@ import { setCards } from '../Table/actions';
 import { makeStackSelector } from '../Seat/selectors';
 import Button from '../../components/Button';
 import Slider from '../../components/Slider';
+import Input from '../../components/Input';
 import ActionBarComponent from '../../components/ActionBar';
 import TableService from '../../services/tableService';
 
@@ -31,7 +33,15 @@ const warn = () => {
 
 /* eslint-disable react/prop-types */
 const renderField = ({ input, label, type, min, max, step }) => (
-  <Slider {...input} placeholder={label} type={type} min={min} max={max} step={step} />
+  <div>
+    <Grid sm={1 / 4}>
+      <Input />
+    </Grid>
+    <Grid sm={3 / 4}>
+      <Slider {...input} placeholder={label} type={type} min={min} max={max} step={step} />
+    </Grid>
+  </div>
+
 );
 
 class ActionBar extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -107,11 +117,6 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
 
   render() {
     const { handleSubmit, submitting } = this.props;
-    const divButton = {
-      width: '33%',
-      float: 'left',
-      textAlign: 'center',
-    };
 
     return (
       <ActionBarComponent>
@@ -124,15 +129,15 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
           min={5000}
           step={5000}
         />
-        <div style={divButton}>
+        <Grid sm={1 / 3}>
           <Button size="large" onClick={handleSubmit(this.handleBet)} disabled={submitting} >Bet</Button>
-        </div>
-        <div style={divButton}>
+        </Grid>
+        <Grid sm={1 / 3}>
           <Button size="large" onClick={handleSubmit(this.handleCheck)} disabled={submitting} >Check</Button>
-        </div>
-        <div style={divButton}>
+        </Grid>
+        <Grid sm={1 / 3}>
           <Button size="large" onClick={handleSubmit(this.handleFold)} disabled={submitting} >Fold</Button>
-        </div>
+        </Grid>
       </ActionBarComponent>
     );
   }

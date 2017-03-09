@@ -87,9 +87,5 @@ export const PokerTable = styled.div`
   height: 57.6000000%;
   background-color: ${lightBlue};
   border: 2px solid beige;
-  border-radius: 35%;
-`;
-
-export const SeatsWrapper = styled.div`
-  position: relative
+  border-radius: 50%;
 `;

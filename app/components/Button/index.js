@@ -10,7 +10,8 @@ import React, { PropTypes, Children } from 'react';
 import styled from 'styled-components';
 
 const StyledButton = styled.button`{
-  display: inline-block;
+  display: block;
+  width: 100%;
   box-sizing: border-box;
   text-decoration: none;
   ${(props) => {
@@ -50,7 +51,6 @@ const StyledButton = styled.button`{
 
 const Wrapper = styled.div`
   text-align: center;
-  float: left;
 `;
 
 function Button(props) {

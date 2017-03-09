@@ -7,14 +7,12 @@ import styled from 'styled-components';
 
 const ControlPanel = styled.div`
   float:right;
-  width: 50%;
-  min-width: 550px;
+  width: 100%;
 `;
 
 const ActionBarWrapper = styled.div`
   position: fixed;
   bottom: 0;
-  height: 15%;
   width: 100%;
   background: #f5f5f5;
 `;
