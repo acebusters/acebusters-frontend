@@ -41,6 +41,13 @@ export const initialState = fromJS({});
 export default function tableReducer(state = initialState, action) {
   switch (action.type) {
 
+    case TableActions.TABLE_RECEIVED: {
+      if (!state.get(action.tableAddr)) {
+        return state.set(action.tableAddr, Map({}));
+      }
+      return state;
+    }
+
     case TableActions.LINEUP_RECEIVED: {
       let lineup = List([]);
       let amounts = List([]);

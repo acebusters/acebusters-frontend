@@ -5,53 +5,66 @@
 import React from 'react';
 import Button from 'components/Button';
 import Container from 'components/Container';
-import List from 'components/List';
+import { TableStriped } from 'components/List';
 import H2 from 'components/H2';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
-import { browserHistory } from 'react-router';
-import { getTables } from './actions';
+
+import LobbyItem from '../LobbyItem';
+import { tableReceived } from '../Table/actions';
 import { makeSelectLobby } from './selectors';
+import { fetchTables } from '../../services/tableService';
 
 
 class LobbyComponent extends React.PureComponent {  // eslint-disable-line
 
   constructor(props) {
     super(props);
-    this.props.getTables();
+    this.handleGetTables = this.handleGetTables.bind(this);
+    this.handleGetTables();
   }
 
-
-  showTable(table) {
-    browserHistory.push(`/table/${table}/hand/0`);
-  }
-
-  tablesToList(tables) {
-    let tableList = [];
-    if (tables) {
-      tableList = tables.map((address, i) => [i, address, (<Button onClick={() => this.showTable(address)}>SHOW</Button>)]);
-    }
-    return tableList;
+  handleGetTables() {
+    fetchTables().then((tables) => {
+      if (tables) {
+        tables.forEach((tableAddr) => this.props.tableReceived(tableAddr));
+      }
+    });
   }
 
   render() {
-    if (this.props.lobby.tables) {
-      const tables = this.props.lobby.tables.tableContracts;
-      return (
-        <Container>
-          <H2> Table Overview </H2>
-          <List items={this.tablesToList(tables)} headers={['#', 'address', 'Action']}></List>
-          <Button onClick={this.props.getTables}>Refresh Tables</Button>
-        </Container>
+    let content = [];
+    if (this.props.lobby) {
+      content = this.props.lobby.map((tableAddr, i) =>
+        <LobbyItem key={i} tableAddr={tableAddr} />
       );
     }
-    return null;
+    return (
+      <Container>
+        <H2> Table Overview </H2>
+        <TableStriped>
+          <thead>
+            <tr>
+              <th key="addr"> Address </th>
+              <th key="blin"> Blind </th>
+              <th key="play"> Players </th>
+              <th key="lhan"> LHN </th>
+              <th key="actn"> Action </th>
+            </tr>
+          </thead>
+          <tbody>
+            {content}
+          </tbody>
+        </TableStriped>
+        <Button onClick={this.handleGetTables}>Refresh Tables</Button>
+      </Container>
+    );
   }
 }
 
 export function mapDispatchToProps(dispatch) {
   return {
-    getTables: () => dispatch(getTables()),
+    tableReceived: (tableAddr) => dispatch(tableReceived(tableAddr)),
   };
 }
 
@@ -60,8 +73,8 @@ const mapStateToProps = createStructuredSelector({
 });
 
 LobbyComponent.propTypes = {
-  lobby: React.PropTypes.object,
-  getTables: React.PropTypes.func,
+  lobby: React.PropTypes.array,
+  tableReceived: React.PropTypes.func,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(LobbyComponent);

@@ -8,6 +8,7 @@ export const HAND_REQUEST = 'HAND_REQUEST';
 export const NEXT_HAND = 'NEXT_HAND';
 export const SET_CARDS = 'SET_CARDS';
 export const RESIZE_TABLE = 'RESIZE_TABLE';
+export const TABLE_RECEIVED = 'TABLE_RECEIVED';
 export const UPDATE_RECEIVED = 'UPDATE_RECEIVED';
 export const LINEUP_RECEIVED = 'LINEUP_RECEIVED';
 export const PROCESS_NETTING = 'PROCESS_NETTING';
@@ -33,6 +34,10 @@ export function poll(tableAddr) {
 
 export function resizeTable(computedStyles, tableAddr) {
   return { type: RESIZE_TABLE, computedStyles, tableAddr };
+}
+
+export function tableReceived(tableAddr) {
+  return { type: TABLE_RECEIVED, tableAddr };
 }
 
 export function updateReceived(tableAddr, hand) {
