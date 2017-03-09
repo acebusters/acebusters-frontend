@@ -104,7 +104,7 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
 
   handleLeave() {
     const handId = parseInt(this.props.params.handId, 10);
-    const exitHand = handId + 1;
+    const exitHand = handId - 1;
     return this.table.leave(exitHand).catch((err) => {
       throw new SubmissionError({ _error: `Leave failed with error ${err}.` });
     });

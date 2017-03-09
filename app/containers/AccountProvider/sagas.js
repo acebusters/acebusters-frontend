@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import ethUtil from 'ethereumjs-util';
 import { takeLatest, select, actionChannel, put, fork, take, call, cancelled } from 'redux-saga/effects';
-import { eventChannel, END } from 'redux-saga';
+import { delay, eventChannel, END } from 'redux-saga';
 import fetch from 'isomorphic-fetch';
 
 import {
@@ -70,6 +70,7 @@ function* web3ConnectSaga() {
     yield getPeerCount(getWeb3());
     yield put(web3Connected({ isConnected: true }));
     const tokenContract = web3Instance.eth.contract(ABI_TOKEN_CONTRACT).at(tokenContractAddress);
+    yield call(delay, 500);
     yield fork(ethEventListenerSaga, tokenContract);
   } catch (err) {
     yield put(web3Disconnected({ isConnected: false, error: err }));

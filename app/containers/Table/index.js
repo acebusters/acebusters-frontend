@@ -241,7 +241,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     }
     const coordArray = SEAT_COORDS[lineup.length.toString()];
     const amountCoords = AMOUNT_COORDS[lineup.length.toString()];
-
     for (let i = 0; i < lineup.length; i += 1) {
       const open = (lineup[i].address.indexOf('0x0000000000000000000000000000000000000000') > -1);
       const seat = (
