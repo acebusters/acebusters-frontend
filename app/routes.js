@@ -89,7 +89,6 @@ export default function createRoutes(store) {
     }, {
       path: '/table/:tableAddr/hand/:handId',
       name: 'table',
-      childRoutes: [],
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/Table/reducer'),

@@ -87,7 +87,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     });
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.handleResize();
   }
 
@@ -144,7 +144,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     const infoHeight = (document.getElementById('table-info')) ? document.getElementById('table-info').clientWidth : 0;
     const actionBarHeight = (document.getElementById('action-bar')) ? document.getElementById('action-bar').clientHeight : 0;
     if (this.props) {
-      this.props.resizeTable(this.computeStyles(windowWidth, windowHeight, infoHeight, actionBarHeight));
+      this.props.resizeTable(this.computeStyles(windowWidth, windowHeight, infoHeight, actionBarHeight), this.tableAddr);
     }
   }
 
@@ -309,7 +309,7 @@ export function mapDispatchToProps() {
     lineupReceived: (tableAddr, lineup, smallBlind) => (lineupReceived(tableAddr, lineup, smallBlind)),
     modalAdd: (node) => (modalAdd(node)),
     processNetting: (netRequest, handId, privKey, tableAddr) => (processNetting(netRequest, handId, privKey, tableAddr)),
-    resizeTable: (computed) => (resizeTable(computed)),
+    resizeTable: (computed, tableAddr) => (resizeTable(computed, tableAddr)),
   };
 }
 

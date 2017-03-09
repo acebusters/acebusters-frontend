@@ -11,6 +11,7 @@ import { makePotSizeSelector, makeMyMaxBetSelector, makeAmountSelector } from '.
 import { setCards } from '../Table/actions';
 import { makeStackSelector } from '../Seat/selectors';
 import Button from '../../components/Button';
+import Slider from '../../components/Slider';
 import ActionBarComponent from '../../components/ActionBar';
 import TableService from '../../services/tableService';
 
@@ -29,14 +30,8 @@ const warn = () => {
 };
 
 /* eslint-disable react/prop-types */
-const renderField = ({ input, label, type, meta: { touched, error, warning } }) => (
-  <div>
-    <label htmlFor={input.name}>{label}</label>
-    <div>
-      <input {...input} placeholder={label} type={type} />
-      {touched && ((error && <span>{error}</span>) || (warning && <span>{warning}</span>))}
-    </div>
-  </div>
+const renderField = ({ input, label, type, min, max, step }) => (
+  <Slider {...input} placeholder={label} type={type} min={min} max={max} step={step} />
 );
 
 class ActionBar extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -111,24 +106,33 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
   }
 
   render() {
-    const { error, handleSubmit, submitting } = this.props;
+    const { handleSubmit, submitting } = this.props;
+    const divButton = {
+      width: '33%',
+      float: 'left',
+      textAlign: 'center',
+    };
+
     return (
       <ActionBarComponent>
-        <input
+        <Field
+          name="amount"
           type="range"
-          min="50000" // small blind amount
-          step="50000" // small blind amount
+          component={renderField}
+          label="Amount"
           max={this.props.stackSize}
-          // TODO: use redux form here
-          // onChange={(e) => this.props.updateAmount(e)}
+          min={5000}
+          step={5000}
         />
-        <Field name="amount" type="number" component={renderField} label="Amount" />
-        {error && <strong>{error}</strong>}
-        <Button onClick={handleSubmit(this.handleBet)} disabled={submitting} >Bet</Button>
-        <Button onClick={handleSubmit(this.handleCheck)} disabled={submitting} >Check</Button>
-        <Button onClick={handleSubmit(this.handleShow)} disabled={submitting} >Show</Button>
-        <Button onClick={handleSubmit(this.handleFold)} disabled={submitting} >Fold</Button>
-        <Button onClick={handleSubmit(this.handleLeave)} disabled={submitting} >Leave</Button>
+        <div style={divButton}>
+          <Button size="large" onClick={handleSubmit(this.handleBet)} disabled={submitting} >Bet</Button>
+        </div>
+        <div style={divButton}>
+          <Button size="large" onClick={handleSubmit(this.handleCheck)} disabled={submitting} >Check</Button>
+        </div>
+        <div style={divButton}>
+          <Button size="large" onClick={handleSubmit(this.handleFold)} disabled={submitting} >Fold</Button>
+        </div>
       </ActionBarComponent>
     );
   }
@@ -145,6 +149,7 @@ const mapStateToProps = createStructuredSelector({
   potSize: makePotSizeSelector(),
   myMaxBet: makeMyMaxBetSelector(),
   stackSize: makeStackSelector(),
+
 });
 
 ActionBar.propTypes = {

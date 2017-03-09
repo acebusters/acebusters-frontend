@@ -84,7 +84,7 @@ export default function tableReducer(state = initialState, action) {
     }
 
     case TableActions.RESIZE_TABLE: {
-      return state.set('computedStyles', action.computedStyles);
+      return state.setIn([action.tableAddr, 'computedStyles'], action.computedStyles);
     }
 
     case TableActions.UPDATE_RECEIVED: {

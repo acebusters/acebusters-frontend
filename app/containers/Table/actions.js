@@ -31,8 +31,8 @@ export function poll(tableAddr) {
   return { type: START_POLLING, tableAddr };
 }
 
-export function resizeTable(computedStyles) {
-  return { type: RESIZE_TABLE, computedStyles };
+export function resizeTable(computedStyles, tableAddr) {
+  return { type: RESIZE_TABLE, computedStyles, tableAddr };
 }
 
 export function updateReceived(tableAddr, hand) {
