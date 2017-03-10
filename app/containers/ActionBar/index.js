@@ -35,7 +35,7 @@ const warn = () => {
 const renderField = ({ input, label, type, min, max, step }) => (
   <div>
     <Grid sm={1 / 4}>
-      <Input />
+      <Input type="number" />
     </Grid>
     <Grid sm={3 / 4}>
       <Slider {...input} placeholder={label} type={type} min={min} max={max} step={step} />
@@ -117,8 +117,8 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
           component={renderField}
           label="Amount"
           max={this.props.stackSize}
-          min={5000}
-          step={5000}
+          min={this.props.sb}
+          step={this.props.sb}
         />
         <Grid sm={1 / 3}>
           <Button size="large" onClick={handleSubmit(this.handleBet)} disabled={submitting} >Bet</Button>
@@ -145,7 +145,6 @@ const mapStateToProps = createStructuredSelector({
   potSize: makePotSizeSelector(),
   myMaxBet: makeMyMaxBetSelector(),
   stackSize: makeStackSelector(),
-
 });
 
 ActionBar.propTypes = {
@@ -156,6 +155,7 @@ ActionBar.propTypes = {
   myMaxBet: React.PropTypes.number,
   me: React.PropTypes.object,
   stackSize: React.PropTypes.number,
+  sb: React.PropTypes.number,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(reduxForm({ form: 'actionBar', validate, warn })(ActionBar));

@@ -301,7 +301,8 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
         { this.props.hand &&
         <TableComponent
           {...this.props}
-          sb={sb} board={board}
+          sb={sb}
+          board={board}
           seats={seats}
           onLeave={this.handleLeave}
           computedStyles={this.props.computedStyles}

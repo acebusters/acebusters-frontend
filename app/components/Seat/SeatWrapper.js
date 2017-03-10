@@ -27,11 +27,13 @@ export const ImageContainer = styled.div`
     }
     return navy;
   }};
-  width: 5.5em;
-  height: 5.5em;
   background: #FFF;
-  text-align: center;
   position: absolute;
+  width: 3em;
+  height: 3em;
+  background: none;
+  text-align: center;
+  transform: translate(-50%,-50%);
   ${(props) => (props.open) ? 'cursor: pointer' : ''};
   z-index: 10;
 `;
@@ -62,8 +64,6 @@ export const InfoContainer = styled.div`
 export const CardContainer = styled.div`
   width: 7em;
   height: 5.5em;
-  text-align: center;
-  margin-top: -4em;
-  margin-left: 3em;
+  transform: translate(-50%,-50%); 
   ${(props) => (props.folded) ? 'display: none' : ''}
 `;
