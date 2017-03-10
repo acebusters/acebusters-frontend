@@ -52,7 +52,6 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
     this.handleCheck = this.handleCheck.bind(this);
     this.handleShow = this.handleShow.bind(this);
     this.handleFold = this.handleFold.bind(this);
-    this.handleLeave = this.handleLeave.bind(this);
 
     this.table = new TableService(props.params.tableAddr, this.props.privKey);
   }
@@ -104,14 +103,6 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
     const handId = parseInt(this.props.params.handId, 10);
     return this.table.fold(handId, amount).catch((err) => {
       throw new SubmissionError({ _error: `Fold failed with error ${err}.` });
-    });
-  }
-
-  handleLeave() {
-    const handId = parseInt(this.props.params.handId, 10);
-    const exitHand = handId - 1;
-    return this.table.leave(exitHand).catch((err) => {
-      throw new SubmissionError({ _error: `Leave failed with error ${err}.` });
     });
   }
 

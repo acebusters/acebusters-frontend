@@ -22,7 +22,6 @@ import {
   poll,
   lineupReceived,
   processNetting,
-  handRequest,
   resizeTable,
 } from './actions';
 // selectors
@@ -47,6 +46,7 @@ import {
 import TableComponent from '../../components/Table';
 import JoinDialog from '../JoinDialog';
 import web3Connect from '../AccountProvider/web3Connect';
+import TableService from '../../services/tableService';
 
 const getTableData = (table, props) => {
   const lineup = table.getLineup.callPromise();
@@ -57,6 +57,36 @@ const getTableData = (table, props) => {
   });
 };
 
+const computeStyles = (windowWidth, windowHeight, infoHeight, actionBarHeight) => {
+  const computed = {};
+  computed.d = windowWidth;
+  computed.b = infoHeight;
+  computed.h = 1.6;
+  computed.a = 0.96;
+  computed.e = 100;
+  computed.f = computed.d - computed.b - computed.e;
+  computed.l = computed.f;
+  computed.g = windowHeight;
+  computed.z = actionBarHeight;
+  computed.y = computed.g - computed.z;
+  computed.computeSize = () => {
+    let k;
+    let c;
+    const obj = {};
+    if (computed.y < computed.l / computed.h) {
+      k = computed.y * computed.a;
+      c = k * computed.h;
+    } else {
+      c = computed.l * computed.a;
+      k = (c / computed.h);
+    }
+    obj.width = c;
+    obj.height = k;
+    return obj;
+  };
+  return computed;
+};
+
 export class Table extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   constructor(props) {
@@ -65,6 +95,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.watchToken = this.watchToken.bind(this);
     this.handleJoin = this.handleJoin.bind(this);
     this.handleResize = this.handleResize.bind(this);
+    this.handleLeave = this.handleLeave.bind(this);
     this.tableAddr = props.params.tableAddr;
     this.web3 = props.web3Redux.web3;
     this.table = this.web3.eth.contract(ABI_TABLE).at(this.tableAddr);
@@ -103,39 +134,19 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.tokenEvents.stopWatching();
   }
 
-  computeStyles = (windowWidth, windowHeight, infoHeight, actionBarHeight) => {
-    const computed = {};
-    computed.d = windowWidth;
-    computed.b = infoHeight;
-    computed.h = 1.6;
-    computed.a = 0.96;
-    computed.e = 100;
-    computed.f = computed.d - computed.b - computed.e;
-    computed.l = computed.f;
-    computed.g = windowHeight;
-    computed.z = actionBarHeight;
-    computed.y = computed.g - computed.z;
-    computed.computeSize = () => {
-      let k;
-      let c;
-      const obj = {};
-      if (computed.y < computed.l / computed.h) {
-        k = computed.y * computed.a;
-        c = k * computed.h;
-      } else {
-        c = computed.l * computed.a;
-        k = (c / computed.h);
-      }
-      obj.width = c;
-      obj.height = k;
-      return obj;
-    };
-    return computed;
-  };
-
   handleJoin(pos, amount) {
     this.token.approve.sendTransaction(this.tableAddr, amount);
     this.table.join.sendTransaction(amount, this.props.signerAddr, pos, '');
+  }
+
+  handleLeave() {
+    const handId = parseInt(this.props.params.handId, 10);
+    const exitHand = handId - 1;
+    const table = new TableService(this.props.params.tableAddr, this.props.privKey);
+    return table.leave(exitHand).catch((err) => {
+      console.log(err);
+      // throw new SubmissionError({ _error: `Leave failed with error ${err}.` });
+    });
   }
 
   handleResize() {
@@ -144,7 +155,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     const infoHeight = (document.getElementById('table-info')) ? document.getElementById('table-info').clientWidth : 0;
     const actionBarHeight = (document.getElementById('action-bar')) ? document.getElementById('action-bar').clientHeight : 0;
     if (this.props) {
-      this.props.resizeTable(this.computeStyles(windowWidth, windowHeight, infoHeight, actionBarHeight), this.tableAddr);
+      this.props.resizeTable(computeStyles(windowWidth, windowHeight, infoHeight, actionBarHeight), this.tableAddr);
     }
   }
 
@@ -293,10 +304,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           sb={sb}
           board={board}
           seats={seats}
+          onLeave={this.handleLeave}
           computedStyles={this.props.computedStyles}
         >
-        </TableComponent
-        > }
+        </TableComponent> }
       </div>
     );
   }
@@ -305,7 +316,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
 export function mapDispatchToProps() {
   return {
-    updateLastHand: (tableAddr, handId) => (handRequest(tableAddr, handId)),
     poll: (tableAddr) => (poll(tableAddr)),
     lineupReceived: (tableAddr, lineup, smallBlind) => (lineupReceived(tableAddr, lineup, smallBlind)),
     modalAdd: (node) => (modalAdd(node)),
