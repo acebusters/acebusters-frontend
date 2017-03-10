@@ -14,7 +14,7 @@ function TableComponent(props) {
     <GamePlay id="game-play" {...props} computedStyles={props.computedStyles}>
       <TableArea id="table-area" computedStyles={props.computedStyles}>
         { props.myPos && <Button size="large" onClick={props.onLeave} >Leave</Button> }
-        <TableHeader> { props.myAddress }, { `state:${props.hand.state}` }, { props.potSize }, { props.amountToCall }, { `sb: ${props.sb}` }, { props.sb * 2 } </TableHeader>
+        <TableHeader> { props.myAddress }, { `state:${props.state}` }, { props.potSize }, { props.amountToCall }, { `sb: ${props.sb}` }, { props.sb * 2 } </TableHeader>
         <TableContainer id="table-container">
           <TableAndChairs id="table-and-chairs" computedStyles={props.computedStyles}>
             <PokerTable id="poker-table">
@@ -32,7 +32,7 @@ function TableComponent(props) {
 }
 
 TableComponent.propTypes = {
-  hand: React.PropTypes.object,
+  state: React.PropTypes.string,
   lineup: React.PropTypes.any,
   onLeave: React.PropTypes.any,
   myAddress: React.PropTypes.string,

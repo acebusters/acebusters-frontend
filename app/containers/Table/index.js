@@ -35,8 +35,10 @@ import {
   makeTableDataSelector,
   makeIsMyTurnSelector,
   makePotSizeSelector,
-  makeAmountToCallSelector,
+  makeBoardSelector,
   makeHandSelector,
+  makeAmountToCallSelector,
+  makeHandStateSelector,
   makeLineupSelector,
   makeMyPosSelector,
   makeNetRequestSelector,
@@ -284,10 +286,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
   renderBoard() {
     const board = [];
-    if (!this.props.hand) {
-      return (<div></div>);
-    }
-    const cards = this.props.hand.get('cards');
+    const cards = this.props.board;
     if (cards && cards.length > 0) {
       for (let i = 0; i < cards.length; i += 1) {
         const card = (<Card key={i} cardNumber={cards[i]}></Card>);
@@ -304,7 +303,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     const sb = (this.props.data && this.props.data.get('smallBlind')) ? this.props.data.get('smallBlind') : 0;
     return (
       <div>
-        { this.props.hand &&
+        { this.props.state &&
         <TableComponent
           {...this.props}
           sb={sb}
@@ -331,7 +330,9 @@ export function mapDispatchToProps() {
 }
 
 const mapStateToProps = createStructuredSelector({
+  state: makeHandStateSelector(),
   hand: makeHandSelector(),
+  board: makeBoardSelector(),
   data: makeTableDataSelector(),
   lineup: makeLineupSelector(),
   isMyTurn: makeIsMyTurnSelector(),
@@ -346,6 +347,8 @@ const mapStateToProps = createStructuredSelector({
 });
 
 Table.propTypes = {
+  state: React.PropTypes.string,
+  board: React.PropTypes.array,
   hand: React.PropTypes.object,
   lineup: React.PropTypes.object,
   params: React.PropTypes.object,

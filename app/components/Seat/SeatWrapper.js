@@ -19,7 +19,7 @@ export const SeatWrapper = styled.div`
 export const ImageContainer = styled.div`
   border-radius: 50%;
   border: 4px solid ${(props) => {
-    if (props.whosTurn === props.pos && props.open) {
+    if (props.whosTurn === props.pos) {
       return orange;
     }
     if (props.lastAction === 'sitOut') {

@@ -16,6 +16,16 @@ const makeHandSelector = () => createSelector(
   (hand) => hand
 );
 
+const makeHandStateSelector = () => createSelector(
+  makeHandSelector(),
+  (hand) => (hand) ? hand.get('state') : null
+);
+
+const makeBoardSelector = () => createSelector(
+  makeHandSelector(),
+  (hand) => (hand) ? hand.get('cards') : null
+);
+
 const makeTableDataSelector = () => createSelector(
   tableStateSelector,
   (table) => (table) ? (table.get('data')) : null
@@ -110,6 +120,8 @@ export {
     makeAmountSelector,
     makeLineupSelector,
     makeMyStackSelector,
+    makeHandStateSelector,
+    makeBoardSelector,
     makeIsMyTurnSelector,
     makeWhosTurnSelector,
     makeLastHandNettedSelector,

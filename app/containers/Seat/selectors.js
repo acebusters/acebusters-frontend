@@ -12,17 +12,17 @@ const pokerHelper = new PokerHelper(rc);
 const posSelector = (state, props) => (state && props) ? props.pos : null;
 
 const makeLastReceiptSelector = () => createSelector(
-    [makeHandSelector, posSelector],
-    (hand, pos) => (hand && hand.getIn && hand.getIn(['lineup', pos])) ? rc.get(hand.getIn(['lineup', pos, 'last'])).toJS() : undefined
+    [makeHandSelector(), posSelector],
+    (hand, pos) => (hand && pos && hand.getIn && hand.getIn(['lineup', pos])) ? rc.get(hand.getIn(['lineup', pos, 'last'])) : undefined
 );
 
 const makeLastAmountSelector = () => createSelector(
-    makeLastReceiptSelector,
+    makeLastReceiptSelector(),
     (lastReceipt) => (lastReceipt && lastReceipt.values) ? lastReceipt.values[1] : 0
 );
 
 const makeWhosTurnSelector = () => createSelector(
-  makeHandSelector,
+  makeHandSelector(),
   (hand) => (hand && hand.toJS) ? pokerHelper.whosTurn(hand.toJS()) : null
 );
 
@@ -38,7 +38,7 @@ const makeStackSelector = () => createSelector(
 );
 
 const makeLastActionSelector = () => createSelector(
-  [posSelector, makeHandSelector],
+  [posSelector, makeHandSelector()],
   (pos, hand) => {
     if (hand && hand.getIn && hand.getIn(['lineup', pos, 'last'])) {
       return rc.get(hand.getIn(['lineup', pos, 'last'])).abi[0].name;
