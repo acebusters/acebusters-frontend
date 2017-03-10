@@ -26,38 +26,14 @@ export const GamePlay = styled.div`
   width: 100%;
 `;
 
-export const TableInfo = styled.div`
-  float: left;
-  min-width: 200px;
-  max-width: 600px;
-  width: 320px;
-  height: 100%;
-  padding-left: 20px;
-  padding-right: 20px;
-  border: none;
-  color: ${lightBlue};
-  border-right: 2px double #d5d5d5;
-  overflow: hidden;
-  position: relative;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  font-size: 100%;
-  font: inherit;
-  vertical-align: baseline;
-`;
-
 export const TableArea = styled.div`
-  ${(props) => `width:${props.computedStyles.f}px`}
+  width: 100%;
   margin: 0;
   padding: 0;
   border: 0;
   font-size: 100%;
   font: inherit;
-  float: left;
   vertical-align: baseline;
-  margin-left: 20px;
-  margin-right: 20px;
   position: relative;
 `;
 
@@ -72,19 +48,19 @@ export const TableContainer = styled.div`
 export const TableAndChairs = styled.div`
   ${(props) => `height:${ props.computedStyles.computeSize().height}px`};
   ${(props) => `width:${ props.computedStyles.computeSize().width}px`};
-  position: absolute;
-  top: 25%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0 auto;
 `;
 
 export const PokerTable = styled.div`
   margin: 0 auto;
   position: relative;
-  top: 100%;
-  transform: translateY(-100%);
-  width: 81.6666666%;
-  height: 57.6000000%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 80%;
+  height: 50%;
   background-color: ${lightBlue};
   border: 2px solid beige;
   border-radius: 50%;

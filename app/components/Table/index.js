@@ -24,7 +24,7 @@ function TableComponent(props) {
           </TableAndChairs>
         </TableContainer>
       </TableArea>
-      <ActionBar {...props} me={props.lineup[props.myPos]}></ActionBar>
+      <ActionBar {...props} me={props.lineup[props.myPos]} sb={props.sb}></ActionBar>
     </GamePlay>
   );
 }

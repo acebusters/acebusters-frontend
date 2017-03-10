@@ -15,11 +15,6 @@ const Tr = styled.tr`
   }
 `;
 
-const Th = styled.th`
-  text-align: left;
-  color: #464a4c;
-`;
-
 //   background-color: #eceeef;
 
 const Td = styled.td`
@@ -66,7 +61,7 @@ class LobbyItem extends React.PureComponent {  // eslint-disable-line
     });
     return (
       <Tr>
-        <Th>{this.props.tableAddr}</Th>
+        <Td key={this.props.number}>{this.props.number}</Td>
         <Td key="sb">{this.props.data.smallBlind}</Td>
         <Td key="np">{`${players}/${this.props.data.seats.length}`}</Td>
         <Td key="lh">{this.props.data.lastHandNetted}</Td>
@@ -80,6 +75,7 @@ LobbyItem.propTypes = {
   tableAddr: React.PropTypes.string,
   data: React.PropTypes.object,
   web3Redux: React.PropTypes.any,
+  number: React.PropTypes.number,
 };
 
 export function mapDispatchToProps() {
