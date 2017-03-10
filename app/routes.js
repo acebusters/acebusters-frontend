@@ -50,16 +50,11 @@ export default function createRoutes(store) {
       name: 'lobby',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
-          import('containers/Lobby/reducer'),
-          import('containers/Lobby/sagas'),
           import('containers/Lobby'),
         ]);
         const renderRoute = loadModule(cb);
 
-        importModules.then(([reducer, sagas, component]) => {
-          injectReducer('lobby', reducer.default);
-          injectSagas(sagas.default);
-
+        importModules.then(([component]) => {
           renderRoute(component);
         });
 

@@ -1,15 +1,19 @@
-/**
- * Created by helge on 08.02.17.
- */
 import { createSelector } from 'reselect';
 
-const selectLobby = (state) => state.get('lobby');
+const selectTables = (state) => state.get('table');
 
 const makeSelectLobby = () => createSelector(
-  selectLobby,
-  (lobby) => lobby
+  selectTables,
+  (tableState) => {
+    const tableAddresses = [];
+    tableState.keySeq().forEach((key) => {
+      if (key.length > 20) {
+        tableAddresses.push(key);
+      }
+    });
+    return tableAddresses;
+  }
 );
-
 
 export {
   makeSelectLobby,

@@ -28,7 +28,7 @@ const TableStyled = styled(Table)`
   }
 `;
 
-const TableStriped = styled(TableStyled)`
+export const TableStriped = styled(TableStyled)`
   & tbody tr:nth-of-type(odd) {
     background-color: rgba(0, 0, 0, 0.05);
   }

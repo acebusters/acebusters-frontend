@@ -11,7 +11,6 @@ import createReducer from './reducers';
 import { accountSaga } from './containers/AccountProvider/sagas';
 import { loginSaga } from './containers/LoginPage/sagas';
 import { registerSaga } from './containers/RegisterPage/sagas';
-import { lobbySaga } from './containers/Lobby/sagas';
 import { formActionSaga } from './services/reduxFormSaga';
 
 const sagaMiddleware = createSagaMiddleware();
@@ -44,7 +43,7 @@ export default function configureStore(initialState = {}, history) {
     composeEnhancers(...enhancers)
   );
 
-  sagaMiddleware.run(formActionSaga, accountSaga, loginSaga, registerSaga, lobbySaga);
+  sagaMiddleware.run(formActionSaga, accountSaga, loginSaga, registerSaga);
 
   // Extensions
   store.runSaga = sagaMiddleware.run;

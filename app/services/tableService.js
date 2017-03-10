@@ -127,4 +127,16 @@ export function fetchTableState(tableAddr) {
   });
 }
 
+export function fetchTables() {
+  return new Promise((resolve, reject) => {
+    fetch(`${apiBasePath}/config`).then(
+      (res) => res.json(),
+      (error) => reject(error)
+    ).then(
+      (tables) => resolve(tables.tableContracts),
+      (err) => reject(err)
+    );
+  });
+}
+
 export default TableService;
