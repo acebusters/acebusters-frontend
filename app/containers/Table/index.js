@@ -45,6 +45,7 @@ import {
 
 import TableComponent from '../../components/Table';
 import JoinDialog from '../JoinDialog';
+import InviteDialog from '../InviteDialog';
 import web3Connect from '../AccountProvider/web3Connect';
 import TableService from '../../services/tableService';
 
@@ -247,6 +248,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   renderSeats() {
     const seats = [];
     const lineup = (this.props.lineup) ? this.props.lineup.toJS() : null;
+    const myPos = this.props.myPos;
     if (!lineup) {
       return (<div></div>);
     }
@@ -262,12 +264,15 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           amountCoords={amountCoords[i]}
           open={open}
           onClick={() => {
-            if (open) {
+            if (open && myPos) {
               this.props.modalAdd((
                 <JoinDialog pos={i} handleJoin={this.handleJoin} />
               ));
+            } else {
+              this.props.modalAdd((
+                <InviteDialog handleJoin={this.handleJoin} />
+              ));
             }
-            return null;
           }}
         >
         </Seat>);
@@ -349,6 +354,7 @@ Table.propTypes = {
   poll: React.PropTypes.func,
   web3Redux: React.PropTypes.any,
   data: React.PropTypes.any,
+  myPos: React.PropTypes.any,
   computedStyles: React.PropTypes.object,
   modalAdd: React.PropTypes.func,
   processNetting: React.PropTypes.func,

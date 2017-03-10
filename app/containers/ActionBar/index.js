@@ -108,7 +108,7 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
 
   render() {
     const { handleSubmit, submitting } = this.props;
-
+    console.log(this.props.stackSize);
     return (
       <ActionBarComponent>
         <Field
