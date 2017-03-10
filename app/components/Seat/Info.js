@@ -16,7 +16,8 @@ export const InfoBox = styled.div`
 `;
 
 export const ActionBox = styled.div`
-  margin-left: ${(props) => props.amountCoords[0]}%;
-  margin-top: ${(props) => props.amountCoords[1]}%;
+  margin-top: -80%;
   color: white;
+  background: #5a5a5a;
+  text-align: center;
 `;

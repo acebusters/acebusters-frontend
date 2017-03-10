@@ -4,8 +4,8 @@
 
 import React from 'react';
 import Card from '../Card'; // eslint-disable-line
-import { SeatWrapper, ImageContainer, InfoContainer, CardContainer, DealerButton } from './SeatWrapper';
-import { InfoBox, ActionBox } from './Info';
+import { SeatWrapper, ImageContainer, CardContainer, DealerButton } from './SeatWrapper';
+import { ActionBox } from './Info';
 
 function SeatComponent(props) {
   let seat = null;
@@ -24,14 +24,10 @@ function SeatComponent(props) {
           <DealerButton {...props}></DealerButton>
           <div>{ props.lastAction } </div>
         </ImageContainer>
-        <InfoContainer>
-          <InfoBox> { props.lineup.getIn([props.pos, 'address']).substring(0, 8) }</InfoBox>
-          <InfoBox> { props.lineup.getIn([props.pos, 'amount']) } </InfoBox>
-          <ActionBox {...props}> { (props.lastAmount > 0) ? props.lastAmount : '' }</ActionBox>
-        </InfoContainer>
         <CardContainer>
           <Card cardNumber={props.cards[0]} folded={props.folded}></Card>
           <Card cardNumber={props.cards[1]} folded={props.folded}></Card>
+          <ActionBox {...props}> { (props.lastAmount > 0) ? props.lastAmount : '' }</ActionBox>
         </CardContainer>
       </SeatWrapper>
     );
