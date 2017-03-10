@@ -48,14 +48,12 @@ const makeLastActionSelector = () => createSelector(
 );
 
 const makeCardSelector = () => createSelector(
-    [makeHandSelector, posSelector],
-    (hand, pos) => {
-      let cards = [];
-      if (hand && hand.lineup && pos) {
-        const lu = hand.lineup;
-        cards = (lu[pos].cards) ? lu[pos].cards : [-1, -1];
+    [posSelector, makeMyPosSelector(), makeHandSelector()],
+    (pos, myPos, hand) => {
+      if (pos === myPos) {
+        return (hand && hand.get('holeCards')) ? hand.get('holeCards') : [-1, -1];
       }
-      return cards;
+      return [-1, -1];
     }
 );
 
