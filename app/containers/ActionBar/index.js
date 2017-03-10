@@ -8,7 +8,7 @@ import { Field, reduxForm, SubmissionError } from 'redux-form/immutable';
 import Grid from 'grid-styled';
 
 import { makeSelectPrivKey } from '../AccountProvider/selectors';
-import { makePotSizeSelector, makeMyMaxBetSelector, makeAmountSelector, makeMyStackSelector } from '../Table/selectors';
+import { makeHandStateSelector, makePotSizeSelector, makeMyMaxBetSelector, makeAmountSelector, makeMyStackSelector } from '../Table/selectors';
 import { setCards } from '../Table/actions';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
@@ -59,7 +59,7 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
 
   handleCheck() {
     const amount = this.props.myMaxBet;
-    const state = 'something';
+    const state = this.props.state;
     let call;
     switch (state) {
       case 'turn': {
@@ -129,6 +129,7 @@ const mapStateToProps = createStructuredSelector({
   potSize: makePotSizeSelector(),
   myMaxBet: makeMyMaxBetSelector(),
   stackSize: makeMyStackSelector(),
+  state: makeHandStateSelector(),
 });
 
 ActionBar.propTypes = {
