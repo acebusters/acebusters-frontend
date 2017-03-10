@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 import { PokerHelper, ReceiptCache } from 'poker-helper';
-import { makeSelectProxyAddr } from '../AccountProvider/selectors';
+import { makeSignerAddrSelector } from '../AccountProvider/selectors';
 
 const rc = new ReceiptCache();
 const pokerHelper = new PokerHelper(rc);
@@ -45,52 +45,52 @@ const makeAmountSelector = () => createSelector(
 
 const makeLastHandNettedSelector = () => createSelector(
   tableStateSelector,
-  (tableState) => (tableState && tableState.get) ? tableState.get('lastHandNettedOnClient') : null
-);
-
-const makeMyPosSelector = () => createSelector(
-  [makeLineupSelector, makeSelectProxyAddr],
-  (lineup, myAddress) => (lineup && lineup.toJS && myAddress) ? pokerHelper.getMyPos(lineup.toJS(), myAddress) : null
-);
-
-const makeWhosTurnSelector = () => createSelector(
-  makeHandSelector,
-  (hand) => (hand && hand.get && hand.get('lineup').size > 0) ? pokerHelper.whosTurn(hand.toJS()) : null
-);
-
-const makeIsMyTurnSelector = () => createSelector(
-  [makeMyPosSelector, makeWhosTurnSelector],
-  (myPos, whosTurn) => (myPos && whosTurn) ? myPos === whosTurn : false
-);
-
-const makeMaxBetSelector = () => createSelector(
-  [makeHandSelector, makeLineupSelector],
-  (hand, lineup) => (hand && lineup) ? pokerHelper.findMaxBet(lineup.toJS(), hand.get('dealer')).amount : 0
-);
-
-const makeMyMaxBetSelector = () => createSelector(
-  [makeLineupSelector, makeSelectProxyAddr],
-  (lineup, myAddress) => (lineup && lineup.toJS && myAddress) ? pokerHelper.getMyMaxBet(lineup.toJS(), myAddress) : 0
-);
-
-const makeAmountToCallSelector = () => createSelector(
-  [makeMaxBetSelector, makeMyMaxBetSelector],
-  (maxBet, myMaxbet) => (maxBet && myMaxbet) ? maxBet - myMaxbet : 0
-);
-
-const makePotSizeSelector = () => createSelector(
-  makeLineupSelector,
-  (lineup) => (lineup && lineup.toJS) ? pokerHelper.calculatePotsize(lineup.toJS()) : 0
+  (tableState) => (tableState) ? tableState.get('lastHandNettedOnClient') : null
 );
 
 const makeNetRequestSelector = () => createSelector(
   tableStateSelector,
-  (tableState) => (tableState && tableState.get) ? tableState.get('netting') : null
+  (tableState) => (tableState) ? tableState.get('netting') : null
 );
 
 const makeComputedSelector = () => createSelector(
   tableStateSelector,
-  (tableState) => (tableState && tableState.get) ? tableState.get('computedStyles') : null
+  (tableState) => (tableState) ? tableState.get('computedStyles') : null
+);
+
+const makeMyPosSelector = () => createSelector(
+  [makeLineupSelector(), makeSignerAddrSelector()],
+  (lineup, myAddress) => (lineup && myAddress) ? pokerHelper.getMyPos(lineup.toJS(), myAddress) : null
+);
+
+const makeWhosTurnSelector = () => createSelector(
+  makeHandSelector(),
+  (hand) => (hand && hand.get('lineup').size > 0) ? pokerHelper.whosTurn(hand.toJS()) : null
+);
+
+const makeIsMyTurnSelector = () => createSelector(
+  [makeMyPosSelector(), makeWhosTurnSelector()],
+  (myPos, whosTurn) => (myPos && whosTurn) ? myPos === whosTurn : false
+);
+
+const makeMaxBetSelector = () => createSelector(
+  [makeHandSelector(), makeLineupSelector()],
+  (hand, lineup) => (hand && lineup && lineup.toJS) ? pokerHelper.findMaxBet(lineup.toJS(), hand.get('dealer')).amount : 0
+);
+
+const makeMyMaxBetSelector = () => createSelector(
+  [makeLineupSelector(), makeSignerAddrSelector()],
+  (lineup, myAddress) => (lineup && lineup.toJS && myAddress) ? pokerHelper.getMyMaxBet(lineup.toJS(), myAddress) : 0
+);
+
+const makeAmountToCallSelector = () => createSelector(
+  [makeMaxBetSelector(), makeMyMaxBetSelector()],
+  (maxBet, myMaxbet) => (maxBet && myMaxbet) ? maxBet - myMaxbet : 0
+);
+
+const makePotSizeSelector = () => createSelector(
+  makeLineupSelector(),
+  (lineup) => (lineup) ? pokerHelper.calculatePotsize(lineup.toJS()) : 0
 );
 
 export {
