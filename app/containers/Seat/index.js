@@ -12,6 +12,7 @@ import {
   makeFoldedSelector,
   makeWhosTurnSelector,
   makeLastActionSelector,
+  makeStackSelector,
 } from './selectors';
 
 import {
@@ -59,6 +60,7 @@ const mapStateToProps = createStructuredSelector({
   cards: makeCardSelector(),
   folded: makeFoldedSelector(),
   lastAction: makeLastActionSelector(),
+  stackSize: makeStackSelector(),
 });
 
 

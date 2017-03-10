@@ -21,6 +21,17 @@ const makeTableDataSelector = () => createSelector(
   (table) => (table) ? (table.get('data')) : null
 );
 
+const makeMyStackSelector = () => createSelector(
+  [tableStateSelector, makeMyPosSelector()],
+  (tableState, myPos) => {
+    if (tableState && myPos && tableState.getIn(['data', 'amounts'])) {
+      const amounts = tableState.getIn(['data', 'amounts']).toJS();
+      return amounts[myPos];
+    }
+    return 0;
+  }
+);
+
 const makeLineupSelector = () => createSelector(
   [handSelector, tableStateSelector],
   (hand, table) => {
@@ -98,6 +109,7 @@ export {
     makeTableDataSelector,
     makeAmountSelector,
     makeLineupSelector,
+    makeMyStackSelector,
     makeIsMyTurnSelector,
     makeWhosTurnSelector,
     makeLastHandNettedSelector,

@@ -259,18 +259,19 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       const seat = (
         <Seat
           key={i}
-          pos={i} {...this.props}
+          pos={i}
+          {...this.props}
           coords={coordArray[i]}
           amountCoords={amountCoords[i]}
           open={open}
           onClick={() => {
-            if (open && myPos) {
+            if (open && !myPos) {
               this.props.modalAdd((
                 <JoinDialog pos={i} handleJoin={this.handleJoin} />
               ));
             } else {
               this.props.modalAdd((
-                <InviteDialog handleJoin={this.handleJoin} />
+                <InviteDialog />
               ));
             }
           }}

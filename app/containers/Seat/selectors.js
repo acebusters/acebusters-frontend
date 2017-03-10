@@ -27,11 +27,11 @@ const makeWhosTurnSelector = () => createSelector(
 );
 
 const makeStackSelector = () => createSelector(
-    [tableStateSelector, makeMyPosSelector],
-    (tableState, myPos) => {
-      if (tableState && myPos && tableState.getIn(['data', 'amounts'])) {
+    [tableStateSelector, posSelector],
+    (tableState, pos) => {
+      if (tableState && pos && tableState.getIn(['data', 'amounts'])) {
         const amounts = tableState.getIn(['data', 'amounts']).toJS();
-        return amounts[myPos];
+        return amounts[pos];
       }
       return 0;
     }

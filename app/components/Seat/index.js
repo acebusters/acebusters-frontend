@@ -5,7 +5,7 @@
 import React from 'react';
 import Card from '../Card'; // eslint-disable-line
 import { SeatWrapper, ImageContainer, CardContainer, DealerButton } from './SeatWrapper';
-import { ActionBox } from './Info';
+import { ActionBox, StackBox } from './Info';
 
 function SeatComponent(props) {
   let seat = null;
@@ -28,6 +28,7 @@ function SeatComponent(props) {
           <Card cardNumber={props.cards[0]} folded={props.folded}></Card>
           <Card cardNumber={props.cards[1]} folded={props.folded}></Card>
           <ActionBox {...props}> { (props.lastAmount > 0) ? props.lastAmount : '' }</ActionBox>
+          <StackBox {...props}> { (props.stackSize > 0) ? props.stackSize : '' }</StackBox>
         </CardContainer>
       </SeatWrapper>
     );

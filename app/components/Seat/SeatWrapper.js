@@ -29,8 +29,8 @@ export const ImageContainer = styled.div`
   }};
   background: #FFF;
   position: absolute;
-  width: 3em;
-  height: 3em;
+  width: 3.5em;
+  height: 3.5em;
   background: none;
   text-align: center;
   transform: translate(-50%,-50%);

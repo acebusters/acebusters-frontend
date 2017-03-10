@@ -17,7 +17,21 @@ export const InfoBox = styled.div`
 
 export const ActionBox = styled.div`
   margin-top: -80%;
+  border-radius: 25%;
   color: white;
   background: #5a5a5a;
   text-align: center;
+  position: absolute;
+  width: 100%;
 `;
+
+export const StackBox = styled.div`
+  margin-top: 0%;
+  width: 100%;
+  border-radius: 25%;
+  color: white;
+  background: #5a5a5a;
+  text-align: center;
+  position: absolute;
+`;
+
