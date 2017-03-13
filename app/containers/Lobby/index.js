@@ -36,7 +36,7 @@ class LobbyComponent extends React.PureComponent {  // eslint-disable-line
     let content = [];
     if (this.props.lobby) {
       content = this.props.lobby.map((tableAddr, i) =>
-        <LobbyItem key={i} tableAddr={tableAddr} number={i} />
+        <LobbyItem key={i} tableAddr={tableAddr} />
       );
     }
     return (
@@ -48,7 +48,7 @@ class LobbyComponent extends React.PureComponent {  // eslint-disable-line
               <th key="number"> # </th>
               <th key="blind"> Blind </th>
               <th key="play"> Players </th>
-              <th key="lhan"> LHN </th>
+              <th key="hand"> Hand </th>
               <th key="actn"> Action </th>
             </tr>
           </thead>
