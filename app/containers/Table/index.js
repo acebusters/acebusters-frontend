@@ -113,7 +113,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.tokenEvents = this.token.allEvents({ fromBlock: 'latest' });
     // this.tokenEvents.watch(this.watchToken);
 
-    // getting initial lineup from contract
+    // getting table data from oracle
     getTableData(this.table, props).then(() => {
       this.interval = setInterval(() => {
         props.poll(this.tableAddr);

@@ -5,8 +5,9 @@ import { browserHistory } from 'react-router';
 import Button from 'components/Button';
 
 import web3Connect from '../AccountProvider/web3Connect';
-import { lineupReceived } from '../Table/actions';
-import { makeSelectTableData } from './selectors';
+import { lineupReceived, updateReceived } from '../Table/actions';
+import { fetchTableState } from '../../services/tableService';
+import { makeSelectTableData, makeSelectTableLastHandId } from './selectors';
 import { ABI_TABLE } from '../../app.config';
 
 const Tr = styled.tr`
@@ -14,8 +15,6 @@ const Tr = styled.tr`
     background-color: rgba(0, 0, 0, 0.05);
   }
 `;
-
-//   background-color: #eceeef;
 
 const Td = styled.td`
   padding: 0.75rem;
@@ -34,6 +33,8 @@ const getTableData = (table, props) => {
   });
 };
 
+const getTableHand = (props) => fetchTableState(props.tableAddr).then((rsp) => props.updateReceived(props.tableAddr, rsp));
+
 class LobbyItem extends React.PureComponent {  // eslint-disable-line
 
   constructor(props) {
@@ -42,10 +43,11 @@ class LobbyItem extends React.PureComponent {  // eslint-disable-line
     this.web3 = props.web3Redux.web3;
     this.table = this.web3.eth.contract(ABI_TABLE).at(props.tableAddr);
     getTableData(this.table, props);
+    getTableHand(props);
   }
 
   handleView() {
-    browserHistory.push(`/table/${this.props.tableAddr}/hand/${this.props.data.lastHandNetted + 1}`);
+    browserHistory.push(`/table/${this.props.tableAddr}/hand/${this.props.lastHandId}`);
   }
 
   render() {
@@ -59,12 +61,13 @@ class LobbyItem extends React.PureComponent {  // eslint-disable-line
         players += 1;
       }
     });
+    const ta = this.props.tableAddr.substring(2, 8);
     return (
       <Tr>
-        <Td key={this.props.number}>{this.props.number}</Td>
+        <Td key="ta">{ta}</Td>
         <Td key="sb">{this.props.data.smallBlind}</Td>
         <Td key="np">{`${players}/${this.props.data.seats.length}`}</Td>
-        <Td key="lh">{this.props.data.lastHandNetted}</Td>
+        <Td key="lh">{this.props.lastHandId}</Td>
         <Td key="ac"><Button onClick={this.handleView}>SHOW</Button></Td>
       </Tr>
     );
@@ -75,17 +78,19 @@ LobbyItem.propTypes = {
   tableAddr: React.PropTypes.string,
   data: React.PropTypes.object,
   web3Redux: React.PropTypes.any,
-  number: React.PropTypes.number,
+  lastHandId: React.PropTypes.number,
 };
 
 export function mapDispatchToProps() {
   return {
     lineupReceived: (tableAddr, lineup, smallBlind) => (lineupReceived(tableAddr, lineup, smallBlind)),
+    updateReceived: (tableAddr, hand) => (updateReceived(tableAddr, hand)),
   };
 }
 
 const mapStateToProps = createStructuredSelector({
   data: makeSelectTableData(),
+  lastHandId: makeSelectTableLastHandId(),
 });
 
 export default web3Connect(mapStateToProps, mapDispatchToProps)(LobbyItem);
