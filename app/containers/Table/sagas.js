@@ -85,7 +85,7 @@ export function* updateScanner() {
   while (true) {
     const action = yield take(UPDATE_RECEIVED);
     // do nothing if hand data missing
-    if (action.hand && action.hand.lineup) {
+    if (!action.hand && !action.hand.lineup) {
       continue; // eslint-disable-line no-continue
     }
     // fetch state if not existing
@@ -96,10 +96,10 @@ export function* updateScanner() {
 
     // check if turn to pay small blind
     if (isSbTurnByAction(action, { address: myAddr })) {
+      console.log('sb');
       yield put(bet(action.tableAddr, action.hand.handId, sb, privKey));
       continue; // eslint-disable-line no-continue
     }
-
     // check if turn to pay big blind
     if (isBbTurnByAction(action, { address: myAddr })) {
       yield put(bet(action.tableAddr, action.hand.handId, sb * 2, privKey));

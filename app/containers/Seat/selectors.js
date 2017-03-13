@@ -40,7 +40,7 @@ const makeCardSelector = () => createSelector(
     [posSelector, makeMyPosSelector(), makeHandSelector()],
     (pos, myPos, hand) => {
       if (pos === myPos) {
-        return (hand && hand.get('holeCards')) ? hand.get('holeCards') : [-1, -1];
+        return (hand && hand.get('holeCards')) ? hand.get('holeCards').toJS() : [-1, -1];
       }
       return [-1, -1];
     }
