@@ -17,6 +17,7 @@ export const JOIN_TABLE = 'JOIN_TABLE';
 export const BET = 'acebusters/Table/BET';
 export const SHOW = 'acebusters/Table/SHOW';
 export const ADD_PENDING = 'ADD_PENDING';
+export const REMOVE_PENDING = 'REMOVE_PENDING';
 
 export function completeHandQuery(tableAddr, hand) {
   return { type: COMPLETE_HAND_QUERY, tableAddr, hand };
@@ -50,8 +51,12 @@ export function tableReceived(tableAddr) {
   return { type: TABLE_RECEIVED, tableAddr };
 }
 
-export function addPending(tableAddr, hand, pos) {
-  return { type: ADD_PENDING, tableAddr, hand, pos };
+export function addPending(tableAddr, handId, pos) {
+  return { type: ADD_PENDING, tableAddr, handId, pos };
+}
+
+export function removePending(tableAddr, handId) {
+  return { type: REMOVE_PENDING, tableAddr, handId };
 }
 
 export function updateReceived(tableAddr, hand) {

@@ -10,12 +10,20 @@ import { ActionBox, StackBox } from './Info';
 function SeatComponent(props) {
   const cardSize = (props.computedStyles && props.computedStyles.d < 600) ? 25 : 40;
   let seat = null;
+  let status = '';
+  if (props.pending) {
+    status = 'PENDING';
+  } else if (props.myPos) {
+    status = 'JOIN';
+  } else {
+    status = 'EPMPTY';
+  }
   if (props.open) {
     seat = (
       <SeatWrapper coords={props.coords} comuptedStyles={props.computedStyles}>
         <ImageContainer {...props} >
           <SeatLabel computedStyles={props.computedStyles}>
-            { !props.myPos ? 'JOIN' : 'EMPTY' }
+            { status }
           </SeatLabel>
         </ImageContainer>
       </SeatWrapper>

@@ -25,6 +25,7 @@ import {
   processNetting,
   resizeTable,
   addPending,
+  removePending,
 } from './actions';
 // selectors
 import {
@@ -146,8 +147,9 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       <p> Request send. Waiting for the blockchain :)</p>
       <Button onClick={this.props.modalDismiss}>OK!</Button>
     </div>);
+    this.props.modalDismiss();
     this.props.modalAdd(statusElement);
-    this.props.addPending(this.tableAddr, pos);
+    this.props.addPending(this.tableAddr, this.props.params.handId, pos);
   }
 
   handleLeave() {
@@ -182,9 +184,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       case 'Join': {
         // update lineup when join successful
         this.table.getLineup.call();
+        this.props.removePending(this.tableAddr, this.props.params.handId);
         this.props.modalDismiss();
         const statusElement = (<div>
-          <p>Sufficient Balance</p>
+          <h2>Join Successful!</h2>
           <Button onCLick={() => this.props.modalDismiss}>Ok!</Button>
         </div>);
         this.props.modalAdd(statusElement);
@@ -201,7 +204,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       case 'Error': {
         let msg = 'Ups Something went wrong';
         const errorCode = result.args.errorCode.toNumber();
-
+        this.props.removePending(this.tableAddr, this.props.params.handId);
         if (errorCode === 1) {
           msg = 'Wrong Amount';
         }
@@ -235,7 +238,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
   watchToken(error, result) {
     if (error) {
-      const errorElement = (<p>{errorElement}/</p>);
+      const errorElement = (<h2>{errorElement}/</h2>);
       this.props.modalAdd(errorElement);
       return;
     }
@@ -244,19 +247,19 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     switch (result.event) {
       case 'Approval': {
         this.props.modalDismiss();
-        const statusElement = (<p>Sufficient Balance</p>);
+        const statusElement = (<h2>Sufficient Balance</h2>);
         this.props.modalAdd(statusElement);
         break;
       }
       case 'Transfer': {
         this.props.modalDismiss();
-        const statusElement = (<p>Amount Transferred</p>);
+        const statusElement = (<h2>Amount Transferred</h2>);
         this.props.modalAdd(statusElement);
         break;
       }
       case 'Issuance': {
         this.props.modalDismiss();
-        const statusElement = (<p>Amount Issued</p>);
+        const statusElement = (<h2>Amount Issued</h2>);
         this.props.modalAdd(statusElement);
         break;
       }
@@ -271,6 +274,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     const seats = [];
     const lineup = (this.props.lineup) ? this.props.lineup.toJS() : null;
     const myPos = this.props.myPos;
+
     if (!lineup) {
       return (<div></div>);
     }
@@ -278,6 +282,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     const amountCoords = AMOUNT_COORDS[lineup.length.toString()];
     for (let i = 0; i < lineup.length; i += 1) {
       const open = (lineup[i].address.indexOf('0x0000000000000000000000000000000000000000') > -1);
+      const pending = lineup[i].pending;
       const seat = (
         <Seat
           key={i}
@@ -286,12 +291,13 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           coords={coordArray[i]}
           amountCoords={amountCoords[i]}
           open={open}
+          pending={pending}
           onClick={() => {
-            if (open && !myPos) {
+            if (open && !myPos && !pending) {
               this.props.modalAdd((
                 <JoinDialog pos={i} handleJoin={this.handleJoin} />
               ));
-            } else if (open && myPos) {
+            } else if (open && myPos && !pending) {
               this.props.modalAdd((
                 <InviteDialog />
               ));
@@ -320,6 +326,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     // Get last Modal Element
     const seats = this.renderSeats();
     const board = this.renderBoard();
+
     const sb = (this.props.data && this.props.data.get('smallBlind')) ? this.props.data.get('smallBlind') : 0;
     return (
       <div>
@@ -345,7 +352,8 @@ export function mapDispatchToProps() {
     lineupReceived: (tableAddr, lineup, smallBlind) => (lineupReceived(tableAddr, lineup, smallBlind)),
     modalAdd: (node) => (modalAdd(node)),
     modalDismiss: () => (modalDismiss()),
-    addPending: (tableAddr, pos) => (addPending(tableAddr, pos)),
+    addPending: (tableAddr, handId, pos) => (addPending(tableAddr, handId, pos)),
+    removePending: (tableAddr, handId) => (removePending(tableAddr, handId)),
     processNetting: (netRequest, handId, privKey, tableAddr) => (processNetting(netRequest, handId, privKey, tableAddr)),
     resizeTable: (computed, tableAddr) => (resizeTable(computed, tableAddr)),
   };
@@ -384,6 +392,7 @@ Table.propTypes = {
   computedStyles: React.PropTypes.object,
   modalAdd: React.PropTypes.func,
   addPending: React.PropTypes.func,
+  removePending: React.PropTypes.func,
   modalDismiss: React.PropTypes.func,
   processNetting: React.PropTypes.func,
   netRequest: React.PropTypes.func,

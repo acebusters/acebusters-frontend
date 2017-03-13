@@ -27,14 +27,19 @@ export const ImageContainer = styled.div`
     }
     return navy;
   }};
-  background: #FFF;
+  
+  background: ${(props) => {
+    if (props.pending) {
+      return orange;
+    }
+    return '#FFF';
+  }};
   ${(props) => {
     if (props.computedStyles && props.computedStyles.d > 600) {
       return 'width: 5em; height: 5em;';
     }
     return 'width: 3em; height: 3em;';
   }}
-  background: none;
   text-align: center;
   transform: translate(-50%,-50%);
   ${(props) => (props.open) ? 'cursor: pointer' : ''};
