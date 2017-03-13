@@ -4,6 +4,7 @@ import EWT from 'ethereum-web-token';
 import {
   tableStateSelector,
   makeStackSelector,
+  actionSelector,
 } from '../selectors';
 
 const ABI_BET = [{ name: 'bet', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
@@ -148,5 +149,20 @@ describe('stackSelector', () => {
       },
     };
     expect(stackSelector(mockedState, props)).toEqual(4300);
+  });
+});
+
+describe('actionSelector', () => {
+  it('should select action', () => {
+    const action = fromJS({
+      state: 'waiting',
+      dealer: 0,
+      lineup: [{
+        address: P1_ADDR,
+      }, {
+        address: P2_ADDR,
+      }],
+    });
+    expect(actionSelector(action, 1)).toEqual({ address: P2_ADDR });
   });
 });

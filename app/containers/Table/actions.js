@@ -14,7 +14,8 @@ export const LINEUP_RECEIVED = 'LINEUP_RECEIVED';
 export const PROCESS_NETTING = 'PROCESS_NETTING';
 export const LEAVE_REQUEST = 'LEAVE_REQUEST';
 export const JOIN_TABLE = 'JOIN_TABLE';
-export const PERFORM_DEALING_ACTION = 'PERFORM_DEALING_ACTION';
+export const BET = 'acebusters/Table/BET';
+export const SHOW = 'acebusters/Table/SHOW';
 
 export function completeHandQuery(tableAddr, hand) {
   return { type: COMPLETE_HAND_QUERY, tableAddr, hand };
@@ -26,6 +27,14 @@ export function handRequest(tableAddr, handId) {
 
 export function setCards(tableAddr, handId, cards, pos) {
   return { type: SET_CARDS, tableAddr, handId, cards, pos };
+}
+
+export function bet(tableAddr, handId, amount, privKey) {
+  return { type: BET, tableAddr, handId, amount, privKey };
+}
+
+export function show(tableAddr, handId, amount, privKey) {
+  return { type: SHOW, tableAddr, handId, amount, privKey };
 }
 
 export function poll(tableAddr) {

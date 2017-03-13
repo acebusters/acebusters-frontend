@@ -13,6 +13,101 @@ const handSelector = (state, props) => (state && props) ? state.getIn(['table', 
 
 const posSelector = (state, props) => (props) ? props.pos : null;
 
+const actionSelector = (action) => action;
+
+const addressSelector = (state, props) => (props) ? props.address : null;
+
+const myPosByAction = createSelector(
+  [actionSelector, addressSelector],
+  (action, myAddr) => {
+    if (!myAddr || !action.hand || !action.hand.lineup) {
+      return -1;
+    }
+    for (let i = 0; i < action.hand.lineup.length; i += 1) {
+      if (myAddr === action.hand.lineup[i].address) {
+        return i;
+      }
+    }
+    return -1;
+  }
+);
+
+const isSbTurnByAction = createSelector(
+  [actionSelector, myPosByAction],
+  (action, myPos) => {
+    if (!action.hand) {
+      return false;
+    }
+    const sbPos = pokerHelper.getSbPos(action.hand.lineup, action.hand.dealer);
+    if (typeof sbPos === 'undefined' || sbPos < 0) {
+      return false;
+    }
+    const whosTurn = pokerHelper.whosTurn(action.hand);
+    if (typeof whosTurn === 'undefined' || whosTurn < 0) {
+      return false;
+    }
+    if (action.hand.state === 'waiting' && whosTurn === sbPos && sbPos === myPos) {
+      return true;
+    }
+    return false;
+  }
+);
+
+const isBbTurnByAction = createSelector(
+  [actionSelector, myPosByAction],
+  (action, myPos) => {
+    if (!action.hand) {
+      return false;
+    }
+    const bbPos = pokerHelper.getBbPos(action.hand.lineup, action.hand.dealer);
+    if (typeof bbPos === 'undefined' || bbPos < 0) {
+      return false;
+    }
+    const whosTurn = pokerHelper.whosTurn(action.hand);
+    if (typeof whosTurn === 'undefined' || whosTurn < 0) {
+      return false;
+    }
+    if (action.hand.state === 'dealing' && whosTurn === bbPos && bbPos === myPos) {
+      return true;
+    }
+    return false;
+  }
+);
+
+const is0rTurnByAction = createSelector(
+  [actionSelector, myPosByAction, isBbTurnByAction],
+  (action, myPos, bbTurn) => {
+    if (!action.hand) {
+      return false;
+    }
+    const whosTurn = pokerHelper.whosTurn(action.hand);
+    if (typeof whosTurn === 'undefined' || whosTurn < 0) {
+      return false;
+    }
+    if (action.hand.state === 'dealing' && !bbTurn && whosTurn === myPos) {
+      return true;
+    }
+    return false;
+  }
+);
+
+const isShowTurnByAction = createSelector(
+  [actionSelector, myPosByAction],
+  (action, myPos) => {
+    if (!action || !action.hand || action.state !== 'showdown') {
+      return false;
+    }
+    const whosTurn = pokerHelper.whosTurn(action.hand);
+    if (typeof whosTurn === 'undefined' || whosTurn < 0) {
+      return false;
+    }
+    if (whosTurn === myPos) {
+      return true;
+    }
+    return false;
+  }
+);
+
 // other selectors
 const makeHandSelector = () => createSelector(
   handSelector,
@@ -32,6 +127,16 @@ const makeBoardSelector = () => createSelector(
 const makeTableDataSelector = () => createSelector(
   tableStateSelector,
   (table) => (table) ? (table.get('data')) : null
+);
+
+const makeSbSelector = () => createSelector(
+  [makeTableDataSelector()],
+  (data) => {
+    if (!data || typeof data.get('smallBlind') === 'undefined') {
+      return null;
+    }
+    return data.get('smallBlind');
+  }
 );
 
 const makeMyStackSelector = () => createSelector(
@@ -174,7 +279,13 @@ const makePotSizeSelector = () => createSelector(
 
 export {
     tableStateSelector,
+    actionSelector,
+    isSbTurnByAction,
+    isBbTurnByAction,
+    is0rTurnByAction,
+    isShowTurnByAction,
     makeTableDataSelector,
+    makeSbSelector,
     makeAmountSelector,
     makeLineupSelector,
     makeMyStackSelector,
