@@ -21,7 +21,7 @@ const StyledButton = styled.button`{
       case 'medium':
         return 'padding: 0.25em 2em;font-size: 16px;';
       case 'large':
-        return 'padding: 0.5em 4em;font-size: 10em;';
+        return 'padding: 0.5em 2em;font-size: 10em;';
       default:
         return 'padding: 0.25em 2em;font-size: 10em;';
     }

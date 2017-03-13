@@ -104,13 +104,13 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
           component={renderField}
           label="Amount"
         />
-        <Grid sm={1 / 3}>
+        <Grid xs={1 / 3}>
           <Button size="large" onClick={handleSubmit(this.handleBet)} disabled={submitting} >Bet</Button>
         </Grid>
-        <Grid sm={1 / 3}>
+        <Grid xs={1 / 3}>
           <Button size="large" onClick={handleSubmit(this.handleCheck)} disabled={submitting} >Check</Button>
         </Grid>
-        <Grid sm={1 / 3}>
+        <Grid xs={1 / 3}>
           <Button size="large" onClick={handleSubmit(this.handleFold)} disabled={submitting} >Fold</Button>
         </Grid>
       </ActionBarComponent>
