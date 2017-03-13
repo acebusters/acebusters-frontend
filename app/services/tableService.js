@@ -127,6 +127,19 @@ export function fetchTableState(tableAddr) {
   });
 }
 
+// export function* getHand({ tableAddr, handId }) {
+//   const header = new Headers({
+//     'Content-Type': 'application/json',
+//   });
+//   const myInit = {
+//     headers: header,
+//     method: 'GET',
+//   };
+//   const request = new Request(`${apiBasePath}/table/${tableAddr}/hand/${handId}`, myInit);
+//   const lastHand = yield call(() => fetch(request).then((res) => res.json()));
+//   yield put(completeHandQuery(tableAddr, lastHand));
+// }
+
 export function fetchTables() {
   return new Promise((resolve, reject) => {
     fetch(`${apiBasePath}/config`).then(

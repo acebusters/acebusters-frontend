@@ -11,11 +11,12 @@ export const RESIZE_TABLE = 'RESIZE_TABLE';
 export const TABLE_RECEIVED = 'TABLE_RECEIVED';
 export const UPDATE_RECEIVED = 'UPDATE_RECEIVED';
 export const LINEUP_RECEIVED = 'LINEUP_RECEIVED';
-export const ADD_PENDING = 'ADD_PENDING';
 export const PROCESS_NETTING = 'PROCESS_NETTING';
 export const LEAVE_REQUEST = 'LEAVE_REQUEST';
-export const PERFORM_SHOW = 'PERFORM_SHOW';
-export const PERFORM_DEALING_ACTION = 'PERFORM_DEALING_ACTION';
+export const JOIN_TABLE = 'JOIN_TABLE';
+export const BET = 'acebusters/Table/BET';
+export const SHOW = 'acebusters/Table/SHOW';
+export const ADD_PENDING = 'ADD_PENDING';
 
 export function completeHandQuery(tableAddr, hand) {
   return { type: COMPLETE_HAND_QUERY, tableAddr, hand };
@@ -25,12 +26,16 @@ export function handRequest(tableAddr, handId) {
   return { type: HAND_REQUEST, tableAddr, handId };
 }
 
-export function addPending(tableAddr, pos) {
-  return { type: ADD_PENDING, tableAddr, pos };
-}
-
 export function setCards(tableAddr, handId, cards, pos) {
   return { type: SET_CARDS, tableAddr, handId, cards, pos };
+}
+
+export function bet(tableAddr, handId, amount, privKey) {
+  return { type: BET, tableAddr, handId, amount, privKey };
+}
+
+export function show(tableAddr, handId, amount, privKey) {
+  return { type: SHOW, tableAddr, handId, amount, privKey };
 }
 
 export function poll(tableAddr) {
@@ -45,8 +50,8 @@ export function tableReceived(tableAddr) {
   return { type: TABLE_RECEIVED, tableAddr };
 }
 
-export function performShow(table, handId, amount, holeCards) {
-  return { type: PERFORM_SHOW, table, handId, amount, holeCards };
+export function addPending(tableAddr, hand, pos) {
+  return { type: ADD_PENDING, tableAddr, hand, pos };
 }
 
 export function updateReceived(tableAddr, hand) {

@@ -12,7 +12,6 @@ import {
   makeFoldedSelector,
   makeWhosTurnSelector,
   makeLastActionSelector,
-  makeStackSelector,
 } from './selectors';
 
 import {
@@ -20,6 +19,7 @@ import {
   makeHandSelector,
   makeLastHandNettedSelector,
   makeLineupSelector,
+  makeStackSelector,
 } from '../Table/selectors';
 
 import SeatComponent from '../../components/Seat';

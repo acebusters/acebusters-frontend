@@ -1,5 +1,6 @@
 import { createSelector } from 'reselect';
 import { PokerHelper, ReceiptCache } from 'poker-helper';
+import EWT from 'ethereum-web-token';
 import { makeSignerAddrSelector } from '../AccountProvider/selectors';
 
 const rc = new ReceiptCache();
@@ -9,6 +10,103 @@ const pokerHelper = new PokerHelper(rc);
 const tableStateSelector = (state, props) => (state && props) ? state.getIn(['table', props.params.tableAddr]) : null;
 
 const handSelector = (state, props) => (state && props) ? state.getIn(['table', props.params.tableAddr, props.params.handId.toString()]) : null;
+
+const posSelector = (state, props) => (props) ? props.pos : null;
+
+const actionSelector = (action) => action;
+
+const addressSelector = (state, props) => (props) ? props.address : null;
+
+const myPosByAction = createSelector(
+  [actionSelector, addressSelector],
+  (action, myAddr) => {
+    if (!myAddr || !action.hand || !action.hand.lineup) {
+      return -1;
+    }
+    for (let i = 0; i < action.hand.lineup.length; i += 1) {
+      if (myAddr === action.hand.lineup[i].address) {
+        return i;
+      }
+    }
+    return -1;
+  }
+);
+
+const isSbTurnByAction = createSelector(
+  [actionSelector, myPosByAction],
+  (action, myPos) => {
+    if (!action.hand) {
+      return false;
+    }
+    const sbPos = pokerHelper.getSbPos(action.hand.lineup, action.hand.dealer);
+    if (typeof sbPos === 'undefined' || sbPos < 0) {
+      return false;
+    }
+    const whosTurn = pokerHelper.whosTurn(action.hand);
+    if (typeof whosTurn === 'undefined' || whosTurn < 0) {
+      return false;
+    }
+    if (action.hand.state === 'waiting' && whosTurn === sbPos && sbPos === myPos) {
+      return true;
+    }
+    return false;
+  }
+);
+
+const isBbTurnByAction = createSelector(
+  [actionSelector, myPosByAction],
+  (action, myPos) => {
+    if (!action.hand) {
+      return false;
+    }
+    const bbPos = pokerHelper.getBbPos(action.hand.lineup, action.hand.dealer);
+    if (typeof bbPos === 'undefined' || bbPos < 0) {
+      return false;
+    }
+    const whosTurn = pokerHelper.whosTurn(action.hand);
+    if (typeof whosTurn === 'undefined' || whosTurn < 0) {
+      return false;
+    }
+    if (action.hand.state === 'dealing' && whosTurn === bbPos && bbPos === myPos) {
+      return true;
+    }
+    return false;
+  }
+);
+
+const is0rTurnByAction = createSelector(
+  [actionSelector, myPosByAction, isBbTurnByAction],
+  (action, myPos, bbTurn) => {
+    if (!action.hand) {
+      return false;
+    }
+    const whosTurn = pokerHelper.whosTurn(action.hand);
+    if (typeof whosTurn === 'undefined' || whosTurn < 0) {
+      return false;
+    }
+    if (action.hand.state === 'dealing' && !bbTurn && whosTurn === myPos) {
+      return true;
+    }
+    return false;
+  }
+);
+
+const isShowTurnByAction = createSelector(
+  [actionSelector, myPosByAction],
+  (action, myPos) => {
+    if (!action || !action.hand || action.state !== 'showdown') {
+      return false;
+    }
+    const whosTurn = pokerHelper.whosTurn(action.hand);
+    if (typeof whosTurn === 'undefined' || whosTurn < 0) {
+      return false;
+    }
+    if (whosTurn === myPos) {
+      return true;
+    }
+    return false;
+  }
+);
 
 // other selectors
 const makeHandSelector = () => createSelector(
@@ -29,6 +127,16 @@ const makeBoardSelector = () => createSelector(
 const makeTableDataSelector = () => createSelector(
   tableStateSelector,
   (table) => (table) ? (table.get('data')) : null
+);
+
+const makeSbSelector = () => createSelector(
+  [makeTableDataSelector()],
+  (data) => {
+    if (!data || typeof data.get('smallBlind') === 'undefined') {
+      return null;
+    }
+    return data.get('smallBlind');
+  }
 );
 
 const makeMyStackSelector = () => createSelector(
@@ -109,6 +217,61 @@ const makeAmountToCallSelector = () => createSelector(
   (maxBet, myMaxbet) => (maxBet && myMaxbet) ? maxBet - myMaxbet : 0
 );
 
+const makeStackSelector = () => createSelector(
+  [tableStateSelector, posSelector],
+  (table, pos) => {
+    // make sure we have a position to work on
+    if (typeof pos === 'undefined') {
+      return null;
+    }
+    // get state of contract
+    const lastHandNetted = table.getIn(['data', 'lastHandNetted']);
+    if (typeof lastHandNetted === 'undefined' || lastHandNetted < 1) {
+      return null;
+    }
+    const addr = table.getIn(['data', 'seats', pos, 'address']);
+    let amount = table.getIn(['data', 'amounts', pos]);
+    // get progress of state channel
+    let maxHand = 0;
+    table.keySeq().forEach((k) => {
+      if (!isNaN(k)) {
+        const handId = parseInt(k, 10);
+        if (handId > maxHand) {
+          maxHand = handId;
+        }
+      }
+    });
+    // handle empty state channel
+    if (maxHand === 0) {
+      return amount;
+    }
+    if (maxHand <= lastHandNetted) {
+      return amount;
+    }
+    // sum up state channel
+    for (let i = lastHandNetted + 1; i <= maxHand; i += 1) {
+      // get all the bets
+      const rec = table.getIn([i.toString(), 'lineup', pos, 'last']);
+      const bet = (rec) ? EWT.parse(rec).values[1] : 0;
+      if (typeof bet !== 'undefined') {
+        amount -= bet;
+      }
+      // get all the winnings
+      const distsRec = table.getIn([i.toString(), 'distribution']);
+      if (distsRec) {
+        const dists = EWT.parse(distsRec);
+        for (let j = 0; j < dists.values[2].length; j += 1) {
+          const dist = EWT.separate(dists.values[2][j]);
+          if (dist.address === addr) {
+            amount += dist.amount;
+          }
+        }
+      }
+    }
+    return amount;
+  }
+);
+
 const makePotSizeSelector = () => createSelector(
   makeLineupSelector(),
   (lineup) => (lineup) ? pokerHelper.calculatePotsize(lineup.toJS()) : 0
@@ -116,7 +279,13 @@ const makePotSizeSelector = () => createSelector(
 
 export {
     tableStateSelector,
+    actionSelector,
+    isSbTurnByAction,
+    isBbTurnByAction,
+    is0rTurnByAction,
+    isShowTurnByAction,
     makeTableDataSelector,
+    makeSbSelector,
     makeAmountSelector,
     makeLineupSelector,
     makeMyStackSelector,
@@ -133,5 +302,6 @@ export {
     makeMyMaxBetSelector,
     makeNetRequestSelector,
     makeComputedSelector,
+    makeStackSelector,
 };
 

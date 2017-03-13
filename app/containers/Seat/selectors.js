@@ -4,7 +4,7 @@
 
 import { PokerHelper, ReceiptCache } from 'poker-helper';
 import { createSelector } from 'reselect';
-import { makeHandSelector, makeMyPosSelector, tableStateSelector } from '../Table/selectors';
+import { makeHandSelector, makeMyPosSelector } from '../Table/selectors';
 
 const rc = new ReceiptCache();
 const pokerHelper = new PokerHelper(rc);
@@ -26,17 +26,6 @@ const makeWhosTurnSelector = () => createSelector(
   (hand) => (hand && hand.toJS) ? pokerHelper.whosTurn(hand.toJS()) : null
 );
 
-const makeStackSelector = () => createSelector(
-    [tableStateSelector, posSelector],
-    (tableState, pos) => {
-      if (tableState && pos && tableState.getIn(['data', 'amounts'])) {
-        const amounts = tableState.getIn(['data', 'amounts']).toJS();
-        return amounts[pos];
-      }
-      return 0;
-    }
-);
-
 const makeLastActionSelector = () => createSelector(
   [posSelector, makeHandSelector()],
   (pos, hand) => {
@@ -51,7 +40,7 @@ const makeCardSelector = () => createSelector(
     [posSelector, makeMyPosSelector(), makeHandSelector()],
     (pos, myPos, hand) => {
       if (pos === myPos) {
-        return (hand && hand.get('holeCards')) ? hand.get('holeCards') : [-1, -1];
+        return (hand && hand.get('holeCards')) ? hand.get('holeCards').toJS() : [-1, -1];
       }
       return [-1, -1];
     }
@@ -66,7 +55,6 @@ export {
     posSelector,
     makeLastReceiptSelector,
     makeLastAmountSelector,
-    makeStackSelector,
     makeCardSelector,
     makeFoldedSelector,
     makeWhosTurnSelector,

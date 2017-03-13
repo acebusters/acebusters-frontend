@@ -2,86 +2,31 @@
  * Created by helge on 25.01.17.
  */
 import EthUtil from 'ethereumjs-util';
-import { PokerHelper, ReceiptCache } from 'poker-helper';
-import { call, put, takeLatest, select, fork } from 'redux-saga/effects';
-import { delay } from 'redux-saga';
+import { call, put, takeLatest, select, fork, take } from 'redux-saga/effects';
 import {
-  nextHand,
   setCards,
   updateReceived,
-  completeHandQuery,
-  HAND_REQUEST,
-  PERFORM_DEALING_ACTION,
+  bet,
+  show,
+  BET,
+  SHOW,
   START_POLLING,
   UPDATE_RECEIVED,
 } from './actions';
 
-import { apiBasePath } from '../../app.config';
+import {
+  makeSelectPrivKey,
+  makeSignerAddrSelector,
+} from '../AccountProvider/selectors';
+import {
+  isSbTurnByAction,
+  isBbTurnByAction,
+  is0rTurnByAction,
+  isShowTurnByAction,
+  makeSbSelector,
+  makeMaxBetSelector,
+} from './selectors';
 import TableService, { fetchTableState } from '../../services/tableService';
-
-const rc = new ReceiptCache();
-const pokerHelper = new PokerHelper(rc);
-
-export function* getHand({ tableAddr, handId }) {
-  const header = new Headers({
-    'Content-Type': 'application/json',
-  });
-  const myInit = {
-    headers: header,
-    method: 'GET',
-  };
-  const request = new Request(`${apiBasePath}/table/${tableAddr}/hand/${handId}`, myInit);
-  const lastHand = yield call(() => fetch(request).then((res) => res.json()));
-  yield put(completeHandQuery(tableAddr, lastHand));
-}
-
-export function* dispatchDealingAction() {
-  const state = yield select();
-  const hand = state.get('table').get('hand');
-  if (!hand.lineup) {
-    return;
-  }
-  const myAddr = state.get('account').get('proxy');
-  const handId = hand.handId;
-  const dealer = hand.dealer;
-  const myPos = pokerHelper.getMyPos(hand.lineup, myAddr);
-  const sb = pokerHelper.nextActivePlayer(hand.lineup, dealer + 1);
-  let amount = 0;
-  const whosTurn = pokerHelper.whosTurn(hand);
-  if ((whosTurn === sb && myPos !== sb)
-        || (hand.state !== 'dealing')
-        || (state.get('table').get('error'))
-        || state.get('table').get('performedDealing')) {
-    return;
-  }
-
-  const bb = pokerHelper.nextActivePlayer(hand.lineup, sb + 1);
-  const sbAmount = state.get('table').get('smallBlind');
-  if (myPos === sb) { amount = sbAmount; }
-  if (myPos === bb) { amount = sbAmount * 2; }
-
-  const tableAddr = state.get('table').get('tableAddr');
-  const privKey = state.get('account').get('privKey');
-  yield put({ type: PERFORM_DEALING_ACTION, handId, amount, privKey, tableAddr });
-}
-
-function* performDealingAction(action) {
-  const table = new TableService(action.tableAddr, action.privKey);
-  try {
-    const holeCards = yield table.bet(action.handId, action.amount);
-    yield put(setCards(action.tableAddr, action.handId, holeCards));
-  } catch (err) {
-    // TODO: handle;
-    console.dir(err);
-  }
-}
-
-export function* waitThenNextHand(action) {
-  // debounce by 500ms
-  yield call(delay, 2000);
-  yield put(nextHand(action.tableAddr, action.hand.handId + 1));
-  yield call(delay, 2000);
-}
 
 export function* poll(action) {
   try {
@@ -112,26 +57,81 @@ export function* submitSignedNetting(action) {
   }
 }
 
-
-export function* updateHandler(action) {
-  if (action.hand && action.hand.lineup) {
-    const handComplete = pokerHelper.checkForNextHand(action.hand);
-    if (handComplete) {
-      yield fork(waitThenNextHand(action.tableAddr, action.hand.handId + 1));
-    }
-  }
-
-  if (action.hand.state === 'dealing') {
-    // yield call(dispatchDealingAction);
+function* performBet(action) {
+  const table = new TableService(action.tableAddr, action.privKey);
+  try {
+    const holeCards = yield table.bet(action.handId, action.amount);
+    yield put(setCards(action.tableAddr, action.handId, holeCards));
+  } catch (err) {
+    // TODO: handle;
+    console.dir(err);
   }
 }
 
+function* performShow(action) {
+  const table = new TableService(action.tableAddr, action.privKey);
+  try {
+    yield table.show(action.handId, action.amount);
+  } catch (err) {
+    // TODO: handle;
+    console.dir(err);
+  }
+}
+
+export function* updateScanner() {
+  const privKeySelector = makeSelectPrivKey();
+  const myAddrSelector = makeSignerAddrSelector();
+  const sbSelector = makeSbSelector();
+  while (true) {
+    const action = yield take(UPDATE_RECEIVED);
+    // do nothing if hand data missing
+    if (!action.hand && !action.hand.lineup) {
+      continue; // eslint-disable-line no-continue
+    }
+    // fetch state if not existing
+    const state = yield select();
+    const myAddr = myAddrSelector(state);
+    const privKey = privKeySelector(state);
+    const sb = sbSelector(state, { params: { tableAddr: action.tableAddr } });
+
+    // check if turn to pay small blind
+    if (isSbTurnByAction(action, { address: myAddr })) {
+      console.log('sb');
+      yield put(bet(action.tableAddr, action.hand.handId, sb, privKey));
+      continue; // eslint-disable-line no-continue
+    }
+    // check if turn to pay big blind
+    if (isBbTurnByAction(action, { address: myAddr })) {
+      yield put(bet(action.tableAddr, action.hand.handId, sb * 2, privKey));
+      continue; // eslint-disable-line no-continue
+    }
+
+    // check if turn to pay 0 receipt
+    if (is0rTurnByAction(action, { address: myAddr })) {
+      yield put(bet(action.tableAddr, action.hand.handId, 0, privKey));
+      continue; // eslint-disable-line no-continue
+    }
+
+    // check if time to show
+    if (isShowTurnByAction(action, { address: myAddr })) {
+      const maxBetSelector = makeMaxBetSelector();
+      const max = maxBetSelector(state);
+      yield put(show(action.tableAddr, action.hand.handId, max, privKey));
+      continue; // eslint-disable-line no-continue
+    }
+
+    // check if time to fetch old hands
+    if (false) {
+      continue; // eslint-disable-line no-continue
+    }
+  }
+}
 
 function* tableSaga() {
-  yield takeLatest(HAND_REQUEST, getHand);
-  yield takeLatest(PERFORM_DEALING_ACTION, performDealingAction);
+  yield takeLatest(BET, performBet);
+  yield takeLatest(SHOW, performShow);
   yield takeLatest(START_POLLING, poll);
-  yield takeLatest(UPDATE_RECEIVED, updateHandler);
+  yield fork(updateScanner);
 }
 
 export default [

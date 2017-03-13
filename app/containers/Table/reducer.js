@@ -2,7 +2,6 @@
  * Created by helge on 20.09.16.
  */
 import { Map, List, fromJS } from 'immutable';
-import EWT from 'ethereum-web-token';
 import { PokerHelper, ReceiptCache } from 'poker-helper';
 import * as TableActions from './actions';
 
@@ -70,32 +69,7 @@ export default function tableReducer(state = initialState, action) {
     }
 
     case TableActions.SET_CARDS: {
-      return state.setIn([action.tableAddr, action.handId, 'holeCards'], action.cards);
-    }
-
-    case TableActions.COMPLETE_HAND_QUERY: {
-      let newState = state;
-      const lineup = state.getIn([action.tableAddr, 'lineup']);
-      action.hand.lineup.forEach((player) => {
-        const lastReceipt = rc.get(player.last);
-        for (let i = 0; i < lineup.size; i += 1) {
-          if (lineup.getIn([i, 'address']) === lastReceipt.signer) {
-            const amount = newState.getIn([action.tableAddr, 'amounts', i]);
-            newState = newState.setIn([action.tableAddr, 'amounts', i], amount - lastReceipt.values[1]);
-          }
-        }
-      });
-      const dists = rc.get(action.hand.distribution);
-      for (let j = 0; j < dists.values[2].length; j += 1) {
-        const dist = EWT.separate(dists.values[2][j]);
-        for (let i = 0; i < lineup.size; i += 1) {
-          if (lineup.getIn([i, 'address']) === dist.address) {
-            const amount = newState.getIn([action.tableAddr, 'amounts', i]);
-            newState = newState.setIn([action.tableAddr, 'amounts', i], amount + dist.amount);
-          }
-        }
-      }
-      return newState.setIn([action.tableAddr, 'lastHandNettedOnClient'], action.hand.handId);
+      return state.setIn([action.tableAddr, action.handId.toString(), 'holeCards'], action.cards);
     }
 
     case TableActions.RESIZE_TABLE: {
@@ -123,6 +97,11 @@ export default function tableReducer(state = initialState, action) {
 
       // if the hand state changed, make sure to update it
       if (hand.get('changed') !== action.hand.changed) {
+        // in any state but dealing, update maxBet
+        if (action.hand.state !== hand.get('state')) {
+          const maxBet = pokerHelper.findMaxBet(action.hand.lineup, action.hand.dealer).amount;
+          hand = hand.set('lastRoundMaxBet', maxBet);
+        }
         hand = hand.set('state', action.hand.state);
         hand = hand.set('changed', action.hand.changed);
         if (action.hand.cards && action.hand.cards.length > 0) {
@@ -136,12 +115,6 @@ export default function tableReducer(state = initialState, action) {
         }
         if (action.hand.distribution) {
           hand = hand.set('distribution', action.hand.distribution);
-        }
-
-        // in any state but dealing, update maxBet
-        if (action.hand.state !== 'dealing') {
-          const maxBet = pokerHelper.findMaxBet(action.hand.lineup, action.hand.dealer).amount;
-          hand = hand.set('lastRoundMaxBet', maxBet);
         }
       }
       if (table.get(action.hand.handId.toString()) === hand) {
