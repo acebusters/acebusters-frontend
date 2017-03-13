@@ -62,7 +62,7 @@ export default function tableReducer(state = initialState, action) {
     }
 
     case TableActions.SET_CARDS: {
-      return state.setIn([action.tableAddr, action.handId, 'holeCards'], action.cards);
+      return state.setIn([action.tableAddr, action.handId.toString(), 'holeCards'], action.cards);
     }
 
     case TableActions.COMPLETE_HAND_QUERY: {
@@ -115,6 +115,11 @@ export default function tableReducer(state = initialState, action) {
 
       // if the hand state changed, make sure to update it
       if (hand.get('changed') !== action.hand.changed) {
+        // in any state but dealing, update maxBet
+        if (action.hand.state !== hand.get('state')) {
+          const maxBet = pokerHelper.findMaxBet(action.hand.lineup, action.hand.dealer).amount;
+          hand = hand.set('lastRoundMaxBet', maxBet);
+        }
         hand = hand.set('state', action.hand.state);
         hand = hand.set('changed', action.hand.changed);
         if (action.hand.cards && action.hand.cards.length > 0) {
@@ -128,12 +133,6 @@ export default function tableReducer(state = initialState, action) {
         }
         if (action.hand.distribution) {
           hand = hand.set('distribution', action.hand.distribution);
-        }
-
-        // in any state but dealing, update maxBet
-        if (action.hand.state !== 'dealing') {
-          const maxBet = pokerHelper.findMaxBet(action.hand.lineup, action.hand.dealer).amount;
-          hand = hand.set('lastRoundMaxBet', maxBet);
         }
       }
       if (table.get(action.hand.handId.toString()) === hand) {
