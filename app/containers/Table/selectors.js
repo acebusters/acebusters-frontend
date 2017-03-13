@@ -1,5 +1,6 @@
 import { createSelector } from 'reselect';
 import { PokerHelper, ReceiptCache } from 'poker-helper';
+import EWT from 'ethereum-web-token';
 import { makeSignerAddrSelector } from '../AccountProvider/selectors';
 
 const rc = new ReceiptCache();
@@ -9,6 +10,8 @@ const pokerHelper = new PokerHelper(rc);
 const tableStateSelector = (state, props) => (state && props) ? state.getIn(['table', props.params.tableAddr]) : null;
 
 const handSelector = (state, props) => (state && props) ? state.getIn(['table', props.params.tableAddr, props.params.handId.toString()]) : null;
+
+const posSelector = (state, props) => (props) ? props.pos : null;
 
 // other selectors
 const makeHandSelector = () => createSelector(
@@ -109,6 +112,61 @@ const makeAmountToCallSelector = () => createSelector(
   (maxBet, myMaxbet) => (maxBet && myMaxbet) ? maxBet - myMaxbet : 0
 );
 
+const makeStackSelector = () => createSelector(
+  [tableStateSelector, posSelector],
+  (table, pos) => {
+    // make sure we have a position to work on
+    if (typeof pos === 'undefined') {
+      return null;
+    }
+    // get state of contract
+    const lastHandNetted = table.getIn(['data', 'lastHandNetted']);
+    if (typeof lastHandNetted === 'undefined' || lastHandNetted < 1) {
+      return null;
+    }
+    const addr = table.getIn(['data', 'seats', pos, 'address']);
+    let amount = table.getIn(['data', 'amounts', pos]);
+    // get progress of state channel
+    let maxHand = 0;
+    table.keySeq().forEach((k) => {
+      if (!isNaN(k)) {
+        const handId = parseInt(k, 10);
+        if (handId > maxHand) {
+          maxHand = handId;
+        }
+      }
+    });
+    // handle empty state channel
+    if (maxHand === 0) {
+      return amount;
+    }
+    if (maxHand <= lastHandNetted) {
+      return amount;
+    }
+    // sum up state channel
+    for (let i = lastHandNetted + 1; i <= maxHand; i += 1) {
+      // get all the bets
+      const rec = table.getIn([i.toString(), 'lineup', pos, 'last']);
+      const bet = (rec) ? EWT.parse(rec).values[1] : 0;
+      if (typeof bet !== 'undefined') {
+        amount -= bet;
+      }
+      // get all the winnings
+      const distsRec = table.getIn([i.toString(), 'distribution']);
+      if (distsRec) {
+        const dists = EWT.parse(distsRec);
+        for (let j = 0; j < dists.values[2].length; j += 1) {
+          const dist = EWT.separate(dists.values[2][j]);
+          if (dist.address === addr) {
+            amount += dist.amount;
+          }
+        }
+      }
+    }
+    return amount;
+  }
+);
+
 const makePotSizeSelector = () => createSelector(
   makeLineupSelector(),
   (lineup) => (lineup) ? pokerHelper.calculatePotsize(lineup.toJS()) : 0
@@ -133,5 +191,6 @@ export {
     makeMyMaxBetSelector,
     makeNetRequestSelector,
     makeComputedSelector,
+    makeStackSelector,
 };
 
