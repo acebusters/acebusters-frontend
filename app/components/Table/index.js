@@ -3,11 +3,20 @@
  */
 
 import React from 'react';
+import styled from 'styled-components';
 import { GamePlay, TableArea, TableContainer, PokerTable, TableAndChairs } from './TableWrapper';
 import { Board } from './Board';
 import { TableHeader } from './TableHeader';
 import ActionBar from '../../containers/ActionBar';
 import Button from '../../components/Button';
+
+const Pot = styled.div`
+  position: absolute;
+  color: white;
+  left: 50%;
+  top: 10%
+  transform: translateX(-50%);
+`;
 
 function TableComponent(props) {
   return (
@@ -18,6 +27,7 @@ function TableComponent(props) {
         <TableContainer id="table-container">
           <TableAndChairs id="table-and-chairs" computedStyles={props.computedStyles}>
             <PokerTable id="poker-table">
+              <Pot>Pot: { props.potSize }</Pot>
               { props.seats }
               <Board id="board" board={props.board}>
                 { props.board }

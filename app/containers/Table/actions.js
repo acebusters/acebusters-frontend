@@ -13,7 +13,7 @@ export const UPDATE_RECEIVED = 'UPDATE_RECEIVED';
 export const LINEUP_RECEIVED = 'LINEUP_RECEIVED';
 export const PROCESS_NETTING = 'PROCESS_NETTING';
 export const LEAVE_REQUEST = 'LEAVE_REQUEST';
-export const JOIN_TABLE = 'JOIN_TABLE';
+export const PERFORM_SHOW = 'PERFORM_SHOW';
 export const PERFORM_DEALING_ACTION = 'PERFORM_DEALING_ACTION';
 
 export function completeHandQuery(tableAddr, hand) {
@@ -38,6 +38,10 @@ export function resizeTable(computedStyles, tableAddr) {
 
 export function tableReceived(tableAddr) {
   return { type: TABLE_RECEIVED, tableAddr };
+}
+
+export function performShow(table, handId, amount, holeCards) {
+  return { type: PERFORM_SHOW, table, handId, amount, holeCards };
 }
 
 export function updateReceived(tableAddr, hand) {

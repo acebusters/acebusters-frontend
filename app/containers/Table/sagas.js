@@ -76,10 +76,10 @@ function* performDealingAction(action) {
   }
 }
 
-export function* waitThenNextHand() {
+export function* waitThenNextHand(action) {
   // debounce by 500ms
   yield call(delay, 2000);
-  yield put({ type: 'NEXT_HAND' });
+  yield put(nextHand(action.tableAddr, action.hand.handId + 1));
   yield call(delay, 2000);
 }
 
@@ -117,13 +117,11 @@ export function* updateHandler(action) {
   if (action.hand && action.hand.lineup) {
     const handComplete = pokerHelper.checkForNextHand(action.hand);
     if (handComplete) {
-      yield put(nextHand(action.tableAddr, action.hand.handId + 1));
-      yield fork(waitThenNextHand);
+      yield fork(waitThenNextHand(action.tableAddr, action.hand.handId + 1));
     }
   }
 
   if (action.hand.state === 'dealing') {
-    console.log('perform dealing action');
     // yield call(dispatchDealingAction);
   }
 }

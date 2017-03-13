@@ -8,6 +8,7 @@ import { SeatWrapper, ImageContainer, CardContainer, DealerButton } from './Seat
 import { ActionBox, StackBox } from './Info';
 
 function SeatComponent(props) {
+  const cardSize = (props.computedStyles.d < 600) ? 40 : 60;
   let seat = null;
   if (props.open) {
     seat = (
@@ -25,8 +26,8 @@ function SeatComponent(props) {
           <div>{ props.lastAction } </div>
         </ImageContainer>
         <CardContainer>
-          <Card cardNumber={props.cards[0]} folded={props.folded}></Card>
-          <Card cardNumber={props.cards[1]} folded={props.folded}></Card>
+          <Card cardNumber={props.cards[0]} folded={props.folded} size={cardSize}></Card>
+          <Card cardNumber={props.cards[1]} folded={props.folded} size={cardSize}></Card>
           <ActionBox {...props}> { (props.lastAmount > 0) ? props.lastAmount : '' }</ActionBox>
           <StackBox {...props}> { (props.stackSize > 0) ? props.stackSize : '' }</StackBox>
         </CardContainer>
