@@ -4,23 +4,25 @@
 
 import React from 'react';
 import Card from '../Card'; // eslint-disable-line
-import { SeatWrapper, ImageContainer, CardContainer, DealerButton } from './SeatWrapper';
+import { SeatWrapper, ImageContainer, CardContainer, DealerButton, SeatLabel } from './SeatWrapper';
 import { ActionBox, StackBox } from './Info';
 
 function SeatComponent(props) {
-  const cardSize = (props.computedStyles.d < 600) ? 40 : 60;
+  const cardSize = (props.computedStyles && props.computedStyles.d < 600) ? 25 : 40;
   let seat = null;
   if (props.open) {
     seat = (
-      <SeatWrapper coords={props.coords}>
-        <ImageContainer whosTurn={props.whosTurn} open={props.open} onClick={props.onClick} >
-          { !props.myPos ? 'JOIN' : 'EMPTY' }
+      <SeatWrapper coords={props.coords} comuptedStyles={props.computedStyles}>
+        <ImageContainer {...props} >
+          <SeatLabel computedStyles={props.computedStyles}>
+            { !props.myPos ? 'JOIN' : 'EMPTY' }
+          </SeatLabel>
         </ImageContainer>
       </SeatWrapper>
       );
   } else {
     seat = (
-      <SeatWrapper {...props}>
+      <SeatWrapper coords={props.coords} {...props} comuptedStyles={props.computedStyles}>
         <ImageContainer {...props}>
           <DealerButton {...props}></DealerButton>
           <div>{ props.lastAction } </div>

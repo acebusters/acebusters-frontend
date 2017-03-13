@@ -7,6 +7,7 @@ import { createStructuredSelector } from 'reselect';
 // components and styles
 import Card from 'components/Card'; // eslint-disable-line
 import Seat from '../Seat'; // eslint-disable-line
+import Button from 'components/Button'; // eslint-disable-line
 // config data
 import {
   SEAT_COORDS,
@@ -16,13 +17,14 @@ import {
   tokenContractAddress,
 } from '../../app.config';
 
-import { modalAdd } from '../App/actions';
+import { modalAdd, modalDismiss } from '../App/actions';
 // actions
 import {
   poll,
   lineupReceived,
   processNetting,
   resizeTable,
+  addPending,
 } from './actions';
 // selectors
 import {
@@ -108,10 +110,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     window.onresize = this.handleResize;
     // register event listener for table
     this.tableEvents = this.table.allEvents({ fromBlock: 'latest' });
-    // this.tableEvents.watch(this.watchTable);
+    this.tableEvents.watch(this.watchTable);
 
     this.tokenEvents = this.token.allEvents({ fromBlock: 'latest' });
-    // this.tokenEvents.watch(this.watchToken);
+    this.tokenEvents.watch(this.watchToken);
 
     // getting table data from oracle
     getTableData(this.table, props).then(() => {
@@ -140,6 +142,12 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   handleJoin(pos, amount) {
     this.token.approve.sendTransaction(this.tableAddr, amount);
     this.table.join.sendTransaction(amount, this.props.signerAddr, pos, '');
+    const statusElement = (<div>
+      <p> Request send. Waiting for the blockchain :)</p>
+      <Button onClick={this.props.modalDismiss}>OK!</Button>
+    </div>);
+    this.props.modalAdd(statusElement);
+    this.props.addPending(this.tableAddr, pos);
   }
 
   handleLeave() {
@@ -174,18 +182,24 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       case 'Join': {
         // update lineup when join successful
         this.table.getLineup.call();
+        this.props.modalDismiss();
+        const statusElement = (<div>
+          <p>Sufficient Balance</p>
+          <Button onCLick={() => this.props.modalDismiss}>Ok!</Button>
+        </div>);
+        this.props.modalAdd(statusElement);
         break;
       }
 
       case 'NettingRequest': {
         // disptach action to sign netting request
         this.props.processNetting(this.props.netRequest,
-          this.props.hand.handId, this.props.privKey, this.props.params.id);
+        this.props.hand.handId, this.props.privKey, this.props.params.id);
         break;
       }
 
       case 'Error': {
-        let msg = 'Up Something went wrong';
+        let msg = 'Ups Something went wrong';
         const errorCode = result.args.errorCode.toNumber();
 
         if (errorCode === 1) {
@@ -229,15 +243,21 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     // dispatch action according to event type
     switch (result.event) {
       case 'Approval': {
-        console.log('approved');
+        this.props.modalDismiss();
+        const statusElement = (<p>Sufficient Balance</p>);
+        this.props.modalAdd(statusElement);
         break;
       }
       case 'Transfer': {
-        console.log('transferred');
+        this.props.modalDismiss();
+        const statusElement = (<p>Amount Transferred</p>);
+        this.props.modalAdd(statusElement);
         break;
       }
       case 'Issuance': {
-        console.log('issued');
+        this.props.modalDismiss();
+        const statusElement = (<p>Amount Issued</p>);
+        this.props.modalAdd(statusElement);
         break;
       }
 
@@ -271,7 +291,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
               this.props.modalAdd((
                 <JoinDialog pos={i} handleJoin={this.handleJoin} />
               ));
-            } else {
+            } else if (open && myPos) {
               this.props.modalAdd((
                 <InviteDialog />
               ));
@@ -324,6 +344,8 @@ export function mapDispatchToProps() {
     poll: (tableAddr) => (poll(tableAddr)),
     lineupReceived: (tableAddr, lineup, smallBlind) => (lineupReceived(tableAddr, lineup, smallBlind)),
     modalAdd: (node) => (modalAdd(node)),
+    modalDismiss: () => (modalDismiss()),
+    addPending: (tableAddr, pos) => (addPending(tableAddr, pos)),
     processNetting: (netRequest, handId, privKey, tableAddr) => (processNetting(netRequest, handId, privKey, tableAddr)),
     resizeTable: (computed, tableAddr) => (resizeTable(computed, tableAddr)),
   };
@@ -361,6 +383,8 @@ Table.propTypes = {
   myPos: React.PropTypes.any,
   computedStyles: React.PropTypes.object,
   modalAdd: React.PropTypes.func,
+  addPending: React.PropTypes.func,
+  modalDismiss: React.PropTypes.func,
   processNetting: React.PropTypes.func,
   netRequest: React.PropTypes.func,
   resizeTable: React.PropTypes.func,

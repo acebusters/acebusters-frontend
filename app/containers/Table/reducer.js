@@ -61,6 +61,14 @@ export default function tableReducer(state = initialState, action) {
         .setIn([action.tableAddr, 'data', 'smallBlind'], action.smallBlind.toNumber());
     }
 
+    case TableActions.ADD_PENDING: {
+      const table = state.get(action.tableAddr);
+      if (!table || !table.get('data')) {
+        return state;
+      }
+      return state;
+    }
+
     case TableActions.SET_CARDS: {
       return state.setIn([action.tableAddr, action.handId, 'holeCards'], action.cards);
     }

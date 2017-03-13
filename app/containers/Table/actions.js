@@ -11,6 +11,7 @@ export const RESIZE_TABLE = 'RESIZE_TABLE';
 export const TABLE_RECEIVED = 'TABLE_RECEIVED';
 export const UPDATE_RECEIVED = 'UPDATE_RECEIVED';
 export const LINEUP_RECEIVED = 'LINEUP_RECEIVED';
+export const ADD_PENDING = 'ADD_PENDING';
 export const PROCESS_NETTING = 'PROCESS_NETTING';
 export const LEAVE_REQUEST = 'LEAVE_REQUEST';
 export const PERFORM_SHOW = 'PERFORM_SHOW';
@@ -22,6 +23,10 @@ export function completeHandQuery(tableAddr, hand) {
 
 export function handRequest(tableAddr, handId) {
   return { type: HAND_REQUEST, tableAddr, handId };
+}
+
+export function addPending(tableAddr, pos) {
+  return { type: ADD_PENDING, tableAddr, pos };
 }
 
 export function setCards(tableAddr, handId, cards, pos) {
