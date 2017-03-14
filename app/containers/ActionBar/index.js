@@ -10,7 +10,7 @@ import Grid from 'grid-styled';
 import * as LocalStorage from '../../services/localStorage';
 import { makeSelectPrivKey } from '../AccountProvider/selectors';
 import { makeHandStateSelector, makePotSizeSelector, makeMyMaxBetSelector, makeAmountSelector, makeMyStackSelector, makeMyPosSelector } from '../Table/selectors';
-import { setCards, performShow } from '../Table/actions';
+import { setCards } from '../Table/actions';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import ActionBarComponent from '../../components/ActionBar';
@@ -130,9 +130,7 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
 }
 
 export function mapDispatchToProps() {
-  return {
-    performShow: (table, handId, amount, holeCards) => (performShow(table, handId, amount, holeCards)),
-  };
+  return {};
 }
 
 

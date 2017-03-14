@@ -8,12 +8,12 @@ import { SeatWrapper, ImageContainer, CardContainer, DealerButton, SeatLabel } f
 import { ActionBox, StackBox } from './Info';
 
 function SeatComponent(props) {
-  const cardSize = (props.computedStyles && props.computedStyles.d < 600) ? 25 : 40;
+  const cardSize = (props.computedStyles && props.computedStyles.d < 600) ? 20 : 40;
   let seat = null;
   let status = '';
   if (props.pending) {
     status = 'PENDING';
-  } else if (props.myPos) {
+  } else if (props.myPos === -1) {
     status = 'JOIN';
   } else {
     status = 'EPMPTY';
@@ -23,7 +23,7 @@ function SeatComponent(props) {
       <SeatWrapper coords={props.coords} comuptedStyles={props.computedStyles}>
         <ImageContainer {...props} >
           <SeatLabel computedStyles={props.computedStyles}>
-            { status }
+            { status } , { props.pos }
           </SeatLabel>
         </ImageContainer>
       </SeatWrapper>
@@ -33,14 +33,14 @@ function SeatComponent(props) {
       <SeatWrapper coords={props.coords} {...props} comuptedStyles={props.computedStyles}>
         <ImageContainer {...props}>
           <DealerButton {...props}></DealerButton>
+          <CardContainer>
+            <Card cardNumber={props.cards[0]} folded={props.folded} size={cardSize}></Card>
+            <Card cardNumber={props.cards[1]} folded={props.folded} size={cardSize}></Card>
+            <ActionBox {...props}> { (props.lastAmount > 0) ? props.lastAmount : '' }</ActionBox>
+            <StackBox {...props}> { (props.stackSize > 0) ? props.stackSize : '' }</StackBox>
+          </CardContainer>
           <div>{ props.lastAction } </div>
         </ImageContainer>
-        <CardContainer>
-          <Card cardNumber={props.cards[0]} folded={props.folded} size={cardSize}></Card>
-          <Card cardNumber={props.cards[1]} folded={props.folded} size={cardSize}></Card>
-          <ActionBox {...props}> { (props.lastAmount > 0) ? props.lastAmount : '' }</ActionBox>
-          <StackBox {...props}> { (props.stackSize > 0) ? props.stackSize : '' }</StackBox>
-        </CardContainer>
       </SeatWrapper>
     );
   }

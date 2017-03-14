@@ -141,8 +141,9 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   handleJoin(pos, amount) {
+    console.log(pos);
     this.token.approve.sendTransaction(this.tableAddr, amount);
-    this.table.join.sendTransaction(amount, this.props.signerAddr, pos, '');
+    this.table.join.sendTransaction(amount, this.props.signerAddr, pos + 1, '');
     const statusElement = (<div>
       <p> Request send. Waiting for the blockchain :)</p>
       <Button onClick={this.props.modalDismiss}>OK!</Button>
@@ -278,6 +279,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     if (!lineup) {
       return (<div></div>);
     }
+
     const coordArray = SEAT_COORDS[lineup.length.toString()];
     const amountCoords = AMOUNT_COORDS[lineup.length.toString()];
     for (let i = 0; i < lineup.length; i += 1) {
@@ -293,11 +295,11 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           open={open}
           pending={pending}
           onClick={() => {
-            if (open && !myPos && !pending) {
+            if (open && myPos === -1 && !pending) {
               this.props.modalAdd((
                 <JoinDialog pos={i} handleJoin={this.handleJoin} />
               ));
-            } else if (open && myPos && !pending) {
+            } else if (open && myPos !== -1 && !pending) {
               this.props.modalAdd((
                 <InviteDialog />
               ));

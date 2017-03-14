@@ -18,6 +18,8 @@ export const SeatWrapper = styled.div`
 
 export const ImageContainer = styled.div`
   border-radius: 50%;
+  position: absolute;
+  transform: translate(-50%,-50%);
   border: 4px solid ${(props) => {
     if (props.whosTurn === props.pos) {
       return orange;
@@ -41,7 +43,6 @@ export const ImageContainer = styled.div`
     return 'width: 3em; height: 3em;';
   }}
   text-align: center;
-  transform: translate(-50%,-50%);
   ${(props) => (props.open) ? 'cursor: pointer' : ''};
   z-index: 10;
 `;
@@ -50,9 +51,9 @@ export const SeatLabel = styled.div`
   position: absolute;
   ${(props) => {
     if (props.computedStyles && props.computedStyles.d > 600) {
-      return 'font-size: 1.2em';
+      return 'font-size: 1em';
     }
-    return 'font-size: 0.7em';
+    return 'font-size: 0.5em';
   }}
   top: 50%;
   left: 50%;  
@@ -74,6 +75,5 @@ export const DealerButton = styled.div`
 
 export const CardContainer = styled.div`
   position absolute;
-  transform: translateY(-20%);
   ${(props) => (props.folded) ? 'display: none' : ''}
 `;
