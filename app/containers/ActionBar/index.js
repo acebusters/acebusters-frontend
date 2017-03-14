@@ -7,9 +7,10 @@ import { connect } from 'react-redux';
 import { Field, reduxForm, SubmissionError } from 'redux-form/immutable';
 import Grid from 'grid-styled';
 
+import * as LocalStorage from '../../services/localStorage';
 import { makeSelectPrivKey } from '../AccountProvider/selectors';
-import { makeHandStateSelector, makePotSizeSelector, makeMyMaxBetSelector, makeAmountSelector, makeMyStackSelector } from '../Table/selectors';
-import { setCards } from '../Table/actions';
+import { makeHandStateSelector, makePotSizeSelector, makeMyMaxBetSelector, makeAmountSelector, makeMyStackSelector, makeMyPosSelector } from '../Table/selectors';
+import { setCards, performShow } from '../Table/actions';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import ActionBarComponent from '../../components/ActionBar';
@@ -46,6 +47,16 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
     this.handleFold = this.handleFold.bind(this);
     this.handId = parseInt(props.params.handId, 10);
     this.table = new TableService(props.params.tableAddr, this.props.privKey);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    // use this function to dispatch auto actions
+    const key = `${this.props.params.tableAddr}-${this.props.params.handId}-${this.props.myPos}`;
+    this.cards = LocalStorage.getItem(key);
+    if (nextProps.hand.state === 'showdown') {
+      const hand = nextProps.hand;
+      this.props.performShow(this.table, hand.handId, this.props.myMaxBet, this.cards);
+    }
   }
 
   handleBet(values, dispatch) {
@@ -104,13 +115,13 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
           component={renderField}
           label="Amount"
         />
-        <Grid sm={1 / 3}>
+        <Grid xs={1 / 3}>
           <Button size="large" onClick={handleSubmit(this.handleBet)} disabled={submitting} >Bet</Button>
         </Grid>
-        <Grid sm={1 / 3}>
+        <Grid xs={1 / 3}>
           <Button size="large" onClick={handleSubmit(this.handleCheck)} disabled={submitting} >Check</Button>
         </Grid>
-        <Grid sm={1 / 3}>
+        <Grid xs={1 / 3}>
           <Button size="large" onClick={handleSubmit(this.handleFold)} disabled={submitting} >Fold</Button>
         </Grid>
       </ActionBarComponent>
@@ -118,8 +129,10 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
   }
 }
 
-export function mapDispatchToProps(dispatch) {
-  return { dispatch };
+export function mapDispatchToProps() {
+  return {
+    performShow: (table, handId, amount, holeCards) => (performShow(table, handId, amount, holeCards)),
+  };
 }
 
 
@@ -129,6 +142,7 @@ const mapStateToProps = createStructuredSelector({
   potSize: makePotSizeSelector(),
   myMaxBet: makeMyMaxBetSelector(),
   stackSize: makeMyStackSelector(),
+  myPos: makeMyPosSelector(),
   state: makeHandStateSelector(),
 });
 
@@ -138,6 +152,7 @@ ActionBar.propTypes = {
   privKey: React.PropTypes.string,
   cards: React.PropTypes.array,
   myMaxBet: React.PropTypes.number,
+  myPos: React.PropTypes.number,
   me: React.PropTypes.object,
 };
 

@@ -13,9 +13,9 @@ function Card(props) {
   const suit = suits[Math.floor(props.cardNumber / 13)];
   const value = values[props.cardNumber % 13];
   if (props.cardNumber >= 0) {
-    link = vc.getCardData(60, suit, value);
+    link = vc.getCardData(props.size, suit, value);
   } else {
-    link = vc.getBackData(60, '#7A7BB8', '#2E319C');
+    link = vc.getBackData(props.size, '#7A7BB8', '#2E319C');
   }
   if (!props.folded) {
     return (
@@ -27,6 +27,7 @@ function Card(props) {
 
 Card.propTypes = {
   cardNumber: React.PropTypes.number,
+  size: React.PropTypes.number,
   folded: React.PropTypes.bool,
 };
 

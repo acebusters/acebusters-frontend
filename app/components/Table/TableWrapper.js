@@ -46,8 +46,8 @@ export const TableContainer = styled.div`
 `;
 
 export const TableAndChairs = styled.div`
-  ${(props) => `height:${ props.computedStyles.computeSize().height}px`};
-  ${(props) => `width:${ props.computedStyles.computeSize().width}px`};
+  ${(props) => (props.computedStyles) ? `height:${ props.computedStyles.computeSize().height}px` : 'height: 0px;'};
+  ${(props) => (props.computedStyles) ? `width:${ props.computedStyles.computeSize().width}px` : 'height: 0px;'};
   position: relative;
   top: 50%;
   transform: translateY(-50%);

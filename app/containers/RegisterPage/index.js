@@ -12,7 +12,6 @@ import Input from '../../components/Input';
 import Button from '../../components/Button';
 import H2 from '../../components/H2';
 import ErrorMessage from '../../components/ErrorMessage';
-import Radial from '../../components/RadialProgress';
 
 import account from '../../services/account';
 import { workerError, walletExported, register } from './actions';
@@ -156,7 +155,6 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
           {error && <ErrorMessage error={error}></ErrorMessage>}
           <Button type="submit" disabled={submitting}>Login</Button>
         </Form>
-        <Radial progress={this.props.progress} msg="encrypting data"></Radial>
         <iframe src={workerPath} style={{ display: 'none' }} onLoad={(event) => { this.frame = event.target; }} />
       </Container>
     );

@@ -27,15 +27,36 @@ export const ImageContainer = styled.div`
     }
     return navy;
   }};
-  background: #FFF;
-  position: absolute;
-  width: 3.5em;
-  height: 3.5em;
-  background: none;
+  
+  background: ${(props) => {
+    if (props.pending) {
+      return orange;
+    }
+    return '#FFF';
+  }};
+  ${(props) => {
+    if (props.computedStyles && props.computedStyles.d > 600) {
+      return 'width: 5em; height: 5em;';
+    }
+    return 'width: 3em; height: 3em;';
+  }}
   text-align: center;
   transform: translate(-50%,-50%);
   ${(props) => (props.open) ? 'cursor: pointer' : ''};
   z-index: 10;
+`;
+
+export const SeatLabel = styled.div`
+  position: absolute;
+  ${(props) => {
+    if (props.computedStyles && props.computedStyles.d > 600) {
+      return 'font-size: 1.2em';
+    }
+    return 'font-size: 0.7em';
+  }}
+  top: 50%;
+  left: 50%;  
+  transform: translate(-50%,-50%);
 `;
 
 export const DealerButton = styled.div`
@@ -51,19 +72,8 @@ export const DealerButton = styled.div`
   z-index: 10;
 `;
 
-export const InfoContainer = styled.div`
-  width: 9em;
-  height: 5.5em;
-  margin-left: 2.75em;
-  border-radius: 25%;
-  background: #FFF;
-  position: absolute;
-  border: 4px solid ${navy};
-`;
-
 export const CardContainer = styled.div`
-  width: 7em;
-  height: 5.5em;
-  transform: translate(-50%,-50%); 
+  position absolute;
+  transform: translateY(-20%);
   ${(props) => (props.folded) ? 'display: none' : ''}
 `;

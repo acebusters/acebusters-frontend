@@ -60,6 +60,30 @@ export default function tableReducer(state = initialState, action) {
         .setIn([action.tableAddr, 'data', 'smallBlind'], action.smallBlind.toNumber());
     }
 
+    case TableActions.ADD_PENDING: {
+      const table = state.get(action.tableAddr);
+      if (!action.handId) {
+        return state
+          .setIn([action.tableAddr, 'data', 'seats', action.pos, 'pending'], true);
+      }
+      let hand = table.get(action.handId);
+      hand = hand.setIn(['lineup', action.pos, 'pending'], true);
+      return state
+        .setIn([action.tableAddr, action.handId], hand);
+    }
+
+    case TableActions.REMOVE_PENDING: {
+      if (!action.handId) {
+        return state;
+      }
+      const lineup = state.getIn([action.tableAddr, action.handId, 'lineup']).toJS();
+      lineup.forEach((item) => {
+        item.pending = false; // eslint-disable-line
+      });
+      return state
+        .setIn([action.tableAddr, action.handId, 'lineup'], fromJS(lineup));
+    }
+
     case TableActions.SET_CARDS: {
       return state.setIn([action.tableAddr, action.handId.toString(), 'holeCards'], action.cards);
     }
