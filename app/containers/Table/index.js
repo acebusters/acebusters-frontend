@@ -22,6 +22,7 @@ import { modalAdd, modalDismiss } from '../App/actions';
 import {
   poll,
   lineupReceived,
+  updateReceived,
   processNetting,
   resizeTable,
   addPending,
@@ -46,13 +47,14 @@ import {
   makeMyPosSelector,
   makeNetRequestSelector,
   makeComputedSelector,
+  makeMissingHandSelector,
 } from './selectors';
 
 import TableComponent from '../../components/Table';
 import JoinDialog from '../JoinDialog';
 import InviteDialog from '../InviteDialog';
 import web3Connect from '../AccountProvider/web3Connect';
-import TableService from '../../services/tableService';
+import TableService, { getHand } from '../../services/tableService';
 
 const getTableData = (table, props) => {
   const lineup = table.getLineup.callPromise();
@@ -106,7 +108,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.web3 = props.web3Redux.web3;
     this.table = this.web3.eth.contract(ABI_TABLE).at(this.tableAddr);
     this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(tokenContractAddress);
-
     // set initial size && resizing table
     window.onresize = this.handleResize;
     // register event listener for table
@@ -131,6 +132,15 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   componentWillReceiveProps(nextProps) {
     if (this.props.hand && nextProps.lastHandNettedOnClient < this.props.hand.handId - 1) {
       this.props.updateLastHand(this.tableAddr, nextProps.lastHandNettedOnClient + 1);
+    }
+
+
+    if (nextProps.missingHands && nextProps.missingHands.length > 0) {
+      for (let i = 0; i < nextProps.missingHands.length; i += 1) {
+        getHand(this.tableAddr, nextProps.missingHands[i]).then((rsp) => {
+          this.props.updateReceived(this.tableAddr, rsp);
+        });
+      }
     }
   }
 
@@ -358,6 +368,7 @@ export function mapDispatchToProps() {
     removePending: (tableAddr, handId) => (removePending(tableAddr, handId)),
     processNetting: (netRequest, handId, privKey, tableAddr) => (processNetting(netRequest, handId, privKey, tableAddr)),
     resizeTable: (computed, tableAddr) => (resizeTable(computed, tableAddr)),
+    updateReceived: (tableAddr, hand) => (updateReceived(tableAddr, hand)),
   };
 }
 
@@ -376,6 +387,7 @@ const mapStateToProps = createStructuredSelector({
   proxyAddr: makeSelectProxyAddr(),
   netRequest: makeNetRequestSelector(),
   computedStyles: makeComputedSelector(),
+  missingHands: makeMissingHandSelector(),
 });
 
 Table.propTypes = {
@@ -399,6 +411,7 @@ Table.propTypes = {
   processNetting: React.PropTypes.func,
   netRequest: React.PropTypes.func,
   resizeTable: React.PropTypes.func,
+  updateReceived: React.PropTypes.func,
 };
 
 

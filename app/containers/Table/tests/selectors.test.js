@@ -4,7 +4,7 @@ import EWT from 'ethereum-web-token';
 import {
   tableStateSelector,
   makeStackSelector,
-  actionSelector,
+  makeMissingHandSelector,
 } from '../selectors';
 
 const ABI_BET = [{ name: 'bet', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
@@ -152,17 +152,49 @@ describe('stackSelector', () => {
   });
 });
 
-describe('actionSelector', () => {
-  it('should select action', () => {
-    const action = fromJS({
-      state: 'waiting',
-      dealer: 0,
-      lineup: [{
-        address: P1_ADDR,
-      }, {
-        address: P2_ADDR,
-      }],
+describe('missingHandSelector', () => {
+  it('should select missing hands.', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          5: {},
+          data: {
+            lastHandNetted: 3,
+          },
+        },
+      },
     });
-    expect(actionSelector(action, 1)).toEqual({ address: P2_ADDR });
+    const missingHandSelector = makeMissingHandSelector();
+    expect(missingHandSelector(mockedState, PROPS)).toEqual([4]);
+  });
+
+  it('should return empty array if no hand missing.', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          4: {},
+          5: {},
+          data: {
+            lastHandNetted: 3,
+          },
+        },
+      },
+    });
+    const missingHandSelector = makeMissingHandSelector();
+    expect(missingHandSelector(mockedState, PROPS)).toEqual([]);
+  });
+
+  it('should return lastHandNetted + 1 if no hand available.', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          data: {
+            lastHandNetted: 3,
+          },
+        },
+      },
+    });
+    const missingHandSelector = makeMissingHandSelector();
+    expect(missingHandSelector(mockedState, PROPS)).toEqual([4]);
   });
 });

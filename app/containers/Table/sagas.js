@@ -119,11 +119,6 @@ export function* updateScanner() {
       yield put(show(action.tableAddr, action.hand.handId, max, privKey));
       continue; // eslint-disable-line no-continue
     }
-
-    // check if time to fetch old hands
-    if (false) {
-      continue; // eslint-disable-line no-continue
-    }
   }
 }
 
