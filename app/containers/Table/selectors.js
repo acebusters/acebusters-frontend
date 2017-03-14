@@ -217,6 +217,41 @@ const makeAmountToCallSelector = () => createSelector(
   (maxBet, myMaxbet) => (maxBet && myMaxbet) ? maxBet - myMaxbet : 0
 );
 
+const makeMissingHandSelector = () => createSelector(
+  [tableStateSelector],
+  (table) => {
+    if (!table) {
+      return null;
+    }
+    // get state of contract
+    const lastHandNetted = table.getIn(['data', 'lastHandNetted']);
+    if (typeof lastHandNetted === 'undefined' || lastHandNetted < 1) {
+      return null;
+    }
+    // get progress of state channel
+    let maxHand = 0;
+    table.keySeq().forEach((k) => {
+      if (!isNaN(k)) {
+        const handId = parseInt(k, 10);
+        if (handId > maxHand) {
+          maxHand = handId;
+        }
+      }
+    });
+    // handle empty state channel
+    if (maxHand <= lastHandNetted) {
+      return [lastHandNetted + 1];
+    }
+    const rsp = [];
+    for (let i = lastHandNetted + 1; i < maxHand; i += 1) {
+      if (!table.get(i.toString())) {
+        rsp.push(i);
+      }
+    }
+    return rsp;
+  }
+);
+
 const makeStackSelector = () => createSelector(
   [tableStateSelector, posSelector],
   (table, pos) => {
@@ -303,5 +338,6 @@ export {
     makeNetRequestSelector,
     makeComputedSelector,
     makeStackSelector,
+    makeMissingHandSelector,
 };
 
