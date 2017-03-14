@@ -35,3 +35,14 @@ export const StackBox = styled.div`
   position: absolute;
 `;
 
+export const NameBox = styled.div`
+  margin-top: 25%;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 25%;
+  color: white;
+  background: #5a5a5a;
+  text-align: center;
+  position: absolute;
+`;
+

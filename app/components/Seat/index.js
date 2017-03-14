@@ -5,7 +5,7 @@
 import React from 'react';
 import Card from '../Card'; // eslint-disable-line
 import { SeatWrapper, ImageContainer, CardContainer, DealerButton, SeatLabel } from './SeatWrapper';
-import { ActionBox, StackBox } from './Info';
+import { ActionBox, StackBox, NameBox } from './Info';
 
 function SeatComponent(props) {
   const cardSize = (props.computedStyles && props.computedStyles.d < 600) ? 20 : 40;
@@ -18,12 +18,13 @@ function SeatComponent(props) {
   } else {
     status = 'EPMPTY';
   }
+
   if (props.open) {
     seat = (
       <SeatWrapper coords={props.coords} comuptedStyles={props.computedStyles}>
         <ImageContainer {...props} >
           <SeatLabel computedStyles={props.computedStyles}>
-            { status } , { props.pos }
+            { status }
           </SeatLabel>
         </ImageContainer>
       </SeatWrapper>
@@ -38,6 +39,7 @@ function SeatComponent(props) {
             <Card cardNumber={props.cards[1]} folded={props.folded} size={cardSize}></Card>
             <ActionBox {...props}> { (props.lastAmount > 0) ? props.lastAmount : '' }</ActionBox>
             <StackBox {...props}> { (props.stackSize > 0) ? props.stackSize : '' }</StackBox>
+            <NameBox {...props}> { props.lineup.getIn([props.pos, 'address']) } </NameBox>
           </CardContainer>
           <div>{ props.lastAction } </div>
         </ImageContainer>
