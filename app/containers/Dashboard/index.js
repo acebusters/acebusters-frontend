@@ -10,7 +10,6 @@ import web3Connect from '../AccountProvider/web3Connect';
 import { ABI_TOKEN_CONTRACT, tokenContractAddress } from '../../app.config';
 
 import List from '../../components/List';
-import Label from '../../components/Label';
 import TransferDialog from '../TransferDialog';
 import Container from '../../components/Container';
 import Button from '../../components/Button';
@@ -20,15 +19,10 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
 
   constructor(props) {
     super(props);
-    this.handleGetBlockNumber = this.handleGetBlockNumber.bind(this);
     this.handleGetBalance = this.handleGetBalance.bind(this);
     this.handleTransfer = this.handleTransfer.bind(this);
     this.web3 = props.web3Redux.web3;
     this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(tokenContractAddress);
-  }
-
-  handleGetBlockNumber() {
-    this.props.web3Redux.web3.eth.getBlockNumber();
   }
 
   handleGetBalance() {
@@ -56,10 +50,6 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     return (
       <Container>
         <h1><FormattedMessage {...messages.header} /></h1>
-        <Label>Last Block {this.web3.eth.blockNumber()}</Label>
-        <FormGroup>
-          <Button size="small" onClick={this.handleGetBlockNumber}>Get Block #</Button>
-        </FormGroup>
         <h3> Your address:</h3>
         <p> { this.props.account.proxy } </p>
         <QRCode value={qrUrl} size={120} />
