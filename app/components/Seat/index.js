@@ -16,7 +16,7 @@ function SeatComponent(props) {
   } else if (props.myPos === -1) {
     status = 'JOIN';
   } else {
-    status = 'EPMPTY';
+    status = 'EMPTY';
   }
 
   if (props.open) {

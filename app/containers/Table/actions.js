@@ -2,7 +2,7 @@
  * Created by helge on 20.09.16.
  */
 
-export const START_POLLING = 'START_POLLING';
+export const GET_INFO = 'GET_INFO';
 export const COMPLETE_HAND_QUERY = 'COMPLETE_HAND_QUERY';
 export const HAND_REQUEST = 'HAND_REQUEST';
 export const NEXT_HAND = 'NEXT_HAND';
@@ -43,8 +43,8 @@ export function net(tableAddr, handId, balances, privKey) {
   return { type: NET, tableAddr, handId, balances, privKey };
 }
 
-export function poll(tableAddr) {
-  return { type: START_POLLING, tableAddr };
+export function getInfo(tableAddr) {
+  return { type: GET_INFO, tableAddr };
 }
 
 export function resizeTable(computedStyles, tableAddr) {

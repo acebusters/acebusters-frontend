@@ -5,6 +5,7 @@
 import React from 'react';
 import { createStructuredSelector } from 'reselect';
 import { browserHistory } from 'react-router';
+import Pusher from 'pusher-js';
 // components and styles
 import Card from 'components/Card'; // eslint-disable-line
 import Seat from '../Seat'; // eslint-disable-line
@@ -21,7 +22,7 @@ import {
 import { modalAdd, modalDismiss } from '../App/actions';
 // actions
 import {
-  poll,
+  getInfo,
   lineupReceived,
   updateReceived,
   resizeTable,
@@ -102,6 +103,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.watchTable = this.watchTable.bind(this);
     this.watchToken = this.watchToken.bind(this);
     this.handleJoin = this.handleJoin.bind(this);
+    this.handleUpdate = this.handleUpdate.bind(this);
     this.handleResize = this.handleResize.bind(this);
     this.handleLeave = this.handleLeave.bind(this);
     this.tableAddr = props.params.tableAddr;
@@ -118,10 +120,11 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.tokenEvents.watch(this.watchToken);
 
     // getting table data from oracle
+    this.pusher = new Pusher('d4832b88a2a81f296f53', { cluster: 'eu', encrypted: true });
+    this.channel = this.pusher.subscribe(this.tableAddr);
     getTableData(this.table, props).then(() => {
-      this.interval = setInterval(() => {
-        props.poll(this.tableAddr);
-      }, 3000);
+      this.props.getInfo(this.tableAddr); // get initial state
+      this.channel.bind('modify', this.handleUpdate); // bind to future state updates
     });
   }
 
@@ -151,7 +154,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   componentWillUnmount() {
-    clearInterval(this.interval);
+    this.channel.unbind('modify', this.handleUpdate);
     this.tableEvents.stopWatching();
     this.tokenEvents.stopWatching();
   }
@@ -167,6 +170,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.props.modalDismiss();
     this.props.modalAdd(statusElement);
     this.props.addPending(this.tableAddr, this.props.params.handId, pos);
+  }
+
+  handleUpdate(hand) {
+    this.props.updateReceived(this.tableAddr, hand);
   }
 
   handleLeave() {
@@ -345,6 +352,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     const board = this.renderBoard();
 
     const sb = (this.props.data && this.props.data.get('smallBlind')) ? this.props.data.get('smallBlind') : 0;
+
     return (
       <div>
         { this.props.state &&
@@ -365,7 +373,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
 export function mapDispatchToProps() {
   return {
-    poll: (tableAddr) => (poll(tableAddr)),
+    getInfo: (tableAddr) => getInfo(tableAddr),
     lineupReceived: (tableAddr, lineup, smallBlind) => (lineupReceived(tableAddr, lineup, smallBlind)),
     modalAdd: (node) => (modalAdd(node)),
     modalDismiss: () => (modalDismiss()),
@@ -403,7 +411,7 @@ Table.propTypes = {
   updateLastHand: React.PropTypes.func,
   privKey: React.PropTypes.string,
   signerAddr: React.PropTypes.string,
-  poll: React.PropTypes.func,
+  getInfo: React.PropTypes.func,
   web3Redux: React.PropTypes.any,
   data: React.PropTypes.any,
   myPos: React.PropTypes.any,

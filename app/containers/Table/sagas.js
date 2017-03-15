@@ -12,7 +12,7 @@ import {
   BET,
   SHOW,
   NET,
-  START_POLLING,
+  GET_INFO,
   UPDATE_RECEIVED,
 } from './actions';
 
@@ -31,7 +31,7 @@ import {
 } from './selectors';
 import TableService, { fetchTableState } from '../../services/tableService';
 
-export function* poll(action) {
+export function* getInfo(action) {
   try {
     const tableState = yield call(fetchTableState, action.tableAddr);
     yield put(updateReceived(action.tableAddr, tableState));
@@ -137,7 +137,7 @@ function* tableSaga() {
   yield takeLatest(BET, performBet);
   yield takeLatest(SHOW, performShow);
   yield takeLatest(NET, submitSignedNetting);
-  yield takeLatest(START_POLLING, poll);
+  yield takeLatest(GET_INFO, getInfo);
   yield fork(updateScanner);
 }
 
