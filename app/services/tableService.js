@@ -103,7 +103,7 @@ TableService.prototype.net = function (handId, payload) {
     const header = new Headers({ 'Content-Type': 'application/json' });
     const data = JSON.stringify({ nettingSig: payload });
     const myInit = { headers: header, body: data, method: 'POST' };
-    const request = new Request(`${this.apiBasePath}/table/${this.tableAddr}/${handId}/netting`, myInit);
+    const request = new Request(`${this.apiBasePath}/table/${this.tableAddr}/hand/${handId}/netting`, myInit);
     fetch(request).then((res) => res.json(), (err) => {
       reject(err);
     }).then((distribution) => {

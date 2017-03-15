@@ -108,6 +108,21 @@ const isShowTurnByAction = createSelector(
   }
 );
 
+const hasNettingInAction = createSelector(
+  [actionSelector, addressSelector],
+  (action, myAddr) => {
+    // check data available
+    if (!myAddr || !action || !action.hand || !action.hand.netting) {
+      return false;
+    }
+    // check already signed
+    if (action.hand.netting[myAddr]) {
+      return false;
+    }
+    return true;
+  }
+);
+
 // other selectors
 const makeHandSelector = () => createSelector(
   handSelector,
@@ -175,11 +190,6 @@ const makeAmountSelector = () => createSelector(
 const makeLastHandNettedSelector = () => createSelector(
   tableStateSelector,
   (tableState) => (tableState) ? tableState.get('lastHandNettedOnClient') : null
-);
-
-const makeNetRequestSelector = () => createSelector(
-  tableStateSelector,
-  (tableState) => (tableState) ? tableState.get('netting') : null
 );
 
 const makeComputedSelector = () => createSelector(
@@ -341,6 +351,7 @@ export {
     isBbTurnByAction,
     is0rTurnByAction,
     isShowTurnByAction,
+    hasNettingInAction,
     makeTableDataSelector,
     makeSbSelector,
     makeAmountSelector,
@@ -358,7 +369,6 @@ export {
     makeHandSelector,
     makeMaxBetSelector,
     makeMyMaxBetSelector,
-    makeNetRequestSelector,
     makeComputedSelector,
     makeStackSelector,
     makeMissingHandSelector,

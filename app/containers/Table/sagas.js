@@ -1,15 +1,17 @@
 /**
  * Created by helge on 25.01.17.
  */
-import EthUtil from 'ethereumjs-util';
+import ethUtil from 'ethereumjs-util';
 import { call, put, takeLatest, select, fork, take } from 'redux-saga/effects';
 import {
   setCards,
   updateReceived,
   bet,
   show,
+  net,
   BET,
   SHOW,
+  NET,
   START_POLLING,
   UPDATE_RECEIVED,
 } from './actions';
@@ -23,6 +25,7 @@ import {
   isBbTurnByAction,
   is0rTurnByAction,
   isShowTurnByAction,
+  hasNettingInAction,
   makeSbSelector,
   makeMaxBetSelector,
 } from './selectors';
@@ -45,8 +48,8 @@ export function* submitSignedNetting(action) {
     // sign balances here
     let payload = new Buffer(action.balances.replace('0x', ''), 'hex');
     const priv = new Buffer(action.privKey.replace('0x', ''), 'hex');
-    const hash = EthUtil.sha3(payload);
-    const sig = EthUtil.ecsign(hash, priv);
+    const hash = ethUtil.sha3(payload);
+    const sig = ethUtil.ecsign(hash, priv);
     payload = sig.r.toString('hex') + sig.s.toString('hex') + sig.v.toString(16);
 
     const table = new TableService(action.tableAddr, action.privKey);
@@ -120,12 +123,20 @@ export function* updateScanner() {
       yield put(show(action.tableAddr, action.hand.handId, max, privKey));
       continue; // eslint-disable-line no-continue
     }
+
+    // check if netting exists that we need to sign
+    if (hasNettingInAction(action, { address: myAddr })) {
+      const balances = action.hand.netting.balances;
+      yield put(net(action.tableAddr, action.hand.handId, balances, privKey));
+      continue; // eslint-disable-line no-continue
+    }
   }
 }
 
 function* tableSaga() {
   yield takeLatest(BET, performBet);
   yield takeLatest(SHOW, performShow);
+  yield takeLatest(NET, submitSignedNetting);
   yield takeLatest(START_POLLING, poll);
   yield fork(updateScanner);
 }

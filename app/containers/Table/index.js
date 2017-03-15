@@ -24,7 +24,6 @@ import {
   poll,
   lineupReceived,
   updateReceived,
-  processNetting,
   resizeTable,
   addPending,
   removePending,
@@ -46,7 +45,6 @@ import {
   makeHandStateSelector,
   makeLineupSelector,
   makeMyPosSelector,
-  makeNetRequestSelector,
   makeComputedSelector,
   makeMissingHandSelector,
   makeLatestHandSelector,
@@ -215,8 +213,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
       case 'NettingRequest': {
         // disptach action to sign netting request
-        this.props.processNetting(this.props.netRequest,
-        this.props.hand.handId, this.props.privKey, this.props.params.id);
         break;
       }
 
@@ -375,7 +371,6 @@ export function mapDispatchToProps() {
     modalDismiss: () => (modalDismiss()),
     addPending: (tableAddr, handId, pos) => (addPending(tableAddr, handId, pos)),
     removePending: (tableAddr, handId) => (removePending(tableAddr, handId)),
-    processNetting: (netRequest, handId, privKey, tableAddr) => (processNetting(netRequest, handId, privKey, tableAddr)),
     resizeTable: (computed, tableAddr) => (resizeTable(computed, tableAddr)),
     updateReceived: (tableAddr, hand) => (updateReceived(tableAddr, hand)),
   };
@@ -395,7 +390,6 @@ const mapStateToProps = createStructuredSelector({
   signerAddr: makeSignerAddrSelector(),
   amountToCall: makeAmountToCallSelector(),
   proxyAddr: makeSelectProxyAddr(),
-  netRequest: makeNetRequestSelector(),
   computedStyles: makeComputedSelector(),
   missingHands: makeMissingHandSelector(),
 });
@@ -418,8 +412,6 @@ Table.propTypes = {
   addPending: React.PropTypes.func,
   removePending: React.PropTypes.func,
   modalDismiss: React.PropTypes.func,
-  processNetting: React.PropTypes.func,
-  netRequest: React.PropTypes.func,
   resizeTable: React.PropTypes.func,
   updateReceived: React.PropTypes.func,
 };
