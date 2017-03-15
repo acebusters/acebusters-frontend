@@ -3,8 +3,8 @@ import { connect } from 'react-redux';
 import { Form, Field, reduxForm } from 'redux-form/immutable';
 import { FormattedMessage } from 'react-intl';
 import Label from '../../components/Label';
-import Input from '../../components/Input';
 import Button from '../../components/Button';
+import Slider from '../../components/Slider';
 import FormGroup from '../../components/Form/FormGroup';
 
 import messages from './messages';
@@ -23,10 +23,10 @@ const warn = () => {
 };
 
 /* eslint-disable react/prop-types */
-const renderField = ({ input, label, type, meta: { touched, error, warning } }) => (
+const renderField = ({ input, label, meta: { touched, error, warning } }) => (
   <FormGroup>
     <Label htmlFor={input.name}>{label}</Label>
-    <Input {...input} placeholder={label} type={type} />
+    <Slider />
     {touched && ((error && <span>{error}</span>) || (warning && <span>{warning}</span>))}
   </FormGroup>
 );
