@@ -82,6 +82,7 @@ export function* updateScanner() {
   const privKeySelector = makeSelectPrivKey();
   const myAddrSelector = makeSignerAddrSelector();
   const sbSelector = makeSbSelector();
+
   while (true) {
     const action = yield take(UPDATE_RECEIVED);
     // do nothing if hand data missing

@@ -45,7 +45,6 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
     this.handleCheck = this.handleCheck.bind(this);
     this.handleShow = this.handleShow.bind(this);
     this.handleFold = this.handleFold.bind(this);
-    this.handId = parseInt(props.params.handId, 10);
     this.table = new TableService(props.params.tableAddr, this.props.privKey);
   }
 
@@ -61,28 +60,30 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
 
   handleBet(values, dispatch) {
     const amount = parseInt(values.get('amount'), 10);
-    return this.table.bet(this.handId, amount).catch((err) => {
+    const handId = parseInt(this.props.params.handId, 10);
+    return this.table.bet(handId, amount).catch((err) => {
       throw new SubmissionError({ _error: `Bet failed with error ${err}.` });
     }).then((data) => {
-      dispatch(setCards(this.props.params.tableAddr, this.handId, data.cards));
+      dispatch(setCards(this.props.params.tableAddr, handId, data.cards));
     });
   }
 
   handleCheck() {
     const amount = this.props.myMaxBet;
     const state = this.props.state;
+    const handId = parseInt(this.props.params.handId, 10);
     let call;
     switch (state) {
       case 'turn': {
-        call = this.table.checkTurn(this.handId, amount);
+        call = this.table.checkTurn(handId, amount);
         break;
       }
       case 'river': {
-        call = this.table.checkRiver(this.handId, amount);
+        call = this.table.checkRiver(handId, amount);
         break;
       }
       default: {
-        call = this.table.checkFlop(this.handId, amount);
+        call = this.table.checkFlop(handId, amount);
       }
     }
     return call.catch((err) => {
@@ -93,14 +94,16 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
   handleShow() {
     const amount = this.props.myMaxBet;
     const cards = this.props.me.cards;
-    return this.table.show(this.handId, amount, cards).catch((err) => {
+    const handId = parseInt(this.props.params.handId, 10);
+    return this.table.show(handId, amount, cards).catch((err) => {
       throw new SubmissionError({ _error: `Show failed with error ${err}.` });
     });
   }
 
   handleFold() {
     const amount = this.props.myMaxBet;
-    return this.table.fold(this.handId, amount).catch((err) => {
+    const handId = parseInt(this.props.params.handId, 10);
+    return this.table.fold(handId, amount).catch((err) => {
       throw new SubmissionError({ _error: `Fold failed with error ${err}.` });
     });
   }

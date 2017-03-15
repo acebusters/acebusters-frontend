@@ -4,6 +4,7 @@
 // react + redux
 import React from 'react';
 import { createStructuredSelector } from 'reselect';
+import { browserHistory } from 'react-router';
 // components and styles
 import Card from 'components/Card'; // eslint-disable-line
 import Seat from '../Seat'; // eslint-disable-line
@@ -48,6 +49,7 @@ import {
   makeNetRequestSelector,
   makeComputedSelector,
   makeMissingHandSelector,
+  makeLatestHandSelector,
 } from './selectors';
 
 import TableComponent from '../../components/Table';
@@ -134,6 +136,12 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       this.props.updateLastHand(this.tableAddr, nextProps.lastHandNettedOnClient + 1);
     }
 
+    if (nextProps.latestHand > this.props.params.handId) {
+      setTimeout(() => {
+        console.log('switching to next hand');
+        browserHistory.push(`/table/${this.tableAddr}/hand/${nextProps.latestHand}`);
+      }, 1000);
+    }
 
     if (nextProps.missingHands && nextProps.missingHands.length > 0) {
       for (let i = 0; i < nextProps.missingHands.length; i += 1) {
@@ -382,6 +390,7 @@ const mapStateToProps = createStructuredSelector({
   isMyTurn: makeIsMyTurnSelector(),
   potSize: makePotSizeSelector(),
   myPos: makeMyPosSelector(),
+  latestHand: makeLatestHandSelector(),
   privKey: makeSelectPrivKey(),
   signerAddr: makeSignerAddrSelector(),
   amountToCall: makeAmountToCallSelector(),

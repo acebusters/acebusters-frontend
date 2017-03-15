@@ -252,6 +252,28 @@ const makeMissingHandSelector = () => createSelector(
   }
 );
 
+const makeLatestHandSelector = () => createSelector(
+  [tableStateSelector],
+  (table) => {
+    if (!table) {
+      return null;
+    }
+
+    // get progress of state channel
+    let maxHand = 2;
+    table.keySeq().forEach((k) => {
+      if (!isNaN(k)) {
+        const handId = parseInt(k, 10);
+        if (handId > maxHand) {
+          maxHand = handId;
+        }
+      }
+    });
+
+    return maxHand;
+  }
+);
+
 const makeStackSelector = () => createSelector(
   [tableStateSelector, posSelector],
   (table, pos) => {
@@ -325,6 +347,7 @@ export {
     makeLineupSelector,
     makeMyStackSelector,
     makeHandStateSelector,
+    makeLatestHandSelector,
     makeBoardSelector,
     makeIsMyTurnSelector,
     makeWhosTurnSelector,
