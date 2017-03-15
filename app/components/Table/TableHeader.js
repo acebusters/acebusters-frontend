@@ -7,4 +7,5 @@ import styled from 'styled-components';
 export const TableHeader = styled.div`
    position: relative;
    text-align: left;
+   margin-left: 1em;
 `;

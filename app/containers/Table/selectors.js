@@ -121,7 +121,7 @@ const makeHandStateSelector = () => createSelector(
 
 const makeBoardSelector = () => createSelector(
   makeHandSelector(),
-  (hand) => (hand && hand.get('cards')) ? hand.get('cards').toJS() : null
+  (hand) => (hand && hand.get('cards')) ? hand.get('cards').toJS() : []
 );
 
 const makeTableDataSelector = () => createSelector(

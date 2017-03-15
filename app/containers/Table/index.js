@@ -325,9 +325,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   renderBoard() {
     const board = [];
     const cards = this.props.board;
+    const cardSize = 80;
     if (cards && cards.length > 0) {
       for (let i = 0; i < cards.length; i += 1) {
-        const card = (<Card key={i} cardNumber={cards[i]}></Card>);
+        const card = (<Card key={i} cardNumber={cards[i]} size={cardSize}></Card>);
         board.push(card);
       }
     }

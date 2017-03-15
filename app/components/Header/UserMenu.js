@@ -207,6 +207,7 @@ class UserMenu extends React.Component {
           <UserMenuHeader>
             <UserMenuHeaderImage src={this.props.image} />
             <UserMenuHeaderName>{this.props.name}</UserMenuHeaderName>
+            <UserMenuHeaderName>{this.props.signerAddr}</UserMenuHeaderName>
           </UserMenuHeader>
           <UserFooter>
             {this.props.profileAction &&
@@ -227,6 +228,7 @@ class UserMenu extends React.Component {
 UserMenu.propTypes = {
   name: React.PropTypes.string,
   image: React.PropTypes.string,
+  signerAddr: React.PropTypes.string,
   profileAction: React.PropTypes.func,
   signOutAction: React.PropTypes.func,
 };

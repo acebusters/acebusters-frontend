@@ -12,6 +12,7 @@ function Card(props) {
   let link;
   const suit = suits[Math.floor(props.cardNumber / 13)];
   const value = values[props.cardNumber % 13];
+
   if (props.cardNumber >= 0) {
     link = vc.getCardData(props.size, suit, value);
   } else {

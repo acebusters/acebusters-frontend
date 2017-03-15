@@ -61,7 +61,7 @@ function* performBet(action) {
   const table = new TableService(action.tableAddr, action.privKey);
   try {
     const holeCards = yield table.bet(action.handId, action.amount);
-    yield put(setCards(action.tableAddr, action.handId, holeCards));
+    yield put(setCards(action.tableAddr, action.handId, holeCards.cards));
   } catch (err) {
     // TODO: handle;
     console.dir(err);

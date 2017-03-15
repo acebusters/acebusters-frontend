@@ -85,7 +85,7 @@ export default function tableReducer(state = initialState, action) {
     }
 
     case TableActions.SET_CARDS: {
-      return state.setIn([action.tableAddr, action.handId.toString(), 'holeCards'], action.cards);
+      return state.setIn([action.tableAddr, action.handId.toString(), 'holeCards'], fromJS(action.cards));
     }
 
     case TableActions.RESIZE_TABLE: {
