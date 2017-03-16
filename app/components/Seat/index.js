@@ -38,7 +38,7 @@ function SeatComponent(props) {
             <Card cardNumber={props.cards[0]} folded={props.folded} size={cardSize}></Card>
             <Card cardNumber={props.cards[1]} folded={props.folded} size={cardSize}></Card>
             <ActionBox {...props}> { (props.lastAmount > 0) ? props.lastAmount : '' }</ActionBox>
-            <StackBox {...props}> { (props.stackSize > 0) ? props.stackSize : '' }</StackBox>
+            <StackBox {...props}> { props.stackSize }</StackBox>
             <NameBox {...props}> { props.lineup.getIn([props.pos, 'address']) } </NameBox>
           </CardContainer>
           <div>{ props.lastAction } </div>

@@ -9,10 +9,10 @@ import Grid from 'grid-styled';
 
 import * as LocalStorage from '../../services/localStorage';
 import { makeSelectPrivKey } from '../AccountProvider/selectors';
-import { makeHandStateSelector, makePotSizeSelector, makeMyMaxBetSelector, makeAmountSelector, makeMyStackSelector, makeMyPosSelector } from '../Table/selectors';
+import { makeHandStateSelector, makePotSizeSelector, makeMyMaxBetSelector, makeAmountSelector, makeStackSelector, makeMyPosSelector } from '../Table/selectors';
 import { setCards } from '../Table/actions';
 import Button from '../../components/Button';
-import Input from '../../components/Input';
+import Slider from '../../components/Slider';
 import ActionBarComponent from '../../components/ActionBar';
 import TableService from '../../services/tableService';
 
@@ -31,9 +31,9 @@ const warn = () => {
 };
 
 /* eslint-disable react/prop-types */
-const renderField = ({ input, label, type }) => (
+const renderField = ({ input, label, min, max, step }) => (
   <Grid md={4 / 4}>
-    <Input {...input} placeholder={label} type={type} />
+    <Slider {...input} placeholder={label} min={min} max={max} step={step} />
   </Grid>
 );
 
@@ -60,6 +60,7 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
 
   handleBet(values, dispatch) {
     const amount = parseInt(values.get('amount'), 10);
+    console.log(amount);
     const handId = parseInt(this.props.params.handId, 10);
     return this.table.bet(handId, amount).catch((err) => {
       throw new SubmissionError({ _error: `Bet failed with error ${err}.` });
@@ -112,9 +113,14 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
     const { handleSubmit, submitting } = this.props;
     return (
       <ActionBarComponent>
+        <Grid xs={1 / 2}>{this.props.amount}</Grid>
+        <Grid xs={1 / 2}>{this.props.stackSize}</Grid>
         <Field
           name="amount"
-          type="number"
+          type="range"
+          min={this.props.sb * 2}
+          max={this.props.stackSize}
+          step={this.props.sb * 2}
           component={renderField}
           label="Amount"
         />
@@ -142,7 +148,7 @@ const mapStateToProps = createStructuredSelector({
   amount: makeAmountSelector(),
   potSize: makePotSizeSelector(),
   myMaxBet: makeMyMaxBetSelector(),
-  stackSize: makeMyStackSelector(),
+  stackSize: makeStackSelector(),
   myPos: makeMyPosSelector(),
   state: makeHandStateSelector(),
 });
