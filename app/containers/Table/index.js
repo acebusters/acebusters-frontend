@@ -8,8 +8,7 @@ import { browserHistory } from 'react-router';
 import Pusher from 'pusher-js';
 // components and styles
 import Card from 'components/Card'; // eslint-disable-line
-import Seat from '../Seat'; // eslint-disable-line
-import Slider from '../Seat'; // eslint-disable-line
+import Seat from '../Seat'; // eslint-disable-lines
 import Button from 'components/Button'; // eslint-disable-line
 // config data
 import {
@@ -117,10 +116,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     window.onresize = this.handleResize;
     // register event listener for table
     this.tableEvents = this.table.allEvents({ fromBlock: 'latest' });
-    // this.tableEvents.watch(this.watchTable);
+    this.tableEvents.watch(this.watchTable);
 
     this.tokenEvents = this.token.allEvents({ fromBlock: 'latest' });
-    // this.tokenEvents.watch(this.watchToken);
+    this.tokenEvents.watch(this.watchToken);
 
     // getting table data from oracle
     this.pusher = new Pusher('d4832b88a2a81f296f53', { cluster: 'eu', encrypted: true });
@@ -331,7 +330,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           onClick={() => {
             if (open && myPos === -1 && !pending) {
               this.props.modalAdd((
-                <JoinDialog pos={i} handleJoin={this.handleJoin} />
+                <JoinDialog pos={i} handleJoin={this.handleJoin} params={this.props.params} web3Redux={this.props.web3Redux} />
               ));
             } else if (open && myPos !== -1 && !pending) {
               this.props.modalAdd((

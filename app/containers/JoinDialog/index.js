@@ -1,72 +1,54 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { Form, Field, reduxForm } from 'redux-form/immutable';
-import { FormattedMessage } from 'react-intl';
-import Label from '../../components/Label';
+import { createStructuredSelector } from 'reselect';
 import Button from '../../components/Button';
 import Slider from '../../components/Slider';
-import FormGroup from '../../components/Form/FormGroup';
+import {
+  ABI_TOKEN_CONTRACT,
+  tokenContractAddress,
+} from '../../app.config';
 
-import messages from './messages';
-
-const validate = (values) => {
-  const errors = {};
-  if (!values.get('amount')) {
-    errors.amount = 'Required';
-  }
-  return errors;
-};
-
-const warn = () => {
-  const warnings = {};
-  return warnings;
-};
-
-/* eslint-disable react/prop-types */
-const renderField = ({ input, label, meta: { touched, error, warning } }) => (
-  <FormGroup>
-    <Label htmlFor={input.name}>{label}</Label>
-    <Slider />
-    {touched && ((error && <span>{error}</span>) || (warning && <span>{warning}</span>))}
-  </FormGroup>
-);
-/* eslint-enable react/prop-types */
+import { makeSbSelector } from '../Table/selectors';
+import {
+  makeSelectProxyAddr,
+} from '../AccountProvider/selectors';
 
 class JoinDialog extends React.Component { // eslint-disable-line react/prefer-stateless-function
-  constructor(props) {
-    super(props);
+
+  componentWillMount() {
+    this.web3 = this.props.web3Redux.web3;
+    this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(tokenContractAddress);
+    this.token.balanceOf.call(this.props.proxyAddr);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  handleSubmit(values) {
-    const amount = parseInt(values.get('amount'), 10);
+  updateAmount(e) {
+    const amount = e.target.value;
+    this.setState({ amount });
+  }
+
+  handleSubmit() {
+    const min = this.props.sb * 40;
+    const amount = (this.state) ? this.state.amount : min;
+    console.log(amount);
     this.props.handleJoin(this.props.pos, amount);
   }
 
   render() {
-    const { error, handleSubmit, submitting } = this.props;
+    const min = this.props.sb * 40;
+    const tableMax = this.props.sb * 200;
+    // const balance = this.token.balanceOf(this.props.proxyAddr);
+    const max = tableMax;
     return (
       <div>
-        <FormattedMessage {...messages.header} />
-        <Form onSubmit={handleSubmit(this.handleSubmit)}>
-          <Field name="amount" component={renderField} type="number" placeholder="amount" />
-          {error && <strong>{error}</strong>}
-          <div>
-            <Button type="submit" disabled={submitting}>Submit</Button>
-          </div>
-        </Form>
+        <Slider max={max} min={min} step={1} onChange={(e) => this.updateAmount(e)}></Slider>
+        <div> Max: {max}</div>
+        <div>{ (this.state) ? this.state.amount : min }</div>
+        <Button onClick={this.handleSubmit}>Join</Button>
       </div>
     );
   }
 }
-
-JoinDialog.propTypes = {
-  submitting: PropTypes.bool,
-  handleSubmit: PropTypes.func,
-  handleJoin: PropTypes.func,
-  pos: PropTypes.any,
-  error: PropTypes.any,
-};
 
 
 function mapDispatchToProps(dispatch) {
@@ -75,7 +57,17 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-const mapStateToProps = () => ({
+const mapStateToProps = createStructuredSelector({
+  sb: makeSbSelector(),
+  proxyAddr: makeSelectProxyAddr(),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(reduxForm({ form: 'join', validate, warn })(JoinDialog));
+JoinDialog.propTypes = {
+  handleJoin: PropTypes.func,
+  pos: PropTypes.any,
+  sb: PropTypes.number,
+  proxyAddr: PropTypes.string,
+  web3Redux: React.PropTypes.any,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(JoinDialog);
