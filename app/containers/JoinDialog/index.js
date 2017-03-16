@@ -40,8 +40,7 @@ class JoinDialog extends React.Component { // eslint-disable-line react/prefer-s
 
   handleSubmit(values) {
     const amount = parseInt(values.get('amount'), 10);
-    const rv = this.props.handleJoin(this.props.pos, amount);
-    console.log(rv);
+    this.props.handleJoin(this.props.pos, amount);
   }
 
   render() {

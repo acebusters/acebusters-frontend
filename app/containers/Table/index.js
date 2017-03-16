@@ -142,7 +142,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
     if (nextProps.latestHand > this.props.params.handId) {
       setTimeout(() => {
-        console.log('switching to next hand');
         browserHistory.push(`/table/${this.tableAddr}/hand/${nextProps.latestHand}`);
       }, 1000);
     }

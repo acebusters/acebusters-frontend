@@ -77,7 +77,7 @@ const isBbTurnByAction = createSelector(
 const is0rTurnByAction = createSelector(
   [actionSelector, myPosByAction, isBbTurnByAction],
   (action, myPos, bbTurn) => {
-    if (!action.hand) {
+    if (!action.hand || !action.hand.lineup) {
       return false;
     }
     const whosTurn = pokerHelper.whosTurn(action.hand);

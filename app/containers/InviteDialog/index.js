@@ -44,8 +44,7 @@ class InviteDialog extends React.Component { // eslint-disable-line react/prefer
   }
 
   handleSubmit(values) {
-    const email = values.get('email');
-    console.log(email);
+    values.get('email');
   }
 
   render() {
