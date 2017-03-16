@@ -30,7 +30,6 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
   }
 
   handleTransfer(to, amount) {
-    console.log(to, amount);
     this.token.transfer.sendTransaction(to, amount);
     return true;
   }

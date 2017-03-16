@@ -100,7 +100,6 @@ export function* updateScanner() {
 
     // check if turn to pay small blind
     if (isSbTurnByAction(action, { address: myAddr })) {
-      console.log('sb');
       yield put(bet(action.tableAddr, action.hand.handId, sb, privKey));
       continue; // eslint-disable-line no-continue
     }

@@ -11,7 +11,6 @@ function TableService(tableAddr, privKey) {
 }
 
 TableService.prototype.bet = function (handId, amount) {
-  console.log(amount);
   const receipt = new EWT(ABI_BET).bet(handId, amount).sign(this.privKey);
   return this.pay(receipt);
 };

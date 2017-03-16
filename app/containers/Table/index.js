@@ -124,7 +124,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.channel = this.pusher.subscribe(this.tableAddr);
     getTableData(this.table, props).then(() => {
       this.props.getInfo(this.tableAddr); // get initial state
-      this.channel.bind('modify', this.handleUpdate); // bind to future state updates
+      this.channel.bind('update', this.handleUpdate); // bind to future state updates
     });
   }
 
@@ -139,7 +139,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
     if (nextProps.latestHand > this.props.params.handId) {
       setTimeout(() => {
-        console.log('switching to next hand');
         browserHistory.push(`/table/${this.tableAddr}/hand/${nextProps.latestHand}`);
       }, 1000);
     }
@@ -160,7 +159,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   handleJoin(pos, amount) {
-    console.log(pos);
     this.token.approve.sendTransaction(this.tableAddr, amount);
     this.table.join.sendTransaction(amount, this.props.signerAddr, pos + 1, '');
     const statusElement = (<div>
