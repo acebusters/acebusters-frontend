@@ -1,7 +1,7 @@
 import EWT from 'ethereum-web-token';
 import fetch from 'isomorphic-fetch';
 
-import { ABI_BET, ABI_SHOW, ABI_FOLD, ABI_LEAVE, checkABIs, apiBasePath } from '../app.config';
+import { ABI_BET, ABI_SHOW, ABI_FOLD, ABI_LEAVE, ABI_SIT_OUT, checkABIs, apiBasePath } from '../app.config';
 
 
 function TableService(tableAddr, privKey) {
@@ -11,7 +11,6 @@ function TableService(tableAddr, privKey) {
 }
 
 TableService.prototype.bet = function (handId, amount) {
-  console.log(amount);
   const receipt = new EWT(ABI_BET).bet(handId, amount).sign(this.privKey);
   return this.pay(receipt);
 };
@@ -95,6 +94,11 @@ TableService.prototype.show = function (handId, amount, holeCards) {
       reject(err);
     });
   });
+};
+
+TableService.prototype.sitOut = function (handId, amount) {
+  const receipt = new EWT(ABI_SIT_OUT).sitOut(handId, amount).sign(this.privKey);
+  return this.pay(receipt);
 };
 
 

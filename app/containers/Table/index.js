@@ -9,6 +9,7 @@ import Pusher from 'pusher-js';
 // components and styles
 import Card from 'components/Card'; // eslint-disable-line
 import Seat from '../Seat'; // eslint-disable-line
+import Slider from '../Seat'; // eslint-disable-line
 import Button from 'components/Button'; // eslint-disable-line
 // config data
 import {
@@ -47,6 +48,7 @@ import {
   makeLineupSelector,
   makeMyPosSelector,
   makeComputedSelector,
+  makeMyMaxBetSelector,
   makeMissingHandSelector,
   makeLatestHandSelector,
 } from './selectors';
@@ -106,6 +108,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.handleUpdate = this.handleUpdate.bind(this);
     this.handleResize = this.handleResize.bind(this);
     this.handleLeave = this.handleLeave.bind(this);
+    this.handleSitout = this.handleSitout.bind(this);
     this.tableAddr = props.params.tableAddr;
     this.web3 = props.web3Redux.web3;
     this.table = this.web3.eth.contract(ABI_TABLE).at(this.tableAddr);
@@ -114,17 +117,17 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     window.onresize = this.handleResize;
     // register event listener for table
     this.tableEvents = this.table.allEvents({ fromBlock: 'latest' });
-    this.tableEvents.watch(this.watchTable);
+    // this.tableEvents.watch(this.watchTable);
 
     this.tokenEvents = this.token.allEvents({ fromBlock: 'latest' });
-    this.tokenEvents.watch(this.watchToken);
+    // this.tokenEvents.watch(this.watchToken);
 
     // getting table data from oracle
     this.pusher = new Pusher('d4832b88a2a81f296f53', { cluster: 'eu', encrypted: true });
     this.channel = this.pusher.subscribe(this.tableAddr);
     getTableData(this.table, props).then(() => {
       this.props.getInfo(this.tableAddr); // get initial state
-      this.channel.bind('modify', this.handleUpdate); // bind to future state updates
+      this.channel.bind('update', this.handleUpdate); // bind to future state updates
     });
   }
 
@@ -154,7 +157,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   componentWillUnmount() {
-    this.channel.unbind('modify', this.handleUpdate);
+    this.channel.unbind('update', this.handleUpdate);
     this.tableEvents.stopWatching();
     this.tokenEvents.stopWatching();
   }
@@ -175,9 +178,20 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.props.updateReceived(this.tableAddr, hand);
   }
 
+  handleSitout() {
+    const handId = parseInt(this.props.params.handId, 10);
+    const amount = (this.props.myMaxbet > -1) ? this.props.myMaxbet : 0;
+    const table = new TableService(this.props.params.tableAddr, this.props.privKey);
+    return table.sitOut(handId, amount).catch((err) => {
+      console.log(err);
+      // throw new SubmissionError({ _error: `Leave failed with error ${err}.` });
+    });
+  }
+
   handleLeave() {
     const handId = parseInt(this.props.params.handId, 10);
-    const exitHand = handId - 1;
+    const state = this.props.state;
+    const exitHand = (state !== 'waiting') ? handId : handId - 1;
     const table = new TableService(this.props.params.tableAddr, this.props.privKey);
     return table.leave(exitHand).catch((err) => {
       console.log(err);
@@ -194,6 +208,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       this.props.resizeTable(computeStyles(windowWidth, windowHeight, infoHeight, actionBarHeight), this.tableAddr);
     }
   }
+
 
   watchTable(error, result) {
     if (error) {
@@ -349,9 +364,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     // Get last Modal Element
     const seats = this.renderSeats();
     const board = this.renderBoard();
-
     const sb = (this.props.data && this.props.data.get('smallBlind')) ? this.props.data.get('smallBlind') : 0;
-
     return (
       <div>
         { this.props.state &&
@@ -361,6 +374,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           board={board}
           seats={seats}
           onLeave={this.handleLeave}
+          onSitout={this.handleSitout}
           computedStyles={this.props.computedStyles}
         >
         </TableComponent> }
@@ -393,6 +407,7 @@ const mapStateToProps = createStructuredSelector({
   potSize: makePotSizeSelector(),
   myPos: makeMyPosSelector(),
   latestHand: makeLatestHandSelector(),
+  myMaxbet: makeMyMaxBetSelector(),
   privKey: makeSelectPrivKey(),
   signerAddr: makeSignerAddrSelector(),
   amountToCall: makeAmountToCallSelector(),
@@ -414,6 +429,7 @@ Table.propTypes = {
   web3Redux: React.PropTypes.any,
   data: React.PropTypes.any,
   myPos: React.PropTypes.any,
+  myMaxbet: React.PropTypes.number,
   computedStyles: React.PropTypes.object,
   modalAdd: React.PropTypes.func,
   addPending: React.PropTypes.func,

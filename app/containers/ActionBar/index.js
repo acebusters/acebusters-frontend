@@ -4,38 +4,27 @@
 import React from 'react';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
-import { Field, reduxForm, SubmissionError } from 'redux-form/immutable';
 import Grid from 'grid-styled';
 
 import * as LocalStorage from '../../services/localStorage';
 import { makeSelectPrivKey } from '../AccountProvider/selectors';
-import { makeHandStateSelector, makePotSizeSelector, makeMyMaxBetSelector, makeAmountSelector, makeStackSelector, makeMyPosSelector } from '../Table/selectors';
+import {
+  makeHandStateSelector,
+  makePotSizeSelector,
+  makeMyMaxBetSelector,
+  makeAmountSelector,
+  makeMyStackSelector,
+  makeMyPosSelector,
+  makeMinSelector,
+  makeMaxSelector,
+  makeIsMyTurnSelector,
+} from '../Table/selectors';
+
 import { setCards } from '../Table/actions';
 import Button from '../../components/Button';
 import Slider from '../../components/Slider';
 import ActionBarComponent from '../../components/ActionBar';
 import TableService from '../../services/tableService';
-
-
-const validate = (values) => {
-  const errors = {};
-  if (!values.get('amount')) {
-    errors.amount = 'Required';
-  }
-  return errors;
-};
-
-const warn = () => {
-  const warnings = {};
-  return warnings;
-};
-
-/* eslint-disable react/prop-types */
-const renderField = ({ input, label, min, max, step }) => (
-  <Grid md={4 / 4}>
-    <Slider {...input} placeholder={label} min={min} max={max} step={step} />
-  </Grid>
-);
 
 class ActionBar extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -50,22 +39,17 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
 
   componentWillReceiveProps(nextProps) {
     // use this function to dispatch auto actions
-    const key = `${this.props.params.tableAddr}-${this.props.params.handId}-${this.props.myPos}`;
+    const key = `${nextProps.params.tableAddr}-${nextProps.params.handId}-${nextProps.myPos}`;
     this.cards = LocalStorage.getItem(key);
-    if (nextProps.hand.state === 'showdown') {
-      const hand = nextProps.hand;
-      this.props.performShow(this.table, hand.handId, this.props.myMaxBet, this.cards);
-    }
   }
 
-  handleBet(values, dispatch) {
-    const amount = parseInt(values.get('amount'), 10);
-    console.log(amount);
+  handleBet() {
+    const amount = (this.state) ? parseInt(this.state.amount, 10) : this.props.stepAndMin;
     const handId = parseInt(this.props.params.handId, 10);
     return this.table.bet(handId, amount).catch((err) => {
-      throw new SubmissionError({ _error: `Bet failed with error ${err}.` });
+      console.log(err);
     }).then((data) => {
-      dispatch(setCards(this.props.params.tableAddr, handId, data.cards));
+      this.props.setCards(this.props.params.tableAddr, handId, data.cards);
     });
   }
 
@@ -88,7 +72,7 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
       }
     }
     return call.catch((err) => {
-      throw new SubmissionError({ _error: `Check failed with error ${err}.` });
+      console.log(err);
     });
   }
 
@@ -97,7 +81,7 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
     const cards = this.props.me.cards;
     const handId = parseInt(this.props.params.handId, 10);
     return this.table.show(handId, amount, cards).catch((err) => {
-      throw new SubmissionError({ _error: `Show failed with error ${err}.` });
+      console.log(err);
     });
   }
 
@@ -105,41 +89,51 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
     const amount = this.props.myMaxBet;
     const handId = parseInt(this.props.params.handId, 10);
     return this.table.fold(handId, amount).catch((err) => {
-      throw new SubmissionError({ _error: `Fold failed with error ${err}.` });
+      console.log(err);
     });
   }
 
+  updateValue(e) {
+    const amount = (e.target.value > this.props.stackSize) ? this.props.stackSize : e.target.value;
+    this.setState({ amount });
+  }
+
   render() {
-    const { handleSubmit, submitting } = this.props;
-    return (
-      <ActionBarComponent>
-        <Grid xs={1 / 2}>{this.props.amount}</Grid>
-        <Grid xs={1 / 2}>{this.props.stackSize}</Grid>
-        <Field
-          name="amount"
-          type="range"
-          min={this.props.sb * 2}
-          max={this.props.stackSize}
-          step={this.props.sb * 2}
-          component={renderField}
-          label="Amount"
-        />
-        <Grid xs={1 / 3}>
-          <Button size="large" onClick={handleSubmit(this.handleBet)} disabled={submitting} >Bet</Button>
-        </Grid>
-        <Grid xs={1 / 3}>
-          <Button size="large" onClick={handleSubmit(this.handleCheck)} disabled={submitting} >Check</Button>
-        </Grid>
-        <Grid xs={1 / 3}>
-          <Button size="large" onClick={handleSubmit(this.handleFold)} disabled={submitting} >Fold</Button>
-        </Grid>
-      </ActionBarComponent>
-    );
+    const state = this.props.state;
+    if (this.props.isMyTurn && state !== 'dealing' && state !== 'waiting') {
+      return (
+        <ActionBarComponent>
+          <Grid xs={1 / 2}>{this.props.stepAndMin}</Grid>
+          <Grid xs={1 / 2}>{(this.state) ? this.state.amount : this.props.stepAndMin}</Grid>
+          <Grid xs={1 / 1}>
+            <Slider
+              max={this.props.max}
+              min={this.props.stepAndMin}
+              step={this.props.stepAndMin}
+              onChange={(e) => this.updateValue(e)}
+            >
+            </Slider>
+          </Grid>
+          <Grid xs={1 / 3}>
+            <Button size="large" onClick={this.handleBet} >Bet</Button>
+          </Grid>
+          <Grid xs={1 / 3}>
+            <Button size="large" onClick={this.handleCheck} >Check</Button>
+          </Grid>
+          <Grid xs={1 / 3}>
+            <Button size="large" onClick={this.handleFold} >Fold</Button>
+          </Grid>
+        </ActionBarComponent>
+      );
+    }
+    return null;
   }
 }
 
 export function mapDispatchToProps() {
-  return {};
+  return {
+    setCards: (tableAddr, handId, cards) => setCards(tableAddr, handId, cards),
+  };
 }
 
 
@@ -148,8 +142,11 @@ const mapStateToProps = createStructuredSelector({
   amount: makeAmountSelector(),
   potSize: makePotSizeSelector(),
   myMaxBet: makeMyMaxBetSelector(),
-  stackSize: makeStackSelector(),
+  stackSize: makeMyStackSelector(),
   myPos: makeMyPosSelector(),
+  isMyTurn: makeIsMyTurnSelector(),
+  stepAndMin: makeMinSelector(),
+  max: makeMaxSelector(),
   state: makeHandStateSelector(),
 });
 
@@ -159,8 +156,13 @@ ActionBar.propTypes = {
   privKey: React.PropTypes.string,
   cards: React.PropTypes.array,
   myMaxBet: React.PropTypes.number,
-  myPos: React.PropTypes.number,
+  stepAndMin: React.PropTypes.number,
+  max: React.PropTypes.number,
+  isMyTurn: React.PropTypes.bool,
+  state: React.PropTypes.string,
+  stackSize: React.PropTypes.number,
   me: React.PropTypes.object,
+  setCards: React.PropTypes.func,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(reduxForm({ form: 'actionBar', validate, warn })(ActionBar));
+export default connect(mapStateToProps, mapDispatchToProps)(ActionBar);

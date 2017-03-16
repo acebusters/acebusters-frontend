@@ -4,6 +4,7 @@
 
 import React from 'react';
 import styled from 'styled-components';
+import Grid from 'grid-styled';
 import { GamePlay, TableArea, TableContainer, PokerTable, TableAndChairs } from './TableWrapper';
 import { Board } from './Board';
 import { TableHeader } from './TableHeader';
@@ -22,7 +23,12 @@ function TableComponent(props) {
   return (
     <GamePlay id="game-play" {...props} computedStyles={props.computedStyles}>
       <TableArea id="table-area" computedStyles={props.computedStyles}>
-        { (props.myPos > -1) && <Button size="large" onClick={props.onLeave} >Leave</Button> }
+        { (props.myPos > -1) &&
+          <div>
+            <Grid xs={1 / 2} ><Button size="large" onClick={props.onLeave} >Leave</Button></Grid>
+            <Grid xs={1 / 2} ><Button size="large" onClick={props.onSitout} >SitOut</Button></Grid>
+          </div>
+         }
         <TableHeader> { `signerAddr: ${props.signerAddr}` } <br />{ `state :${props.state}` } <br />{ `amount to call: ${props.amountToCall}` }
           <br />{ `sb: ${props.sb}` } </TableHeader>
         <TableContainer id="table-container">
@@ -46,6 +52,7 @@ TableComponent.propTypes = {
   state: React.PropTypes.string,
   lineup: React.PropTypes.any,
   onLeave: React.PropTypes.any,
+  onSitout: React.PropTypes.any,
   signerAddr: React.PropTypes.string,
   board: React.PropTypes.array,
   seats: React.PropTypes.array,

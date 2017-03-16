@@ -23,10 +23,6 @@ export function completeHandQuery(tableAddr, hand) {
   return { type: COMPLETE_HAND_QUERY, tableAddr, hand };
 }
 
-export function handRequest(tableAddr, handId) {
-  return { type: HAND_REQUEST, tableAddr, handId };
-}
-
 export function setCards(tableAddr, handId, cards, pos) {
   return { type: SET_CARDS, tableAddr, handId, cards, pos };
 }

@@ -57,7 +57,7 @@ export const TableAndChairs = styled.div`
 export const PokerTable = styled.div`
   margin: 0 auto;
   position: relative;
-  top: 40%;
+  top: 25%;
   transform: translateY(-40%);
   width: 80%;
   height: 50%;

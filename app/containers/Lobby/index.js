@@ -9,7 +9,6 @@ import { TableStriped } from 'components/List';
 import H2 from 'components/H2';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
-
 import LobbyItem from '../LobbyItem';
 import { tableReceived } from '../Table/actions';
 import { makeSelectLobby } from './selectors';
