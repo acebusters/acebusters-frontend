@@ -25,8 +25,11 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(tokenContractAddress);
   }
 
-  handleGetBalance() {
-    this.token.balanceOf.call(this.props.account.proxy);
+  componentWillReceiveProps(nextProps) {
+    const balance = this.token.balanceOf(this.props.account.proxy);
+    if (!balance && nextProps.account.proxy) {
+      this.token.balanceOf.call(nextProps.account.proxy);
+    }
   }
 
   handleTransfer(to, amount) {
@@ -54,7 +57,6 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
         <QRCode value={qrUrl} size={120} />
         <p>Balance: {balance}</p>
         <FormGroup>
-          <Button onClick={this.handleGetBalance} size="small">Refresh Balance</Button>
           <Button
             onClick={() => {
               this.props.modalAdd((
