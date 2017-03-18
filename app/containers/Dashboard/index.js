@@ -19,7 +19,6 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
 
   constructor(props) {
     super(props);
-    this.handleGetBalance = this.handleGetBalance.bind(this);
     this.handleTransfer = this.handleTransfer.bind(this);
     this.web3 = props.web3Redux.web3;
     this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(tokenContractAddress);

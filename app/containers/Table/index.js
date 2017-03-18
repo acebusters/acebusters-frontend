@@ -135,6 +135,11 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   componentWillReceiveProps(nextProps) {
+    const balance = this.token.balanceOf(this.props.proxyAddr);
+    if (!balance && nextProps.proxyAddr) {
+      this.token.balanceOf.call(nextProps.proxyAddr);
+    }
+
     if (this.props.hand && nextProps.lastHandNettedOnClient < this.props.hand.handId - 1) {
       this.props.updateLastHand(this.tableAddr, nextProps.lastHandNettedOnClient + 1);
     }
@@ -220,6 +225,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       case 'Join': {
         // update lineup when join successful
         this.table.getLineup.call();
+        getTableData(this.table, this.props);
         this.props.removePending(this.tableAddr, this.props.params.handId);
         this.props.modalDismiss();
         const statusElement = (<div>
@@ -313,6 +319,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       return (<div></div>);
     }
 
+    let balance = this.token.balanceOf(this.props.proxyAddr);
+    if (balance) {
+      balance = balance.toString();
+    }
     const coordArray = SEAT_COORDS[lineup.length.toString()];
     const amountCoords = AMOUNT_COORDS[lineup.length.toString()];
     for (let i = 0; i < lineup.length; i += 1) {
@@ -330,7 +340,12 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           onClick={() => {
             if (open && myPos === -1 && !pending) {
               this.props.modalAdd((
-                <JoinDialog pos={i} handleJoin={this.handleJoin} params={this.props.params} web3Redux={this.props.web3Redux} />
+                <JoinDialog
+                  pos={i}
+                  handleJoin={this.handleJoin}
+                  params={this.props.params}
+                  balance={balance}
+                />
               ));
             } else if (open && myPos !== -1 && !pending) {
               this.props.modalAdd((
@@ -422,6 +437,7 @@ Table.propTypes = {
   params: React.PropTypes.object,
   updateLastHand: React.PropTypes.func,
   privKey: React.PropTypes.string,
+  proxyAddr: React.PropTypes.string,
   signerAddr: React.PropTypes.string,
   getInfo: React.PropTypes.func,
   web3Redux: React.PropTypes.any,

@@ -3,10 +3,6 @@ import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import Button from '../../components/Button';
 import Slider from '../../components/Slider';
-import {
-  ABI_TOKEN_CONTRACT,
-  tokenContractAddress,
-} from '../../app.config';
 
 import { makeSbSelector } from '../Table/selectors';
 import {
@@ -15,10 +11,8 @@ import {
 
 class JoinDialog extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
-  componentWillMount() {
-    this.web3 = this.props.web3Redux.web3;
-    this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(tokenContractAddress);
-    this.token.balanceOf.call(this.props.proxyAddr);
+  constructor(props) {
+    super(props);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
@@ -30,15 +24,13 @@ class JoinDialog extends React.Component { // eslint-disable-line react/prefer-s
   handleSubmit() {
     const min = this.props.sb * 40;
     const amount = (this.state) ? this.state.amount : min;
-    console.log(amount);
     this.props.handleJoin(this.props.pos, amount);
   }
 
   render() {
     const min = this.props.sb * 40;
     const tableMax = this.props.sb * 200;
-    // const balance = this.token.balanceOf(this.props.proxyAddr);
-    const max = tableMax;
+    const max = (this.props.balance < tableMax) ? this.props.balance : tableMax;
     return (
       <div>
         <Slider max={max} min={min} step={1} onChange={(e) => this.updateAmount(e)}></Slider>
@@ -66,8 +58,7 @@ JoinDialog.propTypes = {
   handleJoin: PropTypes.func,
   pos: PropTypes.any,
   sb: PropTypes.number,
-  proxyAddr: PropTypes.string,
-  web3Redux: React.PropTypes.any,
+  balance: React.PropTypes.string,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(JoinDialog);
