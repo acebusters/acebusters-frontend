@@ -26,6 +26,21 @@ import SeatComponent from '../../components/Seat';
 
 class Seat extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
+  componentDidMount() {
+    if (this.props.whosTurn === this.props.pos && !this.interval) {
+      this.interval = setInterval(() => {
+        let timeLeft;
+        if (this.props.hand && this.props.hand.get('changed')) {
+          const deadline = this.props.hand.get('changed') + 60;
+          timeLeft = deadline - Math.floor(Date.now() / 1000);
+          this.setState({ timeLeft });
+        }
+      }, 1000);
+    } else {
+      clearInterval(this.interval);
+    }
+  }
+
   componentWillReceiveProps(nextProps) {
     // Saving holecards for the hand
     if (nextProps.hand && nextProps.hand.lineup
@@ -44,8 +59,9 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
   }
 
   render() {
+    const timeLeft = (this.state) ? this.state.timeLeft : 0;
     return (
-      <SeatComponent {...this.props}></SeatComponent>
+      <SeatComponent {...this.props} timeLeft={timeLeft}></SeatComponent>
     );
   }
 }
@@ -76,6 +92,7 @@ Seat.propTypes = {
   hand: React.PropTypes.object,
   params: React.PropTypes.object,
   setCards: React.PropTypes.func,
+  whosTurn: React.PropTypes.number,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Seat);

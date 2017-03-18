@@ -135,6 +135,29 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   componentWillReceiveProps(nextProps) {
+    console.log(this.props.hand);
+    if (this.props.myPos > -1
+      && this.props.hand
+      && this.props.hand.get('changed') < nextProps.hand.get('changed')
+      && nextProps.hand.get('state') !== 'waiting') {
+      if (this.timeOut) {
+        clearTimeout(this.timeOut);
+      }
+
+      const random = (Math.random() * 9000);
+      const timeOut = (nextProps.hand.get('changed') - Math.floor(Date.now() / 1000)) + 59000 + random;
+      if (timeOut > 0) {
+        console.log('timeout started');
+        this.timeOut = setTimeout(() => {
+          console.log('timeout fired');
+          const table = new TableService(this.props.params.tableAddr);
+          table.timeOut().then((res) => {
+            console.log(res);
+          });
+        }, timeOut);
+      }
+    }
+
     const balance = this.token.balanceOf(this.props.proxyAddr);
     if (!balance && nextProps.proxyAddr) {
       this.token.balanceOf.call(nextProps.proxyAddr);

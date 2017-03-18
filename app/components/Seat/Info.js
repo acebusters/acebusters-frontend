@@ -46,3 +46,14 @@ export const NameBox = styled.div`
   position: absolute;
 `;
 
+export const TimeBox = styled.div`
+  margin-top: 45%;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 25%;
+  color: white;
+  background: #5a5a5a;
+  text-align: center;
+  position: absolute;
+`;
+

@@ -34,6 +34,7 @@ import TableService, { fetchTableState } from '../../services/tableService';
 export function* getInfo(action) {
   try {
     const tableState = yield call(fetchTableState, action.tableAddr);
+    console.dir(tableState);
     yield put(updateReceived(action.tableAddr, tableState));
   } catch (err) {
     // TODO: handle;

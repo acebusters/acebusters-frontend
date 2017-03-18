@@ -101,6 +101,33 @@ TableService.prototype.sitOut = function (handId, amount) {
   return this.pay(receipt);
 };
 
+TableService.prototype.timeOut = function () {
+  return new Promise((resolve, reject) => {
+    fetch(`${apiBasePath}/table/${this.tableAddr}/timeout`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      } }).then((rsp) => {
+        if (rsp.status >= 200 && rsp.status < 300) {
+          rsp.json().then((response) => {
+            resolve(response);
+          });
+          return;
+        }
+        if (rsp.status < 500) {
+          rsp.json().then((response) => {
+            reject(response.errorMessage);
+          });
+          return;
+        }
+        reject('server error.');
+      }).catch((error) => {
+        reject(error);
+      });
+  });
+};
+
 
 TableService.prototype.net = function (handId, payload) {
   return new Promise((resolve, reject) => {

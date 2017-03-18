@@ -5,7 +5,7 @@
 import React from 'react';
 import Card from '../Card'; // eslint-disable-line
 import { SeatWrapper, ImageContainer, CardContainer, DealerButton, SeatLabel } from './SeatWrapper';
-import { ActionBox, StackBox, NameBox } from './Info';
+import { ActionBox, StackBox, NameBox, TimeBox } from './Info';
 
 function SeatComponent(props) {
   const cardSize = (props.computedStyles && props.computedStyles.d < 600) ? 20 : 40;
@@ -40,6 +40,7 @@ function SeatComponent(props) {
             <ActionBox {...props}> { (props.lastAmount > 0) ? props.lastAmount : '' }</ActionBox>
             <StackBox {...props}> { props.stackSize }</StackBox>
             <NameBox {...props}> { props.lineup.getIn([props.pos, 'address']) } </NameBox>
+            <TimeBox>{ props.timeLeft } </TimeBox>
           </CardContainer>
           <div>{ props.lastAction } </div>
         </ImageContainer>
