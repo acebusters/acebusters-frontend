@@ -101,6 +101,7 @@ export default function tableReducer(state = initialState, action) {
           dealer: action.hand.dealer,
           state: action.hand.state,
           changed: action.hand.changed,
+          distribution: action.hand.distribution,
         });
         if (action.hand.lineup) {
           for (let j = 0; j < action.hand.lineup.length; j += 1) {

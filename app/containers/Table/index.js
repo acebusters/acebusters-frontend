@@ -135,13 +135,13 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log(this.props.hand);
     if (this.props.myPos > -1
       && this.props.hand
       && this.props.hand.get('changed') < nextProps.hand.get('changed')
       && nextProps.hand.get('state') !== 'waiting') {
       if (this.timeOut) {
         clearTimeout(this.timeOut);
+        console.log('timeout cancelled');
       }
 
       const random = (Math.random() * 9000);
