@@ -26,21 +26,6 @@ import SeatComponent from '../../components/Seat';
 
 class Seat extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
-  componentDidMount() {
-    if (this.props.whosTurn === this.props.pos && !this.interval) {
-      this.interval = setInterval(() => {
-        let timeLeft;
-        if (this.props.hand && this.props.hand.get('changed')) {
-          const deadline = this.props.hand.get('changed') + 60;
-          timeLeft = deadline - Math.floor(Date.now() / 1000);
-          this.setState({ timeLeft });
-        }
-      }, 1000);
-    } else {
-      clearInterval(this.interval);
-    }
-  }
-
   componentWillReceiveProps(nextProps) {
     // Saving holecards for the hand
     if (nextProps.hand && nextProps.hand.lineup
@@ -55,6 +40,28 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
       const key = `${this.props.params.tableAddr}-${this.props.params.handId}-${this.props.pos}`;
       this.cards = LocalStorage.getItem(key);
       if (this.cards && this.cards.length === 2) { this.props.setCards(this.props.tableAddr, this.props.params.handId, this.cards, this.props.pos); }
+    }
+
+    // manage timer
+    if (nextProps.whosTurn === nextProps.pos) {
+      if (!this.interval) {
+        this.interval = setInterval(() => {
+          let timeLeft;
+          if (nextProps.hand && nextProps.hand.get('changed')) {
+            const deadline = nextProps.hand.get('changed') + 60;
+            timeLeft = deadline - Math.floor(Date.now() / 1000);
+            if (timeLeft <= 0) {
+              clearInterval(this.interval);
+              this.interval = null;
+            } else {
+              this.setState({ timeLeft });
+            }
+          }
+        }, 1000);
+      }
+    } else if (this.interval) {
+      clearInterval(this.interval);
+      this.interval = null;
     }
   }
 
@@ -92,7 +99,6 @@ Seat.propTypes = {
   hand: React.PropTypes.object,
   params: React.PropTypes.object,
   setCards: React.PropTypes.func,
-  whosTurn: React.PropTypes.number,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Seat);
