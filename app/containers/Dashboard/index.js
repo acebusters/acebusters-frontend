@@ -60,9 +60,11 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
             onClick={() => {
               this.props.modalAdd((
                 <TransferDialog handleTransfer={this.handleTransfer} />
-            ));
-            }} size="small"
-          >Transfer</Button>
+              ));
+            }}
+            size="medium"
+            icon="fa fa-money"
+          >TRANSFER</Button>
         </FormGroup>
         <hr />
         <h2><FormattedMessage {...messages.pending} /></h2>

@@ -7,6 +7,7 @@ import {
   transitionFn,
   navbarHeight,
   screenXsMax,
+  black,
 } from '../../variables';
 
 const StyledNavbarMenuList = styled.ul`
@@ -54,7 +55,7 @@ const StyledNavbar = styled.nav`
   margin-bottom: 0;
   border: none;
   border-radius: 0;
-  background-color: ${(props) => props.theme.backgroundColor || '#fff'};
+  background-color: ${black};
 `;
 
 const Navbar = (props) => (

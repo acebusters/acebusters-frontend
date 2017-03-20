@@ -10,8 +10,9 @@ import FormGroup from '../../components/Form/FormGroup';
 import Label from '../../components/Label';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
-import H2 from '../../components/H2';
+import H1 from '../../components/H1';
 import ErrorMessage from '../../components/ErrorMessage';
+import Radial from '../../components/RadialProgress';
 
 import account from '../../services/account';
 import { workerError, walletExported, register } from './actions';
@@ -47,7 +48,7 @@ const warn = (values) => {
 
 /* eslint-disable react/prop-types */
 const Captcha = (props) => (
-  <div>
+  <div style={{ marginBottom: '15px' }}>
     <ReCAPTCHA
       sitekey={'6LcE0RQUAAAAAEf6UWFsHEPedPBmRPAQiaSiWynN'}
       onChange={props.input.onChange}
@@ -147,15 +148,27 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
     const { error, handleSubmit, submitting } = this.props;
     return (
       <Container>
-        <H2> Please Register a new account </H2>
-        <Form onSubmit={handleSubmit(this.handleSubmit)}>
-          <Field name="email" type="text" component={renderField} label="Email" />
-          <Field name="password" type="password" component={renderField} label="Password" />
-          <Field name="captchaResponse" component={Captcha} />
-          {error && <ErrorMessage error={error}></ErrorMessage>}
-          <Button type="submit" disabled={submitting}>Login</Button>
-        </Form>
-        <iframe src={workerPath} style={{ display: 'none' }} onLoad={(event) => { this.frame = event.target; }} />
+        <div>
+          <H1> Register a new account!</H1>
+          <Form onSubmit={handleSubmit(this.handleSubmit)}>
+            <Field name="email" type="text" component={renderField} label="Email" />
+            <Field name="password" type="password" component={renderField} label="Password" />
+            <Field name="captchaResponse" component={Captcha} />
+            {error && <ErrorMessage error={error}></ErrorMessage>}
+            <Button type="submit" disabled={submitting} size="large">Register</Button>
+          </Form>
+          <iframe
+            src={workerPath} style={{ display: 'none' }} onLoad={(event) => {
+              this.frame = event.target;
+            }}
+          />
+        </div>
+        { this.props.progress &&
+          <div>
+            <Radial progress={this.props.progress}></Radial>
+            <H1>Registering please wait ...</H1>
+          </div>
+        }
       </Container>
     );
   }

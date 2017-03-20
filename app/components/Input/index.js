@@ -3,27 +3,43 @@
  */
 
 import styled from 'styled-components';
-import { green } from '../../variables';
+
+import {
+  green,
+} from '../../variables';
 
 
-const Input = styled.input`
+const InputStyled = styled.input`
   ${(props) => {
     if (props.touched && !props.error) {
       return `border: 2px solid ${green}`;
     }
     return 'border: 1px solid #ccc';
   }}
-  height: 34px;
-  padding: 6px 12px;
-  font-size: 14px;
-  line-height: 1.42857143;
-  color: #555;
-  ${($props) => `type:${$props.placeholder}`};
-  float:left;
+  -webkit-box-shadow: 0 0 0px 1000px white inset !important
+  padding: 10px;
+  border: solid 1px gainsboro;
+  -webkit-transition: box-shadow 0.3s, border 0.3s;
+  -moz-transition: box-shadow 0.3s, border 0.3s;
+  -o-transition: box-shadow 0.3s, border 0.3s;
+  transition: box-shadow 0.3s, border 0.3s;
+  display: block;
+  margin: 0;
+  color: black;
   width: 100%;
-  background-color: #fff;
-  background-image: none;
+  font-family: "Open Sans", sans-serif;
+  font-size: 18px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  -webkit-border-radius: none;
+  -moz-border-radius: none;
+  -ms-border-radius: none;
+  -o-border-radius: none;
   border-radius: 4px;
 `;
 
-export default Input;
+export default InputStyled;

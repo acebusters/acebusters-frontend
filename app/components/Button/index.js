@@ -9,23 +9,20 @@
 import React, { PropTypes, Children } from 'react';
 import styled from 'styled-components';
 
-const StyledButton = styled.button`{
+import {
+  baseColor,
+  fontPrimary,
+  black,
+  background,
+} from '../../variables';
+
+const Medium = styled.button`{
   display: block;
-  width: 100%;
   box-sizing: border-box;
   text-decoration: none;
-  ${(props) => {
-    switch (props.size) {
-      case 'small':
-        return 'padding: 0.2em 0.4em;font-size: 14px;';
-      case 'medium':
-        return 'padding: 0.25em 2em;font-size: 16px;';
-      case 'large':
-        return 'padding: 0.5em 2em;font-size: 10em;';
-      default:
-        return 'padding: 0.25em 2em;font-size: 10em;';
-    }
-  }}
+  margin: 0 auto;
+  padding: 0.1em 0.5em;
+  font-size: 10em;
   border-radius: 4px;
   -webkit-font-smoothing: antialiased;
   -webkit-touch-callout: none;
@@ -35,32 +32,111 @@ const StyledButton = styled.button`{
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: bold;
   font-size: 16px;
-  ${(props) => {
-    if (props.disabled) {
-      return 'border: 2px solid grey; color: grey;';
-    }
-    return 'border: 2px solid #41addd; color: #41addd;';
-  }}
-  
-
+  background-color: ${black};
+  color: ${fontPrimary};
+ 
   &:active {
-    background: #41addd;
-    color: #fff;
+    color: ${baseColor};
+  }
+  
+  &:hover {
+    color: ${baseColor};
   }
 }`;
 
+const Large = styled.button`
+  display: block;
+  box-sizing: border-box;
+  text-decoration: none;
+  margin: 0 auto;
+  padding: 10px;
+  font-size: 10em;
+  border-radius: 4px;
+  border-color: 2px ${baseColor};
+  -webkit-font-smoothing: antialiased;
+  -webkit-touch-callout: none;
+  user-select: none;
+  cursor: pointer;
+  outline: 0;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: bold;
+  font-size: 24px;
+  color: ${fontPrimary};
+  width: 100%;
+  border: 2px solid ${baseColor};
+  background-color: ${baseColor};
+  &:active {
+    color: ${baseColor};
+    background-color: ${background};
+  }
+  
+  ${(props) => {
+    if (props.loading) {
+      console.log('loading true');
+    }
+  }}
+  
+  &:hover {
+    color: ${baseColor};
+    background-color: ${background};
+  }
+`;
+
+const Icon = styled.i`
+  padding-left: 0.5em;
+  ${(props) => {
+    if (props.content.length === 0) {
+      return 'padding-right: 0.5em;';
+    }
+    return 'padding-right: 0';
+  }}
+`;
+
 const Wrapper = styled.div`
   text-align: center;
+  width: 100%;
 `;
 
 function Button(props) {
   // Render an anchor tag
-  const button = (
-    <StyledButton onClick={props.onClick} size={props.size} type={props.type} disabled={props.disabled}>
-      {Children.toArray(props.children)}
-    </StyledButton>
-  );
+  const icon = props.icon ? props.icon : '';
+  let button;
+  switch (props.size) {
+    case 'medium': {
+      button = (
+        <Medium onClick={props.onClick} type={props.type} disabled={props.disabled}>
+          {Children.toArray(props.children)}
+          { props.icon &&
+          <Icon className={icon} content={Children.toArray(props.children)}></Icon>
+          }
+        </Medium>
+      );
+      break;
+    }
 
+    case 'large': {
+      button = (
+        <Large onClick={props.onClick} type={props.type} disabled={props.disabled}>
+          {Children.toArray(props.children)}
+          { props.icon &&
+          <Icon className={icon} content={Children.toArray(props.children)}></Icon>
+          }
+        </Large>
+      );
+      break;
+    }
+
+    default: {
+      button = (
+        <Medium onClick={props.onClick} type={props.type} disabled={props.disabled}>
+          {Children.toArray(props.children)}
+          { props.icon &&
+          <Icon className={icon} content={Children.toArray(props.children)}></Icon>
+          }
+        </Medium>
+      );
+    }
+  }
   return (
     <Wrapper>
       {button}
@@ -72,8 +148,9 @@ Button.propTypes = {
   onClick: PropTypes.func,
   type: PropTypes.string,
   size: PropTypes.string,
+  icon: PropTypes.string,
   disabled: PropTypes.bool,
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node,
 };
 
 export default Button;

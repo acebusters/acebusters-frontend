@@ -11,6 +11,7 @@ import {
   navbarPaddingHorizontal,
   navbarPaddingVertical,
   screenXsMax,
+  baseColor,
 } from '../../variables';
 
 const imageSize = `${Math.floor(parseInt(navbarHeight, 10) / 2)}px`;
@@ -133,12 +134,15 @@ const StyledItem = styled.li`
   &:hover {
     color: ${(props) => props.theme.navbarHoverColor || '#fff'};
     background-color: ${(props) => props.theme.logoBgColor || 'transparent'};
+    border-bottom: 1px solid ${baseColor};    
   }
   
   @media (max-width: ${screenXsMax}) {
     width: 100%;
+    &:hover {
+      border-bottom: none;
+    }
     display: ${(props) => {
-      console.log(props.collapsed);
       if (props.collapsed) {
         return 'none';
       }

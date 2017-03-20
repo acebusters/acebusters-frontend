@@ -21,6 +21,7 @@ import theme from '../../skin-blue';
 
 import {
   boxedLayoutMaxWidth,
+  background,
 } from '../../variables';
 
 const StyledDashboard = styled.div`
@@ -36,7 +37,7 @@ const StyledDashboard = styled.div`
     clear: both;
   }
   /* theme */
-  ${(props) => (props.theme.sidebarBg && `background-color: ${(props).theme.sidebarBg};`)}
+  background-color: ${(background)}
   min-height: 100vh;
   position: relative;
   overflow: hidden;

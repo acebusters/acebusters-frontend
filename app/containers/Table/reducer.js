@@ -114,7 +114,7 @@ export default function tableReducer(state = initialState, action) {
       let hand = table.get(action.hand.handId.toString());
 
       // if the hand state changed, make sure to update it
-      if (hand.get('changed') !== action.hand.changed) {
+      if (hand.get('change  d') !== action.hand.changed) {
         // in any state but dealing, update maxBet
         if (action.hand.state !== hand.get('state')) {
           const maxBet = pokerHelper.findMaxBet(action.hand.lineup, action.hand.dealer).amount;

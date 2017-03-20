@@ -10,6 +10,7 @@ import {
   navbarHeight,
   transitionSpeed,
   transitionFn,
+  fontPrimary,
 } from 'variables';
 
 const Content = styled.div`
@@ -37,6 +38,7 @@ const Content = styled.div`
   /* theme */
   ${(props) => (props.theme.contentLeftBorder && `border-left: ${(props).theme.contentLeftBorder};`)}
   background-color: transparent;
+  color: ${fontPrimary}
 
   min-height: 100%;
   z-index: 800;

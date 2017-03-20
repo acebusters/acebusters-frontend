@@ -58,7 +58,7 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
   }
 
   toggleCollapsedMenu() {
-    const collapsed = (this.state) ? !this.state.toggleCollapsed : true;
+    const collapsed = (this.state) ? !this.state.toggleCollapsed : false;
     this.setState({ toggleCollapsed: collapsed });
   }
 
@@ -67,18 +67,17 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
     const navButtons = this.props.loggedIn ? ([
       <NavToggle
         onClick={this.toggleCollapsedMenu}
+        key="nav-toggle"
       >
         <i className="fa fa-bars fa-2"></i>
       </NavToggle>,
       <NavItem
-        iconClass="fa fa-dashboard"
         onClick={() => browserHistory.push('/dashboard')}
         collapsed={collapsed}
         key="2"
         title="Dashboard"
       />,
       <NavItem
-        iconClass="fa fa-group"
         onClick={() => browserHistory.push('/lobby')}
         key="3"
         collapsed={collapsed}
@@ -95,13 +94,11 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
     ]) : ([
       <NavItem
         onClick={() => browserHistory.push('/register')}
-        iconClass="fa fa-user-plus"
         key="1"
         title="Register"
       />,
       <NavItem
         onClick={() => browserHistory.push('/login')}
-        iconClass="fa fa-sign-in"
         key="2"
         title="Login"
       />,

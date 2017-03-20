@@ -19,6 +19,7 @@ const Tr = styled.tr`
 const Td = styled.td`
   padding: 0.75rem;
   vertical-align: top;
+  text-align: center;
   border-top: 1px solid #eceeef;
 `;
 
@@ -68,7 +69,7 @@ class LobbyItem extends React.PureComponent {  // eslint-disable-line
         <Td key="sb">{this.props.data.smallBlind}</Td>
         <Td key="np">{`${players}/${this.props.data.seats.length}`}</Td>
         <Td key="lh">{this.props.lastHandId}</Td>
-        <Td key="ac"><Button onClick={this.handleView}>SHOW</Button></Td>
+        <Td key="ac"><Button onClick={this.handleView} size="medium" icon="fa fa-eye"></Button></Td>
       </Tr>
     );
   }

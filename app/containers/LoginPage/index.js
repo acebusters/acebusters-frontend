@@ -12,8 +12,8 @@ import account from '../../services/account';
 import { workerError, walletImported, login } from './actions';
 import { modalAdd, modalDismiss } from '../App/actions';
 import { setAuthState } from '../AccountProvider/actions';
-import H2 from '../../components/H2';
-import Progress from '../LoginProgressModal';
+import H1 from '../../components/H1';
+import Radial from '../../components/RadialProgress';
 
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
 
@@ -65,7 +65,6 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
   }
 
   handleSubmit(values, dispatch) {
-    this.props.modalAdd(<Progress />);
     return account.login(values.get('email')).catch((err) => {
       const errMsg = 'Login failed!';
       if (err === 404) {
@@ -88,7 +87,6 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
         // If worker failed, ...
         throw new SubmissionError({ _error: `error, Login failed due to worker error: ${workerErr}` });
       }).then((workerRsp) => {
-        this.props.modalDismiss();
         // If worker success, ...
         // ...tell account provider about login.
         dispatch(setAuthState({
@@ -137,20 +135,24 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
   render() {
     const workerPath = this.props.workerPath + encodeURIComponent(location.origin);
     const { error, handleSubmit, submitting } = this.props;
-    return (
-      <Container>
-        <H2>Log into your account!</H2>
-        <div>
-          <Form onSubmit={handleSubmit(this.handleSubmit)}>
-            <Field name="email" type="text" component={renderField} label="Email" />
-            <Field name="password" type="password" component={renderField} label="Password" />
-            {error && <strong>{error}</strong>}
-            <Button type="submit" disabled={submitting}>Login</Button>
-          </Form>
-          <iframe src={workerPath} style={{ display: 'none' }} onLoad={(event) => { this.frame = event.target; }} />
-        </div>
-      </Container>
-    );
+    return (<Container>
+      <div>
+        <H1>Log into your account!</H1>
+        <Form onSubmit={handleSubmit(this.handleSubmit)}>
+          <Field name="email" type="text" component={renderField} label="Email" />
+          <Field name="password" type="password" component={renderField} label="Password" />
+          {error && <strong>{error}</strong>}
+          <Button type="submit" size="large" loading={submitting}>Login</Button>
+        </Form>
+        <iframe src={workerPath} style={{ display: 'none' }} onLoad={(event) => { this.frame = event.target; }} />
+        { this.props.progress &&
+          <div>
+            <Radial progress={this.props.progress}></Radial>
+            <H1>Loggin in please wait ...</H1>
+          </div>
+        }
+      </div>
+    </Container>);
   }
 }
 

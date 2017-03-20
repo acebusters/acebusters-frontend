@@ -3,6 +3,7 @@
  */
 
 import React from 'react';
+import Grid from 'grid-styled';
 import Button from 'components/Button';
 import Container from 'components/Container';
 import { TableStriped } from 'components/List';
@@ -41,6 +42,7 @@ class LobbyComponent extends React.PureComponent {  // eslint-disable-line
     return (
       <Container>
         <H2> Table Overview </H2>
+
         <TableStriped>
           <thead>
             <tr>
@@ -55,7 +57,13 @@ class LobbyComponent extends React.PureComponent {  // eslint-disable-line
             {content}
           </tbody>
         </TableStriped>
-        <Button onClick={this.handleGetTables}>Refresh Tables</Button>
+        <Grid xs={1 / 4} >
+          <div style={{ float: 'left' }}>
+            <Button onClick={this.handleGetTables} size="medium" icon="fa fa-refresh">REFRESH</Button>
+          </div>
+        </Grid>
+        <Grid xs={3 / 4}>
+        </Grid>
       </Container>
     );
   }

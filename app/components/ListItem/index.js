@@ -17,6 +17,7 @@ const Th = styled.th`
 const Td = styled.td`
   padding: 0.75rem;
   vertical-align: top;
+  text-align: center;
   border-top: 1px solid #eceeef;
 `;
 

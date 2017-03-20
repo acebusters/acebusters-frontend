@@ -230,7 +230,7 @@ UserMenu.propTypes = {
   name: React.PropTypes.string,
   image: React.PropTypes.string,
   signerAddr: React.PropTypes.string,
-  collapsed: React.PropTypes.collapsed,
+  collapsed: React.PropTypes.bool,
   profileAction: React.PropTypes.func,
   signOutAction: React.PropTypes.func,
 };

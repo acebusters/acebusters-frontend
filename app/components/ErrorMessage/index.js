@@ -1,12 +1,17 @@
 import React from 'react';
 import styled from 'styled-components';
 
+import {
+  baseColor,
+} from '../../variables';
+
 const FormError = styled.span`
   margin: 0;
   padding: 0.5em 1em;
   font-size: 0.8em;
   font-family: $text-font-stack;
   float: left;
+  color: ${baseColor};
   width: 100%;
 `;
 

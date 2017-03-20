@@ -3,32 +3,14 @@ import tinycolor from 'tinycolor2';
 
 // COLORS
 // --------------------------------------------------------
-export const baseColor = '#333';
-// Primary
-export const lightBlue = '#3c8dbc';
-// Danger
-export const red = '#dd4b39';
-// Success
-export const green = '#00a65a';
-// Info
-export const aqua = '#00c0ef';
-// Warning
-export const yellow = '#f39c12';
-export const blue = '#0073b7';
-export const navy = '#001f3f';
-export const teal = '#39cccc';
-export const olive = '#3d9970';
-export const lime = '#01ff70';
-export const orange = '#ff851b';
-export const fuchsia = '#f012be';
-export const purple = '#605ca8';
-export const maroon = '#d81b60';
-export const black = '#111';
-export const gray = '#d2d6de';
-export const white = '#fff';
+export const baseColor = '#FD5E60';
+export const black = '#080B0F';
+export const background = '#1A2D3D';
+export const gray = '#999999';
 
-// LAYOUT
+// FONTS
 // --------------------------------------------------------
+export const fontPrimary = '#FFFFFF';
 
 // BOOTSTRAP
 // Screen sizes
@@ -65,7 +47,7 @@ export const boxedLayoutMaxWidth = '1024px';
 export const screenHeaderCollapse = screenXsMax;
 
 // Link colors (Aka = <a> tags)
-export const linkColor = lightBlue;
+export const linkColor = baseColor;
 export const linkHoverColor = tinycolor(linkColor).lighten(15).toString();
 
 // SIDEBAR SKINS
@@ -124,17 +106,6 @@ export const inputRadius = '0';
 // Border radius for non flat buttons
 export const btnBorderRadius = '3px';
 
-// DIRECT CHAT
-//--------------------------------------------------------
-export const directChatHeight = '250px';
-export const directChatDefaultMsgBg = gray;
-export const directChatDefaultFontColor = '#444';
-export const directChatDefaultMsgBorderColor = gray;
-
-// CHAT WIDGET
-//--------------------------------------------------------
-export const attachmentBorderRadius = '3px';
-
 // TRANSITIONS SETTINGS
 //--------------------------------------------------------
 
@@ -147,7 +118,7 @@ export const transitionFn = 'ease-in-out';
 export const navbarVariant = (
   color,
   fontColor = 'rgba(255, 255, 255, 0.8)',
-  hoverColor = '#f6f6f6',
+  hoverColor = baseColor,
   hoverBg = 'rgba(0, 0, 0, 0.1)',
 ) => ({
   backgroundColor: color,
