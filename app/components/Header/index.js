@@ -3,10 +3,12 @@ import styled from 'styled-components';
 import { browserHistory } from 'react-router';
 
 import Navbar from './Navbar';
-import Logo from './Logo';
 import UserMenu from './UserMenu';
 import NavItem from './NavItem';
 
+import {
+  screenXsMax,
+} from '../../variables';
 
 const StyledHeader = styled.header`
   /* clearfix */
@@ -21,8 +23,8 @@ const StyledHeader = styled.header`
     clear: both;
   }
   position: ${(props) => (props.fixed ? 'fixed' : 'relative')};
-  width: ${(props) => (props.boxed ? '1024px' : '100%')};
-  max-height: 100px;
+  width: 100%;
+  max-height: 50px;
   z-index: 1030;
   /* theme */
   ${(props) => props.theme.headerBoxShadow && `
@@ -31,13 +33,47 @@ const StyledHeader = styled.header`
   `}
 `;
 
+const NavToggle = styled.button`
+  position: relative;
+  float: right;
+  padding: 9px 10px;
+  margin-top: 8px;
+  margin-right: 15px;
+  margin-bottom: 8px;
+  background-color: transparent;
+  background-image: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  @media (min-width: ${screenXsMax}) {
+    display: none;
+  }
+`;
+
 
 class Header extends React.Component { // eslint-disable-line react/prefer-stateless-function
+  constructor(props) {
+    super(props);
+    this.toggleCollapsedMenu = this.toggleCollapsedMenu.bind(this);
+  }
+
+  toggleCollapsedMenu() {
+    const collapsed = (this.state) ? !this.state.toggleCollapsed : true;
+    this.setState({ toggleCollapsed: collapsed });
+  }
+
   render() {
+    const collapsed = (this.state) ? this.state.toggleCollapsed : true;
     const navButtons = this.props.loggedIn ? ([
+      <NavToggle
+        onClick={this.toggleCollapsedMenu}
+      >
+        <i className="fa fa-bars fa-2"></i>
+      </NavToggle>,
       <NavItem
         iconClass="fa fa-dashboard"
         onClick={() => browserHistory.push('/dashboard')}
+        collapsed={collapsed}
         key="2"
         title="Dashboard"
       />,
@@ -45,6 +81,7 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
         iconClass="fa fa-group"
         onClick={() => browserHistory.push('/lobby')}
         key="3"
+        collapsed={collapsed}
         title="Lobby"
       />,
       <UserMenu
@@ -52,6 +89,7 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
         image={this.props.imageUrl}
         profileAction={() => browserHistory.push('/dashboard')}
         signOutAction={this.props.onClickLogout}
+        collapsed={collapsed}
         key="4"
       />,
     ]) : ([
@@ -68,14 +106,8 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
         title="Login"
       />,
     ]);
-
     return (
       <StyledHeader fixed={this.props.fixed} id="header">
-        <Logo
-          href={this.props.logoHref}
-          logoLg={this.props.logoLg}
-          logoSm={this.props.logoSm}
-        />
         <Navbar
           loggedIn={this.props.loggedIn}
         >
@@ -89,10 +121,7 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
 Header.propTypes = {
   fixed: React.PropTypes.bool,
   loggedIn: React.PropTypes.bool,
-  logoHref: React.PropTypes.string,
   imageUrl: React.PropTypes.string,
-  logoLg: React.PropTypes.element,
-  logoSm: React.PropTypes.element,
   onClickLogout: React.PropTypes.func,
 };
 

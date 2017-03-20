@@ -5,11 +5,8 @@ import styled from 'styled-components';
 import {
   transitionSpeed,
   transitionFn,
-  screenSmMin,
-  sidebarWidth,
-  sidebarMiniWidth,
   navbarHeight,
-  screenHeaderCollapse,
+  screenXsMax,
 } from '../../variables';
 
 const StyledNavbarMenuList = styled.ul`
@@ -23,19 +20,15 @@ const StyledNavbarMenuList = styled.ul`
   list-style: none;
   margin: 0;
   padding: 0;
-  /* media queries */
-  @media (max-width: ${screenHeaderCollapse}) {
-    float: left;
-  }
-  @media (min-width: ${screenSmMin}) {
-    float: right;
-  }
 `;
 
 const StyledNavbarMenu = styled.div`
   box-sizing: border-box;
   display: block;
   float: right;
+  @media (max-width: ${screenXsMax}) {
+    width: 100%;
+  }
 `;
 
 const StyledNavbar = styled.nav`
@@ -59,38 +52,28 @@ const StyledNavbar = styled.nav`
   min-height: ${navbarHeight};
   z-index: 1000;
   margin-bottom: 0;
-  margin-left: ${(props) => (props.topNav ? '0' : sidebarWidth)};
   border: none;
   border-radius: 0;
   background-color: ${(props) => props.theme.backgroundColor || '#fff'};
-  /* media queries */
-  @media (max-width: ${screenHeaderCollapse}) {
-    width: 100%;
-    float: none;
-    margin: 0;
-  }
-  @media (min-width: ${screenSmMin}) {
-    margin-left: ${(props) => ((!props.topNav && props.sidebarMini && props.collapse) ?
-      sidebarMiniWidth :
-      sidebarWidth)};
-  }
 `;
 
 const Navbar = (props) => (
   <StyledNavbar
     topNav={props.topNav}
   >
-    <StyledNavbarMenu>
+    <StyledNavbarMenu collapsed={props.collapsed}>
       <StyledNavbarMenuList name="navbar-menu-wrapper">
         {props.children}
       </StyledNavbarMenuList>
     </StyledNavbarMenu>
   </StyledNavbar>
-);
+  );
+
 
 Navbar.propTypes = {
   children: React.PropTypes.node,
   topNav: React.PropTypes.bool,
+  collapsed: React.PropTypes.bool,
 };
 
 export default Navbar;

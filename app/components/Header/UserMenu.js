@@ -12,6 +12,7 @@ import {
   navbarPaddingHorizontal,
   navbarPaddingVertical,
   screenXsMin,
+  screenXsMax,
 } from '../../variables';
 
 const imageSize = `${Math.floor(parseInt(navbarHeight, 10) / 2)}px`;
@@ -110,12 +111,6 @@ const UserFooterButton = styled.button`
   -ms-user-select: none;
   user-select: none;
   background-image: none;
-
-  &:hover {
-    @media (max-width: @screen-sm-max) {
-      background-color: #f9f9f9;
-    }
-  }
 `;
 
 const UserFooter = styled.li`
@@ -170,9 +165,15 @@ const StyledUserMenu = styled.li`
     color: ${(props) => props.theme.navbarHoverColor || '#fff'};
     background-color: ${(props) => props.theme.logoBgColor || 'transparent'};
   }
-
-  @media (max-width: ${screenXsMin}) {
-    padding: ${navbarPaddingVertical} 5px;
+  
+  @media (max-width: ${screenXsMax}) {
+    width: 100%;
+    display: ${(props) => {
+      if (props.collapsed) {
+        return 'none';
+      }
+      return 'block';
+    }};
   }
 `;
 
@@ -200,7 +201,7 @@ class UserMenu extends React.Component {
 
   render() {
     return (
-      <StyledUserMenu onClick={this.toggleMenu} onMouseLeave={this.closeMenu} >
+      <StyledUserMenu onClick={this.toggleMenu} onMouseLeave={this.closeMenu} collapsed={this.props.collapsed}>
         <StyledUserImage src={this.props.image} />
         <StyledUserName>{this.props.name}</StyledUserName>
         <UserDropDown open={this.state.open} >
@@ -229,6 +230,7 @@ UserMenu.propTypes = {
   name: React.PropTypes.string,
   image: React.PropTypes.string,
   signerAddr: React.PropTypes.string,
+  collapsed: React.PropTypes.collapsed,
   profileAction: React.PropTypes.func,
   signOutAction: React.PropTypes.func,
 };

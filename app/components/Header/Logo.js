@@ -3,21 +3,12 @@ import React from 'react';
 import styled from 'styled-components';
 
 import {
-  transitionSpeed,
-  transitionFn,
-  screenSmMin,
   sidebarWidth,
-  sidebarMiniWidth,
   navbarHeight,
-  screenHeaderCollapse,
+  screenXsMax,
 } from '../../variables';
 
 const StyledLogo = styled.a`
-  /* transitions */
-  -webkit-transition: width ${transitionSpeed} ${transitionFn};
-  -o-transition: width ${transitionSpeed} ${transitionFn};
-  transition: width ${transitionSpeed} ${transitionFn};
-
   /* theme */
   background-color: ${(props) => props.theme.logoBgColor || '#fff'} !important;
   color: ${(props) => props.theme.logoColor || '#000'} !important;
@@ -34,6 +25,10 @@ const StyledLogo = styled.a`
   font-size: 20px;
   line-height: ${navbarHeight};
   text-align: center;
+  width: ${sidebarWidth};
+  @media (max-width: ${screenXsMax}) {
+    width: 30%;
+  }
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   padding: 0 15px;
   font-weight: 300;
@@ -42,44 +37,21 @@ const StyledLogo = styled.a`
     text-decoration: none !important;
     outline: none;
   }
-
-  /* media queries */
-  @media (max-width: ${screenHeaderCollapse}) {
-    width: 100%;
-    float: none;
-    ${(props) => props.theme.logoSmallVariant || ''}
-  }
-  @media (min-width: ${screenSmMin}) {
-    width: ${(props) => ((props.sidebarMini && props.collapse) ? sidebarMiniWidth : sidebarWidth)};
-    ${(props) => ((props.sidebarMini && props.collapse) && 'padding: 0;')};
-  }
 `;
 
 const LargeLogo = styled.span`
   display: block;
-  @media (min-width: ${screenSmMin}) {
-    display: ${(props) => ((props.sidebarMini && props.collapse) ? 'none' : 'block')}
-  }
 `;
 
-const SmallLogo = styled.span`
-  display: none;
-  @media (min-width: ${screenSmMin}) {
-    display: ${(props) => ((props.sidebarMini && props.collapse) ? 'block' : 'none')}
-  }
-`;
-
-const Logo = ({ href, logoLg, logoSm, sidebarMini, collapse }) => (
+const Logo = ({ href, logoLg, sidebarMini, collapse }) => (
   <StyledLogo sidebarMini={sidebarMini} collapse={collapse} name="navbar-logo" href={href}>
     <LargeLogo sidebarMini={sidebarMini} collapse={collapse} name="navbar-logo-lg">{logoLg}</LargeLogo>
-    <SmallLogo sidebarMini={sidebarMini} collapse={collapse} name="navbar-logo-sm">{logoSm}</SmallLogo>
   </StyledLogo>
     );
 
 Logo.propTypes = {
   href: React.PropTypes.string,
   logoLg: React.PropTypes.element,
-  logoSm: React.PropTypes.element,
   sidebarMini: React.PropTypes.bool,
   collapse: React.PropTypes.bool,
 };

@@ -10,7 +10,7 @@ import {
   navbarHeight,
   navbarPaddingHorizontal,
   navbarPaddingVertical,
-  screenXsMin,
+  screenXsMax,
 } from '../../variables';
 
 const imageSize = `${Math.floor(parseInt(navbarHeight, 10) / 2)}px`;
@@ -26,9 +26,7 @@ const imageMarginBottom = `-${Math.floor(
   parseInt(navbarHeight, 10)) / 2)}px`;
 
 const StyledSpan = styled.span`
-  @media (max-width: ${screenXsMin}) {
-    display: none;
-  }
+  width: 100%;
 `;
 
 const StyledIcon = styled.i`
@@ -103,10 +101,6 @@ const StyledLink = styled.a`
     color: inherit;
     text-decoration: none !important;
   }
-
-  @media (max-width: ${screenXsMin}) {
-    padding: ${navbarPaddingVertical} 5px;
-  }
 `;
 
 const StyledItem = styled.li`
@@ -140,6 +134,17 @@ const StyledItem = styled.li`
     color: ${(props) => props.theme.navbarHoverColor || '#fff'};
     background-color: ${(props) => props.theme.logoBgColor || 'transparent'};
   }
+  
+  @media (max-width: ${screenXsMax}) {
+    width: 100%;
+    display: ${(props) => {
+      console.log(props.collapsed);
+      if (props.collapsed) {
+        return 'none';
+      }
+      return 'block';
+    }};
+  }
 `;
 
 const displayImage = (src, icon) => {
@@ -151,8 +156,8 @@ const displayImage = (src, icon) => {
   return null;
 };
 
-const NavItem = ({ title, onClick, href, image, iconClass }) => (
-  <StyledItem>
+const NavItem = ({ title, onClick, href, image, iconClass, collapsed }) => (
+  <StyledItem collapsed={collapsed} >
     {onClick &&
       <StyledLink onClick={onClick} href={null}>
         {displayImage(image, iconClass)}
@@ -170,6 +175,7 @@ const NavItem = ({ title, onClick, href, image, iconClass }) => (
 
 NavItem.propTypes = {
   title: React.PropTypes.string,
+  collapsed: React.PropTypes.bool,
   onClick: React.PropTypes.func,
   href: React.PropTypes.string,
   image: React.PropTypes.string,
