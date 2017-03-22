@@ -163,21 +163,27 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       this.token.balanceOf.call(nextProps.proxyAddr);
     }
 
-    if (this.props.hand && nextProps.lastHandNettedOnClient < this.props.hand.handId - 1) {
+    if (this.props.hand && !this.updateStarted && nextProps.lastHandNettedOnClient < this.props.hand.handId - 1) {
+      this.updateStarted = true;
       this.props.updateLastHand(this.tableAddr, nextProps.lastHandNettedOnClient + 1);
     }
 
-    if (nextProps.latestHand > this.props.params.handId) {
+    if (nextProps.latestHand > this.props.params.handId && !this.pushed) {
+      this.pushed = true;
       setTimeout(() => {
         browserHistory.push(`/table/${this.tableAddr}/hand/${nextProps.latestHand}`);
       }, 1000);
     }
 
     if (nextProps.missingHands && nextProps.missingHands.length > 0) {
+      this.getHandStarted = (this.getHandStarted) ? this.getHandStarted : {};
       for (let i = 0; i < nextProps.missingHands.length; i += 1) {
-        getHand(this.tableAddr, nextProps.missingHands[i]).then((rsp) => {
-          this.props.updateReceived(this.tableAddr, rsp);
-        });
+        if (!this.getHandStarted[nextProps.missingHands[i].toString()]) {
+          this.getHandStarted[nextProps.missingHands[i].toString()] = true;
+          getHand(this.tableAddr, nextProps.missingHands[i]).then((rsp) => {
+            this.props.updateReceived(this.tableAddr, rsp);
+          });
+        }
       }
     }
   }

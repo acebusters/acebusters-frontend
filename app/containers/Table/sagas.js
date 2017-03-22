@@ -85,6 +85,10 @@ export function* updateScanner() {
   const privKeySelector = makeSelectPrivKey();
   const myAddrSelector = makeSignerAddrSelector();
   const sbSelector = makeSbSelector();
+  // toggle variables to avoid duplicate requests
+  const payedBlind = {};
+  const showed = {};
+  const netted = {};
 
   while (true) {
     const action = yield take(UPDATE_RECEIVED);
@@ -99,24 +103,32 @@ export function* updateScanner() {
     const sb = sbSelector(state, { params: { tableAddr: action.tableAddr } });
 
     // check if turn to pay small blind
-    if (isSbTurnByAction(action, { address: myAddr })) {
+    if (isSbTurnByAction(action, { address: myAddr })
+      && !payedBlind[action.tableAddr + action.hand.handId]) {
+      payedBlind[action.tableAddr + action.hand.handId] = true;
       yield put(bet(action.tableAddr, action.hand.handId, sb, privKey));
       continue; // eslint-disable-line no-continue
     }
     // check if turn to pay big blind
-    if (isBbTurnByAction(action, { address: myAddr })) {
+    if (isBbTurnByAction(action, { address: myAddr })
+      && !payedBlind[action.tableAddr + action.hand.handId]) {
+      payedBlind[action.tableAddr + action.hand.handId] = true;
       yield put(bet(action.tableAddr, action.hand.handId, sb * 2, privKey));
       continue; // eslint-disable-line no-continue
     }
 
     // check if turn to pay 0 receipt
-    if (is0rTurnByAction(action, { address: myAddr })) {
+    if (is0rTurnByAction(action, { address: myAddr })
+      && !payedBlind[action.tableAddr + action.hand.handId]) {
+      payedBlind[action.tableAddr + action.hand.handId] = true;
       yield put(bet(action.tableAddr, action.hand.handId, 0, privKey));
       continue; // eslint-disable-line no-continue
     }
 
     // check if time to show
-    if (isShowTurnByAction(action, { address: myAddr })) {
+    if (isShowTurnByAction(action, { address: myAddr })
+      && !showed[action.tableAddr + action.hand.handId]) {
+      showed[action.tableAddr + action.hand.handId] = true;
       const maxBetSelector = makeMaxBetSelector();
       const max = maxBetSelector(state);
       yield put(show(action.tableAddr, action.hand.handId, max, privKey));
@@ -124,7 +136,9 @@ export function* updateScanner() {
     }
 
     // check if netting exists that we need to sign
-    if (hasNettingInAction(action, { address: myAddr })) {
+    if (hasNettingInAction(action, { address: myAddr })
+      && !netted[action.tableAddr + action.hand.handId]) {
+      netted[action.tableAddr + action.hand.handId] = true;
       const balances = action.hand.netting.newBalances;
       yield put(net(action.tableAddr, action.hand.handId, balances, privKey));
       continue; // eslint-disable-line no-continue
