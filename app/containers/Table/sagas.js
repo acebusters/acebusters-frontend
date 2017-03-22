@@ -34,7 +34,6 @@ import TableService, { fetchTableState } from '../../services/tableService';
 export function* getInfo(action) {
   try {
     const tableState = yield call(fetchTableState, action.tableAddr);
-    console.dir(tableState);
     yield put(updateReceived(action.tableAddr, tableState));
   } catch (err) {
     // TODO: handle;
@@ -126,7 +125,7 @@ export function* updateScanner() {
 
     // check if netting exists that we need to sign
     if (hasNettingInAction(action, { address: myAddr })) {
-      const balances = action.hand.netting.balances;
+      const balances = action.hand.netting.newBalances;
       yield put(net(action.tableAddr, action.hand.handId, balances, privKey));
       continue; // eslint-disable-line no-continue
     }
