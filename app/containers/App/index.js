@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, { ThemeProvider } from 'styled-components';
+import styled from 'styled-components';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import { ModalContainer, ModalDialog } from 'react-modal-dialog';
@@ -17,7 +17,6 @@ import {
 } from './selectors';
 import { setAuthState } from '../AccountProvider/actions';
 import { modalDismiss } from './actions';
-import theme from '../../skin-blue';
 
 import {
   boxedLayoutMaxWidth,
@@ -55,25 +54,19 @@ export function App(props) {
   return (
     <div>
       <StyledDashboard>
-        <ThemeProvider theme={theme}>
-          <Header
-            loggedIn={props.account.loggedIn}
-            onClickLogout={props.handleClickLogout}
-            imageUrl={props.gravatarUrl}
-            logoHref={props.logoHref}
-            signerAddr={props.signerAddr}
-          />
-        </ThemeProvider>
-        {props.account.loggedIn && <ThemeProvider theme={theme}>
-        </ThemeProvider>}
-        <ThemeProvider theme={theme}>
-          <Content
-            fixed={props.fixed}
-            name="content-wrapper"
-          >
-            {React.Children.toArray(props.children)}
-          </Content>
-        </ThemeProvider>
+        <Header
+          loggedIn={props.account.loggedIn}
+          onClickLogout={props.handleClickLogout}
+          imageUrl={props.gravatarUrl}
+          logoHref={props.logoHref}
+          signerAddr={props.signerAddr}
+        />
+        <Content
+          fixed={props.fixed}
+          name="content-wrapper"
+        >
+          {React.Children.toArray(props.children)}
+        </Content>
       </StyledDashboard>
 
       { modalContent &&

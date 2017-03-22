@@ -194,11 +194,6 @@ const makeAmountSelector = () => createSelector(
   (tableState) => (tableState) ? tableState.get('amount') : null
 );
 
-const makeLastHandNettedSelector = () => createSelector(
-  tableStateSelector,
-  (tableState) => (tableState) ? tableState.get('lastHandNettedOnClient') : null
-);
-
 const makeComputedSelector = () => createSelector(
   tableStateSelector,
   (tableState) => (tableState) ? tableState.get('computedStyles') : null
@@ -375,7 +370,6 @@ export {
     makeBoardSelector,
     makeIsMyTurnSelector,
     makeWhosTurnSelector,
-    makeLastHandNettedSelector,
     makePotSizeSelector,
     makeAmountToCallSelector,
     makeMyPosSelector,
