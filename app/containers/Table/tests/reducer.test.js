@@ -7,11 +7,9 @@ import {
   updateReceived,
   setCards,
   lineupReceived,
-  completeHandQuery,
 } from '../actions';
 
 const ABI_BET = [{ name: 'bet', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
-const ABI_DIST = [{ name: 'distribution', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }, { type: 'bytes32[]' }] }];
 
 // secretSeed: 'rural tent tests net drip fatigue uncle action repeat couple lawn rival'
 const P1_ADDR = '0x6d2f2c0fa568243d2def3e999a791a6df45d816e';
@@ -141,45 +139,6 @@ describe('table reducer tests', () => {
     }));
   });
 
-  it('should calculate stack for one hand', () => {
-    // set up previous state
-    const dists = [];
-    dists.push(EWT.concat(P3_ADDR, 10).toString('hex')); // rake
-    dists.push(EWT.concat(P1_ADDR, 100).toString('hex'));
-    const before = fromJS({
-      [tableAddr]: {
-        lineup: [{
-          address: P1_ADDR,
-        }, {
-          address: P2_ADDR,
-        }],
-        amounts: [3000, 3000],
-        state: 'turn',
-        lastHandNettedOnClient: 0,
-      },
-    });
-
-    // execute action
-    const nextState = tableReducer(before, completeHandQuery(tableAddr, {
-      handId: 1,
-      lineup: [{
-        address: P1_ADDR,
-        last: new EWT(ABI_BET).bet(1, 50).sign(P1_KEY),
-      }, {
-        address: P2_ADDR,
-        last: new EWT(ABI_BET).bet(1, 50).sign(P2_KEY),
-      }],
-      distribution: new EWT(ABI_DIST).distribution(1, 0, dists).sign(P1_KEY),
-    }));
-
-    // check state after execution
-    const after = before
-      .setIn([tableAddr, 'amounts', 0], 3050)
-      .setIn([tableAddr, 'amounts', 1], 2950)
-      .setIn([tableAddr, 'lastHandNettedOnClient'], 1);
-    expect(nextState).toEqual(after);
-  });
-
   it('should add holeCards at right position into lineup', () => {
     // set up previous state
     const before = fromJS({
@@ -197,7 +156,7 @@ describe('table reducer tests', () => {
     const nextState = tableReducer(before, setCards(tableAddr, 2, [2, 3]));
 
     // check state after execution
-    const after = before.setIn([tableAddr, '2', 'holeCards'], [2, 3]);
+    const after = before.setIn([tableAddr, '2', 'holeCards'], fromJS([2, 3]));
     expect(nextState).toEqual(after);
   });
 });
