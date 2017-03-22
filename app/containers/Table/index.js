@@ -163,11 +163,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       this.token.balanceOf.call(nextProps.proxyAddr);
     }
 
-    if (this.props.hand && !this.updateStarted && nextProps.lastHandNettedOnClient < this.props.hand.handId - 1) {
-      this.updateStarted = true;
-      this.props.updateLastHand(this.tableAddr, nextProps.lastHandNettedOnClient + 1);
-    }
-
     if (nextProps.latestHand > this.props.params.handId && !this.pushed) {
       this.pushed = true;
       setTimeout(() => {
@@ -473,7 +468,6 @@ Table.propTypes = {
   hand: React.PropTypes.object,
   lineup: React.PropTypes.object,
   params: React.PropTypes.object,
-  updateLastHand: React.PropTypes.func,
   privKey: React.PropTypes.string,
   proxyAddr: React.PropTypes.string,
   signerAddr: React.PropTypes.string,

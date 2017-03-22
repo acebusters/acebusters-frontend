@@ -155,7 +155,6 @@ describe('table reducer tests', () => {
         }],
         amounts: [3000, 3000],
         state: 'turn',
-        lastHandNettedOnClient: 0,
       },
     });
 
@@ -175,8 +174,7 @@ describe('table reducer tests', () => {
     // check state after execution
     const after = before
       .setIn([tableAddr, 'amounts', 0], 3050)
-      .setIn([tableAddr, 'amounts', 1], 2950)
-      .setIn([tableAddr, 'lastHandNettedOnClient'], 1);
+      .setIn([tableAddr, 'amounts', 1], 2950);
     expect(nextState).toEqual(after);
   });
 

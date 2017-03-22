@@ -149,7 +149,6 @@ const mapStateToProps = createStructuredSelector({
 });
 
 ActionBar.propTypes = {
-  lastHandNettedOnClient: React.PropTypes.number,  // eslint-disable-line
   params: React.PropTypes.object,
   privKey: React.PropTypes.string,
   cards: React.PropTypes.array,

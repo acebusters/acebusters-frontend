@@ -17,7 +17,6 @@ import {
 import {
   makeMyPosSelector,
   makeHandSelector,
-  makeLastHandNettedSelector,
   makeLineupSelector,
   makeStackSelector,
 } from '../Table/selectors';
@@ -82,7 +81,6 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
 const mapStateToProps = createStructuredSelector({
   hand: makeHandSelector(),
   lineup: makeLineupSelector(),
-  lastHandNettedOnClient: makeLastHandNettedSelector(),
   myPos: makeMyPosSelector(),
   whosTurn: makeWhosTurnSelector(),
   lastAmount: makeLastAmountSelector(),
