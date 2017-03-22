@@ -3,16 +3,50 @@
  */
 
 import SagaTester from 'redux-saga-tester';
+import { fromJS } from 'immutable';
+import { PLAYER1, PLAYER2, PLAYER3, PLAYER4 } from './consts';
+import { updateScanner } from '../sagas';
 
+
+import {
+  updateReceived,
+} from '../actions';
+
+const tableAddr = '0x112233';
 
 describe('Saga Tests', () => {
-  const someInitialValue = 'SOME_INITIAL_VALUE';
-  const someInitialState = { someKey: someInitialValue };
+  it('should disptach sb action when i am sb', () => {
+    const hand = {
+      state: 'waiting',
+      dealer: 0,
+      lineup: [{
+        address: PLAYER1.address,
+      }, {
+        address: PLAYER2.address,
+      }, {
+        address: PLAYER3.address,
+      }, {
+        address: PLAYER4.address,
+      }],
+    };
 
-  it('should return falsy when its sb turn and i am not sb', () => {
-    const sagaTester = new SagaTester({ initialState: someInitialState });
-    console.log(sagaTester.getState());
-    expect(sagaTester.getState()).toEqual(someInitialState);
+    let table = fromJS({
+      hand,
+    });
+
+    table = table.set(tableAddr, fromJS({ data: { smallBlind: 500 } }));
+
+    const initialState = fromJS({
+      account: {
+        privKey: PLAYER2.key,
+      },
+      table,
+    });
+
+    const sagaTester = new SagaTester({ initialState });
+    sagaTester.start(updateScanner);
+    sagaTester.dispatch(updateReceived(tableAddr, hand));
+    expect(sagaTester.wasCalled('BET')).toEqual(true);
   });
 
   it('should return the sb amount when i am sb and its my turn', () => {
