@@ -22,11 +22,17 @@ import {
   makeStackSelector,
 } from '../Table/selectors';
 
+import {
+  makeSelectGravatar,
+} from '../AccountProvider/selectors';
+
 import SeatComponent from '../../components/Seat';
 
 class Seat extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   componentWillReceiveProps(nextProps) {
+    // Show Action;
+    this.opacity = (nextProps.lastAmount !== this.props.lastAmount) ? '1' : 0;
     // Saving holecards for the hand
     if (nextProps.hand && nextProps.hand.lineup
             && nextProps.hand.lineup[this.props.pos]
@@ -68,7 +74,7 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
   render() {
     const timeLeft = (this.state) ? this.state.timeLeft : 0;
     return (
-      <SeatComponent {...this.props} timeLeft={timeLeft}></SeatComponent>
+      <SeatComponent {...this.props} timeLeft={timeLeft} opacity={this.opacity}></SeatComponent>
     );
   }
 }
@@ -84,6 +90,7 @@ const mapStateToProps = createStructuredSelector({
   folded: makeFoldedSelector(),
   lastAction: makeLastActionSelector(),
   stackSize: makeStackSelector(),
+  gravatarUrl: makeSelectGravatar(),
 });
 
 
@@ -96,6 +103,7 @@ export function mapDispatchToProps(dispatch) {
 Seat.propTypes = {
   pos: React.PropTypes.number,
   tableAddr: React.PropTypes.string,
+  lastAmount: React.PropTypes.number,
   hand: React.PropTypes.object,
   params: React.PropTypes.object,
   setCards: React.PropTypes.func,

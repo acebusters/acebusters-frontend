@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 
 import {
-  lightBlue,
+  baseColor,
 } from 'variables';
 
 export const GamePlay = styled.div`
@@ -61,7 +61,6 @@ export const PokerTable = styled.div`
   transform: translateY(-40%);
   width: 80%;
   height: 50%;
-  background-color: ${lightBlue};
-  border: 2px solid beige;
+  border: 2px solid ${baseColor};
   border-radius: 50%;
 `;

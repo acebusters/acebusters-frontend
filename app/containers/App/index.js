@@ -9,7 +9,7 @@ import Content from 'components/Content';
 import withProgressBar from 'components/ProgressBar';
 
 import { landingPageUrl } from '../../app.config';
-import makeSelectAccountData, { makeSelectGravatar } from '../AccountProvider/selectors';
+import makeSelectAccountData, { makeSelectGravatar, makeSignerAddrSelector } from '../AccountProvider/selectors';
 import {
   makeSelectSidebarCollapse,
   makeSelectTransferShow,
@@ -61,6 +61,7 @@ export function App(props) {
             onClickLogout={props.handleClickLogout}
             imageUrl={props.gravatarUrl}
             logoHref={props.logoHref}
+            signerAddr={props.signerAddr}
           />
         </ThemeProvider>
         {props.account.loggedIn && <ThemeProvider theme={theme}>
@@ -101,6 +102,7 @@ App.propTypes = {
   logoHref: React.PropTypes.string,
   fixed: React.PropTypes.bool,
   gravatarUrl: React.PropTypes.string,
+  signerAddr: React.PropTypes.string,
   modalStack: React.PropTypes.array,
 };
 
@@ -117,6 +119,7 @@ function mapDispatchToProps(dispatch) {
 
 const mapStateToProps = createStructuredSelector({
   account: makeSelectAccountData(),
+  signerAddr: makeSignerAddrSelector(),
   sidebarCollapse: makeSelectSidebarCollapse(),
   isModalOpen: makeSelectTransferShow(),
   gravatarUrl: makeSelectGravatar(),

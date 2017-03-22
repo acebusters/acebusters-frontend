@@ -214,11 +214,20 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     });
   }
 
-  handleLeave() {
+  handleLeave(pos) {
     const handId = parseInt(this.props.params.handId, 10);
     const state = this.props.state;
     const exitHand = (state !== 'waiting') ? handId : handId - 1;
     const table = new TableService(this.props.params.tableAddr, this.props.privKey);
+    this.props.addPending(this.tableAddr, this.props.params.handId, pos);
+    const statusElement = (<div>
+      <p>
+        Please wait until your leave request is processed!
+        Until then your status will be shown as pending.
+      </p>
+      <Button onClick={this.props.modalDismiss}>OK!</Button>
+    </div>);
+    this.props.modalAdd(statusElement);
     return table.leave(exitHand).catch((err) => {
       console.log(err);
       // throw new SubmissionError({ _error: `Leave failed with error ${err}.` });
@@ -409,7 +418,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           sb={sb}
           board={board}
           seats={seats}
-          onLeave={this.handleLeave}
+          onLeave={() => this.handleLeave(this.props.myPos)}
           onSitout={this.handleSitout}
           computedStyles={this.props.computedStyles}
         >

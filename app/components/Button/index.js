@@ -42,6 +42,10 @@ const Medium = styled.button`{
   &:hover {
     color: ${baseColor};
   }
+  &:active {
+    color: ${baseColor};
+    background-color: ${background};
+  }
 }`;
 
 const Large = styled.button`
@@ -70,15 +74,14 @@ const Large = styled.button`
     background-color: ${background};
   }
   
-  ${(props) => {
-    if (props.loading) {
-      console.log('loading true');
-    }
-  }}
-  
   &:hover {
     color: ${baseColor};
     background-color: ${background};
+  }
+  
+  &:active {
+    color: ${background};
+    background-color: ${baseColor};
   }
 `;
 

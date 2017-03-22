@@ -84,7 +84,7 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
         title="Lobby"
       />,
       <UserMenu
-        name="Alexander Pierce"
+        name={`${this.props.signerAddr.substring(0, 8)}...`}
         image={this.props.imageUrl}
         profileAction={() => browserHistory.push('/dashboard')}
         signOutAction={this.props.onClickLogout}
@@ -119,6 +119,7 @@ Header.propTypes = {
   fixed: React.PropTypes.bool,
   loggedIn: React.PropTypes.bool,
   imageUrl: React.PropTypes.string,
+  signerAddr: React.PropTypes.string,
   onClickLogout: React.PropTypes.func,
 };
 

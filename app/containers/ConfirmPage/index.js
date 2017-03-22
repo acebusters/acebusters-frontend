@@ -4,6 +4,12 @@ import { Form, Field, reduxForm, SubmissionError, propTypes } from 'redux-form/i
 import { browserHistory } from 'react-router';
 
 import account from '../../services/account';
+// components
+import FormGroup from '../../components/Form/FormGroup';
+import Container from '../../components/Container';
+import Input from '../../components/Input';
+import Button from '../../components/Button';
+import H1 from '../../components/H1';
 
 const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -24,13 +30,11 @@ const warn = () => {
 
 /* eslint-disable react/prop-types */
 const renderField = ({ input, label, type, meta: { touched, error, warning } }) => (
-  <div>
+  <FormGroup>
     <label htmlFor={input.name}>{label}</label>
-    <div>
-      <input {...input} placeholder={label} type={type} />
-      {touched && ((error && <span>{error}</span>) || (warning && <span>{warning}</span>))}
-    </div>
-  </div>
+    <Input {...input} placeholder={label} type={type} />
+    {touched && ((error && <span>{error}</span>) || (warning && <span>{warning}</span>))}
+  </FormGroup>
 );
 /* eslint-enable react/prop-types */
 
@@ -58,13 +62,14 @@ export class ConfirmPage extends React.PureComponent { // eslint-disable-line re
   render() {
     const { error, handleSubmit, submitting } = this.props;
     return (
-      <Form onSubmit={handleSubmit(this.handleSubmit)}>
-        <Field name="confCode" component={renderField} type="text" placeholder="code" />
-        {error && <strong>{error}</strong>}
-        <div>
-          <button type="submit" disabled={submitting}>Submit</button>
-        </div>
-      </Form>
+      <Container>
+        <H1>Please confirm your registration!</H1>
+        <Form onSubmit={handleSubmit(this.handleSubmit)}>
+          <Field name="confCode" component={renderField} type="text" placeholder="code" />
+          {error && <strong>{error}</strong>}
+          <Button size="large" type="submit" disabled={submitting}>Submit</Button>
+        </Form>
+      </Container>
     );
   }
 }

@@ -19,18 +19,25 @@ const Pot = styled.div`
   transform: translateX(-50%);
 `;
 
+const Wrapper = styled.div`
+  padding: 1em;
+`;
+
 function TableComponent(props) {
   return (
     <GamePlay id="game-play" {...props} computedStyles={props.computedStyles}>
       <TableArea id="table-area" computedStyles={props.computedStyles}>
         { (props.myPos > -1) &&
-          <div>
-            <Grid xs={1 / 2} ><Button size="large" onClick={props.onLeave} >Leave</Button></Grid>
-            <Grid xs={1 / 2} ><Button size="large" onClick={props.onSitout} >SitOut</Button></Grid>
-          </div>
+          <Wrapper>
+            <Grid xs={1 / 2} ><Button size="medium" onClick={props.onLeave} >Leave</Button></Grid>
+            <Grid xs={1 / 2} ><Button size="medium" onClick={props.onSitout} >SitOut</Button></Grid>
+          </Wrapper>
          }
-        <TableHeader> { `signerAddr: ${props.signerAddr}` } <br />{ `state :${props.state}` } <br />{ `amount to call: ${props.amountToCall}` }
-          <br />{ `sb: ${props.sb}` } </TableHeader>
+        <TableHeader>
+          { `state: ${props.state}` } <br />
+          { `amount to call: ${props.amountToCall}` } <br />
+          { `sb: ${props.sb}` }
+        </TableHeader>
         <TableContainer id="table-container">
           <TableAndChairs id="table-and-chairs" computedStyles={props.computedStyles}>
             <PokerTable id="poker-table">
@@ -53,7 +60,6 @@ TableComponent.propTypes = {
   lineup: React.PropTypes.any,
   onLeave: React.PropTypes.any,
   onSitout: React.PropTypes.any,
-  signerAddr: React.PropTypes.string,
   board: React.PropTypes.array,
   seats: React.PropTypes.array,
   potSize: React.PropTypes.number,

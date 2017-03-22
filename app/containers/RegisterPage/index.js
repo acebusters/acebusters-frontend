@@ -31,6 +31,9 @@ const validate = (values) => {
   } else if (values.get('password').length < 8) {
     errors.password = 'Must be 8 characters or more.';
   }
+  if (values.get('password') !== values.get('confirmedPassword')) {
+    errors.confirmedPassword = 'Passwords dont match';
+  }
   if (!values.get('captchaResponse')) {
     errors.captchaResponse = 'Required';
   }
@@ -146,13 +149,17 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
   render() {
     const workerPath = this.props.workerPath + encodeURIComponent(location.origin);
     const { error, handleSubmit, submitting } = this.props;
+
     return (
       <Container>
         <div>
           <H1> Register a new account!</H1>
-          <Form onSubmit={handleSubmit(this.handleSubmit)}>
-            <Field name="email" type="text" component={renderField} label="Email" />
-            <Field name="password" type="password" component={renderField} label="Password" />
+          <Form
+            onSubmit={handleSubmit(this.handleSubmit)}
+          >
+            <Field name="email" type="text" component={renderField} label="e-mail" />
+            <Field name="password" type="password" component={renderField} label="password" />
+            <Field name="confirmedPassword" type="password" component={renderField} label="confirm   password" />
             <Field name="captchaResponse" component={Captcha} />
             {error && <ErrorMessage error={error}></ErrorMessage>}
             <Button type="submit" disabled={submitting} size="large">Register</Button>
