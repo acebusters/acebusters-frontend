@@ -99,34 +99,32 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
   }
 
   render() {
-    const state = this.props.state;
-    if (this.props.isMyTurn && state !== 'dealing' && state !== 'waiting') {
-      return (
-        <ActionBarComponent>
-          <Grid xs={1 / 2}>{this.props.stepAndMin}</Grid>
-          <Grid xs={1 / 2}>{(this.state) ? this.state.amount : this.props.stepAndMin}</Grid>
-          <Grid xs={1 / 1}>
-            <Slider
-              max={this.props.max}
-              min={this.props.stepAndMin}
-              step={this.props.stepAndMin}
-              onChange={(e) => this.updateValue(e)}
-            >
-            </Slider>
-          </Grid>
-          <Grid xs={1 / 3}>
-            <Button size="large" onClick={this.handleBet} >Bet</Button>
-          </Grid>
-          <Grid xs={1 / 3}>
-            <Button size="large" onClick={this.handleCheck} >Check</Button>
-          </Grid>
-          <Grid xs={1 / 3}>
-            <Button size="large" onClick={this.handleFold} >Fold</Button>
-          </Grid>
-        </ActionBarComponent>
-      );
-    }
-    return null;
+    // const state = this.props.state;
+    // if (this.props.isMyTurn && state !== 'dealing' && state !== 'waiting') {
+    return (
+      <ActionBarComponent>
+        <Grid xs={1 / 2}>{this.props.stepAndMin}</Grid>
+        <Grid xs={1 / 2}>{(this.state) ? this.state.amount : this.props.stepAndMin}</Grid>
+        <Grid xs={1 / 1}>
+          <Slider
+            max={this.props.max}
+            min={this.props.stepAndMin}
+            step={this.props.stepAndMin}
+            onChange={(e) => this.updateValue(e)}
+          >
+          </Slider>
+        </Grid>
+        <Grid xs={1 / 3}>
+          <Button size="large" onClick={this.handleBet} >Bet</Button>
+        </Grid>
+        <Grid xs={1 / 3}>
+          <Button size="large" onClick={this.handleCheck} >Check</Button>
+        </Grid>
+        <Grid xs={1 / 3}>
+          <Button size="large" onClick={this.handleFold} >Fold</Button>
+        </Grid>
+      </ActionBarComponent>
+    );
   }
 }
 
@@ -158,7 +156,7 @@ ActionBar.propTypes = {
   myMaxBet: React.PropTypes.number,
   stepAndMin: React.PropTypes.number,
   max: React.PropTypes.number,
-  isMyTurn: React.PropTypes.bool,
+  // isMyTurn: React.PropTypes.bool,
   state: React.PropTypes.string,
   stackSize: React.PropTypes.number,
   me: React.PropTypes.object,
