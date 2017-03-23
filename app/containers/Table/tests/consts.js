@@ -24,6 +24,10 @@ export const PLAYER4 = {
   key: '0xa803ed744543e69b5e4816c5fc7539427a2928e78d729c87712f180fae52fcc9',
 };
 
+export const PLAYER_EMPTY = {
+  address: '0x0000000000000000000000000000000000000000',
+};
+
 export const ABI = {
   ABI_BET: [{ name: 'bet', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }],
   ABI_ALL_IN: [{ name: 'allIn', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }],

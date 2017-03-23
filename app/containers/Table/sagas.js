@@ -125,7 +125,7 @@ export function* updateScanner() {
       continue; // eslint-disable-line no-continue
     }
 
-    // check if time to show
+    // check if's showtime!
     if (isShowTurnByAction(action, { address: myAddr })
       && !showed[action.tableAddr + action.hand.handId]) {
       showed[action.tableAddr + action.hand.handId] = true;

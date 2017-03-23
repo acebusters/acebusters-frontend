@@ -94,7 +94,7 @@ const is0rTurnByAction = createSelector(
 const isShowTurnByAction = createSelector(
   [actionSelector, myPosByAction],
   (action, myPos) => {
-    if (!action || !action.hand || action.state !== 'showdown') {
+    if (!action || !action.hand || action.hand.state !== 'showdown') {
       return false;
     }
     const whosTurn = pokerHelper.whosTurn(action.hand);
@@ -176,6 +176,7 @@ const makeLineupSelector = () => createSelector(
   [handSelector, tableStateSelector],
   (hand, table) => {
     // we have no table yet
+    console.log(hand, table);
     if (!table || !table.get('data')) {
       return null;
     }
@@ -184,6 +185,7 @@ const makeLineupSelector = () => createSelector(
     if (!hand || !hand.get('lineup')) {
       return table.getIn(['data', 'seats']);
     }
+
     // if we have a hand, just get the hand
     return hand.get('lineup');
   }
