@@ -70,6 +70,14 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
     }
   }
 
+  componentWillUnmount() {
+    // manage timer
+    if (this.interval) {
+      clearInterval(this.interval);
+      this.interval = null;
+    }
+  }
+
   render() {
     const timeLeft = (this.state) ? this.state.timeLeft : 0;
     return (

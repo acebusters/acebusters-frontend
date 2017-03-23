@@ -170,8 +170,8 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     const nextHandStr = nextProps.latestHand.toString();
     if (nextProps.latestHand > handId && !this.pushed[nextHandStr]) {
       this.pushed[nextHandStr] = true;
-      console.log(`dispatched push to hand ${nextHandStr}`);
       setTimeout(() => {
+        console.log(`dispatched push to hand ${nextHandStr}`);
         browserHistory.push(`/table/${this.tableAddr}/hand/${nextHandStr}`);
       }, 1000);
     }
@@ -190,6 +190,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   componentWillUnmount() {
+    if (this.timeOut) {
+      console.log('timeout cancelled');
+      clearInterval(this.timeOut);
+    }
     this.channel.unbind('update', this.handleUpdate);
     this.tableEvents.stopWatching();
     this.tokenEvents.stopWatching();
