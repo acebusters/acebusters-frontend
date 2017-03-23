@@ -164,7 +164,7 @@ const makeMinSelector = () => createSelector(
     if (amountToCall === 0) {
       return (sb * 2);
     }
-    return amountToCall * 2;
+    return amountToCall;
   }
 );
 

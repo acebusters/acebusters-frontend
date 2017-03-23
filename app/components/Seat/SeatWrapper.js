@@ -61,7 +61,7 @@ export const SeatLabel = styled.div`
 
 export const DealerButton = styled.div`
   border-radius: 50%;
-  ${(props) => (!(props.hand.dealer === props.pos)) ? 'display: none;' : ''}
+  ${(props) => (!(props.hand.get('dealer') === props.pos)) ? 'display: none;' : ''}
   border: 4px solid ${baseColor}
   width: 1.5em;
   height: 1.5em;
