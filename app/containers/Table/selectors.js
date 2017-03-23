@@ -112,7 +112,6 @@ const hasNettingInAction = createSelector(
   [actionSelector, addressSelector],
   (action, myAddr) => {
     // check data available
-    console.log(action.hand.netting);
     if (!myAddr || !action || !action.hand || !action.hand.netting) {
       return false;
     }
