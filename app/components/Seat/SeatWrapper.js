@@ -48,12 +48,7 @@ export const ImageContainer = styled.div`
 
 export const SeatLabel = styled.div`
   position: absolute;
-  ${(props) => {
-    if (props.computedStyles && props.computedStyles.d > 600) {
-      return 'font-size: 1em';
-    }
-    return 'font-size: 0.5em';
-  }}
+  font-size: 0.5em
   top: 50%;
   left: 50%;  
   transform: translate(-50%,-50%);

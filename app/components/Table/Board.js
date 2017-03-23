@@ -12,3 +12,8 @@ export const Board = styled.div`
   min-width: 255px;
   transform: translate(-50%, -50%);
 `;
+
+export const BoardCardWrapper = styled.div`
+  float: left;
+  margin-left: 0.5em;
+`;

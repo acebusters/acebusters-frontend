@@ -43,10 +43,6 @@ export function getInfo(tableAddr) {
   return { type: GET_INFO, tableAddr };
 }
 
-export function resizeTable(computedStyles, tableAddr) {
-  return { type: RESIZE_TABLE, computedStyles, tableAddr };
-}
-
 export function tableReceived(tableAddr) {
   return { type: TABLE_RECEIVED, tableAddr };
 }

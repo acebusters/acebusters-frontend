@@ -88,10 +88,6 @@ export default function tableReducer(state = initialState, action) {
       return state.setIn([action.tableAddr, action.handId.toString(), 'holeCards'], fromJS(action.cards));
     }
 
-    case TableActions.RESIZE_TABLE: {
-      return state.setIn([action.tableAddr, 'computedStyles'], action.computedStyles);
-    }
-
     case TableActions.UPDATE_RECEIVED: {
       const table = state.get(action.tableAddr);
 

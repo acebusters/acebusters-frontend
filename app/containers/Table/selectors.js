@@ -195,11 +195,6 @@ const makeAmountSelector = () => createSelector(
   (tableState) => (tableState) ? tableState.get('amount') : null
 );
 
-const makeComputedSelector = () => createSelector(
-  tableStateSelector,
-  (tableState) => (tableState) ? tableState.get('computedStyles') : null
-);
-
 const makeMyPosSelector = () => createSelector(
   [makeLineupSelector(), makeSignerAddrSelector()],
   (lineup, myAddress) => (lineup && myAddress) ? pokerHelper.getMyPos(lineup.toJS(), myAddress) : -1
@@ -377,7 +372,6 @@ export {
     makeHandSelector,
     makeMaxBetSelector,
     makeMyMaxBetSelector,
-    makeComputedSelector,
     makeMyStackSelector,
     makeMinSelector,
     makeMaxSelector,

@@ -12,6 +12,8 @@ const CardWrapper = styled.div`
   position: relative;
   margin-left: ${(props) => props.offset[0]}%;
   margin-top: ${(props) => props.offset[1]}%;
+  max-width: 100%;
+  height: auto;
 `;
 
 function Card(props) {
@@ -28,7 +30,13 @@ function Card(props) {
   if (!props.folded) {
     return (
       <CardWrapper offset={props.offset}>
-        <img key={suit + value} src={link} className="card" alt="" />
+        <img
+          key={suit + value}
+          src={link}
+          className="card"
+          alt=""
+          style={{ maxWidth: '100%', height: 'auto' }}
+        />
       </CardWrapper>
     );
   }

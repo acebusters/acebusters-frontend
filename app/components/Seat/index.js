@@ -8,12 +8,7 @@ import { SeatWrapper, ImageContainer, CardContainer, DealerButton, SeatLabel, Ch
 import { ActionBox, StackBox, NameBox, TimeBox, AmountBox } from './Info';
 
 function SeatComponent(props) {
-  let cardSize;
-  if (props.myPos === props.pos) {
-    cardSize = (props.computedStyles && props.computedStyles.d < 600) ? 40 : 50;
-  } else {
-    cardSize = (props.computedStyles && props.computedStyles.d < 600) ? 15 : 25;
-  }
+  const cardSize = 40;
   let seat = null;
   let status = '';
   if (props.pending) {
@@ -28,10 +23,9 @@ function SeatComponent(props) {
     seat = (
       <SeatWrapper
         coords={props.coords}
-        comuptedStyles={props.computedStyles}
       >
         <ImageContainer {...props} >
-          <SeatLabel computedStyles={props.computedStyles}>
+          <SeatLabel>
             { status }
           </SeatLabel>
         </ImageContainer>
@@ -42,7 +36,6 @@ function SeatComponent(props) {
       <SeatWrapper
         coords={props.coords}
         {...props}
-        comuptedStyles={props.computedStyles}
       >
         <ImageContainer {...props}>
           <DealerButton {...props}></DealerButton>
@@ -58,7 +51,7 @@ function SeatComponent(props) {
               cardNumber={props.cards[1]}
               folded={props.folded}
               size={cardSize}
-              offset={[-100, -100]}
+              offset={[-110, -110]}
             >
             </Card>
           </CardContainer>

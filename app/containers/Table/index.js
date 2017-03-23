@@ -8,6 +8,7 @@ import { browserHistory } from 'react-router';
 import Pusher from 'pusher-js';
 // components and styles
 import Card from 'components/Card'; // eslint-disable-line
+import { BoardCardWrapper } from 'components/Table/Board';
 import Seat from '../Seat'; // eslint-disable-lines
 import Button from 'components/Button'; // eslint-disable-line
 // config data
@@ -25,7 +26,6 @@ import {
   getInfo,
   lineupReceived,
   updateReceived,
-  resizeTable,
   addPending,
   removePending,
 } from './actions';
@@ -46,7 +46,6 @@ import {
   makeHandStateSelector,
   makeLineupSelector,
   makeMyPosSelector,
-  makeComputedSelector,
   makeMyMaxBetSelector,
   makeMissingHandSelector,
   makeLatestHandSelector,
@@ -67,36 +66,6 @@ const getTableData = (table, props) => {
   });
 };
 
-const computeStyles = (windowWidth, windowHeight, infoHeight, actionBarHeight) => {
-  const computed = {};
-  computed.d = windowWidth;
-  computed.b = infoHeight;
-  computed.h = 1.6;
-  computed.a = 0.96;
-  computed.e = 100;
-  computed.f = computed.d - computed.b - computed.e;
-  computed.l = computed.f;
-  computed.g = windowHeight;
-  computed.z = actionBarHeight;
-  computed.y = computed.g - computed.z;
-  computed.computeSize = () => {
-    let k;
-    let c;
-    const obj = {};
-    if (computed.y < computed.l / computed.h) {
-      k = computed.y * computed.a;
-      c = k * computed.h;
-    } else {
-      c = computed.l * computed.a;
-      k = (c / computed.h);
-    }
-    obj.width = c;
-    obj.height = k;
-    return obj;
-  };
-  return computed;
-};
-
 export class Table extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   constructor(props) {
@@ -105,15 +74,12 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.watchToken = this.watchToken.bind(this);
     this.handleJoin = this.handleJoin.bind(this);
     this.handleUpdate = this.handleUpdate.bind(this);
-    this.handleResize = this.handleResize.bind(this);
     this.handleLeave = this.handleLeave.bind(this);
     this.handleSitout = this.handleSitout.bind(this);
     this.tableAddr = props.params.tableAddr;
     this.web3 = props.web3Redux.web3;
     this.table = this.web3.eth.contract(ABI_TABLE).at(this.tableAddr);
     this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(tokenContractAddress);
-    // set initial size && resizing table
-    window.onresize = this.handleResize;
     // register event listener for table
     this.tableEvents = this.table.allEvents({ fromBlock: 'latest' });
     this.tableEvents.watch(this.watchTable);
@@ -128,10 +94,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       this.props.getInfo(this.tableAddr); // get initial state
       this.channel.bind('update', this.handleUpdate); // bind to future state updates
     });
-  }
-
-  componentDidMount() {
-    this.handleResize();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -243,16 +205,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       console.log(err);
       // throw new SubmissionError({ _error: `Leave failed with error ${err}.` });
     });
-  }
-
-  handleResize() {
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
-    const infoHeight = (document.getElementById('table-info')) ? document.getElementById('table-info').clientWidth : 0;
-    const actionBarHeight = (document.getElementById('action-bar')) ? document.getElementById('action-bar').clientHeight : 0;
-    if (this.props) {
-      this.props.resizeTable(computeStyles(windowWidth, windowHeight, infoHeight, actionBarHeight), this.tableAddr);
-    }
   }
 
 
@@ -406,10 +358,14 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   renderBoard() {
     const board = [];
     const cards = this.props.board;
-    const cardSize = 80;
+    const cardSize = 60;
     if (cards && cards.length > 0) {
-      for (let i = 0; i < cards.length; i += 1) {
-        const card = (<Card key={i} cardNumber={cards[i]} size={cardSize} offset={[0, 0]}></Card>);
+      for (let i = 0; i < 5; i += 1) {
+        const card = (
+          <BoardCardWrapper key={i}>
+            <Card key={i} cardNumber={cards[i]} size={cardSize} offset={[0, 0]}></Card>
+          </BoardCardWrapper>
+        );
         board.push(card);
       }
     }
@@ -431,7 +387,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           seats={seats}
           onLeave={() => this.handleLeave(this.props.myPos)}
           onSitout={this.handleSitout}
-          computedStyles={this.props.computedStyles}
         >
         </TableComponent> }
       </div>
@@ -448,7 +403,6 @@ export function mapDispatchToProps() {
     modalDismiss: () => (modalDismiss()),
     addPending: (tableAddr, handId, pos) => (addPending(tableAddr, handId, pos)),
     removePending: (tableAddr, handId) => (removePending(tableAddr, handId)),
-    resizeTable: (computed, tableAddr) => (resizeTable(computed, tableAddr)),
     updateReceived: (tableAddr, hand) => (updateReceived(tableAddr, hand)),
   };
 }
@@ -468,7 +422,6 @@ const mapStateToProps = createStructuredSelector({
   signerAddr: makeSignerAddrSelector(),
   amountToCall: makeAmountToCallSelector(),
   proxyAddr: makeSelectProxyAddr(),
-  computedStyles: makeComputedSelector(),
   missingHands: makeMissingHandSelector(),
 });
 
@@ -486,12 +439,10 @@ Table.propTypes = {
   data: React.PropTypes.any,
   myPos: React.PropTypes.any,
   myMaxbet: React.PropTypes.number,
-  computedStyles: React.PropTypes.object,
   modalAdd: React.PropTypes.func,
   addPending: React.PropTypes.func,
   removePending: React.PropTypes.func,
   modalDismiss: React.PropTypes.func,
-  resizeTable: React.PropTypes.func,
   updateReceived: React.PropTypes.func,
 };
 
