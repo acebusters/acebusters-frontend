@@ -100,6 +100,7 @@ export default function tableReducer(state = initialState, action) {
         let hand = Map({
           dealer: action.hand.dealer,
           state: action.hand.state,
+          cards: List(action.hand.cards),
           changed: action.hand.changed,
           distribution: action.hand.distribution,
         });
