@@ -165,10 +165,14 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       this.token.balanceOf.call(nextProps.proxyAddr);
     }
 
-    if (nextProps.latestHand > this.props.params.handId && !this.pushed) {
-      this.pushed = true;
+    this.pushed = (this.pushed) ? this.pushed : {};
+    const handId = parseInt(this.props.params.handId, 10);
+    const nextHandStr = nextProps.latestHand.toString();
+    if (nextProps.latestHand > handId && !this.pushed[nextHandStr]) {
+      this.pushed[nextHandStr] = true;
+      console.log(`dispatched push to hand ${nextHandStr}`);
       setTimeout(() => {
-        browserHistory.push(`/table/${this.tableAddr}/hand/${nextProps.latestHand}`);
+        browserHistory.push(`/table/${this.tableAddr}/hand/${nextHandStr}`);
       }, 1000);
     }
 
