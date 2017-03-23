@@ -43,17 +43,29 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
     this.cards = LocalStorage.getItem(key);
   }
 
+  setActive(active) {
+    this.setState({ active });
+  }
+
+  updateValue(e) {
+    const amount = (e.target.value > this.props.stackSize) ? this.props.stackSize : e.target.value;
+    this.setState({ amount });
+  }
+
   handleBet() {
+    this.setActive(false);
     const amount = (this.state) ? parseInt(this.state.amount, 10) : this.props.stepAndMin;
     const handId = parseInt(this.props.params.handId, 10);
     return this.table.bet(handId, amount).catch((err) => {
       console.log(err);
+      this.setActive(true);
     }).then((data) => {
       this.props.setCards(this.props.params.tableAddr, handId, data.cards);
     });
   }
 
   handleCheck() {
+    this.setActive(false);
     const amount = this.props.myMaxBet;
     const state = this.props.state;
     const handId = parseInt(this.props.params.handId, 10);
@@ -73,58 +85,61 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
     }
     return call.catch((err) => {
       console.log(err);
+      this.setActive(true);
     });
   }
 
   handleShow() {
+    this.setActive(false);
     const amount = this.props.myMaxBet;
     const cards = this.props.me.cards;
     const handId = parseInt(this.props.params.handId, 10);
     return this.table.show(handId, amount, cards).catch((err) => {
       console.log(err);
+      this.setActive(true);
     });
   }
 
   handleFold() {
+    this.setActive(false);
     const amount = this.props.myMaxBet;
     const handId = parseInt(this.props.params.handId, 10);
     return this.table.fold(handId, amount).catch((err) => {
       console.log(err);
+      this.setActive(true);
     });
-  }
-
-  updateValue(e) {
-    const amount = (e.target.value > this.props.stackSize) ? this.props.stackSize : e.target.value;
-    this.setState({ amount });
   }
 
   render() {
     // const state = this.props.state;
-    // if (this.props.isMyTurn && state !== 'dealing' && state !== 'waiting') {
-    return (
-      <ActionBarComponent>
-        <Grid xs={1 / 2}>{this.props.stepAndMin}</Grid>
-        <Grid xs={1 / 2}>{(this.state) ? this.state.amount : this.props.stepAndMin}</Grid>
-        <Grid xs={1 / 1}>
-          <Slider
-            max={this.props.max}
-            min={this.props.stepAndMin}
-            step={this.props.stepAndMin}
-            onChange={(e) => this.updateValue(e)}
-          >
-          </Slider>
-        </Grid>
-        <Grid xs={1 / 3}>
-          <Button size="large" onClick={this.handleBet} >Bet</Button>
-        </Grid>
-        <Grid xs={1 / 3}>
-          <Button size="large" onClick={this.handleCheck} >Check</Button>
-        </Grid>
-        <Grid xs={1 / 3}>
-          <Button size="large" onClick={this.handleFold} >Fold</Button>
-        </Grid>
-      </ActionBarComponent>
-    );
+    const active = (this.state) ? this.state.active : true;
+    if (active) {
+      return (
+        <ActionBarComponent>
+          <Grid xs={1 / 2}>{this.props.stepAndMin}</Grid>
+          <Grid xs={1 / 2}>{(this.state) ? this.state.amount : ''}</Grid>
+          <Grid xs={1 / 1}>
+            <Slider
+              max={this.props.max}
+              min={this.props.stepAndMin}
+              step={this.props.stepAndMin}
+              onChange={(e) => this.updateValue(e)}
+            >
+            </Slider>
+          </Grid>
+          <Grid xs={1 / 3}>
+            <Button size="large" onClick={this.handleBet}>Bet</Button>
+          </Grid>
+          <Grid xs={1 / 3}>
+            <Button size="large" onClick={this.handleCheck}>Check</Button>
+          </Grid>
+          <Grid xs={1 / 3}>
+            <Button size="large" onClick={this.handleFold}>Fold</Button>
+          </Grid>
+        </ActionBarComponent>
+      );
+    }
+    return null;
   }
 }
 
