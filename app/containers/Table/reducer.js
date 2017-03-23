@@ -114,7 +114,7 @@ export default function tableReducer(state = initialState, action) {
       let hand = table.get(action.hand.handId.toString());
 
       // if the hand state changed, make sure to update it
-      if (hand.get('change  d') !== action.hand.changed) {
+      if (hand.get('changed') !== action.hand.changed) {
         // in any state but dealing, update maxBet
         if (action.hand.state !== hand.get('state')) {
           const maxBet = pokerHelper.findMaxBet(action.hand.lineup, action.hand.dealer).amount;
@@ -127,7 +127,8 @@ export default function tableReducer(state = initialState, action) {
         }
         for (let j = 0; j < action.hand.lineup.length; j += 1) {
           if (hand.getIn(['lineup', j, 'address']) !== action.hand.lineup[j].address ||
-            hand.getIn(['lineup', j, 'last']) !== action.hand.lineup[j].last) {
+            hand.getIn(['lineup', j, 'last']) !== action.hand.lineup[j].last ||
+            hand.getIn(['lineup', j, 'sitout']) !== action.hand.lineup[j].sitout) {
             hand = hand.setIn(['lineup', j], Map(action.hand.lineup[j]));
           }
         }
@@ -140,43 +141,6 @@ export default function tableReducer(state = initialState, action) {
       }
       return state.setIn([action.tableAddr, action.hand.handId.toString()], hand);
     }
-
-    // case TableActions.NEXT_HAND: {
-    //   const currentDealer = state.get('hand').dealer;
-    //   const currentLineup = state.get('hand').lineup;
-    //   const newHand = null;// TODO fix _.clone(state.get('hand'));
-    //   const newLineup = currentLineup.map((player) => {
-    //     delete player.cards; // eslint-disable-line
-    //     return player;
-    //   });
-    //   newHand.lineup = newLineup;
-    //   newHand.state = 'dealing';
-    //   newHand.cards = [];
-    //   newHand.dealer = currentDealer + 1;
-    //   return state
-    //     .set('lastRoundMaxBet', 0)
-    //     .set('complete', false)
-    //     .set('performedDealing', false)
-    //     .set('hand', newHand);
-
-
-      // we start a new hand here:
-      // - delete all the last receipts in the lineup
-
-      // - increment handId and reset lastRoundMaxBet
-      // const handId = state.getIn([action.tableAddr, 'handId']);
-      // if (handComplete && handId === action.hand.handId) {
-      //   let newState = state;
-      //   // delete all the last receipts in the lineup
-      //   for (let j = 0; j < action.hand.length; j += 1) {
-      //     newState = state.deleteIn([action.tableAddr, 'lineup', j], 'last');
-      //   }
-      //   // increment handId and reset lastRoundMaxBet
-      //   return newState
-      //     .setIn([action.tableAddr, 'handId'], action.hand.handId + 1)
-      //     .setIn([action.tableAddr, 'lastRoundMaxBet'], 0);
-      // }
-    // }
 
     default:
       return state;

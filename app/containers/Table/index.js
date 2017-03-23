@@ -142,10 +142,14 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
         console.log('timeout cancelled');
       }
 
+      const period = 59000;
+      let passed = Math.floor(Date.now() / 1000) - nextProps.hand.get('changed');
+      passed = (passed > 59) ? 59 : passed;
       const random = (Math.random() * 9000);
-      const timeOut = (nextProps.hand.get('changed') - Math.floor(Date.now() / 1000)) + 59000 + random;
+      const timeOut = (period - (passed * 1000)) + random;
+
       if (timeOut > 0) {
-        console.log('timeout started');
+        console.log(`timeout started with ${timeOut}`);
         this.timeOut = setTimeout(() => {
           console.log('timeout fired');
           const table = new TableService(this.props.params.tableAddr);

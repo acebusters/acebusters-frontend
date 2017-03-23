@@ -75,8 +75,8 @@ const isBbTurnByAction = createSelector(
 );
 
 const is0rTurnByAction = createSelector(
-  [actionSelector, myPosByAction, isBbTurnByAction],
-  (action, myPos, bbTurn) => {
+  [actionSelector, myPosByAction, isSbTurnByAction, isBbTurnByAction],
+  (action, myPos, sbTurn, bbTurn) => {
     if (!action.hand || !action.hand.lineup) {
       return false;
     }
@@ -84,7 +84,7 @@ const is0rTurnByAction = createSelector(
     if (typeof whosTurn === 'undefined' || whosTurn < 0) {
       return false;
     }
-    if (action.hand.state === 'dealing' && !bbTurn && whosTurn === myPos) {
+    if (action.hand.state === 'dealing' && !sbTurn && !bbTurn && whosTurn === myPos) {
       return true;
     }
     return false;
@@ -176,7 +176,6 @@ const makeLineupSelector = () => createSelector(
   [handSelector, tableStateSelector],
   (hand, table) => {
     // we have no table yet
-    console.log(hand, table);
     if (!table || !table.get('data')) {
       return null;
     }
