@@ -50,7 +50,7 @@ describe('Saga Tests', () => {
     expect(sagaTester.getLatestCalledAction().amount).toEqual(500);
   });
 
-  it('should return the bb amount when i am bb and its my turn', () => {
+  it('should dispatch bet action with bb amount', () => {
     const hand = {
       state: 'dealing',
       dealer: 0,
@@ -85,7 +85,7 @@ describe('Saga Tests', () => {
     expect(sagaTester.getLatestCalledAction().amount).toEqual(1000);
   });
 
-  it('should pay 0 receipt when not sb or bb', () => {
+  it('should dispatch show action when its showtime!', () => {
     const hand = {
       state: 'dealing',
       dealer: 0,
@@ -116,22 +116,22 @@ describe('Saga Tests', () => {
     const sagaTester = new SagaTester({ initialState });
     sagaTester.start(updateScanner);
     sagaTester.dispatch(updateReceived(tableAddr, hand));
-    // console.log(sagaTester.getLatestCalledAction());
     expect(sagaTester.getLatestCalledAction().amount).toEqual(0);
   });
 
-  it('should show on showtime', () => {
+  it('should dispatch net action when there is a netting request', () => {
     const hand = {
-      state: 'showdown',
+      state: 'flop',
       dealer: 0,
+      netting: {},
       lineup: [{
         address: PLAYER_EMPTY.address,
       }, {
         address: PLAYER2.address,
-        last: new EWT(ABI.ABI_BET).bet(1, 5000).sign(PLAYER2.key),
+        last: new EWT(ABI.ABI_BET).bet(1, 0).sign(PLAYER2.key),
       }, {
         address: PLAYER3.address,
-        last: new EWT(ABI.ABI_BET).bet(1, 5000).sign(PLAYER3.key),
+        last: new EWT(ABI.ABI_BET).bet(1, 0).sign(PLAYER3.key),
       }, {
         address: PLAYER_EMPTY.address,
       }],
@@ -148,19 +148,11 @@ describe('Saga Tests', () => {
       table,
     });
 
+    // max bet 0 not optimal -> find out out how to set props for testing
     const sagaTester = new SagaTester({ initialState });
     sagaTester.start(updateScanner);
     sagaTester.dispatch(updateReceived(tableAddr, hand));
-    // console.log(sagaTester.getLatestCalledAction());
-    expect(sagaTester.getLatestCalledAction().amount).toEqual(5000);
-  });
-
-  it('should not dispatch dealing action for BB when global error', () => {
-
-  });
-
-  it('should dispatch NEXT_HAND action when completed is true', () => {
-
+    expect(sagaTester.getLatestCalledAction().type).toEqual('acebusters/Table/NET');
   });
 });
 

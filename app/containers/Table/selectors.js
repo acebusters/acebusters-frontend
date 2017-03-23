@@ -112,6 +112,7 @@ const hasNettingInAction = createSelector(
   [actionSelector, addressSelector],
   (action, myAddr) => {
     // check data available
+    console.log(action.hand.netting);
     if (!myAddr || !action || !action.hand || !action.hand.netting) {
       return false;
     }
@@ -163,7 +164,7 @@ const makeMinSelector = () => createSelector(
     if (amountToCall === 0) {
       return (sb * 2);
     }
-    return amountToCall * 2;
+    return amountToCall;
   }
 );
 
