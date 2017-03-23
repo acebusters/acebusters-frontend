@@ -112,7 +112,7 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
 
   render() {
     // const state = this.props.state;
-    const active = (this.state) ? this.state.active : true;
+    const active = (this.state && this.state.active !== undefined) ? this.state.active : true;
     if (active) {
       return (
         <ActionBarComponent>
