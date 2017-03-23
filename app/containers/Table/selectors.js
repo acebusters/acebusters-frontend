@@ -112,6 +112,7 @@ const hasNettingInAction = createSelector(
   [actionSelector, addressSelector],
   (action, myAddr) => {
     // check data available
+    console.log(action.hand.netting);
     if (!myAddr || !action || !action.hand || !action.hand.netting) {
       return false;
     }
@@ -176,7 +177,6 @@ const makeLineupSelector = () => createSelector(
   [handSelector, tableStateSelector],
   (hand, table) => {
     // we have no table yet
-    console.log(hand, table);
     if (!table || !table.get('data')) {
       return null;
     }
