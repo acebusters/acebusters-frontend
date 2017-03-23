@@ -135,10 +135,8 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.myPos > -1
-      && this.props.hand
-      && this.props.hand.get('changed') < nextProps.hand.get('changed')
-      && nextProps.hand.get('state') !== 'waiting') {
+    if (this.props.myPos > -1 && this.props.hand
+      && this.props.hand.get('changed') < nextProps.hand.get('changed')) {
       if (this.timeOut) {
         clearTimeout(this.timeOut);
         console.log('timeout cancelled');
