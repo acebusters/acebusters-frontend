@@ -20,6 +20,10 @@ import {
   makeSelectPrivKey,
   makeSignerAddrSelector,
 } from '../AccountProvider/selectors';
+
+import {
+  makeMyCardsSelector,
+} from '../Seat/selectors';
 import {
   isSbTurnByAction,
   isBbTurnByAction,
@@ -74,7 +78,7 @@ function* performBet(action) {
 function* performShow(action) {
   const table = new TableService(action.tableAddr, action.privKey);
   try {
-    yield table.show(action.handId, action.amount);
+    yield table.show(action.handId, action.amount, action.holeCards);
   } catch (err) {
     // TODO: handle;
     console.dir(err);
@@ -85,6 +89,7 @@ export function* updateScanner() {
   const privKeySelector = makeSelectPrivKey();
   const myAddrSelector = makeSignerAddrSelector();
   const sbSelector = makeSbSelector();
+  const myCardsSelector = makeMyCardsSelector();
   // toggle variables to avoid duplicate requests
   const payedBlind = {};
   const showed = {};
@@ -100,6 +105,7 @@ export function* updateScanner() {
     const state = yield select();
     const myAddr = myAddrSelector(state);
     const privKey = privKeySelector(state);
+    const holeCards = myCardsSelector(state, { params: { tableAddr: action.tableAddr, handId: action.hand.handId } });
     const sb = sbSelector(state, { params: { tableAddr: action.tableAddr } });
 
     // check if turn to pay small blind
@@ -126,12 +132,13 @@ export function* updateScanner() {
     }
 
     // check if's showtime!
-    if (isShowTurnByAction(action, { address: myAddr })
-      && !showed[action.tableAddr + action.hand.handId]) {
+    const isShow = isShowTurnByAction(action, { address: myAddr });
+    if (isShow && !showed[action.tableAddr + action.hand.handId]) {
       showed[action.tableAddr + action.hand.handId] = true;
       const maxBetSelector = makeMaxBetSelector();
       const max = maxBetSelector(state);
-      yield put(show(action.tableAddr, action.hand.handId, max, privKey));
+      console.log('holeCards: ', holeCards);
+      yield put(show(action.tableAddr, action.hand.handId, holeCards, max, privKey));
       continue; // eslint-disable-line no-continue
     }
 

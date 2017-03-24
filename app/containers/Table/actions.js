@@ -31,8 +31,8 @@ export function bet(tableAddr, handId, amount, privKey) {
   return { type: BET, tableAddr, handId, amount, privKey };
 }
 
-export function show(tableAddr, handId, amount, privKey) {
-  return { type: SHOW, tableAddr, handId, amount, privKey };
+export function show(tableAddr, handId, holeCards, amount, privKey) {
+  return { type: SHOW, tableAddr, handId, holeCards, amount, privKey };
 }
 
 export function net(tableAddr, handId, balances, privKey) {

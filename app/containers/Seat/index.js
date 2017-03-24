@@ -64,7 +64,10 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
 
   render() {
     const timeLeft = (this.state) ? this.state.timeLeft : 0;
-    const cards = (this.props.pos === this.props.myPos) ? this.props.myCards : this.props.cards;
+    let cards = (this.props.pos === this.props.myPos) ? this.props.myCards : this.props.cards;
+    if (!cards) {
+      cards = [-1, -1];
+    }
     return (
       <SeatComponent {...this.props} timeLeft={timeLeft} opacity={this.opacity} holeCards={cards}></SeatComponent>
     );

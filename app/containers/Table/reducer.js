@@ -4,7 +4,7 @@
 import { Map, List, fromJS } from 'immutable';
 import { PokerHelper, ReceiptCache } from 'poker-helper';
 import * as TableActions from './actions';
-
+import * as storageService from '../../services/localStorage';
 
 const rc = new ReceiptCache();
 const pokerHelper = new PokerHelper(rc);
@@ -85,14 +85,17 @@ export default function tableReducer(state = initialState, action) {
     }
 
     case TableActions.SET_CARDS: {
-      return state.setIn([action.tableAddr, action.handId.toString(), 'holeCards'], fromJS(action.cards));
+      const handIdStr = action.handId.toString();
+      storageService.setItem(`holeCards${action.tableAddr}${handIdStr}`, action.cards);
+      return state.setIn([action.tableAddr, handIdStr, 'holeCards'], fromJS(action.cards));
     }
 
     case TableActions.UPDATE_RECEIVED: {
       const table = state.get(action.tableAddr);
 
       // if we did not have the fetched hand, we create it in the state
-      if (!table || table.get(action.hand.handId.toString()) === undefined) {
+      const handIdStr = action.hand.handId.toString();
+      if (!table || table.get(handIdStr) === undefined) {
         let hand = Map({
           dealer: action.hand.dealer,
           state: action.hand.state,
@@ -100,6 +103,10 @@ export default function tableReducer(state = initialState, action) {
           changed: action.hand.changed,
           distribution: action.hand.distribution,
         });
+        const holeCards = storageService.getItem(`holeCards${action.tableAddr}${handIdStr}`);
+        if (holeCards) {
+          hand = hand.set('holeCards', List(holeCards));
+        }
         if (action.hand.lineup) {
           for (let j = 0; j < action.hand.lineup.length; j += 1) {
             hand = hand.set('lineup', fromJS(action.hand.lineup));

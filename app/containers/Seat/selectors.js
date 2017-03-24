@@ -4,7 +4,7 @@
 
 import { PokerHelper, ReceiptCache } from 'poker-helper';
 import { createSelector } from 'reselect';
-import { makeHandSelector, makeMyPosSelector } from '../Table/selectors';
+import { makeHandSelector } from '../Table/selectors';
 
 const rc = new ReceiptCache();
 const pokerHelper = new PokerHelper(rc);
@@ -47,13 +47,8 @@ const makeCardsSelector = () => createSelector(
 );
 
 const makeMyCardsSelector = () => createSelector(
-    [posSelector, makeMyPosSelector(), makeHandSelector()],
-    (pos, myPos, hand) => {
-      if (pos === myPos) {
-        return (hand && hand.get('holeCards')) ? hand.get('holeCards').toJS() : [-1, -1];
-      }
-      return [-1, -1];
-    }
+    [makeHandSelector()],
+    (hand) => (hand && hand.get('holeCards')) ? hand.get('holeCards').toJS() : [-1, -1]
 );
 
 const makeFoldedSelector = () => createSelector(
