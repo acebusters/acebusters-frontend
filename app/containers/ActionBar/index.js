@@ -21,9 +21,8 @@ import {
 } from '../Table/selectors';
 
 import { setCards } from '../Table/actions';
-import Button from '../../components/Button';
 import Slider from '../../components/Slider';
-import ActionBarComponent from '../../components/ActionBar';
+import { ActionBarComponent, ActionButton, ActionButtonWrapper } from '../../components/ActionBar';
 import TableService from '../../services/tableService';
 
 class ActionBar extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -128,13 +127,19 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
             </Slider>
           </Grid>
           <Grid xs={1 / 3}>
-            <Button size="large" onClick={this.handleBet}>Bet</Button>
+            <ActionButtonWrapper>
+              <ActionButton onClick={this.handleBet}>Bet</ActionButton>
+            </ActionButtonWrapper>
           </Grid>
           <Grid xs={1 / 3}>
-            <Button size="large" onClick={this.handleCheck}>Check</Button>
+            <ActionButtonWrapper>
+              <ActionButton onClick={this.handleCheck}>Check</ActionButton>
+            </ActionButtonWrapper>
           </Grid>
           <Grid xs={1 / 3}>
-            <Button size="large" onClick={this.handleFold}>Fold</Button>
+            <ActionButtonWrapper>
+              <ActionButton onClick={this.handleFold}>Fold</ActionButton>
+            </ActionButtonWrapper>
           </Grid>
         </ActionBarComponent>
       );

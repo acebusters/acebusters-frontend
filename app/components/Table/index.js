@@ -34,20 +34,14 @@ const Wrapper = styled.div`
   padding: 1em;
 `;
 
-
-const GamePlay = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0px;
-  width: 100%;
-`;
-
 const TableAndChairs = styled.div`
   position: relative;
   width: 100%
   padding-bottom: 55%;
-  border: 1px solid gold
+  margin-left: 10em;
+  @media (min-width: 70em) {
+    margin-left: 0;
+  }
 `;
 
 const PokerTable = styled.div`
@@ -60,7 +54,7 @@ const PokerTable = styled.div`
 function TableComponent(props) {
   return (
 
-    <GamePlay id="game-play" >
+    <div>
       { (props.myPos > -1) &&
       <Wrapper>
         <Grid xs={1 / 2} ><Button size="medium" onClick={props.onLeave} >Leave</Button></Grid>
@@ -82,9 +76,9 @@ function TableComponent(props) {
             </Board>
           </PokerTable>
         </TableAndChairs>
+        <ActionBar {...props} me={props.lineup[props.myPos]} sb={props.sb}></ActionBar>
       </TableContainer>
-      <ActionBar {...props} me={props.lineup[props.myPos]} sb={props.sb}></ActionBar>
-    </GamePlay>
+    </div>
   );
 }
 
