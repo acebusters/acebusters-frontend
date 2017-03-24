@@ -24,11 +24,14 @@ export const ImageContainer = styled.div`
   position: absolute;
   transform: translate(-50%,-50%);
   border: 4px solid ${(props) => {
-    if (props.whosTurn === props.pos) {
+    if (props.whosTurn === props.pos && props.hand.get('state') !== 'showdown') {
       return green;
     }
-    if (props.lastAction === 'sitOut' || props.open) {
+    if (props.lastAction === 'sitOut') {
       return gray;
+    }
+    if (props.open) {
+      return '#fff';
     }
     return baseColor;
   }};

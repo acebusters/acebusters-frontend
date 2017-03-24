@@ -9,11 +9,12 @@ import {
   baseColor,
   fontPrimary,
   background,
+  gray,
 } from '../../variables';
 
 const ControlPanel = styled.div`
   width: 100%;
-  margin-top: 10em;
+  margin-top: 15em;
 `;
 
 const ActionBarWrapper = styled.div`
@@ -43,6 +44,12 @@ export const ActionButton = styled.button`
     border: 2px solid #fff;
     width: 8.5em;
     height: 8.5em;
+  }
+  
+  &:disabled {
+    border: 2px solid ${gray};
+    color:  ${gray};
+    cursor: initial;
   }
 `;
 

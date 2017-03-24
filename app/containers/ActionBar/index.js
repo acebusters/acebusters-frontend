@@ -17,10 +17,11 @@ import {
   makeMinSelector,
   makeMaxSelector,
   makeIsMyTurnSelector,
+  makeAmountToCallSelector,
 } from '../Table/selectors';
 
 import { setCards } from '../Table/actions';
-import Slider from '../../components/Slider';
+import { SliderVertical } from '../../components/Slider';
 import { ActionBarComponent, ActionButton, ActionButtonWrapper } from '../../components/ActionBar';
 import TableService from '../../services/tableService';
 
@@ -29,10 +30,16 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
   constructor(props) {
     super(props);
     this.handleBet = this.handleBet.bind(this);
-    this.handleCheck = this.handleCheck.bind(this);
+    this.handleCheckCall = this.handleCheckCall.bind(this);
     this.handleShow = this.handleShow.bind(this);
     this.handleFold = this.handleFold.bind(this);
     this.table = new TableService(props.params.tableAddr, this.props.privKey);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.isMyTurn && !this.props.isMyTurn) {
+      this.setActive(true);
+    }
   }
 
   setActive(active) {
@@ -56,8 +63,15 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
     });
   }
 
-  handleCheck() {
+  handleCheckCall() {
     this.setActive(false);
+
+    if (this.props.amountToCall > 0) {
+      this.setState({ amount: this.props.amountToCall });
+      this.handleBet();
+      return null;
+    }
+
     const amount = this.props.myMaxBet;
     const state = this.props.state;
     const handId = parseInt(this.props.params.handId, 10);
@@ -104,40 +118,42 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
 
   render() {
     // const state = this.props.state;
-    const active = (this.state && this.state.active !== undefined) ? this.state.active : true;
-    if (active) {
-      return (
-        <ActionBarComponent>
-          <Grid xs={1 / 2}>{this.props.stepAndMin}</Grid>
-          <Grid xs={1 / 2}>{(this.state) ? this.state.amount : ''}</Grid>
-          <Grid xs={1 / 1}>
-            <Slider
-              max={this.props.max}
-              min={this.props.stepAndMin}
-              step={this.props.stepAndMin}
-              onChange={(e) => this.updateValue(e)}
-            >
-            </Slider>
-          </Grid>
-          <Grid xs={1 / 3}>
-            <ActionButtonWrapper>
-              <ActionButton onClick={this.handleBet}>Bet</ActionButton>
-            </ActionButtonWrapper>
-          </Grid>
-          <Grid xs={1 / 3}>
-            <ActionButtonWrapper>
-              <ActionButton onClick={this.handleCheck}>Check</ActionButton>
-            </ActionButtonWrapper>
-          </Grid>
-          <Grid xs={1 / 3}>
-            <ActionButtonWrapper>
-              <ActionButton onClick={this.handleFold}>Fold</ActionButton>
-            </ActionButtonWrapper>
-          </Grid>
-        </ActionBarComponent>
-      );
-    }
-    return null;
+    const disabled = ((this.state && this.state.active === false) || !this.props.isMyTurn);
+    const amount = (this.state && this.state.amount) ? this.state.amount : '';
+    return (
+      <ActionBarComponent>
+        <SliderVertical
+          type="range"
+          orient="vertical"
+          max={this.props.max}
+          min={this.props.stepAndMin}
+          step={this.props.stepAndMin}
+          onChange={(e) => this.updateValue(e)}
+        >
+        </SliderVertical>
+        <Grid xs={1 / 3}>
+          <ActionButtonWrapper>
+            <ActionButton onClick={this.handleBet} disabled={disabled} >
+              { (this.props.amountToCall > 0) ? 'RAISE' : 'BET' } { amount }
+            </ActionButton>
+          </ActionButtonWrapper>
+        </Grid>
+        <Grid xs={1 / 3}>
+          <ActionButtonWrapper>
+            <ActionButton onClick={this.handleCheckCall} disabled={disabled}>
+              { (this.props.amountToCall > 0) ? `CALL ${this.props.amountToCall}` : 'CHECK' }
+            </ActionButton>
+          </ActionButtonWrapper>
+        </Grid>
+        <Grid xs={1 / 3}>
+          <ActionButtonWrapper>
+            { this.props.amountToCall > 0 &&
+            <ActionButton onClick={this.handleFold} disabled={disabled}>FOLD</ActionButton>
+            }
+          </ActionButtonWrapper>
+        </Grid>
+      </ActionBarComponent>
+    );
   }
 }
 
@@ -156,6 +172,7 @@ const mapStateToProps = createStructuredSelector({
   stackSize: makeMyStackSelector(),
   myPos: makeMyPosSelector(),
   isMyTurn: makeIsMyTurnSelector(),
+  amountToCall: makeAmountToCallSelector(),
   stepAndMin: makeMinSelector(),
   max: makeMaxSelector(),
   state: makeHandStateSelector(),
@@ -168,7 +185,8 @@ ActionBar.propTypes = {
   myMaxBet: React.PropTypes.number,
   stepAndMin: React.PropTypes.number,
   max: React.PropTypes.number,
-  // isMyTurn: React.PropTypes.bool,
+  amountToCall: React.PropTypes.number,
+  isMyTurn: React.PropTypes.bool,
   state: React.PropTypes.string,
   stackSize: React.PropTypes.number,
   me: React.PropTypes.object,

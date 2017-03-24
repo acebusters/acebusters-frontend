@@ -36,7 +36,17 @@ const makeLastActionSelector = () => createSelector(
   }
 );
 
-const makeCardSelector = () => createSelector(
+const makeCardsSelector = () => createSelector(
+  [posSelector, makeHandSelector()],
+  (pos, hand) => {
+    if (!pos || !hand) {
+      return [-1, -1];
+    }
+    return hand.get('lineup').toJS()[pos].cards;
+  }
+);
+
+const makeMyCardsSelector = () => createSelector(
     [posSelector, makeMyPosSelector(), makeHandSelector()],
     (pos, myPos, hand) => {
       if (pos === myPos) {
@@ -55,7 +65,8 @@ export {
     posSelector,
     makeLastReceiptSelector,
     makeLastAmountSelector,
-    makeCardSelector,
+    makeCardsSelector,
+    makeMyCardsSelector,
     makeFoldedSelector,
     makeWhosTurnSelector,
     makeLastActionSelector,

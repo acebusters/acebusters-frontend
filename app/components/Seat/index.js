@@ -41,14 +41,14 @@ function SeatComponent(props) {
           <DealerButton {...props}></DealerButton>
           <CardContainer>
             <Card
-              cardNumber={props.cards[0]}
+              cardNumber={props.holeCards[0]}
               folded={props.folded}
               size={cardSize}
               offset={[0, 0]}
             >
             </Card>
             <Card
-              cardNumber={props.cards[1]}
+              cardNumber={props.holeCards[1]}
               folded={props.folded}
               size={cardSize}
               offset={[-110, -110]}

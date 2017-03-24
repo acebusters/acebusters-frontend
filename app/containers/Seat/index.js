@@ -5,11 +5,12 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import {
-  makeCardSelector,
+  makeCardsSelector,
   makeLastAmountSelector,
   makeFoldedSelector,
   makeWhosTurnSelector,
   makeLastActionSelector,
+  makeMyCardsSelector,
 } from './selectors';
 
 import {
@@ -63,8 +64,9 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
 
   render() {
     const timeLeft = (this.state) ? this.state.timeLeft : 0;
+    const cards = (this.props.pos === this.props.myPos) ? this.props.myCards : this.props.cards;
     return (
-      <SeatComponent {...this.props} timeLeft={timeLeft} opacity={this.opacity}></SeatComponent>
+      <SeatComponent {...this.props} timeLeft={timeLeft} opacity={this.opacity} holeCards={cards}></SeatComponent>
     );
   }
 }
@@ -75,7 +77,8 @@ const mapStateToProps = createStructuredSelector({
   myPos: makeMyPosSelector(),
   whosTurn: makeWhosTurnSelector(),
   lastAmount: makeLastAmountSelector(),
-  cards: makeCardSelector(),
+  cards: makeCardsSelector(),
+  myCards: makeMyCardsSelector(),
   folded: makeFoldedSelector(),
   lastAction: makeLastActionSelector(),
   stackSize: makeStackSelector(),
@@ -89,6 +92,10 @@ export function mapDispatchToProps(dispatch) {
 
 Seat.propTypes = {
   lastAmount: React.PropTypes.number,
+  cards: React.PropTypes.array,
+  pos: React.PropTypes.number,
+  myPos: React.PropTypes.number,
+  myCards: React.PropTypes.array,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Seat);
