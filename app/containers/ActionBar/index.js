@@ -30,15 +30,18 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
   constructor(props) {
     super(props);
     this.handleBet = this.handleBet.bind(this);
-    this.handleCheckCall = this.handleCheckCall.bind(this);
+    this.handleCheck = this.handleCheck.bind(this);
+    this.handleCall = this.handleCall.bind(this);
     this.handleShow = this.handleShow.bind(this);
     this.handleFold = this.handleFold.bind(this);
     this.table = new TableService(props.params.tableAddr, this.props.privKey);
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.isMyTurn && !this.props.isMyTurn) {
+    if (nextProps.isMyTurn) {
       this.setActive(true);
+    } else {
+      this.setActive(false);
     }
   }
 
@@ -47,13 +50,13 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
   }
 
   updateValue(e) {
-    const amount = (e.target.value > this.props.stackSize) ? this.props.stackSize : e.target.value;
+    const amount = (e.target.value > this.props.stackSize) ? parseInt(this.props.stackSize + this.props.myMaxBet, 10) : parseInt(e.target.value, 10);
     this.setState({ amount });
   }
 
   handleBet() {
     this.setActive(false);
-    const amount = (this.state) ? parseInt(this.state.amount, 10) : this.props.stepAndMin;
+    const amount = (this.state) ? this.state.amount + this.props.myMaxBet : parseInt(this.props.stepAndMin, 10);
     const handId = parseInt(this.props.params.handId, 10);
     return this.table.bet(handId, amount).catch((err) => {
       console.log(err);
@@ -63,15 +66,15 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
     });
   }
 
-  handleCheckCall() {
-    this.setActive(false);
-
-    if (this.props.amountToCall > 0) {
-      this.setState({ amount: this.props.amountToCall });
+  handleCall() {
+    const amount = parseInt(this.props.amountToCall, 10);
+    this.setState({ amount }, function () {
       this.handleBet();
-      return null;
-    }
+    });
+  }
 
+  handleCheck() {
+    this.setActive(false);
     const amount = this.props.myMaxBet;
     const state = this.props.state;
     const handId = parseInt(this.props.params.handId, 10);
@@ -102,7 +105,6 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
     const handId = parseInt(this.props.params.handId, 10);
     return this.table.show(handId, amount, cards).catch((err) => {
       console.log(err);
-      this.setActive(true);
     });
   }
 
@@ -117,9 +119,11 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
   }
 
   render() {
-    // const state = this.props.state;
-    const disabled = ((this.state && this.state.active === false) || !this.props.isMyTurn);
-    const amount = (this.state && this.state.amount) ? this.state.amount : '';
+    let active;
+    if (this.state) {
+      active = this.state.active;
+    }
+    const amount = (this.state && this.state.amount && this.state.amount > this.props.amountToCall) ? this.state.amount : '';
     return (
       <ActionBarComponent>
         <SliderVertical
@@ -133,22 +137,29 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
         </SliderVertical>
         <Grid xs={1 / 3}>
           <ActionButtonWrapper>
-            <ActionButton onClick={this.handleBet} disabled={disabled} >
+            <ActionButton onClick={this.handleBet} disabled={!active} >
               { (this.props.amountToCall > 0) ? 'RAISE' : 'BET' } { amount }
             </ActionButton>
           </ActionButtonWrapper>
         </Grid>
         <Grid xs={1 / 3}>
           <ActionButtonWrapper>
-            <ActionButton onClick={this.handleCheckCall} disabled={disabled}>
-              { (this.props.amountToCall > 0) ? `CALL ${this.props.amountToCall}` : 'CHECK' }
-            </ActionButton>
+            { this.props.amountToCall > 0 &&
+              <ActionButton onClick={this.handleCall} disabled={!active}>
+                CALL { this.props.amountToCall }
+              </ActionButton>
+            }
+            { this.props.amountToCall === 0 &&
+              <ActionButton onClick={this.handleCheck} disabled={!active}>
+                CHECK
+              </ActionButton>
+            }
           </ActionButtonWrapper>
         </Grid>
         <Grid xs={1 / 3}>
           <ActionButtonWrapper>
             { this.props.amountToCall > 0 &&
-            <ActionButton onClick={this.handleFold} disabled={disabled}>FOLD</ActionButton>
+            <ActionButton onClick={this.handleFold} disabled={!active}>FOLD</ActionButton>
             }
           </ActionButtonWrapper>
         </Grid>
@@ -186,7 +197,6 @@ ActionBar.propTypes = {
   stepAndMin: React.PropTypes.number,
   max: React.PropTypes.number,
   amountToCall: React.PropTypes.number,
-  isMyTurn: React.PropTypes.bool,
   state: React.PropTypes.string,
   stackSize: React.PropTypes.number,
   me: React.PropTypes.object,
