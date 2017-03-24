@@ -80,6 +80,10 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
     const handId = parseInt(this.props.params.handId, 10);
     let call;
     switch (state) {
+      case 'preflop': {
+        call = this.table.checkPreflop(handId, amount);
+        break;
+      }
       case 'turn': {
         call = this.table.checkTurn(handId, amount);
         break;

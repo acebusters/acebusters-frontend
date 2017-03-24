@@ -20,6 +20,11 @@ TableService.prototype.fold = function (handId, amount) {
   return this.pay(receipt);
 };
 
+TableService.prototype.checkPreflop = function (handId, amount) {
+  const receipt = new EWT(checkABIs.preflop).checkPre(handId, amount).sign(this.privKey);
+  return this.pay(receipt);
+};
+
 TableService.prototype.checkFlop = function (handId, amount) {
   const receipt = new EWT(checkABIs.flop).checkFlop(handId, amount).sign(this.privKey);
   return this.pay(receipt);
