@@ -25,13 +25,13 @@ import {
   makeMyCardsSelector,
 } from '../Seat/selectors';
 import {
+  lastAmountByAction,
   isSbTurnByAction,
   isBbTurnByAction,
   is0rTurnByAction,
   isShowTurnByAction,
   hasNettingInAction,
   makeSbSelector,
-  makeMaxBetSelector,
 } from './selectors';
 import TableService, { fetchTableState } from '../../services/tableService';
 
@@ -48,14 +48,14 @@ export function* getInfo(action) {
 
 export function* submitSignedNetting(action) {
   try {
-    // check against actual balances here
+    // TODO(ab): check against actual balances here
+
     // sign balances here
     let payload = new Buffer(action.balances.replace('0x', ''), 'hex');
     const priv = new Buffer(action.privKey.replace('0x', ''), 'hex');
     const hash = ethUtil.sha3(payload);
     const sig = ethUtil.ecsign(hash, priv);
-    payload = sig.r.toString('hex') + sig.s.toString('hex') + sig.v.toString(16);
-
+    payload = `0x${sig.r.toString('hex')}${sig.s.toString('hex')}${sig.v.toString(16)}`;
     const table = new TableService(action.tableAddr, action.privKey);
     yield table.net(action.handId, payload);
   } catch (err) {
@@ -105,7 +105,6 @@ export function* updateScanner() {
     const state = yield select();
     const myAddr = myAddrSelector(state);
     const privKey = privKeySelector(state);
-    const holeCards = myCardsSelector(state, { params: { tableAddr: action.tableAddr, handId: action.hand.handId } });
     const sb = sbSelector(state, { params: { tableAddr: action.tableAddr } });
 
     // check if turn to pay small blind
@@ -135,10 +134,9 @@ export function* updateScanner() {
     const isShow = isShowTurnByAction(action, { address: myAddr });
     if (isShow && !showed[action.tableAddr + action.hand.handId]) {
       showed[action.tableAddr + action.hand.handId] = true;
-      const maxBetSelector = makeMaxBetSelector();
-      const max = maxBetSelector(state);
-      console.log('holeCards: ', holeCards);
-      yield put(show(action.tableAddr, action.hand.handId, holeCards, max, privKey));
+      const amount = lastAmountByAction(action, { address: myAddr });
+      const holeCards = myCardsSelector(state, { params: { tableAddr: action.tableAddr, handId: action.hand.handId } });
+      yield put(show(action.tableAddr, action.hand.handId, holeCards, amount, privKey));
       continue; // eslint-disable-line no-continue
     }
 
