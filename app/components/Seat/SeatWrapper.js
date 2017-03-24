@@ -27,7 +27,7 @@ export const ImageContainer = styled.div`
     if (props.whosTurn === props.pos && props.hand.get('state') !== 'showdown') {
       return green;
     }
-    if (props.lastAction === 'sitOut') {
+    if (props.sitout && props.sitout !== 'allin') {
       return gray;
     }
     if (props.open) {
