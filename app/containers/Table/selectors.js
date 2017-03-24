@@ -32,6 +32,21 @@ const myPosByAction = createSelector(
   }
 );
 
+const lastAmountByAction = createSelector(
+  [actionSelector, myPosByAction],
+  (action, myPos) => {
+    if (typeof myPos === 'undefined' || myPos < 0) {
+      return -1;
+    }
+    if (!action.hand || !action.hand.lineup ||
+      !action.hand.lineup[myPos] || !action.hand.lineup[myPos].last) {
+      return -1;
+    }
+    const receipt = rc.get(action.hand.lineup[myPos].last);
+    return receipt.values[1];
+  }
+);
+
 const isSbTurnByAction = createSelector(
   [actionSelector, myPosByAction],
   (action, myPos) => {
@@ -352,6 +367,7 @@ const selectStack = (table, pos) => {
 export {
     tableStateSelector,
     actionSelector,
+    lastAmountByAction,
     isSbTurnByAction,
     isBbTurnByAction,
     is0rTurnByAction,
