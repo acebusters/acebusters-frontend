@@ -36,13 +36,13 @@ export const ActionButton = styled.button`
   &:hover {
     color: ${baseColor};
     background-color: ${background};
-    width: 8.5em;
-    height: 8.5em;
     border: 2px solid ${baseColor}
   }
   
   &:active {
-    color: ${background};
+    border: 2px solid #fff;
+    width: 8.5em;
+    height: 8.5em;
   }
 `;
 
