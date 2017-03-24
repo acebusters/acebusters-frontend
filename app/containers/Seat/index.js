@@ -68,7 +68,6 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
     if (!cards) {
       cards = [-1, -1];
     }
-    console.log(this.props.folded);
     return (
       <SeatComponent {...this.props} timeLeft={timeLeft} opacity={this.opacity} holeCards={cards}></SeatComponent>
     );
@@ -98,7 +97,6 @@ Seat.propTypes = {
   lastAmount: React.PropTypes.number,
   cards: React.PropTypes.array,
   pos: React.PropTypes.number,
-  folded: React.PropTypes.bool,
   myPos: React.PropTypes.number,
   myCards: React.PropTypes.array,
 };

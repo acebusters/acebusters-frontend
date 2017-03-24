@@ -16,9 +16,14 @@ const makeLastReceiptSelector = () => createSelector(
     (hand, pos) => (hand && pos && hand.getIn && hand.getIn(['lineup', pos])) ? rc.get(hand.getIn(['lineup', pos, 'last'])) : undefined
 );
 
+const makeLastRoundMaxBetSelector = () => createSelector(
+  [makeHandSelector()],
+  (hand) => (hand && hand.get && hand.get('lastRoundMaxBet')) ? hand.get('lastRoundMaxBet') : 0
+);
+
 const makeLastAmountSelector = () => createSelector(
-    makeLastReceiptSelector(),
-    (lastReceipt) => (lastReceipt && lastReceipt.values) ? lastReceipt.values[1] : 0
+    [makeLastReceiptSelector(), makeLastRoundMaxBetSelector()],
+    (lastReceipt, maxBet) => (lastReceipt && lastReceipt.values) ? lastReceipt.values[1] - maxBet : 0
 );
 
 const makeWhosTurnSelector = () => createSelector(
@@ -61,6 +66,7 @@ export {
     makeLastReceiptSelector,
     makeLastAmountSelector,
     makeCardsSelector,
+    makeLastRoundMaxBetSelector,
     makeMyCardsSelector,
     makeFoldedSelector,
     makeWhosTurnSelector,

@@ -4,9 +4,11 @@ import EWT from 'ethereum-web-token';
 import {
   makeLastReceiptSelector,
   makeFoldedSelector,
+  makeLastAmountSelector,
 } from '../selectors';
 
 const ABI_FOLD = [{ name: 'fold', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
+const ABI_BET = [{ name: 'bet', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
 
 // secretSeed: 'rural tent tests net drip fatigue uncle action repeat couple lawn rival'
 const P1_ADDR = '0x6d2f2c0fa568243d2def3e999a791a6df45d816e';
@@ -44,6 +46,37 @@ describe('lastReceiptSelector', () => {
     };
     const receiptSelector = makeLastReceiptSelector();
     expect(receiptSelector(mockedState, props)).toEqual(EWT.parse(new EWT(ABI_FOLD).fold(1, 500).sign(P2_KEY)));
+  });
+});
+
+describe('lastAmountSelector', () => {
+  it('should calcluate correct last amount with maxbet', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          0: {
+            state: 'flop',
+            lineup: [{
+              address: P1_ADDR,
+            }, {
+              address: P2_ADDR,
+              last: new EWT(ABI_BET).bet(1, 1500).sign(P2_KEY),
+            }],
+            lastRoundMaxBet: 1000,
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 1,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 0,
+      },
+    };
+    const lastAmountSelector = makeLastAmountSelector();
+    expect(lastAmountSelector(mockedState, props)).toEqual(500);
   });
 });
 
