@@ -52,7 +52,7 @@ const makeMyCardsSelector = () => createSelector(
 );
 
 const makeFoldedSelector = () => createSelector(
-    makeLastReceiptSelector,
+    makeLastReceiptSelector(),
     (lastReceipt) => (lastReceipt && lastReceipt.abi) ? lastReceipt.abi[0].name === 'fold' : false
 );
 

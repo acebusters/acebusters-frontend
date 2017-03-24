@@ -322,6 +322,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     const amountCoords = AMOUNT_COORDS[lineup.length.toString()];
     for (let i = 0; i < lineup.length; i += 1) {
       const open = (lineup[i].address.indexOf('0x0000000000000000000000000000000000000000') > -1);
+      const sitout = lineup[i].sitout;
       const pending = lineup[i].pending;
       const seat = (
         <Seat
@@ -330,6 +331,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           {...this.props}
           coords={coordArray[i]}
           amountCoords={amountCoords[i]}
+          sitout={sitout}
           open={open}
           pending={pending}
           onClick={() => {
