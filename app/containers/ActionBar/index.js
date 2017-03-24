@@ -6,7 +6,6 @@ import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
 import Grid from 'grid-styled';
 
-import * as LocalStorage from '../../services/localStorage';
 import { makeSelectPrivKey } from '../AccountProvider/selectors';
 import {
   makeHandStateSelector,
@@ -34,12 +33,6 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
     this.handleShow = this.handleShow.bind(this);
     this.handleFold = this.handleFold.bind(this);
     this.table = new TableService(props.params.tableAddr, this.props.privKey);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    // use this function to dispatch auto actions
-    const key = `${nextProps.params.tableAddr}-${nextProps.params.handId}-${nextProps.myPos}`;
-    this.cards = LocalStorage.getItem(key);
   }
 
   setActive(active) {
