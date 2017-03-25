@@ -135,49 +135,52 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
     }
 
     const amount = (this.state && this.state.amount && this.state.amount > this.props.amountToCall) ? this.state.amount : this.props.stepAndMin;
-    return (
-      <ActionBarComponent>
-        <SliderWrapper>
-          <Slider
-            data-orientation="vertical"
-            value={amount}
-            min={this.props.stepAndMin}
-            max={this.props.max}
-            step={this.props.stepAndMin}
-            onChange={this.updateAmount}
-          >
-          </Slider>
-        </SliderWrapper>
-        <Grid xs={1 / 3}>
-          <ActionButtonWrapper>
-            <ActionButton onClick={this.handleBet} disabled={!active} >
-              { (this.props.amountToCall > 0) ? 'RAISE' : 'BET' } { amount }
-            </ActionButton>
-          </ActionButtonWrapper>
-        </Grid>
-        <Grid xs={1 / 3}>
-          <ActionButtonWrapper>
-            { this.props.amountToCall > 0 &&
+    if (this.props.myPos > -1 && this.props.state !== 'waiting' && this.props.state !== 'dealing') {
+      return (
+        <ActionBarComponent>
+          <SliderWrapper>
+            <Slider
+              data-orientation="vertical"
+              value={amount}
+              min={this.props.stepAndMin}
+              max={this.props.max}
+              step={this.props.stepAndMin}
+              onChange={this.updateAmount}
+            >
+            </Slider>
+          </SliderWrapper>
+          <Grid xs={1 / 3}>
+            <ActionButtonWrapper>
+              <ActionButton onClick={this.handleBet} disabled={!active} >
+                { (this.props.amountToCall > 0) ? 'RAISE' : 'BET' } { amount }
+              </ActionButton>
+            </ActionButtonWrapper>
+          </Grid>
+          <Grid xs={1 / 3}>
+            <ActionButtonWrapper>
+              { this.props.amountToCall > 0 &&
               <ActionButton onClick={this.handleCall} disabled={!active}>
                 CALL { this.props.amountToCall }
               </ActionButton>
-            }
-            { this.props.amountToCall === 0 &&
+              }
+              { this.props.amountToCall === 0 &&
               <ActionButton onClick={this.handleCheck} disabled={!active}>
                 CHECK
               </ActionButton>
-            }
-          </ActionButtonWrapper>
-        </Grid>
-        <Grid xs={1 / 3}>
-          <ActionButtonWrapper>
-            { this.props.amountToCall > 0 &&
-            <ActionButton onClick={this.handleFold} disabled={!active}>FOLD</ActionButton>
-            }
-          </ActionButtonWrapper>
-        </Grid>
-      </ActionBarComponent>
-    );
+              }
+            </ActionButtonWrapper>
+          </Grid>
+          <Grid xs={1 / 3}>
+            <ActionButtonWrapper>
+              { this.props.amountToCall > 0 &&
+              <ActionButton onClick={this.handleFold} disabled={!active}>FOLD</ActionButton>
+              }
+            </ActionButtonWrapper>
+          </Grid>
+        </ActionBarComponent>
+      );
+    }
+    return null;
   }
 }
 
@@ -212,6 +215,7 @@ ActionBar.propTypes = {
   amountToCall: React.PropTypes.number,
   state: React.PropTypes.string,
   stackSize: React.PropTypes.number,
+  myPos: React.PropTypes.number,
   me: React.PropTypes.object,
   setCards: React.PropTypes.func,
 };
