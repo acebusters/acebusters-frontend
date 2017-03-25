@@ -103,18 +103,15 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
         title="Login"
       />,
     ]);
-    if (!this.props.params.tableAddr) {
-      return (
-        <StyledHeader fixed={this.props.fixed} id="header">
-          <Navbar
-            loggedIn={this.props.loggedIn}
-          >
-            {navButtons}
-          </Navbar>
-        </StyledHeader>
-      );
-    }
-    return null;
+    return (
+      <StyledHeader fixed={this.props.fixed} id="header">
+        <Navbar
+          loggedIn={this.props.loggedIn}
+        >
+          {navButtons}
+        </Navbar>
+      </StyledHeader>
+    );
   }
 }
 
@@ -123,7 +120,6 @@ Header.propTypes = {
   loggedIn: React.PropTypes.bool,
   imageUrl: React.PropTypes.string,
   signerAddr: React.PropTypes.string,
-  params: React.PropTypes.object,
   onClickLogout: React.PropTypes.func,
 };
 

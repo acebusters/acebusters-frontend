@@ -2,7 +2,6 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import Button from '../../components/Button';
-import { Slider } from '../../components/Slider';
 
 import { makeSbSelector } from '../Table/selectors';
 import {
@@ -33,7 +32,10 @@ class JoinDialog extends React.Component { // eslint-disable-line react/prefer-s
     const max = (this.props.balance < tableMax) ? this.props.balance : tableMax;
     return (
       <div>
-        <Slider type="range" max={max} min={min} step={1} onChange={(e) => this.updateAmount(e)}></Slider>
+        <input
+          type="range" max={max} min={min} step={1} onChange={(e) => this.updateAmount(e)}
+        >
+        </input>
         <div> Max: {max}</div>
         <div>{ (this.state) ? this.state.amount : min }</div>
         <Button onClick={this.handleSubmit}>Join</Button>
