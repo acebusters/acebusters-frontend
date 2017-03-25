@@ -6,6 +6,7 @@ import React from 'react';
 import { createStructuredSelector } from 'reselect';
 import { browserHistory } from 'react-router';
 import Pusher from 'pusher-js';
+import EWT from 'ethereum-web-token';
 // components and styles
 import Card from 'components/Card'; // eslint-disable-line
 import { BoardCardWrapper } from 'components/Table/Board';
@@ -17,6 +18,7 @@ import {
   AMOUNT_COORDS,
   ABI_TABLE,
   ABI_TOKEN_CONTRACT,
+  TIMEOUT_PERIOD,
   tokenContractAddress,
 } from '../../app.config';
 
@@ -97,6 +99,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   componentWillReceiveProps(nextProps) {
+    // take care of timing out players
     if (this.props.myPos > -1 && this.props.hand
       && this.props.hand.get('changed') < nextProps.hand.get('changed')) {
       if (this.timeOut) {
@@ -104,11 +107,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
         console.log('timeout cancelled');
       }
 
-      const period = 59000;
       let passed = Math.floor(Date.now() / 1000) - nextProps.hand.get('changed');
-      passed = (passed > 59) ? 59 : passed;
+      passed = (passed > TIMEOUT_PERIOD) ? TIMEOUT_PERIOD : passed;
       const random = (Math.random() * 9000);
-      const timeOut = (period - (passed * 1000)) + random;
+      const timeOut = ((TIMEOUT_PERIOD * 1000) - (passed * 1000)) + random;
 
       if (timeOut > 0) {
         console.log(`timeout started with ${timeOut}`);
@@ -122,11 +124,13 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       }
     }
 
+    // get balance of player
     const balance = this.token.balanceOf(this.props.proxyAddr);
     if (!balance && nextProps.proxyAddr) {
       this.token.balanceOf.call(nextProps.proxyAddr);
     }
 
+    // forward browser to url of next hand
     this.pushed = (this.pushed) ? this.pushed : {};
     const handId = parseInt(this.props.params.handId, 10);
     const nextHandStr = nextProps.latestHand.toString();
@@ -138,6 +142,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       }, 1000);
     }
 
+    // fetch hands that we might need for stack calculation
     if (nextProps.missingHands && nextProps.missingHands.length > 0) {
       this.getHandStarted = (this.getHandStarted) ? this.getHandStarted : {};
       for (let i = 0; i < nextProps.missingHands.length; i += 1) {
@@ -148,6 +153,19 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           });
         }
       }
+    }
+
+    // get and display distribution
+    if (this.props.hand && !this.props.hand.get('distribution')
+      && nextProps.hand.get('distribution')) {
+      const dists = EWT.parse(nextProps.hand.get('distribution'));
+      let winners = [];
+      winners = dists.values[2].map((entry) => {
+        const dist = EWT.separate(entry);
+        return (<p key={dist.address} > {dist.address}: {dist.amount} </p>);
+      });
+      const statusElement = (<div><h2>Winners:</h2>{winners}</div>);
+      this.props.modalAdd(statusElement);
     }
   }
 
