@@ -7,6 +7,7 @@ import { makeSelectAccountData } from '../AccountProvider/selectors';
 import messages from './messages';
 import { modalAdd, modalDismiss } from '../App/actions';
 import web3Connect from '../AccountProvider/web3Connect';
+import { contractEvent } from '../AccountProvider/actions';
 import { ABI_TOKEN_CONTRACT, tokenContractAddress } from '../../app.config';
 
 import List from '../../components/List';
@@ -22,6 +23,14 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     this.handleTransfer = this.handleTransfer.bind(this);
     this.web3 = props.web3Redux.web3;
     this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(tokenContractAddress);
+    this.web3.eth.getBlockNumber((err, blockNumber) => {
+      const events = this.token.allEvents({ fromBlock: blockNumber - (4 * 60 * 24), toBlock: 'latest' });
+      events.get((error, eventList) => {
+        eventList.forEach((event) => {
+          props.contractEvent(event);
+        });
+      });
+    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -88,7 +97,12 @@ const pendingToList = (pending) => {
 const txnsToList = (txns) => {
   let list = [];
   if (txns) {
-    list = Object.keys(txns).map((key) => [key, txns[key].from, txns[key].to, txns[key].value]);
+    list = Object.keys(txns).map((key) => {
+      if (key && txns[key] && txns[key].from && txns[key].to) {
+        return [key.substring(2, 8), txns[key].from.substring(2, 8), txns[key].to.substring(2, 8), txns[key].value];
+      }
+      return [key.substring(2, 8), txns[key].from, txns[key].to, txns[key].value];
+    });
   }
   return list;
 };
@@ -96,6 +110,7 @@ const txnsToList = (txns) => {
 Dashboard.propTypes = {
   modalAdd: PropTypes.func,
   modalDismiss: PropTypes.func,
+  contractEvent: PropTypes.func,
   web3Redux: PropTypes.any,
   account: PropTypes.any,
 };
@@ -109,6 +124,7 @@ function mapDispatchToProps() {
   return {
     modalAdd: (node) => (modalAdd(node)),
     modalDismiss: () => (modalDismiss()),
+    contractEvent: (event) => (contractEvent({ event })),
   };
 }
 
