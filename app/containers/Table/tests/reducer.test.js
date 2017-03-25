@@ -41,6 +41,7 @@ describe('table reducer tests', () => {
           changed: 123,
           state: 'flop',
           lineup,
+          lastRoundMaxBet: 20,
         } },
     });
 
@@ -182,7 +183,8 @@ describe('table reducer tests', () => {
     const after = before
       .setIn([tableAddr, '1', 'lineup', 1, 'last'], newBet)
       .setIn([tableAddr, '1', 'changed'], 234)
-      .setIn([tableAddr, '1', 'lineup', 1, 'time'], 1);
+      .setIn([tableAddr, '1', 'lineup', 1, 'time'], 1)
+      .setIn([tableAddr, '1', 'lastRoundMaxBet'], 100);
     expect(nextState).toEqual(after);
   });
 

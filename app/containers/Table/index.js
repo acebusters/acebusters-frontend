@@ -78,6 +78,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.handleUpdate = this.handleUpdate.bind(this);
     this.handleLeave = this.handleLeave.bind(this);
     this.handleSitout = this.handleSitout.bind(this);
+
     this.tableAddr = props.params.tableAddr;
     this.web3 = props.web3Redux.web3;
     this.table = this.web3.eth.contract(ABI_TABLE).at(this.tableAddr);

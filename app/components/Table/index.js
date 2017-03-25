@@ -24,10 +24,6 @@ const Pot = styled.div`
 const TableContainer = styled.div`
   margin-right: auto;
   margin-left: auto;
-  @media (min-width: 70em) {
-    width: 68em;
-    height: 40em;
-  }
 `;
 
 const Wrapper = styled.div`
@@ -38,17 +34,16 @@ const TableAndChairs = styled.div`
   position: relative;
   width: 100%
   padding-bottom: 55%;
-  margin-left: 10em;
-  @media (min-width: 70em) {
-    margin-left: 0;
-  }
 `;
 
 const PokerTable = styled.div`
   position: absolute;
   border: 2px solid ${baseColor};
+  margin-top: 10%;
   border-radius: 50%;
-  top: 20%;  bottom: 20%;  left: 10%;  right: 10%;
+  width: 60%;
+  margin-left: 25%;
+  height: 50%;
 `;
 
 function TableComponent(props) {

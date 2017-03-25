@@ -5,6 +5,9 @@ import React from 'react';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
 import Grid from 'grid-styled';
+import Slider from 'react-rangeslider';
+import 'react-rangeslider/lib/index.css';
+import SliderWrapper from '../../components/Slider';
 
 import { makeSelectPrivKey } from '../AccountProvider/selectors';
 import {
@@ -21,7 +24,6 @@ import {
 } from '../Table/selectors';
 
 import { setCards } from '../Table/actions';
-import { SliderVertical } from '../../components/Slider';
 import { ActionBarComponent, ActionButton, ActionButtonWrapper } from '../../components/ActionBar';
 import TableService from '../../services/tableService';
 
@@ -34,7 +36,11 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
     this.handleCall = this.handleCall.bind(this);
     this.handleShow = this.handleShow.bind(this);
     this.handleFold = this.handleFold.bind(this);
+    this.updateAmount = this.updateAmount.bind(this);
     this.table = new TableService(props.params.tableAddr, this.props.privKey);
+    this.state = {
+      amount: this.props.stepAndMin,
+    };
   }
 
   componentWillReceiveProps(nextProps) {
@@ -49,8 +55,8 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
     this.setState({ active });
   }
 
-  updateValue(e) {
-    const amount = (e.target.value > this.props.stackSize) ? parseInt(this.props.stackSize + this.props.myMaxBet, 10) : parseInt(e.target.value, 10);
+  updateAmount(value) {
+    const amount = (value > this.props.stackSize) ? parseInt(this.props.stackSize + this.props.myMaxBet, 10) : parseInt(value, 10);
     this.setState({ amount });
   }
 
@@ -127,18 +133,21 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
     if (this.state) {
       active = this.state.active;
     }
-    const amount = (this.state && this.state.amount && this.state.amount > this.props.amountToCall) ? this.state.amount : '';
+
+    const amount = (this.state && this.state.amount && this.state.amount > this.props.amountToCall) ? this.state.amount : this.props.stepAndMin;
     return (
       <ActionBarComponent>
-        <SliderVertical
-          type="range"
-          orient="vertical"
-          max={this.props.max}
-          min={this.props.stepAndMin}
-          step={this.props.stepAndMin}
-          onChange={(e) => this.updateValue(e)}
-        >
-        </SliderVertical>
+        <SliderWrapper>
+          <Slider
+            data-orientation="vertical"
+            value={amount}
+            min={this.props.stepAndMin}
+            max={this.props.max}
+            step={this.props.stepAndMin}
+            onChange={this.updateAmount}
+          >
+          </Slider>
+        </SliderWrapper>
         <Grid xs={1 / 3}>
           <ActionButtonWrapper>
             <ActionButton onClick={this.handleBet} disabled={!active} >

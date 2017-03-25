@@ -22,8 +22,16 @@ const makeLastRoundMaxBetSelector = () => createSelector(
 );
 
 const makeLastAmountSelector = () => createSelector(
-    [makeLastReceiptSelector(), makeLastRoundMaxBetSelector()],
-    (lastReceipt, maxBet) => (lastReceipt && lastReceipt.values) ? lastReceipt.values[1] - maxBet : 0
+    [makeLastReceiptSelector(), makeLastRoundMaxBetSelector(), makeHandSelector()],
+    (lastReceipt, maxBet, hand) => {
+      if (lastReceipt && lastReceipt.values && hand && hand.get) {
+        if (hand.get('state') === 'preflop') {
+          return lastReceipt.values[1];
+        }
+        return lastReceipt.values[1] - maxBet;
+      }
+      return 0;
+    }
 );
 
 const makeWhosTurnSelector = () => createSelector(
@@ -62,13 +70,13 @@ const makeFoldedSelector = () => createSelector(
 );
 
 export {
-    posSelector,
-    makeLastReceiptSelector,
-    makeLastAmountSelector,
-    makeCardsSelector,
-    makeLastRoundMaxBetSelector,
-    makeMyCardsSelector,
-    makeFoldedSelector,
-    makeWhosTurnSelector,
-    makeLastActionSelector,
+  posSelector,
+  makeLastReceiptSelector,
+  makeLastAmountSelector,
+  makeCardsSelector,
+  makeLastRoundMaxBetSelector,
+  makeMyCardsSelector,
+  makeFoldedSelector,
+  makeWhosTurnSelector,
+  makeLastActionSelector,
 };

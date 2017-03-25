@@ -4,18 +4,12 @@
 
 import styled from 'styled-components';
 
-export const Slider = styled.input`
-  float:left;
+const SliderWrapper = styled.div`
   width: 100%;
-  margin: 2.5px 0;
+  position: fixed;
+  bottom: 0;
+  padding-left: 15%;
+  padding-right: 15%;
 `;
 
-export const SliderVertical = styled.input`
-  position: fixed;
-  right: 5%;
-  -webkit-appearance: none;
-  writing-mode: bt-lr; /* IE */
-  -webkit-appearance: slider-vertical; /* WebKit */
-  width: 8px;
-  height: 50%;
-`;
+export default SliderWrapper;

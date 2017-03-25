@@ -60,6 +60,7 @@ export function App(props) {
           imageUrl={props.gravatarUrl}
           logoHref={props.logoHref}
           signerAddr={props.signerAddr}
+          params={props.params}
         />
         <Content
           fixed={props.fixed}
@@ -94,6 +95,7 @@ App.propTypes = {
   modalDismiss: React.PropTypes.func,
   logoHref: React.PropTypes.string,
   fixed: React.PropTypes.bool,
+  params: React.PropTypes.object,
   gravatarUrl: React.PropTypes.string,
   signerAddr: React.PropTypes.string,
   modalStack: React.PropTypes.array,
