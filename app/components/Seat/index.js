@@ -39,7 +39,7 @@ function SeatComponent(props) {
         coords={props.coords}
         {...props}
       >
-        <ImageContainer whosTurn={props.whosTurn} pos={props.pos} state={props.hand.get('state')} sitout={props.sitout} open={props.open} blocky={blocky}>
+        <ImageContainer {...props} blocky={blocky}>
           <DealerButton {...props}></DealerButton>
           <CardContainer>
             <Card

@@ -24,7 +24,7 @@ export const ImageContainer = styled.div`
   position: absolute;
   transform: translate(-50%,-50%);
   border: 3px solid ${(props) => {
-    if (props.whosTurn === props.pos && props.state !== 'showdown') {
+    if (props.whosTurn === props.pos && props.hand.get('state') !== 'showdown') {
       return green;
     }
     if (props.sitout && props.sitout !== 'allin') {
