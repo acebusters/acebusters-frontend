@@ -5,7 +5,7 @@ import { createStructuredSelector } from 'reselect';
 
 import { makeSelectAccountData } from '../AccountProvider/selectors';
 import messages from './messages';
-import { modalAdd } from '../App/actions';
+import { modalAdd, modalDismiss } from '../App/actions';
 import web3Connect from '../AccountProvider/web3Connect';
 import { ABI_TOKEN_CONTRACT, tokenContractAddress } from '../../app.config';
 
@@ -33,7 +33,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
 
   handleTransfer(to, amount) {
     this.token.transfer.sendTransaction(to, amount);
-    return true;
+    this.props.modalDismiss();
   }
 
   render() {
@@ -95,6 +95,7 @@ const txnsToList = (txns) => {
 
 Dashboard.propTypes = {
   modalAdd: PropTypes.func,
+  modalDismiss: PropTypes.func,
   web3Redux: PropTypes.any,
   account: PropTypes.any,
 };
@@ -107,6 +108,7 @@ const mapStateToProps = createStructuredSelector({
 function mapDispatchToProps() {
   return {
     modalAdd: (node) => (modalAdd(node)),
+    modalDismiss: () => (modalDismiss()),
   };
 }
 
