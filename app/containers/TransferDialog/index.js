@@ -5,6 +5,12 @@ import { Form, Field, reduxForm } from 'redux-form/immutable';
 import { FormattedMessage } from 'react-intl';
 
 import messages from './messages';
+import Button from '../../components/Button';
+import Input from '../../components/Input';
+import Label from '../../components/Label';
+import H2 from '../../components/H2';
+import FormGroup from '../../components/Form/FormGroup';
+import ErrorMessage from '../../components/ErrorMessage';
 
 /**
  * Checks if the given string is an address
@@ -67,13 +73,11 @@ const warn = () => {
 
 /* eslint-disable react/prop-types */
 const renderField = ({ input, label, type, meta: { touched, error, warning } }) => (
-  <div>
-    <label htmlFor={input.name}>{label}</label>
-    <div>
-      <input {...input} placeholder={label} type={type} />
-      {touched && ((error && <span>{error}</span>) || (warning && <span>{warning}</span>))}
-    </div>
-  </div>
+  <FormGroup>
+    <Label htmlFor={input.name}>{label}</Label>
+    <Input {...input} placeholder={label} type={type} />
+    {touched && ((error && <ErrorMessage error={error}></ErrorMessage>) || (warning && <ErrorMessage error={warning}></ErrorMessage>))}
+  </FormGroup>
 );
 /* eslint-enable react/prop-types */
 
@@ -92,13 +96,14 @@ class TransferDialog extends React.Component { // eslint-disable-line react/pref
     const { error, handleSubmit, submitting } = this.props;
     return (
       <div>
+        <H2>Send Funds:</H2>
         <FormattedMessage {...messages.header} />
         <Form onSubmit={handleSubmit(this.handleSubmit)}>
-          <Field name="amount" component={renderField} type="number" placeholder="amount" />
-          <Field name="address" component={renderField} type="text" placeholder="address" />
+          <Field name="amount" component={renderField} type="number" label="Amount" />
+          <Field name="address" component={renderField} type="text" label="Address" />
           {error && <strong>{error}</strong>}
           <div>
-            <button type="submit" disabled={submitting}>Submit</button>
+            <Button type="submit" disabled={submitting}>Submit</Button>
           </div>
         </Form>
       </div>

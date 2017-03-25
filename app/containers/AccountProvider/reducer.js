@@ -68,7 +68,6 @@ function accountProviderReducer(state = initialState, action) {
         });
       }
       newState = newState.setIn([action.event.address, 'transactions', action.event.transactionHash, 'blockNumber'], action.event.blockNumber);
-
       if (action.event.event === 'Transfer') {
         newState = newState.setIn([action.event.address, 'transactions', action.event.transactionHash, 'from'], action.event.args.from);
         newState = newState.setIn([action.event.address, 'transactions', action.event.transactionHash, 'to'], action.event.args.to);

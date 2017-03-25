@@ -73,7 +73,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   constructor(props) {
     super(props);
     this.watchTable = this.watchTable.bind(this);
-    this.watchToken = this.watchToken.bind(this);
     this.handleJoin = this.handleJoin.bind(this);
     this.handleUpdate = this.handleUpdate.bind(this);
     this.handleLeave = this.handleLeave.bind(this);
@@ -86,9 +85,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     // register event listener for table
     this.tableEvents = this.table.allEvents({ fromBlock: 'latest' });
     this.tableEvents.watch(this.watchTable);
-
-    this.tokenEvents = this.token.allEvents({ fromBlock: 'latest' });
-    this.tokenEvents.watch(this.watchToken);
 
     // getting table data from oracle
     this.pusher = new Pusher('d4832b88a2a81f296f53', { cluster: 'eu', encrypted: true });
@@ -177,7 +173,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     }
     this.channel.unbind('update', this.handleUpdate);
     this.tableEvents.stopWatching();
-    this.tokenEvents.stopWatching();
   }
 
   handleJoin(pos, amount) {
@@ -281,40 +276,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           </div>);
 
         this.props.modalAdd(errorElement);
-        break;
-      }
-
-      default: {
-        break;
-      }
-    }
-  }
-
-  watchToken(error, result) {
-    if (error) {
-      const errorElement = (<h2>{errorElement}/</h2>);
-      this.props.modalAdd(errorElement);
-      return;
-    }
-
-    // dispatch action according to event type
-    switch (result.event) {
-      case 'Approval': {
-        this.props.modalDismiss();
-        const statusElement = (<h2>Sufficient Balance</h2>);
-        this.props.modalAdd(statusElement);
-        break;
-      }
-      case 'Transfer': {
-        this.props.modalDismiss();
-        const statusElement = (<h2>Amount Transferred</h2>);
-        this.props.modalAdd(statusElement);
-        break;
-      }
-      case 'Issuance': {
-        this.props.modalDismiss();
-        const statusElement = (<h2>Amount Issued</h2>);
-        this.props.modalAdd(statusElement);
         break;
       }
 
