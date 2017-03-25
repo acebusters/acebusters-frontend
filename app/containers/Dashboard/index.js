@@ -14,6 +14,7 @@ import List from '../../components/List';
 import TransferDialog from '../TransferDialog';
 import Container from '../../components/Container';
 import Button from '../../components/Button';
+import Blocky from '../../components/Blocky';
 import FormGroup from '../../components/Form/FormGroup';
 
 export class Dashboard extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -60,6 +61,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     return (
       <Container>
         <h1><FormattedMessage {...messages.header} /></h1>
+        <Blocky address={this.props.account.proxy} />
         <h3> Your address:</h3>
         <p> { this.props.account.proxy } </p>
         <QRCode value={qrUrl} size={120} />

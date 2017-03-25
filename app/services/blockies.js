@@ -1,5 +1,4 @@
-/* jslint bitwise: true */
-(function () {
+
   // The random number is a js implementation of the Xorshift PRNG
   const randseed = new Array(4); // Xorshift: [x, y, z, w] 32 bit values
 
@@ -89,7 +88,7 @@
     return c;
   }
 
-  function createIcon(optsParam) {
+  export function create(optsParam) {
     const opts = optsParam || {};
     const size = opts.size || 8;
     const scale = opts.scale || 4;
@@ -105,6 +104,3 @@
 
     return canvas;
   }
-
-  window.blockies = { create: createIcon };
-}());
