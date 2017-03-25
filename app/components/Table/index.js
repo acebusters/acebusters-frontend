@@ -39,11 +39,11 @@ const TableAndChairs = styled.div`
 const PokerTable = styled.div`
   position: absolute;
   border: 2px solid ${baseColor};
-  margin-top: 10%;
+  margin-top: 5%;
   border-radius: 50%;
   width: 60%;
-  margin-left: 25%;
-  height: 50%;
+  margin-left: 28%;
+  height: 45%;
 `;
 
 function TableComponent(props) {

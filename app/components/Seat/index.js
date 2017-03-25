@@ -4,7 +4,7 @@
 
 import React from 'react';
 import Card from '../Card'; // eslint-disable-line
-import { SeatWrapper, ImageContainer, CardContainer, DealerButton, SeatLabel, ChipGreen } from './SeatWrapper';
+import { SeatWrapper, ImageContainer, CardContainer, DealerButton, SeatLabel, ChipGreen, Amount } from './SeatWrapper';
 import { ActionBox, StackBox, NameBox, TimeBox, AmountBox } from './Info';
 import { createBlocky } from '../../services/blockies';
 
@@ -53,15 +53,18 @@ function SeatComponent(props) {
               cardNumber={props.holeCards[1]}
               folded={props.folded}
               size={cardSize}
-              offset={[-65, -180]}
+              offset={[-100, -133]}
             >
             </Card>
           </CardContainer>
           <AmountBox {...props}>
             { (props.lastAmount > 0) &&
               <div>
-                <ChipGreen />
-                { props.lastAmount }
+                <ChipGreen>
+                </ChipGreen>
+                <Amount>
+                  { props.lastAmount }
+                </Amount>
               </div>
             }
           </AmountBox>
