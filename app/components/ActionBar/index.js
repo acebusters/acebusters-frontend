@@ -14,7 +14,7 @@ import {
 
 const ControlPanel = styled.div`
   width: 100%;
-  margin-top: 15em;
+  margin-top: 5em;
 `;
 
 const ActionBarWrapper = styled.div`
@@ -22,15 +22,15 @@ const ActionBarWrapper = styled.div`
   left: 0;
   top: 0;
   height: 100%
-  width: 9em;
+  width: 5%;
 `;
 
 export const ActionButton = styled.button`
   border-radius: 50%;
   color: ${fontPrimary};
   border: 2px solid #fff;
-  width: 8em;
-  height: 8em;
+  width: 5em;
+  height: 5em;
   margin-bottom: 2em;
   cursor: pointer;  
   
