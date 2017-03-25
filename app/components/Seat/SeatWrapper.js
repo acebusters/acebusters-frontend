@@ -36,7 +36,12 @@ export const ImageContainer = styled.div`
     return baseColor;
   }};
   background-size:cover;
-  background-image: url(${(props) => props.blocky});
+  background-image: url(${(props) => {
+    if (!props.open) {
+      return props.blocky;
+    }
+    return '';
+  }});
   width: 100%;
   height: 100%;
   text-align: center;
