@@ -14,6 +14,7 @@ import {
   screenXsMin,
   screenXsMax,
 } from '../../variables';
+import { createBlocky } from '../../services/blockies';
 
 const imageSize = `${Math.floor(parseInt(navbarHeight, 10) / 2)}px`;
 const imageMarginTop = `-${Math.ceil(
@@ -200,13 +201,14 @@ class UserMenu extends React.Component {
   }
 
   render() {
+    const blocky = createBlocky(this.props.signerAddr);
     return (
       <StyledUserMenu onClick={this.toggleMenu} onMouseLeave={this.closeMenu} collapsed={this.props.collapsed}>
-        <StyledUserImage src={this.props.image} />
+        <StyledUserImage src={blocky} />
         <StyledUserName>{this.props.name}</StyledUserName>
         <UserDropDown open={this.state.open} >
           <UserMenuHeader>
-            <UserMenuHeaderImage src={this.props.image} />
+            <UserMenuHeaderImage src={blocky} />
             <UserMenuHeaderName>{this.props.name}</UserMenuHeaderName>
             <UserMenuHeaderName>{this.props.signerAddr}</UserMenuHeaderName>
           </UserMenuHeader>
@@ -228,7 +230,6 @@ class UserMenu extends React.Component {
 
 UserMenu.propTypes = {
   name: React.PropTypes.string,
-  image: React.PropTypes.string,
   signerAddr: React.PropTypes.string,
   collapsed: React.PropTypes.bool,
   profileAction: React.PropTypes.func,

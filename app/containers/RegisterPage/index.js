@@ -131,7 +131,7 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
       throw new SubmissionError({ _error: `error, Registration failed due to worker error: ${workerErr}` });
     }).then((workerRsp) => (
       // If worker success, ...
-      account.register(values.get('email'), workerRsp.data.wallet, values.get('captchaResponse')).catch((err) => {
+      account.register(values.get('email'), workerRsp.data.wallet, values.get('captchaResponse'), window.location.origin).catch((err) => {
         // If store account failed, ...
         const errMsg = 'Login failed!';
         if (err === 409) {

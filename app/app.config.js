@@ -28,7 +28,7 @@ export const ABI_SIT_OUT = [{ name: 'sitOut', type: 'function', inputs: [{ type:
 export const ABI_SHOW = [{ name: 'show', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
 export const ABI_LEAVE = [{ name: 'leave', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
 
-export const TIMEOUT_PERIOD = 59;
+export const TIMEOUT_PERIOD = 179;
 
 export const SEAT_COORDS = {
   2: [[10, -28], [100, 72]],

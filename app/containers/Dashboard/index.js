@@ -9,6 +9,7 @@ import { modalAdd, modalDismiss } from '../App/actions';
 import web3Connect from '../AccountProvider/web3Connect';
 import { contractEvent } from '../AccountProvider/actions';
 import { ABI_TOKEN_CONTRACT, tokenContractAddress } from '../../app.config';
+import { createBlocky } from '../../services/blockies';
 
 import List from '../../components/List';
 import TransferDialog from '../TransferDialog';
@@ -56,12 +57,12 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     let listTxns = [];
     if (this.props.account[tokenContractAddress]) {
       listPending = pendingToList(this.props.account[tokenContractAddress].pending);
-      listTxns = txnsToList(this.props.account[tokenContractAddress].transactions);
+      listTxns = txnsToList(this.props.account[tokenContractAddress].transactions, this.props.account.proxy);
     }
     return (
       <Container>
         <h1><FormattedMessage {...messages.header} /></h1>
-        <Blocky address={this.props.signerAddr} />
+        <Blocky blocky={createBlocky(this.props.signerAddr)} />
         <h3> Your address:</h3>
         <p> { this.props.account.proxy } </p>
         <QRCode value={qrUrl} size={120} />
@@ -96,15 +97,24 @@ const pendingToList = (pending) => {
   return list;
 };
 
-const txnsToList = (txns) => {
+const txnsToList = (txns, proxyAddr) => {
   let list = [];
   if (txns) {
-    list = Object.keys(txns).map((key) => {
+    const onlyMine = [];
+    Object.keys(txns).forEach((key) => {
       if (key && txns[key] && txns[key].from && txns[key].to) {
-        return [key.substring(2, 8), txns[key].from.substring(2, 8), txns[key].to.substring(2, 8), txns[key].value];
+        if (txns[key].from === proxyAddr || txns[key].to === proxyAddr) {
+          onlyMine.push({
+            txHash: key,
+            blockNumber: txns[key].blockNumber,
+            from: txns[key].from,
+            to: txns[key].to,
+            value: (txns[key].to === proxyAddr) ? txns[key].value : txns[key].value * -1,
+          });
+        }
       }
-      return [key.substring(2, 8), txns[key].from, txns[key].to, txns[key].value];
     });
+    list = onlyMine.map((entry) => [entry.txHash.substring(2, 8), entry.from.substring(2, 8), entry.to.substring(2, 8), entry.value]);
   }
   return list;
 };

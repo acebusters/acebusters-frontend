@@ -30,7 +30,7 @@ const account = {
     });
   },
 
-  register(email, wallet, recapResponse) {
+  register(email, wallet, recapResponse, origin) {
     const accountId = uuid.v4();
     return new Promise((resolve, reject) => {
       fetch(`${accountUrl}/account/${accountId}`, {
@@ -42,6 +42,7 @@ const account = {
         body: JSON.stringify({
           email,
           recapResponse,
+          origin,
           wallet: JSON.stringify(wallet),
         }),
       }).then((response) => {
