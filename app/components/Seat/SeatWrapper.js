@@ -78,6 +78,14 @@ export const ChipGreen = styled.p`
   background: ${green}
 `;
 
+export const Amount = styled.p`
+  display: inline-block;
+  margin-left: 0.5em;
+  font: inherit;
+  line-height: 1em;
+  position: absolute;
+`;
+
 export const CardContainer = styled.div`
   position: absolute;
   left: -50%;
