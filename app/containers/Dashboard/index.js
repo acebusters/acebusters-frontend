@@ -9,6 +9,7 @@ import { modalAdd, modalDismiss } from '../App/actions';
 import web3Connect from '../AccountProvider/web3Connect';
 import { contractEvent } from '../AccountProvider/actions';
 import { ABI_TOKEN_CONTRACT, tokenContractAddress } from '../../app.config';
+import { createBlocky } from '../../services/blockies';
 
 import List from '../../components/List';
 import TransferDialog from '../TransferDialog';
@@ -61,7 +62,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     return (
       <Container>
         <h1><FormattedMessage {...messages.header} /></h1>
-        <Blocky address={this.props.signerAddr} />
+        <Blocky blocky={createBlocky(this.props.signerAddr)} />
         <h3> Your address:</h3>
         <p> { this.props.account.proxy } </p>
         <QRCode value={qrUrl} size={120} />

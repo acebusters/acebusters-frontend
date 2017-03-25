@@ -23,8 +23,8 @@ export const ImageContainer = styled.div`
   border-radius: 50%;
   position: absolute;
   transform: translate(-50%,-50%);
-  border: 4px solid ${(props) => {
-    if (props.whosTurn === props.pos && props.hand.get('state') !== 'showdown') {
+  border: 3px solid ${(props) => {
+    if (props.whosTurn === props.pos && props.state !== 'showdown') {
       return green;
     }
     if (props.sitout && props.sitout !== 'allin') {
@@ -35,15 +35,10 @@ export const ImageContainer = styled.div`
     }
     return baseColor;
   }};
-  
-  background-image: ${(props) => {
-    if (props.myPos === props.pos) {
-      return `url(${props.gravatarUrl})`;
-    }
-    return '';
-  }};
-  width: 100%
-  height: 100%
+  background-size:cover;
+  background-image: url(${(props) => props.blocky});
+  width: 100%;
+  height: 100%;
   text-align: center;
   ${(props) => (props.open) ? 'cursor: pointer' : ''};
   z-index: 10;

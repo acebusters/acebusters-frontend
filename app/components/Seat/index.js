@@ -6,6 +6,7 @@ import React from 'react';
 import Card from '../Card'; // eslint-disable-line
 import { SeatWrapper, ImageContainer, CardContainer, DealerButton, SeatLabel, ChipGreen } from './SeatWrapper';
 import { ActionBox, StackBox, NameBox, TimeBox, AmountBox } from './Info';
+import { createBlocky } from '../../services/blockies';
 
 function SeatComponent(props) {
   const cardSize = 40;
@@ -32,12 +33,13 @@ function SeatComponent(props) {
       </SeatWrapper>
       );
   } else {
+    const blocky = createBlocky(props.lineup.getIn([props.pos, 'address']));
     seat = (
       <SeatWrapper
         coords={props.coords}
         {...props}
       >
-        <ImageContainer {...props}>
+        <ImageContainer whosTurn={props.whosTurn} pos={props.pos} state={props.hand.get('state')} sitout={props.sitout} open={props.open} blocky={blocky}>
           <DealerButton {...props}></DealerButton>
           <CardContainer>
             <Card

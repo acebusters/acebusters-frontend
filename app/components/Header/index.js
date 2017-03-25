@@ -89,6 +89,7 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
         profileAction={() => browserHistory.push('/dashboard')}
         signOutAction={this.props.onClickLogout}
         collapsed={collapsed}
+        signerAddr={this.props.signerAddr}
         key="4"
       />,
     ]) : ([

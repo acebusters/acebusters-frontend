@@ -88,7 +88,22 @@
     return c;
   }
 
-  export function create(optsParam) {
+  export function createBlocky(address) {
+    let addr = address;
+    if (!address || address.length < 10) {
+      addr = '0x00000000000000000000';
+    }
+    return create({
+      seed: addr,
+      color: `#${addr.substring(2, 5)}`,
+      bgcolor: `#${addr.substring(6, 9)}`,
+      size: 8,
+      scale: 16,
+      spotcolor: '#000',
+    }).toDataURL();
+  }
+
+  function create(optsParam) {
     const opts = optsParam || {};
     const size = opts.size || 8;
     const scale = opts.scale || 4;
