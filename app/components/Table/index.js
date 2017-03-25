@@ -33,7 +33,7 @@ const Wrapper = styled.div`
 const TableAndChairs = styled.div`
   position: relative;
   width: 100%
-  padding-bottom: 55%;
+  padding-bottom: 50%;
 `;
 
 const PokerTable = styled.div`
@@ -58,8 +58,6 @@ function TableComponent(props) {
       }
       <TableHeader>
         { `state: ${props.state}` } <br />
-        { `amount to call: ${props.amountToCall}` } <br />
-        { `sb: ${props.sb}` }
       </TableHeader>
       <TableContainer>
         <TableAndChairs id="table-and-chairs" >
@@ -85,7 +83,6 @@ TableComponent.propTypes = {
   board: React.PropTypes.array,
   seats: React.PropTypes.array,
   potSize: React.PropTypes.number,
-  amountToCall: React.PropTypes.number,
   myPos: React.PropTypes.number,
   sb: React.PropTypes.number,
 };
