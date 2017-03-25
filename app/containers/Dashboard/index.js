@@ -3,7 +3,7 @@ import QRCode from 'qrcode.react';
 import { FormattedMessage } from 'react-intl';
 import { createStructuredSelector } from 'reselect';
 
-import { makeSelectAccountData } from '../AccountProvider/selectors';
+import makeSelectAccountData, { makeSignerAddrSelector } from '../AccountProvider/selectors';
 import messages from './messages';
 import { modalAdd, modalDismiss } from '../App/actions';
 import web3Connect from '../AccountProvider/web3Connect';
@@ -61,7 +61,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     return (
       <Container>
         <h1><FormattedMessage {...messages.header} /></h1>
-        <Blocky address={this.props.account.proxy} />
+        <Blocky address={this.props.signerAddr} />
         <h3> Your address:</h3>
         <p> { this.props.account.proxy } </p>
         <QRCode value={qrUrl} size={120} />
@@ -114,11 +114,13 @@ Dashboard.propTypes = {
   modalDismiss: PropTypes.func,
   contractEvent: PropTypes.func,
   web3Redux: PropTypes.any,
+  signerAddr: PropTypes.string,
   account: PropTypes.any,
 };
 
 const mapStateToProps = createStructuredSelector({
   account: makeSelectAccountData(),
+  signerAddr: makeSignerAddrSelector(),
 });
 
 
