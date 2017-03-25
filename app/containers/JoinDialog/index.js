@@ -1,5 +1,7 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
+import Slider from 'react-rangeslider';
+import 'react-rangeslider/lib/index.css';
 import { createStructuredSelector } from 'reselect';
 import Button from '../../components/Button';
 
@@ -12,11 +14,15 @@ class JoinDialog extends React.Component { // eslint-disable-line react/prefer-s
 
   constructor(props) {
     super(props);
+    this.state = {
+      amount: 0,
+    };
+    this.updateAmount = this.updateAmount.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  updateAmount(e) {
-    const amount = e.target.value;
+  updateAmount(value) {
+    const amount = value;
     this.setState({ amount });
   }
 
@@ -31,11 +37,17 @@ class JoinDialog extends React.Component { // eslint-disable-line react/prefer-s
     const tableMax = this.props.sb * 200;
     const max = (this.props.balance < tableMax) ? this.props.balance : tableMax;
     return (
-      <div>
-        <input
-          type="range" max={max} min={min} step={1} onChange={(e) => this.updateAmount(e)}
+      <div style={{ minWidth: '10em' }}>
+        <Slider
+          data-orientation="vertical"
+          value={this.state.amount}
+          tooltip={false}
+          min={min}
+          max={max}
+          step={1}
+          onChange={this.updateAmount}
         >
-        </input>
+        </Slider>
         <div> Max: {max}</div>
         <div>{ (this.state) ? this.state.amount : min }</div>
         <Button onClick={this.handleSubmit}>Join</Button>

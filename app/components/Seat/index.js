@@ -53,7 +53,7 @@ function SeatComponent(props) {
               cardNumber={props.holeCards[1]}
               folded={props.folded}
               size={cardSize}
-              offset={[-110, -110]}
+              offset={[-65, -180]}
             >
             </Card>
           </CardContainer>
