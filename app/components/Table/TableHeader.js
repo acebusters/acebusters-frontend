@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 //    margin-top: 10em;
 export const TableHeader = styled.div`
-   @media (min-width: 700px) {
+   @media (max-width: 700px) {
       display: none;
    }
    position: relative;
