@@ -2,26 +2,21 @@
  * Created by helge on 20.09.16.
  */
 
-export const GET_INFO = 'GET_INFO';
-export const COMPLETE_HAND_QUERY = 'COMPLETE_HAND_QUERY';
-export const HAND_REQUEST = 'HAND_REQUEST';
-export const NEXT_HAND = 'NEXT_HAND';
-export const SET_CARDS = 'SET_CARDS';
-export const RESIZE_TABLE = 'RESIZE_TABLE';
-export const TABLE_RECEIVED = 'TABLE_RECEIVED';
-export const UPDATE_RECEIVED = 'UPDATE_RECEIVED';
-export const LINEUP_RECEIVED = 'LINEUP_RECEIVED';
-export const LEAVE_REQUEST = 'LEAVE_REQUEST';
-export const JOIN_TABLE = 'JOIN_TABLE';
+export const HAND_REQUEST = 'acebusters/Table/HAND_REQUEST';
+export const NEXT_HAND = 'acebusters/Table/NEXT_HAND';
+export const SET_CARDS = 'acebusters/Table/SET_CARDS';
+export const RESIZE_TABLE = 'acebusters/Table/RESIZE_TABLE';
+export const TABLE_RECEIVED = 'acebusters/Table/TABLE_RECEIVED';
+export const UPDATE_RECEIVED = 'acebusters/Table/UPDATE_RECEIVED';
+export const LINEUP_RECEIVED = 'acebusters/Table/LINEUP_RECEIVED';
+export const LEAVE_REQUEST = 'acebusters/Table/LEAVE_REQUEST';
+export const JOIN_TABLE = 'acebusters/Table/JOIN_TABLE';
 export const BET = 'acebusters/Table/BET';
 export const SHOW = 'acebusters/Table/SHOW';
 export const NET = 'acebusters/Table/NET';
-export const ADD_PENDING = 'ADD_PENDING';
-export const REMOVE_PENDING = 'REMOVE_PENDING';
+export const ADD_PENDING = 'acebusters/Table/ADD_PENDING';
+export const REMOVE_PENDING = 'acebusters/Table/REMOVE_PENDING';
 
-export function completeHandQuery(tableAddr, hand) {
-  return { type: COMPLETE_HAND_QUERY, tableAddr, hand };
-}
 
 export function setCards(tableAddr, handId, cards, pos) {
   return { type: SET_CARDS, tableAddr, handId, cards, pos };
@@ -39,8 +34,8 @@ export function net(tableAddr, handId, balances, privKey) {
   return { type: NET, tableAddr, handId, balances, privKey };
 }
 
-export function getInfo(tableAddr) {
-  return { type: GET_INFO, tableAddr };
+export function handRequest(tableAddr, handId) {
+  return { type: HAND_REQUEST, tableAddr, handId };
 }
 
 export function tableReceived(tableAddr) {

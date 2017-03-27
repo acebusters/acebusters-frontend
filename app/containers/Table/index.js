@@ -25,7 +25,7 @@ import {
 import { modalAdd, modalDismiss } from '../App/actions';
 // actions
 import {
-  getInfo,
+  handRequest,
   lineupReceived,
   updateReceived,
   addPending,
@@ -90,7 +90,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.pusher = new Pusher('d4832b88a2a81f296f53', { cluster: 'eu', encrypted: true });
     this.channel = this.pusher.subscribe(this.tableAddr);
     getTableData(this.table, props).then(() => {
-      this.props.getInfo(this.tableAddr); // get initial state
+      this.props.handRequest(this.tableAddr, props.params.handId); // get initial state
       this.channel.bind('update', this.handleUpdate); // bind to future state updates
     });
   }
@@ -379,7 +379,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
 export function mapDispatchToProps() {
   return {
-    getInfo: (tableAddr) => getInfo(tableAddr),
+    handRequest: (tableAddr, handId) => handRequest(tableAddr, handId),
     lineupReceived: (tableAddr, lineup, smallBlind) => (lineupReceived(tableAddr, lineup, smallBlind)),
     modalAdd: (node) => (modalAdd(node)),
     modalDismiss: () => (modalDismiss()),
@@ -416,12 +416,12 @@ Table.propTypes = {
   privKey: React.PropTypes.string,
   proxyAddr: React.PropTypes.string,
   signerAddr: React.PropTypes.string,
-  getInfo: React.PropTypes.func,
   web3Redux: React.PropTypes.any,
   data: React.PropTypes.any,
   myPos: React.PropTypes.any,
   myMaxbet: React.PropTypes.number,
   modalAdd: React.PropTypes.func,
+  handRequest: React.PropTypes.func,
   addPending: React.PropTypes.func,
   removePending: React.PropTypes.func,
   modalDismiss: React.PropTypes.func,
