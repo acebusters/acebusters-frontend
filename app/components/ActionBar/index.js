@@ -25,7 +25,7 @@ const ActionBarWrapper = styled.div`
   width: 5%;
 `;
 
-export const ActionButton = styled.button`
+export const ActionButtonWrapper = styled.button`
   border-radius: 50%;
   color: ${fontPrimary};
   border: 2px solid #fff;
@@ -53,9 +53,13 @@ export const ActionButton = styled.button`
   }
 `;
 
-export const ActionButtonWrapper = styled.div`
-  text-align: center;
-`;
+export function ActionButton(props) {
+  return (
+    <ActionButtonWrapper>
+      { props.text }
+    </ActionButtonWrapper>
+  );
+}
 
 export function ActionBarComponent(props) {
   return (
@@ -65,5 +69,9 @@ export function ActionBarComponent(props) {
     </ActionBarWrapper>
   );
 }
+
+ActionButton.propTypes = {
+  text: React.PropTypes.string,
+};
 
 ActionBarComponent.propTypes = {};

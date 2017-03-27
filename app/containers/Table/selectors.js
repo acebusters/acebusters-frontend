@@ -205,11 +205,6 @@ const makeLineupSelector = () => createSelector(
   }
 );
 
-const makeAmountSelector = () => createSelector(
-  tableStateSelector,
-  (tableState) => (tableState) ? tableState.get('amount') : null
-);
-
 const makeMyPosSelector = () => createSelector(
   [makeLineupSelector(), makeSignerAddrSelector()],
   (lineup, myAddress) => (lineup && myAddress) ? pokerHelper.getMyPos(lineup.toJS(), myAddress) : -1
@@ -375,7 +370,6 @@ export {
     hasNettingInAction,
     makeTableDataSelector,
     makeSbSelector,
-    makeAmountSelector,
     makeLineupSelector,
     makeHandStateSelector,
     makeLatestHandSelector,
