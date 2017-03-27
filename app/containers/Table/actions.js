@@ -19,6 +19,10 @@ export const NET = 'acebusters/Table/NET';
 export const ADD_PENDING = 'ADD_PENDING';
 export const REMOVE_PENDING = 'REMOVE_PENDING';
 
+export function completeHandQuery(tableAddr, hand) {
+  return { type: COMPLETE_HAND_QUERY, tableAddr, hand };
+}
+
 export function setCards(tableAddr, handId, cards, pos) {
   return { type: SET_CARDS, tableAddr, handId, cards, pos };
 }
@@ -57,4 +61,12 @@ export function updateReceived(tableAddr, hand) {
 
 export function lineupReceived(tableAddr, lineup, smallBlind) {
   return { type: LINEUP_RECEIVED, tableAddr, lineup, smallBlind };
+}
+
+export function nextHand(tableAddr, handId) {
+  return { type: NEXT_HAND, tableAddr, handId };
+}
+
+export function leaveRequest(tableAddr, handId, amount, privKey) {
+  return { type: LEAVE_REQUEST, tableAddr, handId, amount, privKey };
 }
