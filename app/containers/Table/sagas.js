@@ -12,7 +12,7 @@ import {
   BET,
   SHOW,
   NET,
-  GET_INFO,
+  HAND_REQUEST,
   UPDATE_RECEIVED,
 } from './actions';
 
@@ -33,11 +33,11 @@ import {
   hasNettingInAction,
   makeSbSelector,
 } from './selectors';
-import TableService, { fetchTableState } from '../../services/tableService';
+import TableService, { getHand } from '../../services/tableService';
 
-export function* getInfo(action) {
+export function* handRequest(action) {
   try {
-    const tableState = yield call(fetchTableState, action.tableAddr);
+    const tableState = yield call(getHand, action.tableAddr, action.handId);
     yield put(updateReceived(action.tableAddr, tableState));
   } catch (err) {
     // TODO: handle;
@@ -155,7 +155,7 @@ function* tableSaga() {
   yield takeLatest(BET, performBet);
   yield takeLatest(SHOW, performShow);
   yield takeLatest(NET, submitSignedNetting);
-  yield takeLatest(GET_INFO, getInfo);
+  yield takeLatest(HAND_REQUEST, handRequest);
   yield fork(updateScanner);
 }
 
