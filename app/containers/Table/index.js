@@ -364,6 +364,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
         { this.props.state &&
         <TableComponent
           {...this.props}
+          id="table"
           sb={sb}
           board={board}
           seats={seats}
