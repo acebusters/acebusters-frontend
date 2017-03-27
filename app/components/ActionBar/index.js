@@ -9,7 +9,6 @@ import {
   baseColor,
   fontPrimary,
   background,
-  gray,
 } from '../../variables';
 
 const ControlPanel = styled.div`
@@ -38,24 +37,13 @@ export const ActionButtonWrapper = styled.button`
     color: ${baseColor};
     background-color: ${background};
     border: 2px solid ${baseColor}
-  }
-  
-  &:active {
-    border: 2px solid #fff;
-    width: 8.5em;
-    height: 8.5em;
-  }
-  
-  &:disabled {
-    border: 2px solid ${gray};
-    color:  ${gray};
-    cursor: initial;
+    cursor: pointer;
   }
 `;
 
 export function ActionButton(props) {
   return (
-    <ActionButtonWrapper>
+    <ActionButtonWrapper onClick={props.onClick} >
       { props.text }
     </ActionButtonWrapper>
   );
@@ -72,6 +60,7 @@ export function ActionBarComponent(props) {
 
 ActionButton.propTypes = {
   text: React.PropTypes.string,
+  onClick: React.PropTypes.func,
 };
 
 ActionBarComponent.propTypes = {};

@@ -20,7 +20,7 @@ import {
 } from '../Table/selectors';
 
 import { setCards } from '../Table/actions';
-import { ActionBarComponent, ActionButton, ActionButtonWrapper } from '../../components/ActionBar';
+import { ActionBarComponent, ActionButton } from '../../components/ActionBar';
 import TableService from '../../services/tableService';
 
 export class ActionBar extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -41,12 +41,18 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
     };
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.isMyTurn === true) {
+      this.setActive(true);
+    }
+  }
+
   setActive(active) {
     this.setState({ active });
   }
 
   updateAmount(value) {
-    const amount = parseInt(value + this.props.myMaxBet, 10);
+    const amount = parseInt(value, 10);
     this.setState({ amount });
   }
 
@@ -138,29 +144,23 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
             </Slider>
           </SliderWrapper>
           <Grid xs={1 / 3}>
-            <ActionButtonWrapper>
-              <ActionButton onClick={this.handleBet} text={`BET ${this.state.amount}`}>
-              </ActionButton>
-              <Grid xs={1 / 3}>
-                <ActionButtonWrapper>
-                  { this.props.amountToCall > 0 &&
-                  <ActionButton onClick={this.handleCall} text={`CALL ${this.props.amountToCall}`}>
-                  </ActionButton>
-                  }
-                  { this.props.amountToCall === 0 &&
-                  <ActionButton onClick={this.handleCheck} text="CHECK">
-                  </ActionButton>
-                  }
-                </ActionButtonWrapper>
-              </Grid>
-              <Grid xs={1 / 3}>
-                <ActionButtonWrapper>
-                  { this.props.amountToCall > 0 &&
-                    <ActionButton onClick={this.handleFold} text="FOLD"></ActionButton>
-                  }
-                </ActionButtonWrapper>
-              </Grid>
-            </ActionButtonWrapper>
+            <ActionButton onClick={this.handleBet} text={`BET ${this.state.amount}`}>
+            </ActionButton>
+          </Grid>
+          <Grid xs={1 / 3}>
+            { this.props.amountToCall > 0 &&
+            <ActionButton onClick={this.handleCall} text={`CALL ${this.props.amountToCall}`}>
+            </ActionButton>
+            }
+            { this.props.amountToCall === 0 &&
+            <ActionButton onClick={this.handleCheck} text="CHECK">
+            </ActionButton>
+            }
+          </Grid>
+          <Grid xs={1 / 3}>
+            { this.props.amountToCall > 0 &&
+              <ActionButton onClick={this.handleFold} text="FOLD"></ActionButton>
+            }
           </Grid>
         </ActionBarComponent>
       );
