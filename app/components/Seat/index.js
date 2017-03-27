@@ -59,13 +59,13 @@ function SeatComponent(props) {
           </CardContainer>
           <AmountBox {...props}>
             { (props.lastAmount > 0) &&
-              <div>
-                <ChipGreen>
-                </ChipGreen>
-                <Amount>
-                  { props.lastAmount }
-                </Amount>
-              </div>
+            <div>
+              <ChipGreen>
+              </ChipGreen>
+              <Amount>
+                { props.lastAmount }
+              </Amount>
+            </div>
             }
           </AmountBox>
           <div>

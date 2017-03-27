@@ -46,7 +46,6 @@ export const ImageContainer = styled.div`
   height: 100%;
   text-align: center;
   ${(props) => (props.open) ? 'cursor: pointer' : ''};
-  z-index: 10;
 `;
 
 export const SeatLabel = styled.div`
@@ -67,7 +66,6 @@ export const DealerButton = styled.div`
   text-align: center;
   color: white;
   position: absolute;
-  z-index: 10;
 `;
 
 export const ChipGreen = styled.p`

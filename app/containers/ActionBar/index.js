@@ -12,11 +12,7 @@ import SliderWrapper from '../../components/Slider';
 import { makeSelectPrivKey } from '../AccountProvider/selectors';
 import {
   makeHandStateSelector,
-  makePotSizeSelector,
   makeMyMaxBetSelector,
-  makeAmountSelector,
-  makeMyStackSelector,
-  makeMyPosSelector,
   makeMinSelector,
   makeMaxSelector,
   makeIsMyTurnSelector,
@@ -24,10 +20,10 @@ import {
 } from '../Table/selectors';
 
 import { setCards } from '../Table/actions';
-import { ActionBarComponent, ActionButton, ActionButtonWrapper } from '../../components/ActionBar';
+import { ActionBarComponent, ActionButton } from '../../components/ActionBar';
 import TableService from '../../services/tableService';
 
-class ActionBar extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export class ActionBar extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
   constructor(props) {
     super(props);
@@ -38,16 +34,16 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
     this.handleFold = this.handleFold.bind(this);
     this.updateAmount = this.updateAmount.bind(this);
     this.table = new TableService(props.params.tableAddr, this.props.privKey);
+    const amount = this.props.stepAndMin;
     this.state = {
-      amount: this.props.stepAndMin,
+      amount,
+      active: true,
     };
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.isMyTurn) {
+    if (nextProps.isMyTurn === true) {
       this.setActive(true);
-    } else {
-      this.setActive(false);
     }
   }
 
@@ -56,13 +52,13 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
   }
 
   updateAmount(value) {
-    const amount = (value > this.props.stackSize) ? parseInt(this.props.stackSize + this.props.myMaxBet, 10) : parseInt(value, 10);
+    const amount = parseInt(value, 10);
     this.setState({ amount });
   }
 
   handleBet() {
     this.setActive(false);
-    const amount = (this.state) ? this.state.amount + this.props.myMaxBet : parseInt(this.props.stepAndMin, 10);
+    const amount = this.state.amount + this.props.myMaxBet;
     const handId = parseInt(this.props.params.handId, 10);
     return this.table.bet(handId, amount).catch((err) => {
       console.log(err);
@@ -129,19 +125,17 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
   }
 
   render() {
-    let active;
-    if (this.state) {
-      active = this.state.active;
-    }
-
-    const amount = (this.state && this.state.amount && this.state.amount > this.props.amountToCall) ? this.state.amount : this.props.stepAndMin;
-    if (this.props.myPos > -1 && this.props.state !== 'waiting' && this.props.state !== 'dealing') {
+    if (this.state.active
+        && this.props.isMyTurn
+        && this.props.state !== 'waiting'
+        && this.props.state !== 'dealing') {
       return (
         <ActionBarComponent>
           <SliderWrapper>
             <Slider
+              key="betting-slider"
               data-orientation="vertical"
-              value={amount}
+              value={this.state.amount}
               min={this.props.stepAndMin}
               max={this.props.max}
               step={this.props.stepAndMin}
@@ -150,32 +144,23 @@ class ActionBar extends React.PureComponent { // eslint-disable-line react/prefe
             </Slider>
           </SliderWrapper>
           <Grid xs={1 / 3}>
-            <ActionButtonWrapper>
-              <ActionButton onClick={this.handleBet} disabled={!active} >
-                { (this.props.amountToCall > 0) ? 'RAISE' : 'BET' } { amount }
-              </ActionButton>
-            </ActionButtonWrapper>
+            <ActionButton onClick={this.handleBet} text={`BET ${this.state.amount}`}>
+            </ActionButton>
           </Grid>
           <Grid xs={1 / 3}>
-            <ActionButtonWrapper>
-              { this.props.amountToCall > 0 &&
-              <ActionButton onClick={this.handleCall} disabled={!active}>
-                CALL { this.props.amountToCall }
-              </ActionButton>
-              }
-              { this.props.amountToCall === 0 &&
-              <ActionButton onClick={this.handleCheck} disabled={!active}>
-                CHECK
-              </ActionButton>
-              }
-            </ActionButtonWrapper>
+            { this.props.amountToCall > 0 &&
+            <ActionButton onClick={this.handleCall} text={`CALL ${this.props.amountToCall}`}>
+            </ActionButton>
+            }
+            { this.props.amountToCall === 0 &&
+            <ActionButton onClick={this.handleCheck} text="CHECK">
+            </ActionButton>
+            }
           </Grid>
           <Grid xs={1 / 3}>
-            <ActionButtonWrapper>
-              { this.props.amountToCall > 0 &&
-              <ActionButton onClick={this.handleFold} disabled={!active}>FOLD</ActionButton>
-              }
-            </ActionButtonWrapper>
+            { this.props.amountToCall > 0 &&
+              <ActionButton onClick={this.handleFold} text="FOLD"></ActionButton>
+            }
           </Grid>
         </ActionBarComponent>
       );
@@ -193,11 +178,7 @@ export function mapDispatchToProps() {
 
 const mapStateToProps = createStructuredSelector({
   privKey: makeSelectPrivKey(),
-  amount: makeAmountSelector(),
-  potSize: makePotSizeSelector(),
   myMaxBet: makeMyMaxBetSelector(),
-  stackSize: makeMyStackSelector(),
-  myPos: makeMyPosSelector(),
   isMyTurn: makeIsMyTurnSelector(),
   amountToCall: makeAmountToCallSelector(),
   stepAndMin: makeMinSelector(),
@@ -208,14 +189,12 @@ const mapStateToProps = createStructuredSelector({
 ActionBar.propTypes = {
   params: React.PropTypes.object,
   privKey: React.PropTypes.string,
-  cards: React.PropTypes.array,
   myMaxBet: React.PropTypes.number,
+  isMyTurn: React.PropTypes.bool,
   stepAndMin: React.PropTypes.number,
   max: React.PropTypes.number,
   amountToCall: React.PropTypes.number,
   state: React.PropTypes.string,
-  stackSize: React.PropTypes.number,
-  myPos: React.PropTypes.number,
   me: React.PropTypes.object,
   setCards: React.PropTypes.func,
 };
