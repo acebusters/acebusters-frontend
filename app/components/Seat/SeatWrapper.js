@@ -7,7 +7,6 @@ import styled from 'styled-components';
 import {
   baseColor,
   background,
-  gray,
   green,
 } from 'variables';
 
@@ -23,29 +22,13 @@ export const ImageContainer = styled.div`
   border-radius: 50%;
   position: absolute;
   transform: translate(-50%,-50%);
-  border: 3px solid ${(props) => {
-    if (props.whosTurn === props.pos && props.hand.get('state') !== 'showdown') {
-      return green;
-    }
-    if (props.sitout && props.sitout !== 'allin') {
-      return gray;
-    }
-    if (props.open) {
-      return '#fff';
-    }
-    return baseColor;
-  }};
+  border: 3px solid ${(props) => props.color};
   background-size:cover;
-  background-image: url(${(props) => {
-    if (!props.open) {
-      return props.blocky;
-    }
-    return '';
-  }});
+  background-image: url(${(props) => props.blocky});
   width: 100%;
   height: 100%;
   text-align: center;
-  ${(props) => (props.open) ? 'cursor: pointer' : ''};
+  cursor: ${(props) => props.cursor};
 `;
 
 export const SeatLabel = styled.div`
@@ -58,7 +41,7 @@ export const SeatLabel = styled.div`
 
 export const DealerButton = styled.div`
   border-radius: 50%;
-  ${(props) => (!(props.hand.get('dealer') === props.pos)) ? 'display: none;' : ''}
+  ${(props) => (!(props.dealer === props.pos)) ? 'display: none;' : ''}
   border: 4px solid ${baseColor}
   width: 1.5em;
   height: 1.5em;
