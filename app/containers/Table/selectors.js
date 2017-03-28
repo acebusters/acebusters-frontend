@@ -1,6 +1,5 @@
 import { createSelector } from 'reselect';
 import { PokerHelper, ReceiptCache } from 'poker-helper';
-import EWT from 'ethereum-web-token';
 import { makeSignerAddrSelector } from '../AccountProvider/selectors';
 
 const rc = new ReceiptCache();
@@ -340,16 +339,16 @@ const selectStack = (table, pos) => {
   for (let i = lastHandNetted + 1; i <= maxHand; i += 1) {
     // get all the bets
     const rec = table.getIn([i.toString(), 'lineup', pos, 'last']);
-    const bet = (rec) ? EWT.parse(rec).values[1] : 0;
+    const bet = (rec) ? rc.get(rec).values[1] : 0;
     if (typeof bet !== 'undefined') {
       amount -= bet;
     }
     // get all the winnings
     const distsRec = table.getIn([i.toString(), 'distribution']);
     if (distsRec) {
-      const dists = EWT.parse(distsRec);
+      const dists = rc.get(distsRec);
       for (let j = 0; j < dists.values[2].length; j += 1) {
-        const dist = EWT.separate(dists.values[2][j]);
+        const dist = rc.get(dists.values[2][j]);
         if (dist.address === addr) {
           amount += dist.amount;
         }

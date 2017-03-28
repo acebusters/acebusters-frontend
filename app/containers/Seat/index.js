@@ -8,7 +8,7 @@ import { createStructuredSelector } from 'reselect';
 import { modalAdd, modalDismiss } from '../App/actions';
 
 import {
-  addPending,
+  pendingToggle,
 } from '../Table/actions';
 
 import {
@@ -91,7 +91,7 @@ export function mapDispatchToProps() {
   return {
     modalAdd: (node) => (modalAdd(node)),
     modalDismiss: () => (modalDismiss()),
-    addPending: (tableAddr, handId, pos) => (addPending(tableAddr, handId, pos)),
+    pendingToggle: (tableAddr, handId, pos) => (pendingToggle(tableAddr, handId, pos)),
   };
 }
 
