@@ -370,7 +370,7 @@ export {
     makeTableDataSelector,
     makeSbSelector,
     makeLineupSelector,
-      makeHandStateSelector,
+    makeHandStateSelector,
     makeLatestHandSelector,
     makeBoardSelector,
     makeIsMyTurnSelector,
