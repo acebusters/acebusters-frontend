@@ -14,8 +14,7 @@ export const JOIN_TABLE = 'acebusters/Table/JOIN_TABLE';
 export const BET = 'acebusters/Table/BET';
 export const SHOW = 'acebusters/Table/SHOW';
 export const NET = 'acebusters/Table/NET';
-export const ADD_PENDING = 'acebusters/Table/ADD_PENDING';
-export const REMOVE_PENDING = 'acebusters/Table/REMOVE_PENDING';
+export const PENDING_TOGGLE = 'acebusters/Table/PENDING_TOGGLE';
 
 
 export function setCards(tableAddr, handId, cards, pos) {
@@ -42,12 +41,8 @@ export function tableReceived(tableAddr) {
   return { type: TABLE_RECEIVED, tableAddr };
 }
 
-export function addPending(tableAddr, handId, pos) {
-  return { type: ADD_PENDING, tableAddr, handId, pos };
-}
-
-export function removePending(tableAddr, handId) {
-  return { type: REMOVE_PENDING, tableAddr, handId };
+export function pendingToggle(tableAddr, handId, pos) {
+  return { type: PENDING_TOGGLE, tableAddr, handId, pos };
 }
 
 export function updateReceived(tableAddr, hand) {
