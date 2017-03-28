@@ -28,8 +28,7 @@ import {
   handRequest,
   lineupReceived,
   updateReceived,
-  addPending,
-  removePending,
+  pendingToggle,
 } from './actions';
 // selectors
 import {
@@ -184,7 +183,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     </div>);
     this.props.modalDismiss();
     this.props.modalAdd(statusElement);
-    this.props.addPending(this.tableAddr, this.props.params.handId, pos);
+    this.props.pendingToggle(this.tableAddr, this.props.params.handId, pos);
   }
 
   handleUpdate(hand) {
@@ -206,7 +205,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     const state = this.props.state;
     const exitHand = (state !== 'waiting') ? handId : handId - 1;
     const table = new TableService(this.props.params.tableAddr, this.props.privKey);
-    this.props.addPending(this.tableAddr, this.props.params.handId, pos);
+    this.props.pendingToggle(this.tableAddr, this.props.params.handId, pos);
     const statusElement = (<div>
       <p>
         Please wait until your leave request is processed!
@@ -232,16 +231,26 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     // dispatch action according to event type
     switch (result.event) {
       case 'Join': {
-        // update lineup when join successful
-        this.table.getLineup.call();
-        getTableData(this.table, this.props);
-        this.props.removePending(this.tableAddr, this.props.params.handId);
-        this.props.modalDismiss();
-        const statusElement = (<div>
-          <h2>Join Successful!</h2>
-          <Button onCLick={() => this.props.modalDismiss}>Ok!</Button>
-        </div>);
-        this.props.modalAdd(statusElement);
+        if (result.args && result.args.addr === this.props.proxyAddr) {
+          // show modal
+          this.props.modalDismiss();
+          const statusElement = (<div>
+            <h2>Join Successful!</h2>
+            <Button onCLick={() => this.props.modalDismiss}>Ok!</Button>
+          </div>);
+          this.props.modalAdd(statusElement);
+
+          // update lineup when join successful
+          // TODO(AB): tell the backend that event happened
+          this.table.getLineup.callPromise().then((rsp) => {
+            for (let i = 0; i < rsp[1].length; i += 1) {
+              if (rsp[1][i] === this.props.signerAddr) {
+                this.props.pendingToggle(this.tableAddr, this.props.params.handId, i);
+                break;
+              }
+            }
+          });
+        }
         break;
       }
 
@@ -253,7 +262,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       case 'Error': {
         let msg = 'Ups Something went wrong';
         const errorCode = result.args.errorCode.toNumber();
-        this.props.removePending(this.tableAddr, this.props.params.handId);
+        this.props.pendingToggle(this.tableAddr, this.props.params.handId);
         if (errorCode === 1) {
           msg = 'Wrong Amount';
         }
@@ -384,8 +393,7 @@ export function mapDispatchToProps() {
     lineupReceived: (tableAddr, lineup, smallBlind) => (lineupReceived(tableAddr, lineup, smallBlind)),
     modalAdd: (node) => (modalAdd(node)),
     modalDismiss: () => (modalDismiss()),
-    addPending: (tableAddr, handId, pos) => (addPending(tableAddr, handId, pos)),
-    removePending: (tableAddr, handId) => (removePending(tableAddr, handId)),
+    pendingToggle: (tableAddr, handId, pos) => (pendingToggle(tableAddr, handId, pos)),
     updateReceived: (tableAddr, hand) => (updateReceived(tableAddr, hand)),
   };
 }
@@ -423,8 +431,7 @@ Table.propTypes = {
   myMaxbet: React.PropTypes.number,
   modalAdd: React.PropTypes.func,
   handRequest: React.PropTypes.func,
-  addPending: React.PropTypes.func,
-  removePending: React.PropTypes.func,
+  pendingToggle: React.PropTypes.func,
   modalDismiss: React.PropTypes.func,
   updateReceived: React.PropTypes.func,
 };

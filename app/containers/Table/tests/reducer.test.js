@@ -6,6 +6,7 @@ import tableReducer from '../reducer';
 import {
   updateReceived,
   setCards,
+  pendingToggle,
   lineupReceived,
 } from '../actions';
 
@@ -21,6 +22,8 @@ const P2_KEY = '0x99e69145c6e7f44ba04d579faac9ef4ce5e942dc02b96a9d42b5fcb03e5087
 
 // secretSeed: 'stadium today then top toward crack faint similar mosquito hunt thing sibling'
 const P3_ADDR = '0xdd7acad75b52bd206777a36bc41a3b65ad1c44fc';
+
+const ADDR_EMPTY = '0x0000000000000000000000000000000000000000';
 
 const tableAddr = '0x112233';
 
@@ -223,7 +226,7 @@ describe('table reducer tests', () => {
   it('should add holeCards at right position into lineup', () => {
     // set up previous state
     const before = fromJS({
-      tableAddr: {
+      [tableAddr]: {
         2: {
           lineup: [{
             address: P1_ADDR,
@@ -238,6 +241,49 @@ describe('table reducer tests', () => {
 
     // check state after execution
     const after = before.setIn([tableAddr, '2', 'holeCards'], fromJS([2, 3]));
+    expect(nextState).toEqual(after);
+  });
+
+  it('should set player pending on join.', () => {
+    // set up previous state
+    const before = fromJS({
+      [tableAddr]: {
+        2: {
+          lineup: [{
+            address: ADDR_EMPTY,
+          }, {
+            address: P2_ADDR,
+          }],
+        } },
+    });
+
+    // execute action
+    const nextState = tableReducer(before, pendingToggle(tableAddr, 2, 0));
+
+    // check state after execution
+    const after = before.setIn([tableAddr, '2', 'lineup', 0, 'pending'], true);
+    expect(nextState).toEqual(after);
+  });
+
+  it('should be able to remove pending state from player.', () => {
+    // set up previous state
+    const before = fromJS({
+      [tableAddr]: {
+        2: {
+          lineup: [{
+            address: ADDR_EMPTY,
+            pending: true,
+          }, {
+            address: P2_ADDR,
+          }],
+        } },
+    });
+
+    // execute action
+    const nextState = tableReducer(before, pendingToggle(tableAddr, 2, 0));
+
+    // check state after execution
+    const after = before.deleteIn([tableAddr, '2', 'lineup', 0, 'pending']);
     expect(nextState).toEqual(after);
   });
 });
