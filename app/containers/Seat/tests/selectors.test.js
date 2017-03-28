@@ -5,6 +5,7 @@ import {
   makeLastReceiptSelector,
   makeFoldedSelector,
   makeLastAmountSelector,
+  makeCardSelector,
 } from '../selectors';
 
 const ABI_FOLD = [{ name: 'fold', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
@@ -106,6 +107,31 @@ describe('foldedSelector', () => {
       },
     };
     const foldedSelector = makeFoldedSelector();
+    expect(foldedSelector(mockedState, props)).toEqual(true);
+  });
+});
+
+describe('cardSelector', () => {
+  it('it should return my holecards for my position', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          0: {
+            state: 'flop',
+            holeCards: [15, 25],
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 1,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 0,
+      },
+    };
+    const foldedSelector = makeCardSelector();
     expect(foldedSelector(mockedState, props)).toEqual(true);
   });
 });
