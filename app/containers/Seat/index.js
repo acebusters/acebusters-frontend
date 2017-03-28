@@ -4,25 +4,37 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
+
+import { modalAdd, modalDismiss } from '../App/actions';
+
+import {
+  pendingToggle,
+} from '../Table/actions';
+
 import {
   makeCardsSelector,
   makeLastAmountSelector,
   makeFoldedSelector,
   makeWhosTurnSelector,
-  makeLastActionSelector,
-  makeMyCardsSelector,
+  makeOpenSelector,
+  makeSitoutSelector,
+  makePendingSelector,
+  makeAmountCoordsSelector,
+  makeCoordsSelector,
+  makeDealerSelector,
+  makeBlockySelector,
 } from './selectors';
 
 import {
-  makeMyPosSelector,
-  makeHandSelector,
-  makeLineupSelector,
-  makeStackSelector,
-} from '../Table/selectors';
-
-import {
+  makeSignerAddrSelector,
   makeSelectGravatar,
 } from '../AccountProvider/selectors';
+
+import {
+  makeMyPosSelector,
+  makeStackSelector,
+  makeHandStateSelector,
+} from '../Table/selectors';
 
 import SeatComponent from '../../components/Seat';
 
@@ -64,41 +76,47 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
 
   render() {
     const timeLeft = (this.state) ? this.state.timeLeft : 0;
-    let cards = (this.props.pos === this.props.myPos) ? this.props.myCards : this.props.cards;
-    if (!cards) {
-      cards = [-1, -1];
-    }
+
     return (
-      <SeatComponent {...this.props} timeLeft={timeLeft} opacity={this.opacity} holeCards={cards}></SeatComponent>
+      <SeatComponent
+        {...this.props}
+        timeLeft={timeLeft}
+      >
+      </SeatComponent>
     );
   }
 }
 
+export function mapDispatchToProps() {
+  return {
+    modalAdd: (node) => (modalAdd(node)),
+    modalDismiss: () => (modalDismiss()),
+    pendingToggle: (tableAddr, handId, pos) => (pendingToggle(tableAddr, handId, pos)),
+  };
+}
+
+
 const mapStateToProps = createStructuredSelector({
-  hand: makeHandSelector(),
-  lineup: makeLineupSelector(),
+  state: makeHandStateSelector(),
+  dealer: makeDealerSelector(),
+  open: makeOpenSelector(),
+  pending: makePendingSelector(),
+  sitout: makeSitoutSelector(),
+  coords: makeCoordsSelector(),
+  amountCoords: makeAmountCoordsSelector(),
   myPos: makeMyPosSelector(),
+  blocky: makeBlockySelector(),
+  signerAddr: makeSignerAddrSelector(),
   whosTurn: makeWhosTurnSelector(),
   lastAmount: makeLastAmountSelector(),
-  cards: makeCardsSelector(),
-  myCards: makeMyCardsSelector(),
+  holeCards: makeCardsSelector(),
   folded: makeFoldedSelector(),
-  lastAction: makeLastActionSelector(),
   stackSize: makeStackSelector(),
   gravatarUrl: makeSelectGravatar(),
 });
 
-
-export function mapDispatchToProps(dispatch) {
-  return { dispatch };
-}
-
 Seat.propTypes = {
   lastAmount: React.PropTypes.number,
-  cards: React.PropTypes.array,
-  pos: React.PropTypes.number,
-  myPos: React.PropTypes.number,
-  myCards: React.PropTypes.array,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Seat);

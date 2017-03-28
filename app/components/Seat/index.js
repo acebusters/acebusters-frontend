@@ -3,10 +3,14 @@
  */
 
 import React from 'react';
+import {
+  baseColor,
+  green,
+} from 'variables';
 import Card from '../Card'; // eslint-disable-line
 import { SeatWrapper, ImageContainer, CardContainer, DealerButton, SeatLabel, ChipGreen, Amount } from './SeatWrapper';
-import { ActionBox, StackBox, NameBox, TimeBox, AmountBox } from './Info';
-import { createBlocky } from '../../services/blockies';
+import { StackBox, NameBox, TimeBox, AmountBox } from './Info';
+
 
 function SeatComponent(props) {
   const cardSize = 40;
@@ -19,13 +23,17 @@ function SeatComponent(props) {
   } else {
     status = 'EMPTY';
   }
-
   if (props.open || props.pending) {
     seat = (
       <SeatWrapper
+        onClick={() => props.isTaken(props.open, props.myPos, props.pending, props.pos)}
         coords={props.coords}
       >
-        <ImageContainer {...props} >
+        <ImageContainer
+          pos={props.pos}
+          color={'#fff'}
+          cursor={'pointer'}
+        >
           <SeatLabel>
             { status }
           </SeatLabel>
@@ -33,14 +41,20 @@ function SeatComponent(props) {
       </SeatWrapper>
       );
   } else {
-    const blocky = createBlocky(props.lineup.getIn([props.pos, 'address']));
+    const color = (props.pos === props.whosTurn) ? green : baseColor;
     seat = (
       <SeatWrapper
         coords={props.coords}
-        {...props}
       >
-        <ImageContainer {...props} blocky={blocky}>
-          <DealerButton {...props}></DealerButton>
+        <ImageContainer
+          blocky={props.blocky}
+          color={color}
+        >
+          <DealerButton
+            dealer={props.dealer}
+            pos={props.pos}
+          >
+          </DealerButton>
           <CardContainer>
             <Card
               cardNumber={props.holeCards[0]}
@@ -57,7 +71,9 @@ function SeatComponent(props) {
             >
             </Card>
           </CardContainer>
-          <AmountBox {...props}>
+          <AmountBox
+            amountCoords={props.amountCoords}
+          >
             { (props.lastAmount > 0) &&
             <div>
               <ChipGreen>
@@ -69,13 +85,12 @@ function SeatComponent(props) {
             }
           </AmountBox>
           <div>
-            <NameBox {...props}> { props.lineup.getIn([props.pos, 'address']) }
+            <NameBox> { props.signerAddr }
               <hr />
             </NameBox>
-            <StackBox {...props}> { props.stackSize }</StackBox>
+            <StackBox> { props.stackSize }</StackBox>
           </div>
           <TimeBox>{ (props.timeLeft > 0) ? props.timeLeft : '' } </TimeBox>
-          <ActionBox fontSize={2} opacity={props.opacity}> { props.lastAction } </ActionBox>
         </ImageContainer>
       </SeatWrapper>
     );
@@ -85,7 +100,6 @@ function SeatComponent(props) {
 
 SeatComponent.propTypes = {
   pos: React.PropTypes.number,
-  hand: React.PropTypes.object,
   cards: React.PropTypes.array,
   lastAction: React.PropTypes.string,
   lastAmount: React.PropTypes.number,
