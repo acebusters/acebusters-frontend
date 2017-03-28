@@ -129,13 +129,15 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     // forward browser to url of next hand
     this.pushed = (this.pushed) ? this.pushed : {};
     const handId = parseInt(this.props.params.handId, 10);
-    const nextHandStr = nextProps.latestHand.toString();
-    if (nextProps.latestHand > handId && !this.pushed[nextHandStr]) {
-      this.pushed[nextHandStr] = true;
-      setTimeout(() => {
-        console.log(`dispatched push to hand ${nextHandStr}`);
-        browserHistory.push(`/table/${this.tableAddr}/hand/${nextHandStr}`);
-      }, 1000);
+    if (nextProps.latestHand) {
+      const nextHandStr = nextProps.latestHand.toString();
+      if (nextProps.latestHand > handId && !this.pushed[nextHandStr]) {
+        this.pushed[nextHandStr] = true;
+        setTimeout(() => {
+          console.log(`dispatched push to hand ${nextHandStr}`);
+          browserHistory.push(`/table/${this.tableAddr}/hand/${nextHandStr}`);
+        }, 1000);
+      }
     }
 
     // fetch hands that we might need for stack calculation
