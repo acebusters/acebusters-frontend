@@ -14,8 +14,6 @@ import Seat from '../Seat'; // eslint-disable-lines
 import Button from 'components/Button'; // eslint-disable-line
 // config data
 import {
-  SEAT_COORDS,
-  AMOUNT_COORDS,
   ABI_TABLE,
   ABI_TOKEN_CONTRACT,
   TIMEOUT_PERIOD,
@@ -32,9 +30,9 @@ import {
 } from './actions';
 // selectors
 import {
-  makeSignerAddrSelector,
   makeSelectPrivKey,
   makeSelectProxyAddr,
+  makeSignerAddrSelector,
 } from '../AccountProvider/selectors';
 
 import {
@@ -53,10 +51,10 @@ import {
 } from './selectors';
 
 import TableComponent from '../../components/Table';
-import JoinDialog from '../JoinDialog';
-import InviteDialog from '../InviteDialog';
 import web3Connect from '../AccountProvider/web3Connect';
 import TableService, { getHand } from '../../services/tableService';
+import JoinDialog from '../JoinDialog';
+import InviteDialog from '../InviteDialog';
 
 const getTableData = (table, props) => {
   const lineup = table.getLineup.callPromise();
@@ -72,10 +70,11 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   constructor(props) {
     super(props);
     this.watchTable = this.watchTable.bind(this);
-    this.handleJoin = this.handleJoin.bind(this);
     this.handleUpdate = this.handleUpdate.bind(this);
     this.handleLeave = this.handleLeave.bind(this);
     this.handleSitout = this.handleSitout.bind(this);
+    this.handleJoin = this.handleJoin.bind(this);
+    this.isTaken = this.isTaken.bind(this);
 
     this.tableAddr = props.params.tableAddr;
     this.web3 = props.web3Redux.web3;
@@ -176,11 +175,16 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.tableEvents.stopWatching();
   }
 
+  handleUpdate(hand) {
+    this.props.updateReceived(this.tableAddr, hand);
+  }
+
   handleJoin(pos, amount) {
+    console.log(amount);
     this.token.approve.sendTransaction(this.tableAddr, amount);
     this.table.join.sendTransaction(amount, this.props.signerAddr, pos + 1, '');
     const statusElement = (<div>
-      <p> Request send. Waiting for the blockchain :)</p>
+      <p> Request send Please wait!</p>
       <Button onClick={this.props.modalDismiss}>OK!</Button>
     </div>);
     this.props.modalDismiss();
@@ -188,8 +192,21 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.props.pendingToggle(this.tableAddr, this.props.params.handId, pos);
   }
 
-  handleUpdate(hand) {
-    this.props.updateReceived(this.tableAddr, hand);
+  isTaken(open, myPos, pending, pos) {
+    if (open && myPos === -1 && !pending) {
+      this.props.modalAdd((
+        <JoinDialog
+          pos={pos}
+          handleJoin={this.handleJoin}
+          params={this.props.params}
+          balance={this.balance}
+        />
+      ));
+    } else if (open && this.props.myPos !== -1 && !pending) {
+      this.props.modalAdd((
+        <InviteDialog />
+      ));
+    }
   }
 
   handleSitout() {
@@ -299,48 +316,16 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   renderSeats() {
     const seats = [];
     const lineup = (this.props.lineup) ? this.props.lineup.toJS() : null;
-    const myPos = this.props.myPos;
-
     if (!lineup) {
-      return (<div></div>);
+      return seats;
     }
-
-    let balance = this.token.balanceOf(this.props.proxyAddr);
-    if (balance) {
-      balance = balance.toString();
-    }
-    const coordArray = SEAT_COORDS[lineup.length.toString()];
-    const amountCoords = AMOUNT_COORDS[lineup.length.toString()];
     for (let i = 0; i < lineup.length; i += 1) {
-      const open = (lineup[i].address.indexOf('0x0000000000000000000000000000000000000000') > -1);
-      const sitout = lineup[i].sitout;
-      const pending = lineup[i].pending;
       const seat = (
         <Seat
           key={i}
           pos={i}
-          {...this.props}
-          coords={coordArray[i]}
-          amountCoords={amountCoords[i]}
-          sitout={sitout}
-          open={open}
-          pending={pending}
-          onClick={() => {
-            if (open && myPos === -1 && !pending) {
-              this.props.modalAdd((
-                <JoinDialog
-                  pos={i}
-                  handleJoin={this.handleJoin}
-                  params={this.props.params}
-                  balance={balance}
-                />
-              ));
-            } else if (open && myPos !== -1 && !pending) {
-              this.props.modalAdd((
-                <InviteDialog />
-              ));
-            }
-          }}
+          params={this.props.params}
+          isTaken={this.isTaken}
         >
         </Seat>);
       seats.push(seat);
@@ -370,6 +355,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     const seats = this.renderSeats();
     const board = this.renderBoard();
     const sb = (this.props.data && this.props.data.get('smallBlind')) ? this.props.data.get('smallBlind') : 0;
+
     return (
       <div>
         { this.props.state &&
@@ -410,9 +396,9 @@ const mapStateToProps = createStructuredSelector({
   potSize: makePotSizeSelector(),
   myPos: makeMyPosSelector(),
   latestHand: makeLatestHandSelector(),
+  signerAddr: makeSignerAddrSelector(),
   myMaxbet: makeMyMaxBetSelector(),
   privKey: makeSelectPrivKey(),
-  signerAddr: makeSignerAddrSelector(),
   amountToCall: makeAmountToCallSelector(),
   proxyAddr: makeSelectProxyAddr(),
   missingHands: makeMissingHandSelector(),
