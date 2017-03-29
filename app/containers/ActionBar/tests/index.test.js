@@ -93,13 +93,14 @@ describe('ActionBar', () => {
         tableAddr: '0x123',
       },
       isMyTurn: true,
-      amountToCall: 1000,
+      callAmount: 1000,
+      amountToCall: 0,
     };
     const actionBar = shallow(
       <ActionBar {...props} />
     );
     actionBar.setState({ amount: 2000 });
-    expect(actionBar.find(ActionButton).first().props().text).toBe('BET 2000');
+    expect(actionBar.find(ActionButton).first().props().text).toEqual('BET 2000');
   });
 
   it('should render the Check Button when amount to call is 0', () => {
@@ -124,6 +125,7 @@ describe('ActionBar', () => {
         tableAddr: '0x123',
       },
       isMyTurn: true,
+      callAmount: 1000,
       amountToCall: 1000,
     };
     const actionBar = shallow(
