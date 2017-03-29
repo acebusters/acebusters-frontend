@@ -5,6 +5,7 @@ import {
   makeLastReceiptSelector,
   makeFoldedSelector,
   makeLastAmountSelector,
+  makeCardsSelector,
 } from '../selectors';
 
 const ABI_FOLD = [{ name: 'fold', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
@@ -12,6 +13,7 @@ const ABI_BET = [{ name: 'bet', type: 'function', inputs: [{ type: 'uint' }, { t
 
 // secretSeed: 'rural tent tests net drip fatigue uncle action repeat couple lawn rival'
 const P1_ADDR = '0x6d2f2c0fa568243d2def3e999a791a6df45d816e';
+const P1_KEY = '0x2e39143576f97f6ecd7439a0678f330d7144110cdc58b6476687cc243d7753ca';
 
 // secretSeed: 'engine bargain deny liberty girl wedding plug valley pig admit kiss couch'
 const P2_ADDR = '0x1c5a1730ffc44ac21700bb85bf0ceefd12ce71d7';
@@ -107,6 +109,111 @@ describe('foldedSelector', () => {
     };
     const foldedSelector = makeFoldedSelector();
     expect(foldedSelector(mockedState, props)).toEqual(true);
+  });
+});
+
+describe('cardSelector', () => {
+  it('it should return my holecards for my position', () => {
+    const mockedState = fromJS({
+      account: {
+        privKey: P1_KEY,
+      },
+      table: {
+        [TBL_ADDR]: {
+          data: {
+            seats: [],
+          },
+          0: {
+            state: 'flop',
+            lineup: [{
+              address: P1_ADDR,
+            }, {
+              address: P2_ADDR,
+            }],
+            holeCards: [15, 25],
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 0,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 0,
+      },
+    };
+    const cardSelector = makeCardsSelector();
+    expect(cardSelector(mockedState, props)).toEqual([15, 25]);
+  });
+
+  it('it should return other guys cards if not my pos and he has cards', () => {
+    const mockedState = fromJS({
+      account: {
+        privKey: P1_KEY,
+      },
+      table: {
+        [TBL_ADDR]: {
+          data: {
+            seats: [],
+          },
+          0: {
+            state: 'flop',
+            lineup: [{
+              address: P1_ADDR,
+            }, {
+              address: P2_ADDR,
+              cards: [12, 21],
+            }],
+            holeCards: [15, 25],
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 1,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 0,
+      },
+    };
+    const cardSelector = makeCardsSelector();
+    expect(cardSelector(mockedState, props)).toEqual([12, 21]);
+  });
+
+  it('it should not return cards if not my pos and no cards are in lineup', () => {
+    const mockedState = fromJS({
+      account: {
+        privKey: P1_KEY,
+      },
+      table: {
+        [TBL_ADDR]: {
+          data: {
+            seats: [],
+          },
+          0: {
+            state: 'flop',
+            lineup: [{
+              address: P1_ADDR,
+            }, {
+              address: P2_ADDR,
+            }],
+            holeCards: [15, 25],
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 1,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 0,
+      },
+    };
+    const cardSelector = makeCardsSelector();
+    expect(cardSelector(mockedState, props)).toEqual([-1, -1]);
   });
 });
 

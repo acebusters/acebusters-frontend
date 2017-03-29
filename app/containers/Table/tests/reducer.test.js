@@ -223,7 +223,7 @@ describe('table reducer tests', () => {
     }));
   });
 
-  it('should add holeCards at right position into lineup', () => {
+  it('should add holeCards', () => {
     // set up previous state
     const before = fromJS({
       [tableAddr]: {
