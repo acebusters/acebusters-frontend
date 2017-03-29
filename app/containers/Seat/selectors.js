@@ -63,7 +63,7 @@ const makeLastActionSelector = () => createSelector(
 const makeCardsSelector = () => createSelector(
   [posSelector, makeHandSelector(), makeMyPosSelector()],
   (pos, hand, myPos) => {
-    if (pos === -1 || !hand || !hand.get('lineup') || myPos === -1) {
+    if (pos === -1 || myPos === -1 || !hand || !hand.get('lineup')) {
       return [-1, -1];
     }
     if (pos === myPos && hand.get('holeCards')) {
