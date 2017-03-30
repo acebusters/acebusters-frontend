@@ -37,11 +37,11 @@ const makeMinSelector = () => createSelector(
     if (!sb || !hand) {
       return -1;
     }
-    // if my stack smaller than BB return stack and go all in
+    // if my stack smaller than BB return the left behind stack
     if (leftBehind < sb * 2) {
       return leftBehind;
     }
-    // check if there was a raise;
+    // check if there was a raise
     const lineup = hand.get('lineup').toJS();
     const dealer = hand.get('dealer');
     const lastRoundMaxBet = hand.get('lastRoundMaxBet');
@@ -49,7 +49,7 @@ const makeMinSelector = () => createSelector(
     if (minRaise > -1) {
       return minRaise;
     }
-    // find this round max raise
+    // otherwise return the BB
     return (sb * 2);
   }
 );

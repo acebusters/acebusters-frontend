@@ -39,15 +39,15 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
     this.handleFold = this.handleFold.bind(this);
     this.updateAmount = this.updateAmount.bind(this);
     this.table = new TableService(props.params.tableAddr, this.props.privKey);
-    const min = (this.props.amountToCall + this.props.minRaise);
-    const amount = (this.props.leftBehind < min) ? this.props.leftBehind : min;
     this.state = {
-      amount,
       active: true,
     };
   }
 
   componentWillReceiveProps(nextProps) {
+    const min = (nextProps.amountToCall + nextProps.minRaise);
+    const amount = (nextProps.leftBehind < min) ? nextProps.leftBehind : min;
+    this.setState({ amount });
     if (nextProps.isMyTurn === true) {
       this.setActive(true);
     }
