@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect';
 import EWT from 'ethereum-web-token';
 import { PokerHelper, ReceiptCache } from 'poker-helper';
-import Hand from 'pokersolver';
+import Solver from 'pokersolver';
 import { makeSignerAddrSelector } from '../AccountProvider/selectors';
 import {
   valuesShort,
@@ -193,24 +193,44 @@ const makeLineupSelector = () => createSelector(
 );
 
 const makeSelectWinners = () => createSelector(
-  handSelector(),
+  makeHandSelector(),
   (hand) => {
-    if (!hand || hand.get || hand.get('distribution')) {
-      return [];
+    if (!hand || !hand.get) {
+      return {};
     }
-    const board = hand.get('cards').map((c) => valuesShort[c % 52] + [Math.floor(suits[c / 13])]);
-
-    const lineup = hand.get('lineup');
-    const hands = lineup.map((player) => {
-      if (!player.cards) {
-        return null;
-      }
-      const card1 = valuesShort[player.cards[0] % 13] + Math.floor(suits[player.cards[0] / 13]);
-      const card2 = valuesShort[player.cards[1] % 13] + Math.floor(suits[player.cards[1] / 13]);
-      return Hand.solve(board.push(card1, card2));
+    const board = hand.get('cards').toJS().map((c) => valuesShort[c % 52] + suits[Math.floor([c / 13])]);
+    const lineup = hand.get('lineup').toJS();
+    const wHands = Solver.Hand.winners(lineup.filter((obj) => obj.cards).map((player, index) => {
+      const pHand = [];
+      const card1 = valuesShort[player.cards[0] % 13] + suits[Math.floor([player.cards[0] / 13])];
+      const card2 = valuesShort[player.cards[1] % 13] + suits[Math.floor([player.cards[1] / 13])];
+      pHand.push(...board, card1, card2);
+      const handObj = Solver.Hand.solve(pHand);
+      lineup[index].hand = handObj.descr;
+      return handObj;
+    }));
+    const winners = {};
+    lineup.forEach((player, index) => {
+      wHands.forEach((wHand) => {
+        if (wHand.descr === player.hand) {
+          winners[index] = {};
+          winners[index].hand = player.hand;
+          winners[index].addr = player.address;
+        }
+      });
     });
-    const winningHands = Hand.winners(...hands);
-    return winningHands;
+    // add amounts
+    const distsRec = hand.get('distribution');
+    if (distsRec) {
+      const dists = rc.get(distsRec);
+      dists.values[2].forEach((dist, i) => {
+        const pDist = EWT.separate(dist);
+        if (winners[i] && pDist.address === winners[i].addr) {
+          winners[i].amount = pDist.amount;
+        }
+      });
+    }
+    return winners;
   }
 );
 
