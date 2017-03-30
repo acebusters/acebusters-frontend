@@ -18,6 +18,7 @@ export const CONTRACT_TX_SUCCESS = 'acebusters/AccountProvider/CONTRACT_TX_SUCCE
 export const CONTRACT_TX_ERROR = 'acebusters/AccountProvider/CONTRACT_TX_ERROR';
 
 export const CONTRACT_EVENT = 'acebusters/AccountProvider/CONTRACT_EVENT';
+export const BLOCK_NOTIFY = 'acebusters/AccountProvider/BLOCK_NOTIFY';
 
 export const SUPPORTED_WEB3_METHODS = {
   net: {
@@ -63,6 +64,10 @@ export function setAuthState(newAuthState) {
 
 export function accountLoaded(data) {
   return { type: ACCOUNT_LOADED, data };
+}
+
+export function blockNotify() {
+  return { type: BLOCK_NOTIFY };
 }
 
 export function web3Connect() {
