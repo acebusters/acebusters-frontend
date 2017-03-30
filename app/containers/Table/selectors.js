@@ -331,7 +331,6 @@ const selectStack = (table, pos) => {
     if (distsRec) {
       const dists = rc.get(distsRec);
       for (let j = 0; j < dists.values[2].length; j += 1) {
-        console.log(dists.values[2][j]);
         const dist = EWT.separate(dists.values[2][j]);
         if (dist.address === addr) {
           amount += dist.amount;
