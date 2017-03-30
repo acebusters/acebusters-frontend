@@ -193,18 +193,18 @@ const makeLineupSelector = () => createSelector(
 );
 
 const makeSelectWinners = () => createSelector(
-  makeHandSelector(),
-  (hand) => {
-    if (!hand || !hand.get) {
+  [makeHandSelector(), makeBoardSelector()],
+  (hand, board) => {
+    if (!hand || !hand.get || !hand.get('distribution')) {
       return {};
     }
-    const board = hand.get('cards').toJS().map((c) => valuesShort[c % 52] + suits[Math.floor([c / 13])]);
+    const boardCards = board.map((c) => valuesShort[c % 52] + suits[Math.floor([c / 13])]);
     const lineup = hand.get('lineup').toJS();
     const wHands = Solver.Hand.winners(lineup.filter((obj) => obj.cards).map((player, index) => {
       const pHand = [];
       const card1 = valuesShort[player.cards[0] % 13] + suits[Math.floor([player.cards[0] / 13])];
       const card2 = valuesShort[player.cards[1] % 13] + suits[Math.floor([player.cards[1] / 13])];
-      pHand.push(...board, card1, card2);
+      pHand.push(...boardCards, card1, card2);
       const handObj = Solver.Hand.solve(pHand);
       lineup[index].hand = handObj.descr;
       return handObj;
