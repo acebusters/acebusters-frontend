@@ -20,6 +20,7 @@ import {
   CONTRACT_TX_SEND,
   SET_AUTH,
   WEB3_CONNECTED,
+  BLOCK_NOTIFY,
   web3Connected,
   web3Disconnected,
   web3MethodSuccess,
@@ -231,6 +232,32 @@ function sendTx(signer, nonceAndDest, data, r, s, v) {
   });
 }
 
+function notifyBlock() {
+  return new Promise((resolve, reject) => {
+    fetch(`${workerUrl}/notify`, {
+      method: 'post',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: '{}',
+    }).then((rsp) => {
+      rsp.json().then((response) => {
+        if (rsp.status >= 200 && rsp.status < 300) {
+          resolve(response);
+        } else {
+          reject({
+            status: rsp.status,
+            message: response,
+          });
+        }
+      });
+    }).catch((error) => {
+      reject(error);
+    });
+  });
+}
+
 function* contractTransactionSendSaga() {
   const txChan = yield actionChannel(CONTRACT_TX_SEND);
   while (true) { // eslint-disable-line no-constant-condition
@@ -300,6 +327,7 @@ export function* ethEventListenerSaga(contract) {
 // The root saga is what is sent to Redux's middleware.
 export function* accountSaga() {
   yield takeLatest(WEB3_CONNECT, web3ConnectSaga);
+  yield takeLatest(BLOCK_NOTIFY, notifyBlock);
   yield fork(web3MethodCallSaga);
   yield fork(accountLoginSaga);
   yield fork(contractMethodCallSaga);

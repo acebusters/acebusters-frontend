@@ -35,6 +35,8 @@ import {
   makeSignerAddrSelector,
 } from '../AccountProvider/selectors';
 
+import { blockNotify } from '../AccountProvider/actions';
+
 import {
   makeTableDataSelector,
   makeIsMyTurnSelector,
@@ -251,6 +253,8 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     switch (result.event) {
       case 'Join': {
         if (result.args && result.args.addr === this.props.proxyAddr) {
+          // notify backend about new block
+          this.props.blockNotify();
           // show modal
           this.props.modalDismiss();
           const statusElement = (<div>
@@ -383,6 +387,7 @@ export function mapDispatchToProps() {
     modalDismiss: () => (modalDismiss()),
     pendingToggle: (tableAddr, handId, pos) => (pendingToggle(tableAddr, handId, pos)),
     updateReceived: (tableAddr, hand) => (updateReceived(tableAddr, hand)),
+    blockNotify: () => (blockNotify()),
   };
 }
 
@@ -418,6 +423,7 @@ Table.propTypes = {
   myPos: React.PropTypes.any,
   myMaxbet: React.PropTypes.number,
   modalAdd: React.PropTypes.func,
+  blockNotify: React.PropTypes.func,
   handRequest: React.PropTypes.func,
   pendingToggle: React.PropTypes.func,
   modalDismiss: React.PropTypes.func,
