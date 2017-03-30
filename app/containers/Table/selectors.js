@@ -169,24 +169,6 @@ const makeSbSelector = () => createSelector(
   }
 );
 
-const makeMinSelector = () => createSelector(
-  [makeSbSelector(), makeAmountToCallSelector()],
-  (sb, amountToCall) => {
-    if (!sb) {
-      return -1;
-    }
-    if (amountToCall === 0) {
-      return (sb * 2);
-    }
-    return amountToCall * 2;
-  }
-);
-
-const makeMaxSelector = () => createSelector(
-  [makeMinSelector(), makeMyStackSelector()],
-  (min, stack) => (Math.floor(stack / min) * min) + min
-);
-
 const makeLineupSelector = () => createSelector(
   [handSelector, tableStateSelector],
   (hand, table) => {
@@ -349,7 +331,6 @@ const selectStack = (table, pos) => {
     if (distsRec) {
       const dists = rc.get(distsRec);
       for (let j = 0; j < dists.values[2].length; j += 1) {
-        console.log(dists.values[2][j]);
         const dist = EWT.separate(dists.values[2][j]);
         if (dist.address === addr) {
           amount += dist.amount;
@@ -384,8 +365,6 @@ export {
     makeMaxBetSelector,
     makeMyMaxBetSelector,
     makeMyStackSelector,
-    makeMinSelector,
-    makeMaxSelector,
     makeStackSelector,
     makeMissingHandSelector,
 };
