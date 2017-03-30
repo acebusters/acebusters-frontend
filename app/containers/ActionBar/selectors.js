@@ -21,25 +21,15 @@ const makeAmountToCallSelector = () => createSelector(
   (maxBet, myMaxbet) => (maxBet && myMaxbet) ? maxBet - myMaxbet : 0
 );
 
-const makeLeftBehindSelector = () => createSelector(
-  [makeMyStackSelector(), makeMyMaxBetSelector()],
-  (stack, myMaxBet) => {
-    if (!stack) {
-      return -1;
-    }
-    return (stack - myMaxBet);
-  }
-);
-
 const makeMinSelector = () => createSelector(
-  [makeSbSelector(), makeHandSelector(), makeLeftBehindSelector()],
-  (sb, hand, leftBehind) => {
+  [makeSbSelector(), makeHandSelector(), makeMyStackSelector()],
+  (sb, hand, stack) => {
     if (!sb || !hand) {
       return -1;
     }
     // if my stack smaller than BB return the left behind stack
-    if (leftBehind < sb * 2) {
-      return leftBehind;
+    if (stack < sb * 2) {
+      return stack;
     }
     // check if there was a raise
     const lineup = hand.get('lineup').toJS();
@@ -55,8 +45,8 @@ const makeMinSelector = () => createSelector(
 );
 
 const makeCallAmountSelector = () => createSelector(
-  [makeAmountToCallSelector(), makeLeftBehindSelector()],
-  (amountToCall, leftBehind) => (amountToCall > leftBehind) ? leftBehind : amountToCall
+  [makeAmountToCallSelector(), makeMyStackSelector()],
+  (amountToCall, stack) => (amountToCall > stack) ? stack : amountToCall
 );
 
 const makeMaxSelector = () => createSelector(
@@ -67,7 +57,6 @@ const makeMaxSelector = () => createSelector(
 export {
   makeAmountToCallSelector,
   makeMinSelector,
-  makeLeftBehindSelector,
   makeMaxSelector,
   makeCallAmountSelector,
 };

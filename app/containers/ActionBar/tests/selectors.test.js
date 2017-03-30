@@ -43,14 +43,14 @@ describe('minSelector', () => {
               address: P2_ADDR,
               last: new EWT(ABI_BET).bet(1, 4000).sign(P2_KEY),
             }, {
-              address: P2_ADDR,
-              last: new EWT(ABI_BET).bet(1, 1000).sign(P2_KEY),
+              address: P3_ADDR,
+              last: new EWT(ABI_BET).bet(1, 1000).sign(P3_KEY),
             }],
           },
           data: {
             amounts: [30000, 50000, 20000],
             smallBlind: 500,
-            lastHandNetted: 4,
+            lastHandNetted: 3,
           },
         },
       },
@@ -91,7 +91,7 @@ describe('minSelector', () => {
           data: {
             amounts: [30000, 50000, 20000],
             smallBlind: 500,
-            lastHandNetted: 4,
+            lastHandNetted: 3,
           },
         },
       },
@@ -108,7 +108,7 @@ describe('minSelector', () => {
     expect(minSelector(mockedState, props)).toEqual(1000);
   });
 
-  it('should return the stacksize when player does not have ', () => {
+  it('should return the stacksize when player does not have enough to bet min', () => {
     const mockedState = fromJS({
       account: {
         privKey: P1_KEY,
@@ -130,9 +130,9 @@ describe('minSelector', () => {
             }],
           },
           data: {
-            amounts: [1521, 50000, 20000],
+            amounts: [1421, 50000, 20000],
             smallBlind: 500,
-            lastHandNetted: 4,
+            lastHandNetted: 3,
           },
         },
       },
@@ -146,7 +146,7 @@ describe('minSelector', () => {
         tableAddr: TBL_ADDR,
       },
     };
-    expect(minSelector(mockedState, props)).toEqual(521);
+    expect(minSelector(mockedState, props)).toEqual(421);
   });
 });
 
