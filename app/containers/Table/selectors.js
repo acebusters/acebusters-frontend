@@ -210,12 +210,12 @@ const makeSelectWinners = () => createSelector(
       return handObj;
     }));
     const winners = {};
-    lineup.forEach((player, index) => {
+    lineup.forEach((player, i) => {
       wHands.forEach((wHand) => {
         if (wHand.descr === player.hand) {
-          winners[index] = {};
-          winners[index].hand = player.hand;
-          winners[index].addr = player.address;
+          winners[i] = {};
+          winners[i].hand = player.hand;
+          winners[i].addr = player.address;
         }
       });
     });
