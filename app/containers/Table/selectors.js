@@ -1,7 +1,12 @@
 import { createSelector } from 'reselect';
 import EWT from 'ethereum-web-token';
 import { PokerHelper, ReceiptCache } from 'poker-helper';
+import Hand from 'pokersolver';
 import { makeSignerAddrSelector } from '../AccountProvider/selectors';
+import {
+  valuesShort,
+  suits,
+} from '../../app.config';
 
 const rc = new ReceiptCache();
 const pokerHelper = new PokerHelper(rc);
@@ -187,6 +192,28 @@ const makeLineupSelector = () => createSelector(
   }
 );
 
+const makeSelectWinners = () => createSelector(
+  handSelector(),
+  (hand) => {
+    if (!hand || hand.get || hand.get('distribution')) {
+      return [];
+    }
+    const board = hand.get('cards').map((c) => valuesShort[c % 52] + [Math.floor(suits[c / 13])]);
+
+    const lineup = hand.get('lineup');
+    const hands = lineup.map((player) => {
+      if (!player.cards) {
+        return null;
+      }
+      const card1 = valuesShort[player.cards[0] % 13] + Math.floor(suits[player.cards[0] / 13]);
+      const card2 = valuesShort[player.cards[1] % 13] + Math.floor(suits[player.cards[1] / 13]);
+      return Hand.solve(board.push(card1, card2));
+    });
+    const winningHands = Hand.winners(...hands);
+    return winningHands;
+  }
+);
+
 const makeMyPosSelector = () => createSelector(
   [makeLineupSelector(), makeSignerAddrSelector()],
   (lineup, myAddress) => (lineup && myAddress) ? pokerHelper.getMyPos(lineup.toJS(), myAddress) : -1
@@ -353,6 +380,7 @@ export {
     makeTableDataSelector,
     makeSbSelector,
     makeLineupSelector,
+    makeSelectWinners,
     makeHandStateSelector,
     makeLatestHandSelector,
     makeBoardSelector,

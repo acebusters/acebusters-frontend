@@ -180,7 +180,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   handleJoin(pos, amount) {
-    console.log(amount);
     this.token.approve.sendTransaction(this.tableAddr, amount);
     this.table.join.sendTransaction(amount, this.props.signerAddr, pos + 1, '');
     const statusElement = (<div>

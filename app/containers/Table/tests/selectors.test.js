@@ -198,3 +198,9 @@ describe('missingHandSelector', () => {
     expect(missingHandSelector(mockedState, PROPS)).toEqual([4]);
   });
 });
+
+describe('missingHandSelector', () => {
+  it('should select correct winner.', () => {
+
+  });
+});
