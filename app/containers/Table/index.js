@@ -6,7 +6,7 @@ import React from 'react';
 import { createStructuredSelector } from 'reselect';
 import { browserHistory } from 'react-router';
 import Pusher from 'pusher-js';
-import EWT from 'ethereum-web-token';
+import Raven from 'raven-js';
 // components and styles
 import Card from 'components/Card'; // eslint-disable-line
 import { BoardCardWrapper } from 'components/Table/Board';
@@ -94,6 +94,11 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       this.props.handRequest(this.tableAddr, props.params.handId); // get initial state
       this.channel.bind('update', this.handleUpdate); // bind to future state updates
     });
+    const handId = parseInt(this.props.params.handId, 10);
+    Raven.setTagsContext({
+      tableAddr: this.tableAddr,
+      handId,
+    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -154,19 +159,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           });
         }
       }
-    }
-
-    // get and display distribution
-    if (this.props.hand && !this.props.hand.get('distribution')
-      && nextProps.hand.get('distribution')) {
-      const dists = EWT.parse(nextProps.hand.get('distribution'));
-      let winners = [];
-      winners = dists.values[2].map((entry) => {
-        const dist = EWT.separate(entry);
-        return (<p key={dist.address} > {dist.address}: {dist.amount} </p>);
-      });
-      const statusElement = (<div><h2>Winners:</h2>{winners}</div>);
-      this.props.modalAdd(statusElement);
     }
   }
 

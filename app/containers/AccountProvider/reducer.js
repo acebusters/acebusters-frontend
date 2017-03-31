@@ -1,5 +1,5 @@
 import { fromJS } from 'immutable';
-
+import Raven from 'raven-js';
 import {
   SET_AUTH,
   WEB3_CONNECTED,
@@ -82,6 +82,9 @@ function accountProviderReducer(state = initialState, action) {
         storageService.removeItem('privKey');
         storageService.removeItem('email');
       } else {
+        Raven.setUserContext({
+          email: action.newAuthState.email,
+        });
         newState = state
           .set('privKey', action.newAuthState.privKey)
           .set('email', action.newAuthState.email);
