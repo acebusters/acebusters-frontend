@@ -196,20 +196,20 @@ const makeSelectWinners = () => createSelector(
   [makeHandSelector(), makeBoardSelector()],
   (hand, board) => {
     if (hand && hand.get) {
-      console.log(hand.get('distribution'));
+      // console.log(hand.get('distribution'));
     }
     if (!hand || !hand.get || !hand.get('distribution')) {
       return {};
     }
-    const boardCards = board.map((c) => valuesShort[c % 52] + suits[Math.floor([c / 13])]);
+    const boardCards = board.map((c) => valuesShort[c % 13] + suits[Math.floor([c / 13])]);
     const lineup = hand.get('lineup').toJS();
-    const wHands = Solver.Hand.winners(lineup.filter((obj) => obj.cards).map((player, index) => {
+    const wHands = Solver.Hand.winners(lineup.filter((obj) => obj.cards).map((player) => {
       const pHand = [];
       const card1 = valuesShort[player.cards[0] % 13] + suits[Math.floor([player.cards[0] / 13])];
       const card2 = valuesShort[player.cards[1] % 13] + suits[Math.floor([player.cards[1] / 13])];
       pHand.push(...boardCards, card1, card2);
       const handObj = Solver.Hand.solve(pHand);
-      lineup[index].hand = handObj.descr;
+      player.hand = handObj.descr; // eslint-disable-line
       return handObj;
     }));
     const winners = {};

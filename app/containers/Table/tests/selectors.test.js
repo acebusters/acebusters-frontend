@@ -23,6 +23,8 @@ const P3_ADDR = '0xdd7acad75b52bd206777a36bc41a3b65ad1c44fc';
 
 const P4_ADDR = '0x0dfbfdf730c7d3612cf605e6629be369aa4eceeb';
 
+const P_EMPTY = '0x0000000000000000000000000000000000000000';
+
 const ORACLE_ADDR = '0x82e8c6cf42c8d1ff9594b17a3f50e94a12cc860f';
 const ORACLE_KEY = '0x94890218f2b0d04296f30aeafd13655eba4c5bbf1770273276fee52cbe3f2cb4';
 
@@ -211,7 +213,7 @@ describe('missingHandSelector', () => {
 describe('winnersSelector', () => {
   it('should have winner with index 0 with a pair of Aces`.', () => {
     const dists = [];
-    dists.push(EWT.concat(P1_ADDR, 1000).toString('hex'));
+    dists.push(EWT.concat(P2_ADDR, 1000).toString('hex'));
     dists.push(EWT.concat(ORACLE_ADDR, 10).toString('hex')); // rake
     const distRec = new EWT(ABI_DIST).distribution(2, 0, dists).sign(ORACLE_KEY);
     const mockedState = fromJS({
@@ -219,15 +221,15 @@ describe('winnersSelector', () => {
         [TBL_ADDR]: {
           2: {
             lineup: [{
+              address: P_EMPTY,
+            }, {
               address: P1_ADDR,
-              cards: [25, 38],
+              cards: [21, 32],
             }, {
               address: P2_ADDR,
-              cards: [12, 49],
-            }, {
-              address: P3_ADDR,
+              cards: [36, 49],
             }],
-            cards: [8, 9, 10],
+            cards: [8, 23, 10],
             distribution: distRec,
           },
         },
@@ -241,9 +243,9 @@ describe('winnersSelector', () => {
       },
     };
     const winner = {
-      0: {
-        addr: P1_ADDR,
-        hand: "Pair, A's",
+      2: {
+        addr: P2_ADDR,
+        hand: "Four of a Kind, Q's",
         amount: 1000,
       },
     };
@@ -265,10 +267,10 @@ describe('winnersSelector', () => {
               address: P1_ADDR,
               cards: [25, 38],
             }, {
+              address: P_EMPTY,
+            }, {
               address: P2_ADDR,
               cards: [12, 51],
-            }, {
-              address: P3_ADDR,
             }],
             cards: [8, 9, 10],
             distribution: distRec,
@@ -290,7 +292,7 @@ describe('winnersSelector', () => {
         hand: "Pair, A's",
         amount: 1000,
       },
-      1: {
+      2: {
         addr: P2_ADDR,
         hand: "Pair, A's",
         amount: 1000,

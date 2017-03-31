@@ -161,25 +161,21 @@ describe('table reducer tests', () => {
         } },
     });
 
-    const newLineup = [{
-      address: P1_ADDR,
-      last: new EWT(ABI_BET).bet(1, 50).sign(P1_KEY),
-    }, {
-      address: P2_ADDR,
-    }];
+    const dist = 'ey123';
     // execute action
     const nextState = tableReducer(before, updateReceived(tableAddr, {
       handId: 0,
       dealer: 0,
       changed: 20,
       state: 'flop',
-      lineup: newLineup,
+      lineup,
+      distribution: dist,
     }));
 
     // check state after execution
     const after = before
-      .setIn([tableAddr, '0', 'lineup'], fromJS(newLineup))
-      .setIn([tableAddr, '0', 'changed'], 20);
+      .setIn([tableAddr, '0', 'changed'], 20)
+      .setIn([tableAddr, '0', 'distribution'], dist);
     expect(nextState).toEqual(after);
   });
 
