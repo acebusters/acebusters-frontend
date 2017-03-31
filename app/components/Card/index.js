@@ -27,7 +27,6 @@ function Card(props) {
   } else {
     link = vc.getBackData(props.size, '#7A7BB8', '#2E319C');
   }
-  console.log(link);
   if (!props.folded) {
     return (
       <CardWrapper offset={props.offset}>
