@@ -26,7 +26,6 @@ import {
 } from './selectors';
 
 import {
-  makeSignerAddrSelector,
   makeSelectGravatar,
 } from '../AccountProvider/selectors';
 
@@ -106,7 +105,6 @@ const mapStateToProps = createStructuredSelector({
   amountCoords: makeAmountCoordsSelector(),
   myPos: makeMyPosSelector(),
   blocky: makeBlockySelector(),
-  signerAddr: makeSignerAddrSelector(),
   whosTurn: makeWhosTurnSelector(),
   lastAmount: makeLastAmountSelector(),
   holeCards: makeCardsSelector(),

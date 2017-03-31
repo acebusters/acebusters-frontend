@@ -329,6 +329,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
         <Seat
           key={i}
           pos={i}
+          signerAddr={lineup[i].address}
           params={this.props.params}
           isTaken={this.isTaken}
         >
