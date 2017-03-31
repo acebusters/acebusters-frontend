@@ -1,7 +1,12 @@
 import { createSelector } from 'reselect';
 import EWT from 'ethereum-web-token';
 import { PokerHelper, ReceiptCache } from 'poker-helper';
+import Solver from 'pokersolver';
 import { makeSignerAddrSelector } from '../AccountProvider/selectors';
+import {
+  valuesShort,
+  suits,
+} from '../../app.config';
 
 const rc = new ReceiptCache();
 const pokerHelper = new PokerHelper(rc);
@@ -187,6 +192,50 @@ const makeLineupSelector = () => createSelector(
   }
 );
 
+const makeSelectWinners = () => createSelector(
+  [makeHandSelector(), makeBoardSelector()],
+  (hand, board) => {
+    if (!hand || !hand.get || !hand.get('distribution')) {
+      return {};
+    }
+    const boardCards = board.map((c) => valuesShort[c % 52] + suits[Math.floor([c / 13])]);
+    const lineup = hand.get('lineup').toJS();
+    const wHands = Solver.Hand.winners(lineup.filter((obj) => obj.cards).map((player, index) => {
+      const pHand = [];
+      const card1 = valuesShort[player.cards[0] % 13] + suits[Math.floor([player.cards[0] / 13])];
+      const card2 = valuesShort[player.cards[1] % 13] + suits[Math.floor([player.cards[1] / 13])];
+      pHand.push(...boardCards, card1, card2);
+      const handObj = Solver.Hand.solve(pHand);
+      lineup[index].hand = handObj.descr;
+      return handObj;
+    }));
+    const winners = {};
+    lineup.forEach((player, i) => {
+      wHands.forEach((wHand) => {
+        if (wHand.descr === player.hand) {
+          winners[i] = {};
+          winners[i].hand = player.hand;
+          winners[i].addr = player.address;
+        }
+      });
+    });
+    // add amounts
+    const distsRec = hand.get('distribution');
+    if (distsRec) {
+      const dists = rc.get(distsRec);
+      dists.values[2].forEach((dist) => {
+        const pDist = EWT.separate(dist);
+        Object.keys(winners).forEach((key) => {
+          if (pDist.address === winners[key].addr) {
+            winners[key].amount = pDist.amount;
+          }
+        });
+      });
+    }
+    return winners;
+  }
+);
+
 const makeMyPosSelector = () => createSelector(
   [makeLineupSelector(), makeSignerAddrSelector()],
   (lineup, myAddress) => (lineup && myAddress) ? pokerHelper.getMyPos(lineup.toJS(), myAddress) : -1
@@ -353,6 +402,7 @@ export {
     makeTableDataSelector,
     makeSbSelector,
     makeLineupSelector,
+    makeSelectWinners,
     makeHandStateSelector,
     makeLatestHandSelector,
     makeBoardSelector,
