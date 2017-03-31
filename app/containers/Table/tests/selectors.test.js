@@ -20,7 +20,11 @@ const P2_ADDR = '0x1c5a1730ffc44ac21700bb85bf0ceefd12ce71d7';
 const P2_KEY = '0x99e69145c6e7f44ba04d579faac9ef4ce5e942dc02b96a9d42b5fcb03e508729';
 
 const P3_ADDR = '0xdd7acad75b52bd206777a36bc41a3b65ad1c44fc';
-const P4_KEY = '0xa803ed744543e69b5e4816c5fc7539427a2928e78d729c87712f180fae52fcc9';
+
+const P4_ADDR = '0x0dfbfdf730c7d3612cf605e6629be369aa4eceeb';
+
+const ORACLE_ADDR = '0x82e8c6cf42c8d1ff9594b17a3f50e94a12cc860f';
+const ORACLE_KEY = '0x94890218f2b0d04296f30aeafd13655eba4c5bbf1770273276fee52cbe3f2cb4';
 
 
 const TBL_ADDR = '0x77aabb1133';
@@ -207,8 +211,9 @@ describe('missingHandSelector', () => {
 describe('winnersSelector', () => {
   it('should have winner with index 0 with a pair of Aces`.', () => {
     const dists = [];
-    dists.push(EWT.concat(P1_ADDR, 1000).toString('hex')); // rake
-    const distRec = new EWT(ABI_DIST).distribution(2, 0, dists).sign(P1_KEY);
+    dists.push(EWT.concat(P1_ADDR, 1000).toString('hex'));
+    dists.push(EWT.concat(ORACLE_ADDR, 10).toString('hex')); // rake
+    const distRec = new EWT(ABI_DIST).distribution(2, 0, dists).sign(ORACLE_KEY);
     const mockedState = fromJS({
       table: {
         [TBL_ADDR]: {
@@ -250,8 +255,8 @@ describe('winnersSelector', () => {
     const dists = [];
     dists.push(EWT.concat(P2_ADDR, 1000).toString('hex'));
     dists.push(EWT.concat(P1_ADDR, 1000).toString('hex'));
-    dists.push(EWT.concat(P3_ADDR, 10).toString('hex')); // rake
-    const distRec = new EWT(ABI_DIST).distribution(2, 0, dists).sign(P4_KEY);
+    dists.push(EWT.concat(ORACLE_ADDR, 10).toString('hex')); // rake
+    const distRec = new EWT(ABI_DIST).distribution(2, 0, dists).sign(ORACLE_KEY);
     const mockedState = fromJS({
       table: {
         [TBL_ADDR]: {
@@ -300,7 +305,8 @@ describe('winnersSelector', () => {
     dists.push(EWT.concat(P3_ADDR, 1000).toString('hex'));
     dists.push(EWT.concat(P1_ADDR, 1000).toString('hex'));
     dists.push(EWT.concat(P2_ADDR, 1000).toString('hex'));
-    const distRec = new EWT(ABI_DIST).distribution(2, 0, dists).sign(P4_KEY);
+    dists.push(EWT.concat(ORACLE_ADDR, 10).toString('hex')); // rake
+    const distRec = new EWT(ABI_DIST).distribution(2, 0, dists).sign(ORACLE_KEY);
     const mockedState = fromJS({
       table: {
         [TBL_ADDR]: {
@@ -314,6 +320,8 @@ describe('winnersSelector', () => {
             }, {
               address: P3_ADDR,
               cards: [48, 49],
+            }, {
+              address: P4_ADDR,
             }],
             cards: [8, 9, 10],
             distribution: distRec,
