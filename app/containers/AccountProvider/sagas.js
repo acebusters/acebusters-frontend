@@ -3,6 +3,7 @@ import ethUtil from 'ethereumjs-util';
 import { takeLatest, select, actionChannel, put, fork, take, call, cancelled } from 'redux-saga/effects';
 import { delay, eventChannel, END } from 'redux-saga';
 import fetch from 'isomorphic-fetch';
+import Raven from 'raven-js';
 
 import {
   ethNodeUrl,
@@ -146,7 +147,9 @@ function* accountLoginSaga() {
     if (loggedIn) {
       const privKeyBuffer = new Buffer(privKey.replace('0x', ''), 'hex');
       const signer = `0x${ethUtil.privateToAddress(privKeyBuffer).toString('hex')}`;
-
+      Raven.setUserContext({
+        id: signer,
+      });
       // this reads account data from the account factory
       const res = yield getAccount(web3Instance, signer);
       const proxy = res[0];
