@@ -11,9 +11,11 @@ import styled from 'styled-components';
 
 import {
   baseColor,
-  fontPrimary,
+  disabled,
   black,
+  white,
   background,
+  hover,
 } from '../../variables';
 
 const Medium = styled.button`{
@@ -33,7 +35,7 @@ const Medium = styled.button`{
   font-weight: bold;
   font-size: 16px;
   background-color: ${black};
-  color: ${fontPrimary};
+  color: ${white};
  
   &:active {
     color: ${baseColor};
@@ -41,10 +43,6 @@ const Medium = styled.button`{
   
   &:hover {
     color: ${baseColor};
-  }
-  &:active {
-    color: ${baseColor};
-    background-color: ${background};
   }
 }`;
 
@@ -56,7 +54,6 @@ const Large = styled.button`
   padding: 10px;
   font-size: 10em;
   border-radius: 4px;
-  border-color: 2px ${baseColor};
   -webkit-font-smoothing: antialiased;
   -webkit-touch-callout: none;
   user-select: none;
@@ -65,9 +62,8 @@ const Large = styled.button`
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: bold;
   font-size: 24px;
-  color: ${fontPrimary};
+  color: ${white};
   width: 100%;
-  border: 2px solid ${baseColor};
   background-color: ${baseColor};
   &:active {
     color: ${baseColor};
@@ -75,13 +71,15 @@ const Large = styled.button`
   }
   
   &:hover {
-    color: ${baseColor};
-    background-color: ${background};
+    color: ${white};
+    background-color: ${hover};
   }
   
-  &:active {
+  
+  &:disabled {
     color: ${background};
-    background-color: ${baseColor};
+    background-color: ${disabled};
+    border-color: ${disabled};
   }
 `;
 

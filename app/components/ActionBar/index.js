@@ -7,8 +7,8 @@ import styled from 'styled-components';
 
 import {
   baseColor,
-  fontPrimary,
   background,
+  white,
 } from '../../variables';
 
 const ControlPanel = styled.div`
@@ -17,17 +17,18 @@ const ControlPanel = styled.div`
 `;
 
 const ActionBarWrapper = styled.div`
-  position: fixed;
+  position: absolute;
   left: 0;
   top: 0;
-  height: 100%
-  width: 5%;
+  height: 10%
+  width: 15%;
+  bottom: 0px;
 `;
 
 export const ActionButtonWrapper = styled.button`
   border-radius: 50%;
-  color: ${fontPrimary};
-  border: 2px solid #fff;
+  color: ${white};
+  border: 2px solid ${white};
   width: 5em;
   height: 5em;
   margin-bottom: 2em;
@@ -35,8 +36,8 @@ export const ActionButtonWrapper = styled.button`
   
   &:hover {
     color: ${baseColor};
-    background-color: ${background};
-    border: 2px solid ${baseColor}
+    background-color: transparent;
+    border: 2px solid ${background}
     cursor: pointer;
   }
 `;

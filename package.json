@@ -231,7 +231,7 @@
     "localStorage": "1.0.3",
     "lodash": "4.17.2",
     "minimist": "1.2.0",
-    "poker-helper": "^0.2.13",
+    "poker-helper": "^0.2.14",
     "pokersolver": "^2.1.2",
     "node-uuid": "^1.4.8",
     "pusher-js": "^4.0.0",

@@ -1,3 +1,10 @@
-describe('table component tests', () => {
-  it('component should render self', () => {});
+/**
+ * Testing our Button component
+ */
+
+
+describe('ActionBar', () => {
+  it('should remind helge how to test components with stores', () => {
+
+  });
 });

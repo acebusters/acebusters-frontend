@@ -8,12 +8,14 @@ import {
   baseColor,
   background,
   green,
+  white,
 } from 'variables';
 
 export const SeatWrapper = styled.div`
   position: absolute;
   left: ${(props) => props.coords[0]}%;
   top: ${(props) => props.coords[1]}%;
+  color: ${white};
   width: 10%;
   height: 25%;
 `;
@@ -22,7 +24,7 @@ export const ImageContainer = styled.div`
   border-radius: 50%;
   position: absolute;
   transform: translate(-50%,-50%);
-  border: 3px solid ${(props) => props.color};
+  border: 5px solid ${(props) => props.color};
   background-size:cover;
   background-image: url(${(props) => props.blocky});
   width: 100%;

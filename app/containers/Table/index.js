@@ -50,6 +50,7 @@ import {
   makeMyMaxBetSelector,
   makeMissingHandSelector,
   makeLatestHandSelector,
+  makeSelectWinners,
 } from './selectors';
 
 import TableComponent from '../../components/Table';
@@ -127,7 +128,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       this.token.balanceOf.call(nextProps.proxyAddr);
     }
 
-    // forward browser to url of next hand
+    // show winner and forward browser to url of next hand
     this.pushed = (this.pushed) ? this.pushed : {};
     const handId = parseInt(this.props.params.handId, 10);
     if (nextProps.latestHand) {
@@ -137,9 +138,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
         setTimeout(() => {
           console.log(`dispatched push to hand ${nextHandStr}`);
           browserHistory.push(`/table/${this.tableAddr}/hand/${nextHandStr}`);
-        }, 1000);
+        }, 2000);
       }
     }
+
 
     // fetch hands that we might need for stack calculation
     if (nextProps.missingHands && nextProps.missingHands.length > 0) {
@@ -357,6 +359,8 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     // Get last Modal Element
     const seats = this.renderSeats();
     const board = this.renderBoard();
+    const winners = Array.from(this.props.winners).map((winner) => (<div>`${winner.addr} won ${winner.amount} with ${winner.hand}`</div>));
+    console.dir(this.props.winners);
     const sb = (this.props.data && this.props.data.get('smallBlind')) ? this.props.data.get('smallBlind') : 0;
 
     return (
@@ -366,6 +370,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           {...this.props}
           id="table"
           sb={sb}
+          winners={winners}
           board={board}
           seats={seats}
           onLeave={() => this.handleLeave(this.props.myPos)}
@@ -405,6 +410,7 @@ const mapStateToProps = createStructuredSelector({
   privKey: makeSelectPrivKey(),
   amountToCall: makeAmountToCallSelector(),
   proxyAddr: makeSelectProxyAddr(),
+  winners: makeSelectWinners(),
   missingHands: makeMissingHandSelector(),
 });
 
@@ -426,6 +432,7 @@ Table.propTypes = {
   handRequest: React.PropTypes.func,
   pendingToggle: React.PropTypes.func,
   modalDismiss: React.PropTypes.func,
+  winners: React.PropTypes.object,
   updateReceived: React.PropTypes.func,
 };
 

@@ -5,14 +5,17 @@ import tinycolor from 'tinycolor2';
 // --------------------------------------------------------
 export const baseColor = '#FD5E60';
 export const black = '#080B0F';
-export const background = '#1A2D3D';
+export const background = '#ECECEC';
+export const disabled = '#FF755C';
+export const tableBG = '#1A2D3D';
 export const gray = '#999999';
 export const green = '#A0FFB1';
 export const white = '#FFF';
+export const hover = '#C85C5C';
 
 // FONTS
 // --------------------------------------------------------
-export const fontPrimary = '#FFFFFF';
+export const fontPrimary = '#262626';
 
 // BOOTSTRAP
 // Screen sizes

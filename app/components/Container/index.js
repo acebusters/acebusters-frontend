@@ -3,13 +3,20 @@
  */
 
 import styled from 'styled-components';
-
+import {
+  white,
+} from '../../variables';
 
 const Container = styled.div`
   margin-right: auto;
   margin-left: auto;
-  padding-right: 15px;
-  padding-left: 15px;
+  margin-top: 3em;
+  padding-right: 2em;
+  padding-left: 2em;
+  padding-top: 2em;
+  border-radius: 0.5em;
+  min-height: 50em;
+  background: ${white};
   @media (min-width: 768px) {
     width: 750px;
   }

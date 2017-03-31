@@ -36,7 +36,17 @@ const StyledDashboard = styled.div`
     clear: both;
   }
   /* theme */
-  background-color: ${(background)}
+  ${(props) => {
+    if (props.params.tableAddr) {
+      return `
+              background: #000000; /* Old browsers */
+              background: -moz-linear-gradient(-45deg,  #000000 0%, #1a2d3d 93%); /* FF3.6-15 */
+              background: -webkit-linear-gradient(-45deg,  #000000 0%,#1a2d3d 93%); /* Chrome10-25,Safari5.1-6 */
+              background: linear-gradient(135deg,  #000000 0%,#1a2d3d 93%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+              filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', endColorstr='#1a2d3d',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */`;
+    }
+    return background;
+  }};
   min-height: 100vh;
   position: relative;
   overflow: hidden;
@@ -53,7 +63,9 @@ export function App(props) {
   const modalContent = props.modalStack[props.modalStack.length - 1];
   return (
     <div>
-      <StyledDashboard>
+      <StyledDashboard
+        params={props.params}
+      >
         <Header
           loggedIn={props.account.loggedIn}
           onClickLogout={props.handleClickLogout}
