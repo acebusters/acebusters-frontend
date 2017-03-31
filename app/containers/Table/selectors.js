@@ -223,11 +223,13 @@ const makeSelectWinners = () => createSelector(
     const distsRec = hand.get('distribution');
     if (distsRec) {
       const dists = rc.get(distsRec);
-      dists.values[2].forEach((dist, i) => {
+      dists.values[2].forEach((dist) => {
         const pDist = EWT.separate(dist);
-        if (winners[i] && pDist.address === winners[i].addr) {
-          winners[i].amount = pDist.amount;
-        }
+        Object.keys(winners).forEach((key) => {
+          if (pDist.address === winners[key].addr) {
+            winners[key].amount = pDist.amount;
+          }
+        });
       });
     }
     return winners;

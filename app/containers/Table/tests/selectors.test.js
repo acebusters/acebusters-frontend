@@ -20,6 +20,7 @@ const P2_ADDR = '0x1c5a1730ffc44ac21700bb85bf0ceefd12ce71d7';
 const P2_KEY = '0x99e69145c6e7f44ba04d579faac9ef4ce5e942dc02b96a9d42b5fcb03e508729';
 
 const P3_ADDR = '0xdd7acad75b52bd206777a36bc41a3b65ad1c44fc';
+const P4_KEY = '0xa803ed744543e69b5e4816c5fc7539427a2928e78d729c87712f180fae52fcc9';
 
 
 const TBL_ADDR = '0x77aabb1133';
@@ -207,7 +208,7 @@ describe('winnersSelector', () => {
   it('should have winner with index 0 with a pair of Aces`.', () => {
     const dists = [];
     dists.push(EWT.concat(P1_ADDR, 1000).toString('hex')); // rake
-    const distRec = new EWT(ABI_DIST).distribution(4, 0, dists).sign(P1_KEY);
+    const distRec = new EWT(ABI_DIST).distribution(2, 0, dists).sign(P1_KEY);
     const mockedState = fromJS({
       table: {
         [TBL_ADDR]: {
@@ -247,9 +248,10 @@ describe('winnersSelector', () => {
 
   it('should have 2 winners with index 0 and 1 with a pair of Aces.', () => {
     const dists = [];
-    dists.push(EWT.concat(P1_ADDR, 1000).toString('hex')); // rake
     dists.push(EWT.concat(P2_ADDR, 1000).toString('hex'));
-    const distRec = new EWT(ABI_DIST).distribution(4, 0, dists).sign(P1_KEY);
+    dists.push(EWT.concat(P1_ADDR, 1000).toString('hex'));
+    dists.push(EWT.concat(P3_ADDR, 10).toString('hex')); // rake
+    const distRec = new EWT(ABI_DIST).distribution(2, 0, dists).sign(P4_KEY);
     const mockedState = fromJS({
       table: {
         [TBL_ADDR]: {
@@ -286,6 +288,61 @@ describe('winnersSelector', () => {
       1: {
         addr: P2_ADDR,
         hand: "Pair, A's",
+        amount: 1000,
+      },
+    };
+    const selectWinners = makeSelectWinners();
+    expect(selectWinners(mockedState, props)).toEqual(winners);
+  });
+
+  it('should have 3 winners with 2 pair.', () => {
+    const dists = [];
+    dists.push(EWT.concat(P3_ADDR, 1000).toString('hex'));
+    dists.push(EWT.concat(P1_ADDR, 1000).toString('hex'));
+    dists.push(EWT.concat(P2_ADDR, 1000).toString('hex'));
+    const distRec = new EWT(ABI_DIST).distribution(2, 0, dists).sign(P4_KEY);
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          2: {
+            lineup: [{
+              address: P1_ADDR,
+              cards: [35, 36],
+            }, {
+              address: P2_ADDR,
+              cards: [22, 23],
+            }, {
+              address: P3_ADDR,
+              cards: [48, 49],
+            }],
+            cards: [8, 9, 10],
+            distribution: distRec,
+          },
+        },
+      },
+    });
+    const props = {
+      pos: 0,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 2,
+      },
+    };
+
+    const winners = {
+      0: {
+        addr: P1_ADDR,
+        hand: "Two Pair, Q's & J's",
+        amount: 1000,
+      },
+      2: {
+        addr: P3_ADDR,
+        hand: "Two Pair, Q's & J's",
+        amount: 1000,
+      },
+      1: {
+        addr: P2_ADDR,
+        hand: "Two Pair, Q's & J's",
         amount: 1000,
       },
     };
