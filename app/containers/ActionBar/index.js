@@ -14,13 +14,13 @@ import {
   makeHandStateSelector,
   makeMyMaxBetSelector,
   makeIsMyTurnSelector,
+  makeMyStackSelector,
   makeAmountToCallSelector,
 } from '../Table/selectors';
 
 import {
   makeMinSelector,
   makeMaxSelector,
-  makeLeftBehindSelector,
   makeCallAmountSelector,
 } from './selectors';
 
@@ -46,7 +46,7 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
 
   componentWillReceiveProps(nextProps) {
     const min = (nextProps.amountToCall + nextProps.minRaise);
-    const amount = (nextProps.leftBehind < min) ? nextProps.leftBehind : min;
+    const amount = (nextProps.myStack < min) ? nextProps.myStack : min;
     this.setState({ amount });
     if (nextProps.isMyTurn === true) {
       this.setActive(true);
@@ -139,7 +139,7 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
       return (
         <ActionBarComponent>
           <SliderWrapper>
-            { this.props.leftBehind > this.props.amountToCall &&
+            { this.props.myStack > this.props.amountToCall &&
               <Slider
                 key="betting-slider"
                 data-orientation="vertical"
@@ -192,7 +192,7 @@ const mapStateToProps = createStructuredSelector({
   amountToCall: makeAmountToCallSelector(),
   callAmount: makeCallAmountSelector(),
   minRaise: makeMinSelector(),
-  leftBehind: makeLeftBehindSelector(),
+  myStack: makeMyStackSelector(),
   max: makeMaxSelector(),
   state: makeHandStateSelector(),
 });
@@ -205,7 +205,7 @@ ActionBar.propTypes = {
   minRaise: React.PropTypes.number,
   max: React.PropTypes.number,
   amountToCall: React.PropTypes.number,
-  leftBehind: React.PropTypes.number,
+  myStack: React.PropTypes.number,
   callAmount: React.PropTypes.number,
   state: React.PropTypes.string,
   me: React.PropTypes.object,
