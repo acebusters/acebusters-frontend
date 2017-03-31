@@ -6,49 +6,67 @@ import React from 'react';
 import styled from 'styled-components';
 import Grid from 'grid-styled';
 import {
-  baseColor,
+  black,
+  white,
 } from 'variables';
 import { Board } from './Board';
-import { TableHeader } from './TableHeader';
 import ActionBar from '../../containers/ActionBar';
 import Button from '../../components/Button';
+import tableImage from './tableBG.svg';
 
-const Pot = styled.div`
+export const Pot = styled.div`
   position: absolute;
-  color: white;
+  color: ${white};
   left: 50%;
   top: 10%
   transform: translateX(-50%);
 `;
 
-const TableContainer = styled.div`
+export const TableContainer = styled.div`
   margin-right: auto;
   margin-left: auto;
 `;
 
-const Wrapper = styled.div`
+export const TableHeader = styled.div`
+   position: relative;
+   text-align: left;
+   color: ${white};
+   padding-left: 10em;
+`;
+
+export const Wrapper = styled.div`
   padding: 1em;
 `;
 
-const TableAndChairs = styled.div`
+export const Winner = styled.div`
+  left: 50%;
+  top: 100%;
+  position: absolute;
+  padding: 0.5em;
+  background-color: ${black};
+  border-radius: 0.5em;
+  color: ${white};
+  transform: translate(-50%,-20%);
+`;
+
+export const TableAndChairs = styled.div`
   position: relative;
   width: 100%
   padding-bottom: 50%;
 `;
 
-const PokerTable = styled.div`
+export const PokerTable = styled.div`
   position: absolute;
-  border: 2px solid ${baseColor};
-  margin-top: 5%;
+  margin-top: 10%;
   border-radius: 50%;
-  width: 60%;
-  margin-left: 28%;
-  height: 45%;
+  transform: translateX(-50%);
+  left: 50%;
+  width: 50%;
+  height: 40%;
 `;
 
 function TableComponent(props) {
   return (
-
     <div>
       { (props.myPos > -1) &&
       <Wrapper>
@@ -62,6 +80,10 @@ function TableComponent(props) {
       <TableContainer>
         <TableAndChairs id="table-and-chairs" >
           <PokerTable id="poker-table">
+            <img src={tableImage} alt="" />
+            { props.winners.length > 0 &&
+              <Winner>{ props.winners }</Winner>
+            }
             <Pot>Pot: { props.potSize }</Pot>
             { props.seats }
             <Board id="board" board={props.board}>
@@ -84,6 +106,7 @@ TableComponent.propTypes = {
   seats: React.PropTypes.array,
   potSize: React.PropTypes.number,
   myPos: React.PropTypes.number,
+  winners: React.PropTypes.array,
   sb: React.PropTypes.number,
 };
 

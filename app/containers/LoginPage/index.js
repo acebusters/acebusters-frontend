@@ -54,6 +54,9 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
     super(props);
     this.handleWorkerMessage = this.handleWorkerMessage.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.state = {
+      waiting: false,
+    };
   }
 
   componentDidMount() {
@@ -65,11 +68,13 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
   }
 
   handleSubmit(values, dispatch) {
+    this.setState({ waiting: true });
     return account.login(values.get('email')).catch((err) => {
       const errMsg = 'Login failed!';
       if (err === 404) {
         throw new SubmissionError({ confCode: 'Email unknown.', _error: errMsg });
       } else {
+        this.setState({ waiting: false });
         throw new SubmissionError({ _error: `Login failed with error code ${err}` });
       }
     }).then((data) => {
@@ -85,6 +90,7 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
       // so we can display form errors if any of the async ops fail.
       return login(values, dispatch).catch((workerErr) => {
         // If worker failed, ...
+        this.setState({ waiting: false });
         throw new SubmissionError({ _error: `error, Login failed due to worker error: ${workerErr}` });
       }).then((workerRsp) => {
         // If worker success, ...
@@ -134,7 +140,7 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
 
   render() {
     const workerPath = this.props.workerPath + encodeURIComponent(location.origin);
-    const { error, handleSubmit, submitting } = this.props;
+    const { error, handleSubmit } = this.props;
     return (<Container>
       <div>
         <H1>Log into your account!</H1>
@@ -142,13 +148,14 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
           <Field name="email" type="text" component={renderField} label="Email" />
           <Field name="password" type="password" component={renderField} label="Password" />
           {error && <strong>{error}</strong>}
-          <Button type="submit" size="large" loading={submitting}>Login</Button>
+          <Button type="submit" size="large" disabled={this.state.waiting}>
+            { (!this.state.waiting) ? 'Login' : 'Please wait ...' }
+          </Button>
         </Form>
         <iframe src={workerPath} style={{ display: 'none' }} onLoad={(event) => { this.frame = event.target; }} />
         { this.props.progress &&
           <div>
             <Radial progress={this.props.progress}></Radial>
-            <H1>Loggin in please wait ...</H1>
           </div>
         }
       </div>
