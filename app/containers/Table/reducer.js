@@ -88,10 +88,6 @@ export default function tableReducer(state = initialState, action) {
           changed: action.hand.changed,
           distribution: action.hand.distribution,
         });
-        const holeCards = storageService.getItem(`holeCards${action.tableAddr}${handIdStr}`);
-        if (holeCards) {
-          hand = hand.set('holeCards', List(holeCards));
-        }
         if (action.hand.lineup) {
           for (let j = 0; j < action.hand.lineup.length; j += 1) {
             hand = hand.set('lineup', fromJS(action.hand.lineup));
