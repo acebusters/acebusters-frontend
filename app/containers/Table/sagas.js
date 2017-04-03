@@ -2,7 +2,7 @@
  * Created by helge on 25.01.17.
  */
 import ethUtil from 'ethereumjs-util';
-import { call, put, takeLatest, select, fork, take } from 'redux-saga/effects';
+import { call, put, takeEvery, select, fork, take } from 'redux-saga/effects';
 import Raven from 'raven-js';
 
 import {
@@ -100,10 +100,6 @@ export function* updateScanner() {
   const myAddrSelector = makeSignerAddrSelector();
   const sbSelector = makeSbSelector();
   const myCardsSelector = makeMyCardsSelector();
-  // fetch state if not existing
-  const state = yield select();
-  const myAddr = myAddrSelector(state);
-  const privKey = privKeySelector(state);
   // toggle variables to avoid duplicate requests
   const payedBlind = {};
   const showed = {};
@@ -111,10 +107,15 @@ export function* updateScanner() {
 
   while (true) {
     const action = yield take(UPDATE_RECEIVED);
+    // fetch state if not existing
+    const state = yield select();
+    const myAddr = myAddrSelector(state);
+    const privKey = privKeySelector(state);
     const sb = sbSelector(state, { params: { tableAddr: action.tableAddr } });
     const toggleKey = action.tableAddr + action.hand.handId;
+
     // do nothing if hand data missing
-    if (!action.hand && !action.hand.lineup) {
+    if (!action.hand || !action.hand.lineup) {
       continue; // eslint-disable-line no-continue
     }
 
@@ -159,14 +160,10 @@ export function* updateScanner() {
   }
 }
 
-function* tableSaga() {
-  yield takeLatest(BET, performBet);
-  yield takeLatest(SHOW, performShow);
-  yield takeLatest(NET, submitSignedNetting);
-  yield takeLatest(HAND_REQUEST, handRequest);
+export function* tableStateSaga() {
+  yield takeEvery(BET, performBet);
+  yield takeEvery(SHOW, performShow);
+  yield takeEvery(NET, submitSignedNetting);
+  yield takeEvery(HAND_REQUEST, handRequest);
   yield fork(updateScanner);
 }
-
-export default [
-  tableSaga,
-];

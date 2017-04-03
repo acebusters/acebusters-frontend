@@ -146,6 +146,7 @@ describe('Saga Tests', () => {
         newBalances: '0x1234',
         [PLAYER1.address]: '0x',
       },
+      lineup: [],
     };
 
     const initialState = fromJS({
