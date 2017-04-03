@@ -7,7 +7,6 @@ import {
 
 // The initial state of the App
 const initialState = fromJS({
-  sidebarCollapse: true,
   modalStack: [],
 });
 

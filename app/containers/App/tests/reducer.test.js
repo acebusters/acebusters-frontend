@@ -6,8 +6,7 @@ describe('appReducer', () => {
   let state;
   beforeEach(() => {
     state = fromJS({
-      sidebarCollapse: true,
-      transferShow: false,
+      modalStack: [],
     });
   });
 

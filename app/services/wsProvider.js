@@ -37,7 +37,7 @@ const WebsocketProvider = function WebsocketProvider(path) {
 
 
     // LISTEN FOR CONNECTION RESPONSES
-  this.connection.onmessage = function (e) {
+  this.connection.onmessage = function onmessage(e) {
         /* jshint maxcomplexity: 6 */
     const data = (typeof e.data === 'string') ? e.data : '';
 
@@ -75,14 +75,14 @@ const WebsocketProvider = function WebsocketProvider(path) {
 
  @method addDefaultEvents
  */
-WebsocketProvider.prototype.addDefaultEvents = function () {
+WebsocketProvider.prototype.addDefaultEvents = function addDefaultEvents() {
   const self = this;
 
-  this.connection.onerror = function () {
+  this.connection.onerror = function onerror() {
     self.timeout();
   };
 
-  this.connection.onclose = function (e) {
+  this.connection.onclose = function onclose(e) {
     self.timeout();
 
     const noteCb = self.notificationCallbacks;
@@ -109,7 +109,7 @@ WebsocketProvider.prototype.addDefaultEvents = function () {
  @method parseResponse
  @param {String} data
  */
-WebsocketProvider.prototype.parseResponse = function (dataChunked) {
+WebsocketProvider.prototype.parseResponse = function parseResponse(dataChunked) {
   const self = this;
   const returnValues = [];
 
@@ -164,7 +164,7 @@ WebsocketProvider.prototype.parseResponse = function (dataChunked) {
 
  @method addResponseCallback
  */
-WebsocketProvider.prototype.addResponseCallback = function (payload, callback) {
+WebsocketProvider.prototype.addResponseCallback = function addResponseCallback(payload, callback) {
   const id = payload.id || payload[0].id;
   const method = payload.method || payload[0].method;
 
@@ -177,18 +177,18 @@ WebsocketProvider.prototype.addResponseCallback = function (payload, callback) {
 
  @method timeout
  */
-WebsocketProvider.prototype.timeout = function () {
-  Object.keys(this.responseCallbacks).forEach(function (key) {
+WebsocketProvider.prototype.timeout = function timeout() {
+  Object.keys(this.responseCallbacks).forEach((key) => {
     this.responseCallbacks[key](errors.InvalidConnection('on IPC'));
     delete this.responseCallbacks[key];
   });
 };
 
-WebsocketProvider.prototype.send = function (payload, callback) {
+WebsocketProvider.prototype.send = function send(payload, callback) {
   return this.sendAsync(payload, callback);
 };
 
-WebsocketProvider.prototype.sendAsync = function (payload, callback) {
+WebsocketProvider.prototype.sendAsync = function sendAsync(payload, callback) {
     // try reconnect, when connection is gone
     // if(!this.connection.writable)
     //     this.connection.connect({path: this.path});
@@ -205,7 +205,7 @@ WebsocketProvider.prototype.sendAsync = function (payload, callback) {
  @param {String} type    'notifcation', 'connect', 'error', 'end' or 'data'
  @param {Function} callback   the callback to call
  */
-WebsocketProvider.prototype.on = function (type, callback) {
+WebsocketProvider.prototype.on = function on(type, callback) {
   if (typeof callback !== 'function') {
     throw new Error('The second parameter callback must be a function.');
   }
@@ -242,7 +242,7 @@ WebsocketProvider.prototype.on = function (type, callback) {
  @param {String} type    'notifcation', 'connect', 'error', 'end' or 'data'
  @param {Function} callback   the callback to call
  */
-WebsocketProvider.prototype.removeListener = function (type, callback) {
+WebsocketProvider.prototype.removeListener = function removeListener(type, callback) {
   const self = this;
 
   switch (type) {
@@ -268,7 +268,7 @@ WebsocketProvider.prototype.removeListener = function (type, callback) {
  @method removeAllListeners
  @param {String} type    'notifcation', 'connect', 'error', 'end' or 'data'
  */
-WebsocketProvider.prototype.removeAllListeners = function (type) {
+WebsocketProvider.prototype.removeAllListeners = function removeAllListeners(type) {
   switch (type) {
     case 'notification':
       this.notificationCallbacks = [];
@@ -299,7 +299,7 @@ WebsocketProvider.prototype.removeAllListeners = function (type) {
 
  @method reset
  */
-WebsocketProvider.prototype.reset = function () {
+WebsocketProvider.prototype.reset = function reset() {
   this.timeout();
   this.notificationCallbacks = [];
 

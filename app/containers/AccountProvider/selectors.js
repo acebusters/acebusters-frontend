@@ -1,5 +1,4 @@
 import EthUtil from 'ethereumjs-util';
-import md5 from 'blueimp-md5';
 import { createSelector } from 'reselect';
 
 import { ABI_TOKEN_CONTRACT, tokenContractAddress } from '../../app.config';
@@ -31,18 +30,6 @@ const makeSignerAddrSelector = () => createSelector(
 const makeSelectEmail = () => createSelector(
   selectAccount,
   (account) => account.get('email')
-);
-
-const makeSelectGravatar = (size) => createSelector(
-  selectAccount,
-  (account) => {
-    if (!account.get('email')) {
-      return null;
-    }
-    const picSize = size || 80;
-    const hash = md5(account.get('email'));
-    return `http://www.gravatar.com/avatar/${hash}.jpg?s=${picSize}`;
-  }
 );
 
 const makeSelectContract = () => createSelector(
@@ -79,5 +66,4 @@ export {
   makeSelectPrivKey,
   makeSelectProxyAddr,
   makeSelectEmail,
-  makeSelectGravatar,
 };
