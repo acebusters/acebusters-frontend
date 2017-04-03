@@ -154,7 +154,7 @@ describe('minSelector', () => {
 });
 
 describe('amountToCall Selector', () => {
-  it('should return the difference between the 2 highes bettors', () => {
+  it('should correct amount when my maxBet 0', () => {
     const mockedState = fromJS({
       account: {
         privKey: P1_KEY,
@@ -167,6 +167,7 @@ describe('amountToCall Selector', () => {
             dealer: 0,
             lineup: [{
               address: P1_ADDR,
+              last: new EWT(ABI_BET).bet(1, 0).sign(P1_KEY),
             }, {
               address: P2_ADDR,
               last: new EWT(ABI_BET).bet(1, 500).sign(P2_KEY),
@@ -178,7 +179,6 @@ describe('amountToCall Selector', () => {
             }],
           },
           data: {
-            amounts: [30000, 50000, 20000],
             smallBlind: 500,
             lastHandNetted: 3,
           },
@@ -195,6 +195,49 @@ describe('amountToCall Selector', () => {
       },
     };
     expect(amountToCallSelector(mockedState, props)).toEqual(1000);
+  });
+
+  it('should return difference between maxBet and myMaxBet', () => {
+    const mockedState = fromJS({
+      account: {
+        privKey: P1_KEY,
+      },
+      table: {
+        [TBL_ADDR]: {
+          4: {
+            state: 'preflop',
+            lastRoundMaxBet: 1000,
+            dealer: 0,
+            lineup: [{
+              address: P1_ADDR,
+              last: new EWT(ABI_BET).bet(1, 1000).sign(P1_KEY),
+            }, {
+              address: P2_ADDR,
+              last: new EWT(ABI_BET).bet(1, 1000).sign(P2_KEY),
+            }, {
+              address: P3_ADDR,
+              last: new EWT(ABI_BET).bet(1, 2500).sign(P3_KEY),
+            }, {
+              address: P_EMPTY,
+            }],
+          },
+          data: {
+            smallBlind: 500,
+            lastHandNetted: 3,
+          },
+        },
+      },
+    });
+
+    const amountToCallSelector = makeAmountToCallSelector();
+    const props = {
+      pos: 0,
+      params: {
+        handId: 4,
+        tableAddr: TBL_ADDR,
+      },
+    };
+    expect(amountToCallSelector(mockedState, props)).toEqual(1500);
   });
 });
 
