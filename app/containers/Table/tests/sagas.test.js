@@ -11,6 +11,10 @@ import { updateScanner } from '../sagas';
 
 import {
   updateReceived,
+  UPDATE_RECEIVED,
+  BET,
+  SHOW,
+  NET,
 } from '../actions';
 
 const tableAddr = '0x112233';
@@ -31,23 +35,26 @@ describe('Saga Tests', () => {
       }],
     };
 
-    let table = fromJS({
-      hand,
-    });
-
-    table = table.set(tableAddr, fromJS({ data: { smallBlind: 500 } }));
-
     const initialState = fromJS({
       account: {
         privKey: PLAYER2.key,
       },
-      table,
+      table: {
+        [tableAddr]: { data: { smallBlind: 500 } },
+      },
     });
 
     const sagaTester = new SagaTester({ initialState });
     sagaTester.start(updateScanner);
     sagaTester.dispatch(updateReceived(tableAddr, hand));
+    expect(sagaTester.getLatestCalledAction().type).toEqual(BET);
     expect(sagaTester.getLatestCalledAction().amount).toEqual(500);
+    expect(sagaTester.getCalledActions().length).toEqual(2);
+    // do the same thing again, and make sure the request
+    // is deduplicated
+    sagaTester.dispatch(updateReceived(tableAddr, hand));
+    expect(sagaTester.getLatestCalledAction().type).toEqual(UPDATE_RECEIVED);
+    expect(sagaTester.getCalledActions().length).toEqual(3);
   });
 
   it('should dispatch bet action with bb amount', () => {
@@ -66,93 +73,121 @@ describe('Saga Tests', () => {
       }],
     };
 
-    let table = fromJS({
-      hand,
-    });
-
-    table = table.set(tableAddr, fromJS({ data: { smallBlind: 500 } }));
-
     const initialState = fromJS({
       account: {
         privKey: PLAYER3.key,
       },
-      table,
+      table: {
+        [tableAddr]: { data: { smallBlind: 500 } },
+      },
     });
 
     const sagaTester = new SagaTester({ initialState });
     sagaTester.start(updateScanner);
     sagaTester.dispatch(updateReceived(tableAddr, hand));
+    expect(sagaTester.getLatestCalledAction().type).toEqual(BET);
     expect(sagaTester.getLatestCalledAction().amount).toEqual(1000);
+    // do the same thing again, and make sure the request
+    // is deduplicated
+    sagaTester.dispatch(updateReceived(tableAddr, hand));
+    expect(sagaTester.getLatestCalledAction().type).toEqual(UPDATE_RECEIVED);
+    expect(sagaTester.getCalledActions().length).toEqual(3);
   });
 
   it('should dispatch show action when its showtime!', () => {
     const hand = {
-      state: 'dealing',
+      handId: 3,
+      state: 'showdown',
       dealer: 0,
       lineup: [{
+      }, {
         address: PLAYER1.address,
+        last: new EWT(ABI.ABI_SHOW).show(1, 1000).sign(PLAYER1.key),
       }, {
-        address: PLAYER2.address,
-        last: new EWT(ABI.ABI_BET).bet(1, 500).sign(PLAYER2.key),
-      }, {
-        address: PLAYER3.address,
-        last: new EWT(ABI.ABI_BET).bet(1, 1000).sign(PLAYER3.key),
-      }, {
-        address: PLAYER4.address,
-      }],
-    };
-
-    const table = fromJS({
-      hand,
-    });
-
-    const initialState = fromJS({
-      account: {
-        privKey: PLAYER4.key,
-      },
-      table,
-    });
-
-    const sagaTester = new SagaTester({ initialState });
-    sagaTester.start(updateScanner);
-    sagaTester.dispatch(updateReceived(tableAddr, hand));
-    expect(sagaTester.getLatestCalledAction().amount).toEqual(0);
-  });
-
-  it('should dispatch net action when there is a netting request', () => {
-    const hand = {
-      state: 'flop',
-      dealer: 0,
-      netting: {},
-      lineup: [{
         address: PLAYER_EMPTY.address,
       }, {
         address: PLAYER2.address,
-        last: new EWT(ABI.ABI_BET).bet(1, 0).sign(PLAYER2.key),
-      }, {
-        address: PLAYER3.address,
-        last: new EWT(ABI.ABI_BET).bet(1, 0).sign(PLAYER3.key),
-      }, {
-        address: PLAYER_EMPTY.address,
+        last: new EWT(ABI.ABI_BET).bet(1, 1000).sign(PLAYER2.key),
       }],
     };
-
-    const table = fromJS({
-      hand,
-    });
 
     const initialState = fromJS({
       account: {
         privKey: PLAYER2.key,
       },
-      table,
+      table: {
+        [tableAddr]: {
+          3: {
+            holeCards: [12, 13],
+          },
+        },
+      },
     });
 
-    // max bet 0 not optimal -> find out out how to set props for testing
     const sagaTester = new SagaTester({ initialState });
     sagaTester.start(updateScanner);
     sagaTester.dispatch(updateReceived(tableAddr, hand));
-    expect(sagaTester.getLatestCalledAction().type).toEqual('acebusters/Table/NET');
+    expect(sagaTester.getLatestCalledAction().type).toEqual(SHOW);
+    expect(sagaTester.getLatestCalledAction().amount).toEqual(1000);
+    expect(sagaTester.getLatestCalledAction().holeCards).toEqual([12, 13]);
+    // do the same thing again, and make sure the request
+    // is deduplicated
+    sagaTester.dispatch(updateReceived(tableAddr, hand));
+    expect(sagaTester.getLatestCalledAction().type).toEqual(UPDATE_RECEIVED);
+    expect(sagaTester.getCalledActions().length).toEqual(3);
+  });
+
+  it('should dispatch net action when there is a netting request', () => {
+    const hand = {
+      handId: 3,
+      state: 'flop',
+      dealer: 0,
+      netting: {
+        newBalances: '0x1234',
+        [PLAYER1.address]: '0x',
+      },
+    };
+
+    const initialState = fromJS({
+      account: {
+        privKey: PLAYER2.key,
+      },
+    });
+
+    const sagaTester = new SagaTester({ initialState });
+    sagaTester.start(updateScanner);
+    sagaTester.dispatch(updateReceived(tableAddr, hand));
+    expect(sagaTester.getLatestCalledAction().type).toEqual(NET);
+    expect(sagaTester.getLatestCalledAction().balances).toEqual('0x1234');
+    expect(sagaTester.getLatestCalledAction().handId).toEqual(3);
+    // do the same thing again, and make sure the request
+    // is deduplicated
+    sagaTester.dispatch(updateReceived(tableAddr, hand));
+    expect(sagaTester.getLatestCalledAction().type).toEqual(UPDATE_RECEIVED);
+    expect(sagaTester.getCalledActions().length).toEqual(3);
+  });
+
+  it('should not dispatch netting when already signed', () => {
+    const hand = {
+      handId: 3,
+      state: 'flop',
+      dealer: 0,
+      netting: {
+        newBalances: '0x1234',
+        [PLAYER2.address]: '0x',
+      },
+    };
+
+    const initialState = fromJS({
+      account: {
+        privKey: PLAYER2.key,
+      },
+    });
+
+    const sagaTester = new SagaTester({ initialState });
+    sagaTester.start(updateScanner);
+    sagaTester.dispatch(updateReceived(tableAddr, hand));
+    expect(sagaTester.getCalledActions().length).toEqual(1);
   });
 });
 
