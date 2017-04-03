@@ -214,7 +214,7 @@ ActionBar.propTypes = {
   myStack: React.PropTypes.number,
   callAmount: React.PropTypes.number,
   state: React.PropTypes.string,
-  cards: React.PropTypes.object,
+  cards: React.PropTypes.array,
   setCards: React.PropTypes.func,
 };
 
