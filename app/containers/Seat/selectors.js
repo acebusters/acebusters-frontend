@@ -24,7 +24,7 @@ const posSelector = (state, props) => (state && props) ? props.pos : -1;
 
 const makeLastReceiptSelector = () => createSelector(
     [makeHandSelector(), posSelector],
-    (hand, pos) => (hand && pos && hand.getIn && hand.getIn(['lineup', pos])) ? rc.get(hand.getIn(['lineup', pos, 'last'])) : undefined
+    (hand, pos) => (hand && pos > -1 && hand.getIn && hand.getIn(['lineup', pos])) ? rc.get(hand.getIn(['lineup', pos, 'last'])) : undefined
 );
 
 const makeLastRoundMaxBetSelector = () => createSelector(
