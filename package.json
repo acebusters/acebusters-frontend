@@ -194,10 +194,10 @@
     ],
     "coverageThreshold": {
       "global": {
-        "statements": 98,
-        "branches": 91,
-        "functions": 98,
-        "lines": 98
+        "statements": 46,
+        "branches": 47,
+        "functions": 47,
+        "lines": 70
       }
     },
     "moduleDirectories": [
@@ -215,7 +215,6 @@
     "ab-vector-cards": "^0.2.0",
     "babel-polyfill": "6.20.0",
     "babel-preset-es2015": "^6.22.0",
-    "blueimp-md5": "^2.6.0",
     "chalk": "1.1.3",
     "compression": "1.6.2",
     "cross-env": "3.1.3",

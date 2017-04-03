@@ -26,10 +26,6 @@ import {
 } from './selectors';
 
 import {
-  makeSelectGravatar,
-} from '../AccountProvider/selectors';
-
-import {
   makeMyPosSelector,
   makeStackSelector,
   makeHandStateSelector,
@@ -110,7 +106,6 @@ const mapStateToProps = createStructuredSelector({
   holeCards: makeCardsSelector(),
   folded: makeFoldedSelector(),
   stackSize: makeStackSelector(),
-  gravatarUrl: makeSelectGravatar(),
 });
 
 Seat.propTypes = {

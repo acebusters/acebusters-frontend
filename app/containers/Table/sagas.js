@@ -105,7 +105,7 @@ export function* updateScanner() {
   const showed = {};
   const netted = {};
 
-  while (true) {
+  while (true) { //eslint-disable-line
     const action = yield take(UPDATE_RECEIVED);
     // fetch state if not existing
     const state = yield select();

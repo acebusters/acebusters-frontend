@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import Grid from 'grid-styled';
 import Slider from 'react-rangeslider';
 import 'react-rangeslider/lib/index.css';
+import Raven from 'raven-js';
 import SliderWrapper from '../../components/Slider';
 
 import {
@@ -72,7 +73,10 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
     const amount = this.state.amount + this.props.myMaxBet;
     const handId = parseInt(this.props.params.handId, 10);
     return this.table.bet(handId, amount).catch((err) => {
-      console.log(err);
+      Raven.captureException(err, { tags: {
+        tableAddr: this.props.params.tableAddr,
+        handId,
+      } });
       this.setActive(true);
     }).then((data) => {
       this.props.setCards(this.props.params.tableAddr, handId, data.cards);
@@ -110,7 +114,10 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
       }
     }
     return call.catch((err) => {
-      console.log(err);
+      Raven.captureException(err, { tags: {
+        tableAddr: this.props.params.tableAddr,
+        handId,
+      } });
       this.setActive(true);
     });
   }
@@ -121,7 +128,10 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
     const cards = this.props.cards;
     const handId = parseInt(this.props.params.handId, 10);
     return this.table.show(handId, amount, cards).catch((err) => {
-      console.log(err);
+      Raven.captureException(err, { tags: {
+        tableAddr: this.props.params.tableAddr,
+        handId,
+      } });
     });
   }
 
@@ -130,7 +140,10 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
     const amount = this.props.myMaxBet;
     const handId = parseInt(this.props.params.handId, 10);
     return this.table.fold(handId, amount).catch((err) => {
-      console.log(err);
+      Raven.captureException(err, { tags: {
+        tableAddr: this.props.params.tableAddr,
+        handId,
+      } });
       this.setActive(true);
     });
   }

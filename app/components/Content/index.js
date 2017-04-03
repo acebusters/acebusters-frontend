@@ -5,8 +5,6 @@ import {
   fontSizeBase,
   lineHeightBase,
   fontWeightBase,
-  screenXsMax,
-  screenSmMin,
   navbarHeight,
   transitionSpeed,
   transitionFn,
@@ -50,20 +48,6 @@ const Content = styled.div`
 
   /* fixed layout */
   ${(props) => (props.fixed && `padding-top: ${navbarHeight};`)};
-
-  /* media queries */
-  /* sidebar on large screens */
-  @media (min-width: ${screenSmMin}) {
-    ${(props) => ((props.sidebarCollapse && props.sidebarMini) && `
-      z-index: 840;
-    `)}
-    ${(props) => ((props.sidebarCollapse && !props.sidebarMini) && 'margin-left: 0;')}
-  }
-  /* sidebar on small screens */
-  @media (max-width: ${screenXsMax}) {
-    margin-left: 0;
-    ${(props) => (props.fixed && `padding-top: ${parseInt(navbarHeight, 10) * 2}px;`)};
-  }
 `;
 
 export default Content;

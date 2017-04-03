@@ -16,11 +16,6 @@ const makeModalStackSelector = () => createSelector(
   (state) => (state && state.get('modalStack')) ? state.get('modalStack').toJS() : []
 );
 
-const makeSelectSidebarCollapse = () => createSelector(
-  selectGlobal,
-  (globalState) => globalState.get('sidebarCollapse')
-);
-
 const makeSelectLocationState = () => {
   let prevRoutingState;
   let prevRoutingStateJS;
@@ -42,5 +37,4 @@ export {
   makeSelectTransferShow,
   makeModalStackSelector,
   makeSelectLocationState,
-  makeSelectSidebarCollapse,
 };

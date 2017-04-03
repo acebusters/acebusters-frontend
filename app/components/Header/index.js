@@ -127,7 +127,6 @@ Header.propTypes = {
 Header.defaultProps = {
   fixed: false,
   sidebarMini: false,
-  sidebarCollapse: false,
   logoLg: <span><b>Ace</b>Busters</span>,
   logoSm: <span><b>A</b>B</span>,
 };

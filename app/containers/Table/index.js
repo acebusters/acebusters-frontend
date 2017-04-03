@@ -101,12 +101,12 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   componentWillReceiveProps(nextProps) {
+    const handId = parseInt(this.props.params.handId, 10);
     // take care of timing out players
     if (this.props.myPos > -1 && this.props.hand
       && this.props.hand.get('changed') < nextProps.hand.get('changed')) {
       if (this.timeOut) {
         clearTimeout(this.timeOut);
-        console.log('timeout cancelled');
       }
 
       let passed = Math.floor(Date.now() / 1000) - nextProps.hand.get('changed');
@@ -115,12 +115,13 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       const timeOut = ((TIMEOUT_PERIOD * 1000) - (passed * 1000)) + random;
 
       if (timeOut > 0) {
-        console.log(`timeout started with ${timeOut}`);
         this.timeOut = setTimeout(() => {
-          console.log('timeout fired');
           const table = new TableService(this.props.params.tableAddr);
           table.timeOut().then((res) => {
-            console.log(res);
+            Raven.captureMessage(`timeout: ${res}`, { tags: {
+              tableAddr: this.props.params.tableAddr,
+              handId,
+            } });
           });
         }, timeOut);
       }
@@ -134,13 +135,11 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
     // show winner and forward browser to url of next hand
     this.pushed = (this.pushed) ? this.pushed : {};
-    const handId = parseInt(this.props.params.handId, 10);
     if (nextProps.latestHand) {
       const nextHandStr = nextProps.latestHand.toString();
       if (nextProps.latestHand > handId && !this.pushed[nextHandStr]) {
         this.pushed[nextHandStr] = true;
         setTimeout(() => {
-          console.log(`dispatched push to hand ${nextHandStr}`);
           browserHistory.push(`/table/${this.tableAddr}/hand/${nextHandStr}`);
         }, 2000);
       }
@@ -163,7 +162,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
   componentWillUnmount() {
     if (this.timeOut) {
-      console.log('timeout cancelled');
       clearInterval(this.timeOut);
     }
     this.channel.unbind('update', this.handleUpdate);
@@ -208,8 +206,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     const amount = (this.props.myMaxbet > -1) ? this.props.myMaxbet : 0;
     const table = new TableService(this.props.params.tableAddr, this.props.privKey);
     return table.sitOut(handId, amount).catch((err) => {
-      console.log(err);
-      // throw new SubmissionError({ _error: `Leave failed with error ${err}.` });
+      Raven.captureException(err, { tags: {
+        tableAddr: this.props.params.tableAddr,
+        handId,
+      } });
     });
   }
 
@@ -228,8 +228,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     </div>);
     this.props.modalAdd(statusElement);
     return table.leave(exitHand).catch((err) => {
-      console.log(err);
-      // throw new SubmissionError({ _error: `Leave failed with error ${err}.` });
+      Raven.captureException(err, { tags: {
+        tableAddr: this.props.params.tableAddr,
+        handId,
+      } });
     });
   }
 

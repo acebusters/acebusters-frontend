@@ -8,7 +8,6 @@ describe('account reducer tests', () => {
     expect(accountProviderReducer(undefined, {}).toJS()).toEqual({
       privKey: undefined,
       email: undefined,
-      lastNonce: 0,
       loggedIn: false,
     });
   });

@@ -10,37 +10,37 @@ function TableService(tableAddr, privKey) {
   this.privKey = privKey;
 }
 
-TableService.prototype.bet = function (handId, amount) {
+TableService.prototype.bet = function bet(handId, amount) {
   const receipt = new EWT(ABI_BET).bet(handId, amount).sign(this.privKey);
   return this.pay(receipt);
 };
 
-TableService.prototype.fold = function (handId, amount) {
+TableService.prototype.fold = function fold(handId, amount) {
   const receipt = new EWT(ABI_FOLD).fold(handId, amount).sign(this.privKey);
   return this.pay(receipt);
 };
 
-TableService.prototype.checkPreflop = function (handId, amount) {
+TableService.prototype.checkPreflop = function checkPreflop(handId, amount) {
   const receipt = new EWT(checkABIs.preflop).checkPre(handId, amount).sign(this.privKey);
   return this.pay(receipt);
 };
 
-TableService.prototype.checkFlop = function (handId, amount) {
+TableService.prototype.checkFlop = function checkFlop(handId, amount) {
   const receipt = new EWT(checkABIs.flop).checkFlop(handId, amount).sign(this.privKey);
   return this.pay(receipt);
 };
 
-TableService.prototype.checkTurn = function (handId, amount) {
+TableService.prototype.checkTurn = function checkTurn(handId, amount) {
   const receipt = new EWT(checkABIs.turn).checkTurn(handId, amount).sign(this.privKey);
   return this.pay(receipt);
 };
 
-TableService.prototype.checkRiver = function (handId, amount) {
+TableService.prototype.checkRiver = function checkRiver(handId, amount) {
   const receipt = new EWT(checkABIs.river).checkRiver(handId, amount).sign(this.privKey);
   return this.pay(receipt);
 };
 
-TableService.prototype.pay = function (receipt) {
+TableService.prototype.pay = function pay(receipt) {
   return new Promise((resolve, reject) => {
     fetch(`${this.apiBasePath}/table/${this.tableAddr}/pay`, {
       method: 'POST',
@@ -68,7 +68,7 @@ TableService.prototype.pay = function (receipt) {
   });
 };
 
-TableService.prototype.leave = function (handId) {
+TableService.prototype.leave = function leave(handId) {
   return new Promise((resolve, reject) => {
     const receipt = new EWT(ABI_LEAVE).leave(handId, 0).sign(this.privKey);
     const header = new Headers({ Authorization: receipt });
@@ -84,7 +84,7 @@ TableService.prototype.leave = function (handId) {
   });
 };
 
-TableService.prototype.show = function (handId, amount, holeCards) {
+TableService.prototype.show = function show(handId, amount, holeCards) {
   return new Promise((resolve, reject) => {
     const receipt = new EWT(ABI_SHOW).show(handId, amount).sign(this.privKey);
     const header = new Headers({ Authorization: receipt, 'Content-Type': 'application/json' });
@@ -101,12 +101,12 @@ TableService.prototype.show = function (handId, amount, holeCards) {
   });
 };
 
-TableService.prototype.sitOut = function (handId, amount) {
+TableService.prototype.sitOut = function sitOut(handId, amount) {
   const receipt = new EWT(ABI_SIT_OUT).sitOut(handId, amount).sign(this.privKey);
   return this.pay(receipt);
 };
 
-TableService.prototype.timeOut = function () {
+TableService.prototype.timeOut = function timeOut() {
   return new Promise((resolve, reject) => {
     fetch(`${apiBasePath}/table/${this.tableAddr}/timeout`, {
       method: 'POST',
@@ -134,7 +134,7 @@ TableService.prototype.timeOut = function () {
 };
 
 
-TableService.prototype.net = function (handId, payload) {
+TableService.prototype.net = function net(handId, payload) {
   return new Promise((resolve, reject) => {
     const header = new Headers({ 'Content-Type': 'application/json' });
     const data = JSON.stringify({ nettingSig: payload });
