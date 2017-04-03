@@ -6,7 +6,7 @@ import styled from 'styled-components';
 
 import {
   baseColor,
-  background,
+  white,
 } from '../../variables';
 
 const Wrapper = styled.div`
@@ -44,7 +44,7 @@ const Progress = styled.div`
   height: 250px;
   position: absolute;
   viewBox: 0 0 250 250;
-  background: ${background};
+  background: ${white};
   left: 50%;
   top: 50%;
   -webkit-transform: translate(-50%, -50%);

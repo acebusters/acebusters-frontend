@@ -10,7 +10,7 @@ import Input from '../../components/Input';
 import Label from '../../components/Label';
 import H2 from '../../components/H2';
 import FormGroup from '../../components/Form/FormGroup';
-import ErrorMessage from '../../components/ErrorMessage';
+import { ErrorMessage } from '../../components/FormMessages';
 
 /**
  * Checks if the given string is an address

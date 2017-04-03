@@ -4,9 +4,11 @@ import { Form, Field, reduxForm, SubmissionError, propTypes } from 'redux-form/i
 import { browserHistory } from 'react-router';
 
 import account from '../../services/account';
+
 // components
 import FormGroup from '../../components/Form/FormGroup';
 import Container from '../../components/Container';
+import { ErrorMessage } from '../../components/FormMessages';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 import H1 from '../../components/H1';
@@ -33,7 +35,7 @@ const renderField = ({ input, label, type, meta: { touched, error, warning } }) 
   <FormGroup>
     <label htmlFor={input.name}>{label}</label>
     <Input {...input} placeholder={label} type={type} />
-    {touched && ((error && <span>{error}</span>) || (warning && <span>{warning}</span>))}
+    {touched && ((error && <ErrorMessage error={error} />) || (warning && <span>{warning}</span>))}
   </FormGroup>
 );
 /* eslint-enable react/prop-types */
