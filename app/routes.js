@@ -4,6 +4,7 @@
 // about the code splitting business
 import { getAsyncInjectors } from './utils/asyncInjectors';
 import { accountSaga } from './containers/AccountProvider/sagas';
+import { tableStateSaga } from './containers/Table/sagas';
 import { selectAccount } from './containers/AccountProvider/selectors';
 
 const errorLoading = (err) => {
@@ -33,7 +34,7 @@ export default function createRoutes(store) {
     }
   };
 
-  injectSagas([accountSaga]);
+  injectSagas([accountSaga, tableStateSaga]);
 
   return [
     {
@@ -87,15 +88,12 @@ export default function createRoutes(store) {
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/Table/reducer'),
-          import('containers/Table/sagas'),
           import('containers/Table'),
         ]);
         const renderRoute = loadModule(cb);
 
-        importModules.then(([reducer, sagas, component]) => {
+        importModules.then(([reducer, component]) => {
           injectReducer('table', reducer.default);
-          injectSagas(sagas.default);
-
           renderRoute(component);
         });
 
