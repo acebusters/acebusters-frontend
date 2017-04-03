@@ -120,7 +120,7 @@ describe('ActionBar', () => {
 
   it('should render the Call Button when amount to call is greater 0', () => {
     const props = {
-      state: 'flop',
+      state: 'preflop',
       params: {
         tableAddr: '0x123',
       },

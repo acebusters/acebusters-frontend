@@ -91,7 +91,7 @@ function TableComponent(props) {
             </Board>
           </PokerTable>
         </TableAndChairs>
-        <ActionBar {...props} me={props.lineup[props.myPos]} sb={props.sb}></ActionBar>
+        <ActionBar {...props} sb={props.sb}></ActionBar>
       </TableContainer>
     </div>
   );
@@ -99,7 +99,6 @@ function TableComponent(props) {
 
 TableComponent.propTypes = {
   state: React.PropTypes.string,
-  lineup: React.PropTypes.any,
   onLeave: React.PropTypes.any,
   onSitout: React.PropTypes.any,
   board: React.PropTypes.array,

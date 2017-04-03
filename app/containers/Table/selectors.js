@@ -256,17 +256,12 @@ const makeIsMyTurnSelector = () => createSelector(
 
 const makeMaxBetSelector = () => createSelector(
   [makeHandSelector(), makeLineupSelector()],
-  (hand, lineup) => (hand && lineup && lineup.toJS) ? pokerHelper.findMaxBet(lineup.toJS(), hand.get('dealer')).amount : 0
+  (hand, lineup) => (hand && lineup && lineup.toJS) ? pokerHelper.findMaxBet(lineup.toJS(), hand.get('dealer')).amount : -1
 );
 
 const makeMyMaxBetSelector = () => createSelector(
   [makeLineupSelector(), makeSignerAddrSelector()],
-  (lineup, myAddress) => (lineup && lineup.toJS && myAddress) ? pokerHelper.getMyMaxBet(lineup.toJS(), myAddress) : 0
-);
-
-const makeAmountToCallSelector = () => createSelector(
-  [makeMaxBetSelector(), makeMyMaxBetSelector()],
-  (maxBet, myMaxbet) => (maxBet && myMaxbet) ? maxBet - myMaxbet : 0
+  (lineup, myAddress) => (lineup && lineup.toJS && myAddress) ? pokerHelper.getMyMaxBet(lineup.toJS(), myAddress) : -1
 );
 
 const makeMissingHandSelector = () => createSelector(
@@ -412,7 +407,6 @@ export {
     makeIsMyTurnSelector,
     makeWhosTurnSelector,
     makePotSizeSelector,
-    makeAmountToCallSelector,
     makeMyPosSelector,
     makeHandSelector,
     makeMaxBetSelector,

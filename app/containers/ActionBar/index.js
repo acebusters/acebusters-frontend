@@ -9,20 +9,25 @@ import Slider from 'react-rangeslider';
 import 'react-rangeslider/lib/index.css';
 import SliderWrapper from '../../components/Slider';
 
+import {
+  makeMinSelector,
+  makeMaxSelector,
+  makeCallAmountSelector,
+  makeAmountToCallSelector,
+} from './selectors';
+
 import { makeSelectPrivKey } from '../AccountProvider/selectors';
+
 import {
   makeHandStateSelector,
   makeMyMaxBetSelector,
   makeIsMyTurnSelector,
   makeMyStackSelector,
-  makeAmountToCallSelector,
 } from '../Table/selectors';
 
 import {
-  makeMinSelector,
-  makeMaxSelector,
-  makeCallAmountSelector,
-} from './selectors';
+  makeMyCardsSelector,
+} from '../Seat/selectors';
 
 import { setCards } from '../Table/actions';
 import { ActionBarComponent, ActionButton } from '../../components/ActionBar';
@@ -113,7 +118,7 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
   handleShow() {
     this.setActive(false);
     const amount = this.props.myMaxBet;
-    const cards = this.props.me.cards;
+    const cards = this.props.cards;
     const handId = parseInt(this.props.params.handId, 10);
     return this.table.show(handId, amount, cards).catch((err) => {
       console.log(err);
@@ -194,6 +199,7 @@ const mapStateToProps = createStructuredSelector({
   minRaise: makeMinSelector(),
   myStack: makeMyStackSelector(),
   max: makeMaxSelector(),
+  cards: makeMyCardsSelector(),
   state: makeHandStateSelector(),
 });
 
@@ -208,7 +214,7 @@ ActionBar.propTypes = {
   myStack: React.PropTypes.number,
   callAmount: React.PropTypes.number,
   state: React.PropTypes.string,
-  me: React.PropTypes.object,
+  cards: React.PropTypes.array,
   setCards: React.PropTypes.func,
 };
 

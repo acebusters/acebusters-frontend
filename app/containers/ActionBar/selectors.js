@@ -18,7 +18,7 @@ const pokerHelper = new PokerHelper(rc);
 
 const makeAmountToCallSelector = () => createSelector(
   [makeMaxBetSelector(), makeMyMaxBetSelector()],
-  (maxBet, myMaxbet) => (maxBet && myMaxbet) ? maxBet - myMaxbet : 0
+  (maxBet, myMaxbet) => (maxBet > -1 && myMaxbet > -1) ? maxBet - myMaxbet : -1
 );
 
 const makeMinSelector = () => createSelector(
