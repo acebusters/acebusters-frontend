@@ -7,6 +7,7 @@ import EWT from 'ethereum-web-token';
 
 import {
   makeMinSelector,
+  makeAmountToCallSelector,
 } from '../selectors';
 
 const ABI_BET = [{ name: 'bet', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
@@ -23,6 +24,8 @@ const P3_ADDR = '0xdd7acad75b52bd206777a36bc41a3b65ad1c44fc';
 const P3_KEY = '0x33de976dfb8bdf2dc3115801e514b902c4c913c351b6549947758a8b9d981722';
 
 const TBL_ADDR = '0x77aabb1133';
+
+const P_EMPTY = '0x0000000000000000000000000000000000000000';
 
 describe('minSelector', () => {
   it('should return the difference between the 2 highes bettors', () => {
@@ -147,6 +150,51 @@ describe('minSelector', () => {
       },
     };
     expect(minSelector(mockedState, props)).toEqual(421);
+  });
+});
+
+describe('amountToCall Selector', () => {
+  it('should return the difference between the 2 highes bettors', () => {
+    const mockedState = fromJS({
+      account: {
+        privKey: P1_KEY,
+      },
+      table: {
+        [TBL_ADDR]: {
+          4: {
+            state: 'preflop',
+            lastRoundMaxBet: 0,
+            dealer: 0,
+            lineup: [{
+              address: P1_ADDR,
+            }, {
+              address: P2_ADDR,
+              last: new EWT(ABI_BET).bet(1, 500).sign(P2_KEY),
+            }, {
+              address: P3_ADDR,
+              last: new EWT(ABI_BET).bet(1, 1000).sign(P3_KEY),
+            }, {
+              address: P_EMPTY,
+            }],
+          },
+          data: {
+            amounts: [30000, 50000, 20000],
+            smallBlind: 500,
+            lastHandNetted: 3,
+          },
+        },
+      },
+    });
+
+    const amountToCallSelector = makeAmountToCallSelector();
+    const props = {
+      pos: 0,
+      params: {
+        handId: 4,
+        tableAddr: TBL_ADDR,
+      },
+    };
+    expect(amountToCallSelector(mockedState, props)).toEqual(1000);
   });
 });
 
