@@ -11,7 +11,7 @@ import Label from '../../components/Label';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 import H1 from '../../components/H1';
-import ErrorMessage from '../../components/ErrorMessage';
+import { ErrorMessage, WarningMessage } from '../../components/FormMessages';
 import Radial from '../../components/RadialProgress';
 
 import account from '../../services/account';
@@ -63,7 +63,7 @@ const renderField = ({ input, label, type, meta: { touched, error, warning } }) 
   <FormGroup>
     <Label htmlFor={input.name}>{label}</Label>
     <Input {...input} placeholder={label} type={type} />
-    {touched && ((error && <ErrorMessage error={error}></ErrorMessage>) || (warning && <ErrorMessage error={warning}></ErrorMessage>))}
+    {touched && ((error && <ErrorMessage error={error} />) || (warning && <WarningMessage warning={warning} />))}
   </FormGroup>
 );
 /* eslint-enable react/prop-types */
@@ -105,6 +105,7 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
       this.props.onWalletExported({ wallet: data.json });
     } else {
       this.props.onWorkerError(evt);
+      throw new SubmissionError({ _error: evt });
     }
   }
 
@@ -133,7 +134,7 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
       // If worker success, ...
       account.register(values.get('email'), workerRsp.data.wallet, values.get('captchaResponse'), window.location.origin).catch((err) => {
         // If store account failed, ...
-        const errMsg = 'Login failed!';
+        const errMsg = 'Registration failed!';
         if (err === 409) {
           throw new SubmissionError({ email: 'Email taken.', _error: errMsg });
         } else {
@@ -161,8 +162,10 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
             <Field name="password" type="password" component={renderField} label="password" />
             <Field name="confirmedPassword" type="password" component={renderField} label="confirm   password" />
             <Field name="captchaResponse" component={Captcha} />
-            {error && <ErrorMessage error={error}></ErrorMessage>}
-            <Button type="submit" disabled={submitting} size="large">Register</Button>
+            {error && <ErrorMessage error={error} />}
+            <Button type="submit" disabled={submitting} size="large">
+              { (!submitting) ? 'Register' : 'Please wait ...' }
+            </Button>
           </Form>
           <iframe
             src={workerPath} style={{ display: 'none' }} onLoad={(event) => {
@@ -170,7 +173,7 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
             }}
           />
         </div>
-        { this.props.progress &&
+        { this.props.progress && submitting &&
           <div>
             <Radial progress={this.props.progress}></Radial>
             <H1>Registering please wait ...</H1>

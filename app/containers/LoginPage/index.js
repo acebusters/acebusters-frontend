@@ -7,7 +7,7 @@ import Label from '../../components/Label';
 import FormGroup from '../../components/Form/FormGroup';
 import Button from '../../components/Button';
 import Container from '../../components/Container';
-import ErrorMessage from '../../components/ErrorMessage';
+import { ErrorMessage, WarningMessage } from '../../components/FormMessages';
 import account from '../../services/account';
 import { workerError, walletImported, login } from './actions';
 import { modalAdd, modalDismiss } from '../App/actions';
@@ -43,7 +43,7 @@ const renderField = ({ input, label, type, meta: { touched, error, warning } }) 
   <FormGroup>
     <Label htmlFor={input.name}>{label}</Label>
     <Input {...input} placeholder={label} type={type} />
-    {touched && ((error && <ErrorMessage error={error}></ErrorMessage>) || (warning && <ErrorMessage error={warning}></ErrorMessage>))}
+    {touched && ((error && <ErrorMessage error={error} />) || (warning && <WarningMessage warning={warning}></WarningMessage>))}
   </FormGroup>
 );
 /* eslint-enable react/prop-types */
@@ -68,13 +68,11 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
   }
 
   handleSubmit(values, dispatch) {
-    this.setState({ waiting: true });
     return account.login(values.get('email')).catch((err) => {
       const errMsg = 'Login failed!';
       if (err === 404) {
         throw new SubmissionError({ confCode: 'Email unknown.', _error: errMsg });
       } else {
-        this.setState({ waiting: false });
         throw new SubmissionError({ _error: `Login failed with error code ${err}` });
       }
     }).then((data) => {
@@ -90,7 +88,6 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
       // so we can display form errors if any of the async ops fail.
       return login(values, dispatch).catch((workerErr) => {
         // If worker failed, ...
-        this.setState({ waiting: false });
         throw new SubmissionError({ _error: `error, Login failed due to worker error: ${workerErr}` });
       }).then((workerRsp) => {
         // If worker success, ...
@@ -140,20 +137,21 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
 
   render() {
     const workerPath = this.props.workerPath + encodeURIComponent(location.origin);
-    const { error, handleSubmit } = this.props;
+    const { error, handleSubmit, submitting } = this.props;
+
     return (<Container>
       <div>
         <H1>Log into your account!</H1>
         <Form onSubmit={handleSubmit(this.handleSubmit)}>
           <Field name="email" type="text" component={renderField} label="Email" />
           <Field name="password" type="password" component={renderField} label="Password" />
-          {error && <strong>{error}</strong>}
-          <Button type="submit" size="large" disabled={this.state.waiting}>
-            { (!this.state.waiting) ? 'Login' : 'Please wait ...' }
+          {error && <ErrorMessage error={error} />}
+          <Button type="submit" size="large" disabled={submitting}>
+            { (!submitting) ? 'Login' : 'Please wait ...' }
           </Button>
         </Form>
         <iframe src={workerPath} style={{ display: 'none' }} onLoad={(event) => { this.frame = event.target; }} />
-        { this.props.progress &&
+        { this.props.progress && submitting &&
           <div>
             <Radial progress={this.props.progress}></Radial>
           </div>
