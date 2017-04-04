@@ -64,7 +64,8 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
   }
 
   updateAmount(value) {
-    const amount = parseInt(value, 10);
+    let amount = parseInt(value, 10);
+    amount = (amount > this.props.myStack) ? this.props.myStack : amount;
     this.setState({ amount });
   }
 

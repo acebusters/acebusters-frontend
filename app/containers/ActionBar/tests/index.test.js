@@ -67,7 +67,6 @@ describe('ActionBar', () => {
     const actionBar = shallow(
       <ActionBar {...props} />
     );
-    actionBar.setState({ amount: 2000 });
     expect(actionBar.find(ActionButton).last().props().text).toBe('FOLD');
   });
 
@@ -99,8 +98,25 @@ describe('ActionBar', () => {
     const actionBar = shallow(
       <ActionBar {...props} />
     );
-    actionBar.setState({ amount: 2000 });
+    actionBar.instance().updateAmount(2000);
     expect(actionBar.find(ActionButton).first().props().text).toEqual('BET 2000');
+  });
+
+  it('should set Bet to all in amount', () => {
+    const props = {
+      state: 'flop',
+      params: {
+        tableAddr: '0x123',
+      },
+      isMyTurn: true,
+      myStack: 1750,
+      amountToCall: 0,
+    };
+    const actionBar = shallow(
+      <ActionBar {...props} />
+    );
+    actionBar.instance().updateAmount(2000);
+    expect(actionBar.find(ActionButton).first().props().text).toEqual('BET 1750');
   });
 
   it('should render the Check Button when amount to call is 0', () => {
@@ -147,7 +163,7 @@ describe('ActionBar', () => {
     const actionBar = shallow(
       <ActionBar {...props} />
     );
-    actionBar.setState({ active: false });
+    actionBar.instance().setActive(false);
     expect(actionBar.children().length).toBe(0);
   });
 });
