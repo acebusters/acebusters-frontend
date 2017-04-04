@@ -153,10 +153,7 @@ const selectStack = (table, pos) => {
     }
   });
   // handle empty state channel
-  if (maxHand === 0) {
-    return amount;
-  }
-  if (maxHand <= lastHandNetted) {
+  if (maxHand === 0 || maxHand <= lastHandNetted) {
     return amount;
   }
   // sum up state channel
