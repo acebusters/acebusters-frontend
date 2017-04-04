@@ -23,11 +23,11 @@ import {
   makeCoordsSelector,
   makeDealerSelector,
   makeBlockySelector,
+  makeStackSelector,
 } from './selectors';
 
 import {
   makeMyPosSelector,
-  makeStackSelector,
   makeHandStateSelector,
 } from '../Table/selectors';
 

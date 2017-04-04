@@ -27,17 +27,3 @@ export const PLAYER4 = {
 export const PLAYER_EMPTY = {
   address: '0x0000000000000000000000000000000000000000',
 };
-
-export const ABI = {
-  ABI_BET: [{ name: 'bet', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }],
-  ABI_ALL_IN: [{ name: 'allIn', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }],
-  ABI_FOLD: [{ name: 'fold', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }],
-  ABI_SIT_OUT: [{ name: 'sitOut', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }],
-
-  ABI_CHECK_FLOP: [{ name: 'checkFlop', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }],
-  ABI_CHECK_TURN: [{ name: 'checkTurn', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }],
-  ABI_CHECK_RIVER: [{ name: 'checkRiver', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }],
-
-  ABI_SHOW: [{ name: 'show', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }],
-  ABI_DIST: [{ name: 'distribution', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }, { type: 'bytes32[]' }] }],
-};
