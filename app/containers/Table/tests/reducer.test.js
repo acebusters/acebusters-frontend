@@ -10,7 +10,7 @@ import {
   lineupReceived,
 } from '../actions';
 
-const ABI_BET = [{ name: 'bet', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
+import { ABI_BET } from '../../../app.config';
 
 // secretSeed: 'rural tent tests net drip fatigue uncle action repeat couple lawn rival'
 const P1_ADDR = '0x6d2f2c0fa568243d2def3e999a791a6df45d816e';

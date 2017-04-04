@@ -5,7 +5,7 @@
 import EWT from 'ethereum-web-token';
 import SagaTester from 'redux-saga-tester';
 import { fromJS } from 'immutable';
-import { PLAYER1, PLAYER2, PLAYER3, PLAYER4, ABI, PLAYER_EMPTY } from './consts';
+import { PLAYER1, PLAYER2, PLAYER3, PLAYER4, PLAYER_EMPTY } from './consts';
 import { updateScanner } from '../sagas';
 
 
@@ -16,6 +16,8 @@ import {
   SHOW,
   NET,
 } from '../actions';
+
+import { ABI_BET, ABI_SHOW } from '../../../app.config';
 
 const tableAddr = '0x112233';
 
@@ -65,7 +67,7 @@ describe('Saga Tests', () => {
         address: PLAYER1.address,
       }, {
         address: PLAYER2.address,
-        last: new EWT(ABI.ABI_BET).bet(1, 500).sign(PLAYER2.key),
+        last: new EWT(ABI_BET).bet(1, 500).sign(PLAYER2.key),
       }, {
         address: PLAYER3.address,
       }, {
@@ -102,12 +104,12 @@ describe('Saga Tests', () => {
       lineup: [{
       }, {
         address: PLAYER1.address,
-        last: new EWT(ABI.ABI_SHOW).show(1, 1000).sign(PLAYER1.key),
+        last: new EWT(ABI_SHOW).show(1, 1000).sign(PLAYER1.key),
       }, {
         address: PLAYER_EMPTY.address,
       }, {
         address: PLAYER2.address,
-        last: new EWT(ABI.ABI_BET).bet(1, 1000).sign(PLAYER2.key),
+        last: new EWT(ABI_BET).bet(1, 1000).sign(PLAYER2.key),
       }],
     };
 

@@ -9,9 +9,12 @@ import {
   makeMaxBetSelector,
   makeMyMaxBetSelector,
   makeSbSelector,
-  makeMyStackSelector,
   makeHandSelector,
 } from '../Table/selectors';
+
+import {
+  makeMyStackSelector,
+} from '../Seat/selectors';
 
 const rc = new ReceiptCache();
 const pokerHelper = new PokerHelper(rc);

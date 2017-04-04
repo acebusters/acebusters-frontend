@@ -23,11 +23,11 @@ import {
   makeHandStateSelector,
   makeMyMaxBetSelector,
   makeIsMyTurnSelector,
-  makeMyStackSelector,
 } from '../Table/selectors';
 
 import {
   makeMyCardsSelector,
+  makeMyStackSelector,
 } from '../Seat/selectors';
 
 import { setCards } from '../Table/actions';

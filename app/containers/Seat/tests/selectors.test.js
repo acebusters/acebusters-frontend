@@ -6,10 +6,10 @@ import {
   makeFoldedSelector,
   makeLastAmountSelector,
   makeCardsSelector,
+  makeStackSelector,
 } from '../selectors';
 
-const ABI_FOLD = [{ name: 'fold', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
-const ABI_BET = [{ name: 'bet', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
+import { ABI_BET, ABI_DIST, ABI_FOLD } from '../../../app.config';
 
 // secretSeed: 'rural tent tests net drip fatigue uncle action repeat couple lawn rival'
 const P1_ADDR = '0x6d2f2c0fa568243d2def3e999a791a6df45d816e';
@@ -217,3 +217,115 @@ describe('cardSelector', () => {
   });
 });
 
+describe('stackSelector', () => {
+  it('should select player\'s stack with empty state channel.', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          data: {
+            seats: [{
+              address: P1_ADDR,
+            }, {
+              address: P2_ADDR,
+            }],
+            amounts: [3000, 5000],
+            lastHandNetted: 3,
+          },
+        },
+      },
+    });
+    const stackSelector = makeStackSelector();
+    const props = {
+      pos: 0,
+      params: {
+        tableAddr: TBL_ADDR,
+      },
+    };
+    expect(stackSelector(mockedState, props)).toEqual(3000);
+  });
+
+  it('should select player\'s stack with 1 hand in state channel.', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          4: {
+            state: 'waiting',
+            lineup: [{
+              address: P1_ADDR,
+              last: new EWT(ABI_BET).bet(1, 500).sign(P1_KEY),
+            }, {
+              address: P2_ADDR,
+            }],
+          },
+          data: {
+            seats: [{
+              address: P1_ADDR,
+            }, {
+              address: P2_ADDR,
+            }],
+            amounts: [3000, 5000],
+            lastHandNetted: 3,
+          },
+        },
+      },
+    });
+    const stackSelector = makeStackSelector();
+    const props = {
+      pos: 0,
+      params: {
+        tableAddr: TBL_ADDR,
+      },
+    };
+    expect(stackSelector(mockedState, props)).toEqual(2500);
+  });
+
+  it('should select player\'s stack with 2 hand in state channel.', () => {
+    const dists = [];
+    dists.push(EWT.concat(P1_ADDR, 10).toString('hex')); // rake
+    dists.push(EWT.concat(P2_ADDR, 1000).toString('hex'));
+    const distRec = new EWT(ABI_DIST).distribution(4, 0, dists).sign(P1_KEY);
+
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          4: {
+            state: 'showdown',
+            lineup: [{
+              address: P1_ADDR,
+            }, {
+              address: P2_ADDR,
+              last: new EWT(ABI_BET).bet(1, 500).sign(P2_KEY),
+            }],
+            distribution: distRec,
+          },
+          5: {
+            state: 'waiting',
+            lineup: [{
+              address: P1_ADDR,
+            }, {
+              address: P2_ADDR,
+              last: new EWT(ABI_BET).bet(1, 1200).sign(P2_KEY),
+            }],
+          },
+          data: {
+            seats: [{
+              address: P1_ADDR,
+            }, {
+              address: P2_ADDR,
+            }],
+            amounts: [3000, 5000],
+            lastHandNetted: 3,
+          },
+        },
+      },
+    });
+    const stackSelector = makeStackSelector();
+    const props = {
+      pos: 1,
+      params: {
+        tableAddr: TBL_ADDR,
+      },
+    };
+    expect(stackSelector(mockedState, props)).toEqual(4300);
+  });
+});
