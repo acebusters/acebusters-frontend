@@ -5,6 +5,7 @@ import {
   tableStateSelector,
   makeMissingHandSelector,
   makeSelectWinners,
+  makeMyHandValueSelector,
 } from '../selectors';
 
 import { ABI_DIST } from '../../../app.config';
@@ -239,5 +240,30 @@ describe('winnersSelector', () => {
     };
     const selectWinners = makeSelectWinners();
     expect(selectWinners(mockedState, props)).toEqual(winners);
+  });
+});
+
+describe('winnersSelector', () => {
+  it('should have winner with index 0 with a pair of Aces`.', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          2: {
+            holeCards: [11, 12],
+            cards: [8, 9, 10],
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 0,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 2,
+      },
+    };
+    const selectHandValue = makeMyHandValueSelector();
+    expect(selectHandValue(mockedState, props).descr).toEqual('Royal Flush');
   });
 });

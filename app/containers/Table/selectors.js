@@ -190,6 +190,23 @@ const makeLineupSelector = () => createSelector(
   }
 );
 
+const makeMyHandValueSelector = () => createSelector(
+  [makeHandSelector(), makeBoardSelector()],
+  (hand, board) => {
+    if (!hand || !hand.get || !hand.get('holeCards') || board.length === 0) {
+      return null;
+    }
+    const myCards = hand.get('holeCards').toJS();
+    const handValue = [];
+    const boardCards = board.map((c) => valuesShort[c % 13] + suits[Math.floor([c / 13])]);
+
+    const card1 = valuesShort[myCards[0] % 13] + suits[Math.floor([myCards[0] / 13])];
+    const card2 = valuesShort[myCards[1] % 13] + suits[Math.floor([myCards[1] / 13])];
+    handValue.push(...boardCards, card1, card2);
+    return Solver.Hand.solve(handValue);
+  }
+);
+
 const makeSelectWinners = () => createSelector(
   [makeHandSelector(), makeBoardSelector()],
   (hand, board) => {
@@ -333,6 +350,7 @@ export {
     is0rTurnByAction,
     isShowTurnByAction,
     hasNettingInAction,
+    makeMyHandValueSelector,
     makeTableDataSelector,
     makeSbSelector,
     makeLineupSelector,
