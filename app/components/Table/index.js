@@ -55,6 +55,17 @@ export const TableAndChairs = styled.div`
   padding-bottom: 50%;
 `;
 
+export const HandBox = styled.div`
+  left: 80%;
+  top: 80%;
+  position: absolute;
+  padding: 0.5em;
+  background-color: ${black};
+  border-radius: 0.5em;
+  color: ${white};
+  transform: translate(-50%,-20%);
+`;
+
 export const PokerTable = styled.div`
   position: absolute;
   margin-top: 10%;
@@ -81,7 +92,7 @@ function TableComponent(props) {
         <TableAndChairs id="table-and-chairs" >
           <PokerTable id="poker-table">
             <img src={tableImage} alt="" />
-            { props.winners.length > 0 &&
+            { props.winners &&
               <Winner>{ props.winners }</Winner>
             }
             <Pot>Pot: { props.potSize }</Pot>
@@ -91,6 +102,9 @@ function TableComponent(props) {
             </Board>
           </PokerTable>
         </TableAndChairs>
+        { props.myHand &&
+          <HandBox> { props.myHand.descr }</HandBox>
+        }
         <ActionBar {...props} sb={props.sb}></ActionBar>
       </TableContainer>
     </div>
@@ -106,6 +120,7 @@ TableComponent.propTypes = {
   potSize: React.PropTypes.number,
   myPos: React.PropTypes.number,
   winners: React.PropTypes.array,
+  myHand: React.PropTypes.object,
   sb: React.PropTypes.number,
 };
 

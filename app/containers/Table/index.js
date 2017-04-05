@@ -45,6 +45,7 @@ import {
   makeHandSelector,
   makeHandStateSelector,
   makeLineupSelector,
+  makeMyHandValueSelector,
   makeMyPosSelector,
   makeMyMaxBetSelector,
   makeMissingHandSelector,
@@ -364,6 +365,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           id="table"
           sb={sb}
           winners={winners}
+          myHand={this.props.myHand}
           board={board}
           seats={seats}
           onLeave={() => this.handleLeave(this.props.myPos)}
@@ -392,6 +394,7 @@ const mapStateToProps = createStructuredSelector({
   state: makeHandStateSelector(),
   hand: makeHandSelector(),
   board: makeBoardSelector(),
+  myHand: makeMyHandValueSelector(),
   data: makeTableDataSelector(),
   lineup: makeLineupSelector(),
   isMyTurn: makeIsMyTurnSelector(),
@@ -410,6 +413,7 @@ Table.propTypes = {
   state: React.PropTypes.string,
   board: React.PropTypes.array,
   hand: React.PropTypes.object,
+  myHand: React.PropTypes.object,
   lineup: React.PropTypes.object,
   params: React.PropTypes.object,
   privKey: React.PropTypes.string,
