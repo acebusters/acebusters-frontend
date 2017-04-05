@@ -5,15 +5,20 @@
 import EWT from 'ethereum-web-token';
 import SagaTester from 'redux-saga-tester';
 import { fromJS } from 'immutable';
+import nock from 'nock';
+
 import { PLAYER1, PLAYER2, PLAYER3, PLAYER4, PLAYER_EMPTY } from './consts';
-import { updateScanner } from '../sagas';
-
-
+import { updateScanner, tableStateSaga, payFlow } from '../sagas';
+import { formActionSaga } from '../../../services/reduxFormSaga';
 import {
+  bet,
+  pay,
   updateReceived,
   UPDATE_RECEIVED,
+  RECEIPT_SET,
   BET,
   SHOW,
+  SET_CARDS,
   NET,
 } from '../actions';
 
@@ -192,6 +197,102 @@ describe('Saga Tests', () => {
     sagaTester.start(updateScanner);
     sagaTester.dispatch(updateReceived(tableAddr, hand));
     expect(sagaTester.getCalledActions().length).toEqual(1);
+  });
+
+  it('should set cards when bet successful', async () => {
+    // mock a successful request
+    nock('http://ab.com', { filteringScope: () => true })
+      .filteringPath(() => '/')
+      .post('/')
+      .reply(200, '{"cards":[12,13]}');
+
+    const sagaTester = new SagaTester(fromJS({}));
+    sagaTester.start(tableStateSaga);
+    sagaTester.dispatch(bet(tableAddr, 3, 500, PLAYER2.key, 1, 'prevReceipt'));
+    await sagaTester.waitFor(RECEIPT_SET);
+    // this is setting the new receipt
+    expect(sagaTester.getCalledActions().length).toEqual(2);
+    expect(sagaTester.getLatestCalledAction().type).toEqual(RECEIPT_SET);
+    expect(sagaTester.getLatestCalledAction().handId).toEqual(3);
+    expect(sagaTester.getLatestCalledAction().pos).toEqual(1);
+    expect(sagaTester.getLatestCalledAction().tableAddr).toEqual(tableAddr);
+    await sagaTester.waitFor(SET_CARDS, true);
+    expect(sagaTester.getCalledActions().length).toEqual(3);
+    expect(sagaTester.getLatestCalledAction().type).toEqual(SET_CARDS);
+    expect(sagaTester.getLatestCalledAction().cards).toEqual([12, 13]);
+    expect(sagaTester.getLatestCalledAction().handId).toEqual(3);
+    expect(sagaTester.getLatestCalledAction().tableAddr).toEqual(tableAddr);
+  });
+
+  it('should reset receipt when call fails', async () => {
+    // mock a failed request
+    nock('http://ab.com', { filteringScope: () => true })
+      .filteringPath(() => '/')
+      .post('/')
+      .reply(401, '{"msg":"err"}');
+
+    const sagaTester = new SagaTester(fromJS({}));
+    sagaTester.start(tableStateSaga);
+    sagaTester.dispatch(bet(tableAddr, 3, 500, PLAYER2.key, 1, 'prevReceipt'));
+    await sagaTester.waitFor(RECEIPT_SET);
+    // this is setting the new receipt
+    expect(sagaTester.getCalledActions().length).toEqual(2);
+    expect(sagaTester.getLatestCalledAction().type).toEqual(RECEIPT_SET);
+    expect(sagaTester.getLatestCalledAction().handId).toEqual(3);
+    expect(sagaTester.getLatestCalledAction().pos).toEqual(1);
+    expect(sagaTester.getLatestCalledAction().tableAddr).toEqual(tableAddr);
+    await sagaTester.waitFor(RECEIPT_SET, true);
+    // here the old receipt is set back
+    expect(sagaTester.getCalledActions().length).toEqual(3);
+    expect(sagaTester.getLatestCalledAction().type).toEqual(RECEIPT_SET);
+    expect(sagaTester.getLatestCalledAction().receipt).toEqual('prevReceipt');
+    expect(sagaTester.getLatestCalledAction().handId).toEqual(3);
+    expect(sagaTester.getLatestCalledAction().pos).toEqual(1);
+    expect(sagaTester.getLatestCalledAction().tableAddr).toEqual(tableAddr);
+  });
+
+  it('should return cards when bet successful', async () => {
+    // mock a successful request
+    nock('http://ab.com', { filteringScope: () => true })
+      .filteringPath(() => '/')
+      .post('/')
+      .reply(200, '{"cards":[12,13]}');
+
+    const sagaTester = new SagaTester({});
+    sagaTester.start(formActionSaga);
+    sagaTester.start(payFlow);
+    const payAction = bet(tableAddr, 3, 500, PLAYER2.key, 1, 'prevReceipt');
+    const rsp = await pay(payAction, (action) => sagaTester.dispatch(action));
+    expect(rsp).toEqual([12, 13]);
+    const receipt = sagaTester.getCalledActions()[1];
+    expect(receipt.type).toEqual(RECEIPT_SET);
+    expect(receipt.handId).toEqual(3);
+    expect(receipt.pos).toEqual(1);
+    expect(receipt.tableAddr).toEqual(tableAddr);
+    expect(sagaTester.getCalledActions().length).toEqual(3);
+  });
+
+  it('should reset receipt when call fails', async (done) => {
+    // mock a failed request
+    nock('http://ab.com', { filteringScope: () => true })
+      .filteringPath(() => '/')
+      .post('/')
+      .reply(401, '{"errorMessage":"unauthorized"}');
+
+    const sagaTester = new SagaTester({});
+    sagaTester.start(formActionSaga);
+    sagaTester.start(payFlow);
+    const payAction = bet(tableAddr, 3, 500, PLAYER2.key, 1, 'prevReceipt');
+    pay(payAction, (action) => sagaTester.dispatch(action)).catch((err) => {
+      expect(err).toEqual('unauthorized');
+      const receiptAction = sagaTester.getCalledActions()[2];
+      expect(receiptAction.type).toEqual(RECEIPT_SET);
+      expect(receiptAction.receipt).toEqual('prevReceipt');
+      expect(receiptAction.handId).toEqual(3);
+      expect(receiptAction.pos).toEqual(1);
+      expect(receiptAction.tableAddr).toEqual(tableAddr);
+      done();
+    });
   });
 });
 

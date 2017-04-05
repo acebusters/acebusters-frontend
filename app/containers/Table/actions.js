@@ -1,6 +1,4 @@
-/**
- * Created by helge on 20.09.16.
- */
+import { createFormAction } from '../../services/reduxFormSaga';
 
 export const HAND_REQUEST = 'acebusters/Table/HAND_REQUEST';
 export const NEXT_HAND = 'acebusters/Table/NEXT_HAND';
@@ -15,14 +13,17 @@ export const BET = 'acebusters/Table/BET';
 export const SHOW = 'acebusters/Table/SHOW';
 export const NET = 'acebusters/Table/NET';
 export const PENDING_TOGGLE = 'acebusters/Table/PENDING_TOGGLE';
+export const RECEIPT_SET = 'acebusters/Table/RECEIPT_SET';
 
 
-export function setCards(tableAddr, handId, cards, pos) {
-  return { type: SET_CARDS, tableAddr, handId, cards, pos };
+export function setCards(tableAddr, handId, cards) {
+  return { type: SET_CARDS, tableAddr, handId, cards };
 }
 
-export function bet(tableAddr, handId, amount, privKey) {
-  return { type: BET, tableAddr, handId, amount, privKey };
+export const pay = createFormAction('PAY');
+
+export function bet(tableAddr, handId, amount, privKey, pos, prevReceipt) {
+  return { type: BET, tableAddr, handId, amount, privKey, pos, prevReceipt };
 }
 
 export function show(tableAddr, handId, holeCards, amount, privKey) {
@@ -59,4 +60,8 @@ export function nextHand(tableAddr, handId) {
 
 export function leaveRequest(tableAddr, handId, amount, privKey) {
   return { type: LEAVE_REQUEST, tableAddr, handId, amount, privKey };
+}
+
+export function receiptSet(tableAddr, handId, pos, receipt) {
+  return { type: RECEIPT_SET, tableAddr, handId, pos, receipt };
 }

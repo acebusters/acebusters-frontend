@@ -301,6 +301,7 @@
     "jest-cli": "18.0.0",
     "lint-staged": "3.2.1",
     "ngrok": "2.2.4",
+    "nock": "^9.0.11",
     "node-plop": "0.5.4",
     "null-loader": "0.1.1",
     "offline-plugin": "4.5.2",

@@ -10,8 +10,12 @@ function TableService(tableAddr, privKey) {
   this.privKey = privKey;
 }
 
+TableService.prototype.betReceipt = function betReceipt(handId, amount) {
+  return new EWT(ABI_BET).bet(handId, amount).sign(this.privKey);
+};
+
 TableService.prototype.bet = function bet(handId, amount) {
-  const receipt = new EWT(ABI_BET).bet(handId, amount).sign(this.privKey);
+  const receipt = this.betReceipt(handId, amount);
   return this.pay(receipt);
 };
 
