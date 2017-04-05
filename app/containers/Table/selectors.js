@@ -116,8 +116,6 @@ const isShowTurnByAction = createSelector(
       return false;
     }
     const whosTurn = pokerHelper.whosTurn(action.hand);
-    console.log(whosTurn);
-    console.log(myPos);
     if (typeof whosTurn === 'undefined' || whosTurn < 0) {
       return false;
     }
