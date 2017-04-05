@@ -134,15 +134,57 @@ describe('Saga Tests', () => {
     const sagaTester = new SagaTester({ initialState });
     sagaTester.start(updateScanner);
     sagaTester.dispatch(updateReceived(tableAddr, hand));
-    expect(sagaTester.getLatestCalledAction().type).toEqual(SHOW);
-    expect(sagaTester.getLatestCalledAction().amount).toEqual(1000);
-    expect(sagaTester.getLatestCalledAction().holeCards).toEqual([12, 13]);
+    const show = sagaTester.getLatestCalledAction();
+    expect(show.type).toEqual(SHOW);
+    expect(show.amount).toEqual(1000);
+    expect(show.holeCards).toEqual([12, 13]);
     // do the same thing again, and make sure the request
     // is deduplicated
     sagaTester.dispatch(updateReceived(tableAddr, hand));
     expect(sagaTester.getLatestCalledAction().type).toEqual(UPDATE_RECEIVED);
     expect(sagaTester.getCalledActions().length).toEqual(3);
   });
+
+  it('should dispatch show action when its showtime as all-in player!', () => {
+    const hand = {
+      handId: 4,
+      state: 'showdown',
+      dealer: 1,
+      lineup: [{
+      }, {
+        address: PLAYER1.address,
+        last: new EWT(ABI_SHOW).show(1, 1000).sign(PLAYER1.key),
+      }, {
+        address: PLAYER_EMPTY.address,
+      }, {
+        address: PLAYER2.address,
+        last: new EWT(ABI_BET).bet(1, 1000).sign(PLAYER2.key),
+        sitout: 'allin',
+      }],
+    };
+    const initialState = fromJS({
+      account: {
+        privKey: PLAYER2.key,
+      },
+      table: {
+        [tableAddr]: {
+          4: {
+            holeCards: [12, 13],
+          },
+        },
+      },
+    });
+
+    const sagaTester = new SagaTester({ initialState });
+    sagaTester.start(updateScanner);
+    sagaTester.dispatch(updateReceived(tableAddr, hand));
+    const show = sagaTester.getLatestCalledAction();
+    expect(show.type).toEqual(SHOW);
+    expect(show.amount).toEqual(1000);
+    expect(show.holeCards).toEqual([12, 13]);
+    expect(sagaTester.getCalledActions().length).toEqual(2);
+  });
+
 
   it('should dispatch net action when there is a netting request', () => {
     const hand = {
