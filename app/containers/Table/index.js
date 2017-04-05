@@ -355,7 +355,11 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     // Get last Modal Element
     const seats = this.renderSeats();
     const board = this.renderBoard();
-    const winners = Array.from(this.props.winners).map((winner) => (<div>`${winner.addr} won ${winner.amount} with ${winner.hand}`</div>));
+    const winners = [];
+    Object.keys(this.props.winners).forEach((key, index) => {
+      const winner = this.props.winners[key];
+      winners.push((<div key={index}>`${winner.addr} won ${winner.amount} with ${winner.hand}`</div>));
+    });
     const sb = (this.props.data && this.props.data.get('smallBlind')) ? this.props.data.get('smallBlind') : 0;
 
     return (
