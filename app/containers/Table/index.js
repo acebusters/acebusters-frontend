@@ -259,7 +259,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           this.props.modalAdd(statusElement);
 
           // update lineup when join successful
-          // TODO(AB): tell the backend that event happened
           this.table.getLineup.callPromise().then((rsp) => {
             this.props.lineupReceived(this.tableAddr, rsp, this.props.data.get('smallBlind'));
             for (let i = 0; i < rsp[1].length; i += 1) {
@@ -268,6 +267,11 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
                 break;
               }
             }
+          });
+        } else {
+          // update lineup when when other players joined
+          this.table.getLineup.callPromise().then((rsp) => {
+            this.props.lineupReceived(this.tableAddr, rsp, this.props.data.get('smallBlind'));
           });
         }
         break;
