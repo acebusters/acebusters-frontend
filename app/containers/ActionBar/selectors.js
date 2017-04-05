@@ -25,8 +25,8 @@ const makeAmountToCallSelector = () => createSelector(
 );
 
 const makeMinSelector = () => createSelector(
-  [makeSbSelector(), makeHandSelector(), makeMyStackSelector()],
-  (sb, hand, stack) => {
+  [makeSbSelector(), makeHandSelector(), makeMyStackSelector(), makeAmountToCallSelector()],
+  (sb, hand, stack, amountToCall) => {
     if (!sb || !hand) {
       return -1;
     }
@@ -34,16 +34,17 @@ const makeMinSelector = () => createSelector(
     if (stack < sb * 2) {
       return stack;
     }
-    // check if there was a raise
     const lineup = hand.get('lineup').toJS();
     const dealer = hand.get('dealer');
+    const maxBet = pokerHelper.findMaxBet(lineup, dealer).amount;
+    // check if there was a raise exclude preflop sb and bb
     const lastRoundMaxBet = hand.get('lastRoundMaxBet');
     const minRaise = pokerHelper.findMinRaiseAmount(lineup, dealer, lastRoundMaxBet);
-    if (minRaise > -1) {
-      return minRaise;
+    if (!(maxBet === sb * 2 && amountToCall <= sb * 2) && minRaise > -1) {
+      return minRaise + amountToCall;
     }
     // otherwise return the BB
-    return (sb * 2);
+    return (sb * 2) + amountToCall;
   }
 );
 

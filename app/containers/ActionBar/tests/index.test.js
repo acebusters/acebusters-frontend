@@ -92,14 +92,33 @@ describe('ActionBar', () => {
         tableAddr: '0x123',
       },
       isMyTurn: true,
-      callAmount: 1000,
+      minRaise: 2000,
       amountToCall: 0,
+      myStack: 10000,
     };
     const actionBar = shallow(
       <ActionBar {...props} />
     );
-    actionBar.instance().updateAmount(2000);
+    actionBar.instance().componentWillReceiveProps(props);
     expect(actionBar.find(ActionButton).first().props().text).toEqual('BET 2000');
+  });
+
+  it('should render the RAISE Button with correct min amount', () => {
+    const props = {
+      state: 'flop',
+      params: {
+        tableAddr: '0x123',
+      },
+      isMyTurn: true,
+      minRaise: 5000,
+      amountToCall: 1000,
+      myStack: 10000,
+    };
+    const actionBar = shallow(
+      <ActionBar {...props} />
+    );
+    actionBar.instance().componentWillReceiveProps(props);
+    expect(actionBar.find(ActionButton).first().props().text).toEqual('RAISE 5000');
   });
 
   it('should set Bet to all in amount', () => {

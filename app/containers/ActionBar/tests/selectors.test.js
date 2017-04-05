@@ -41,10 +41,52 @@ describe('minSelector', () => {
             dealer: 0,
             lineup: [{
               address: P1_ADDR,
-              last: new EWT(ABI_BET).bet(1, 2000).sign(P1_KEY),
+              last: new EWT(ABI_BET).bet(1, 1000).sign(P1_KEY),
             }, {
               address: P2_ADDR,
-              last: new EWT(ABI_BET).bet(1, 4000).sign(P2_KEY),
+              last: new EWT(ABI_BET).bet(1, 3000).sign(P2_KEY),
+            }, {
+              address: P3_ADDR,
+              last: new EWT(ABI_BET).bet(1, 7000).sign(P3_KEY),
+            }],
+          },
+          data: {
+            amounts: [30000, 50000, 20000],
+            smallBlind: 500,
+            lastHandNetted: 3,
+          },
+        },
+      },
+    });
+
+    const minSelector = makeMinSelector();
+    const props = {
+      pos: 0,
+      params: {
+        handId: 4,
+        tableAddr: TBL_ADDR,
+      },
+    };
+    expect(minSelector(mockedState, props)).toEqual(10000);
+  });
+
+  it('should return 2 times the big blind preflop with no raise', () => {
+    const mockedState = fromJS({
+      account: {
+        privKey: P1_KEY,
+      },
+      table: {
+        [TBL_ADDR]: {
+          4: {
+            state: 'preflop',
+            lastRoundMaxBet: 0,
+            dealer: 0,
+            lineup: [{
+              address: P1_ADDR,
+              last: new EWT(ABI_BET).bet(1, 0).sign(P1_KEY),
+            }, {
+              address: P2_ADDR,
+              last: new EWT(ABI_BET).bet(1, 500).sign(P2_KEY),
             }, {
               address: P3_ADDR,
               last: new EWT(ABI_BET).bet(1, 1000).sign(P3_KEY),
