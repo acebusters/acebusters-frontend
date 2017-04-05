@@ -51,7 +51,7 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
   }
 
   componentWillReceiveProps(nextProps) {
-    const min = (nextProps.amountToCall + nextProps.minRaise);
+    const min = nextProps.minRaise;
     const amount = (nextProps.myStack < min) ? nextProps.myStack : min;
     this.setState({ amount });
     if (nextProps.isMyTurn === true) {
@@ -163,7 +163,7 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
                 key="betting-slider"
                 data-orientation="vertical"
                 value={this.state.amount}
-                min={this.props.amountToCall + this.props.minRaise}
+                min={this.props.minRaise}
                 max={this.props.max}
                 step={10} // this should be the smallest unit of our token
                 onChange={this.updateAmount}
