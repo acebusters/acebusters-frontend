@@ -98,14 +98,9 @@ export function* payFlow() {
 function* performBet(action) {
   const table = new TableService(action.tableAddr, action.privKey);
   try {
-    // set toggle flag
-    const newReceipt = table.betReceipt(action.handId, action.amount);
-    yield put(receiptSet(action.tableAddr, action.handId, action.pos, newReceipt));
-    const holeCards = yield table.pay(newReceipt);
+    const holeCards = yield table.bet(action.handId, action.amount);
     yield put(setCards(action.tableAddr, action.handId, holeCards.cards));
   } catch (err) {
-    // unset toggle flag
-    yield put(receiptSet(action.tableAddr, action.handId, action.pos, action.prevReceipt));
     Raven.captureException(err, { tags: {
       tableAddr: action.tableAddr,
       handId: action.handId,
