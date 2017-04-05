@@ -92,7 +92,7 @@ function TableComponent(props) {
         <TableAndChairs id="table-and-chairs" >
           <PokerTable id="poker-table">
             <img src={tableImage} alt="" />
-            { props.winners &&
+            { props.winners.length > 0 &&
               <Winner>{ props.winners }</Winner>
             }
             <Pot>Pot: { props.potSize }</Pot>
