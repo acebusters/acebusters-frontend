@@ -6,6 +6,7 @@ import React from 'react';
 import {
   baseColor,
   green,
+  gray,
 } from 'variables';
 import Card from '../Card'; // eslint-disable-line
 import { SeatWrapper, ImageContainer, CardContainer, DealerButton, SeatLabel, ChipGreen, Amount } from './SeatWrapper';
@@ -41,7 +42,14 @@ function SeatComponent(props) {
       </SeatWrapper>
       );
   } else {
-    const color = (props.pos === props.whosTurn) ? green : baseColor;
+    let color;
+    if (props.pos === props.whosTurn) {
+      color = green;
+    } else if (props.sitout) {
+      color = gray;
+    } else {
+      color = baseColor;
+    }
     seat = (
       <SeatWrapper
         coords={props.coords}

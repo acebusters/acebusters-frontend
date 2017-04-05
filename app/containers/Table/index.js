@@ -324,10 +324,12 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       return seats;
     }
     for (let i = 0; i < lineup.length; i += 1) {
+      const sitout = lineup[i].sitout;
       const seat = (
         <Seat
           key={i}
           pos={i}
+          sitout={sitout}
           signerAddr={lineup[i].address}
           params={this.props.params}
           isTaken={this.isTaken}
