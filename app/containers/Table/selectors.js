@@ -77,7 +77,7 @@ const isBbTurnByAction = createSelector(
     if (!action.hand) {
       return false;
     }
-    const bbPos = pokerHelper.getBbPos(action.hand.lineup, action.hand.dealer);
+    const bbPos = pokerHelper.getBbPos(action.hand.lineup, action.hand.dealer, action.hand.state);
     if (typeof bbPos === 'undefined' || bbPos < 0) {
       return false;
     }
