@@ -1,6 +1,6 @@
 import EWT from 'ethereum-web-token';
 import BigNumber from 'bignumber.js';
-import { fromJS } from 'immutable';
+import { fromJS, is } from 'immutable';
 
 import tableReducer from '../reducer';
 import {
@@ -10,7 +10,7 @@ import {
   lineupReceived,
 } from '../actions';
 
-import { ABI_BET } from '../../../app.config';
+const ABI_BET = [{ name: 'bet', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
 
 // secretSeed: 'rural tent tests net drip fatigue uncle action repeat couple lawn rival'
 const P1_ADDR = '0x6d2f2c0fa568243d2def3e999a791a6df45d816e';
@@ -28,7 +28,7 @@ const ADDR_EMPTY = '0x0000000000000000000000000000000000000000';
 const tableAddr = '0x112233';
 
 describe('table reducer tests', () => {
-  it('should recalculate lastRoundMaxBet if state changed', () => {
+  it('should select lastRoundMaxBet for turn', () => {
     // set up previous state
     const lineup = [{
       address: P1_ADDR,
@@ -41,10 +41,7 @@ describe('table reducer tests', () => {
       [tableAddr]: {
         0: {
           dealer: 0,
-          changed: 123,
-          state: 'flop',
           lineup,
-          lastRoundMaxBet: 20,
         } },
     });
 
@@ -52,15 +49,13 @@ describe('table reducer tests', () => {
     const nextState = tableReducer(before, updateReceived(tableAddr, {
       handId: 0,
       dealer: 0,
-      changed: 234,
       state: 'turn',
+      flopMaxBet: 50,
       lineup,
     }));
 
     // check state after execution
     const after = before
-      .setIn([tableAddr, '0', 'state'], 'turn')
-      .setIn([tableAddr, '0', 'changed'], 234)
       .setIn([tableAddr, '0', 'lastRoundMaxBet'], 50);
     expect(nextState).toEqual(after);
   });
@@ -76,9 +71,6 @@ describe('table reducer tests', () => {
     const before = fromJS({
       [tableAddr]: {
         0: {
-          dealer: 0,
-          state: 'flop',
-          changed: 10,
           lineup,
         } },
     });
@@ -98,11 +90,8 @@ describe('table reducer tests', () => {
       lineup: newLineup,
     }));
 
-    // check state after execution
-    const after = before
-      .setIn([tableAddr, '0', 'lineup'], fromJS(newLineup))
-      .setIn([tableAddr, '0', 'changed'], 20);
-    expect(nextState).toEqual(after);
+    // check lineup after execution
+    expect(is(nextState.getIn([tableAddr, '0', 'lineup']), fromJS(newLineup))).toEqual(true);
   });
 
   it('should add last receipts into lineup', () => {
@@ -115,9 +104,6 @@ describe('table reducer tests', () => {
     const before = fromJS({
       [tableAddr]: {
         0: {
-          dealer: 0,
-          state: 'flop',
-          changed: 10,
           lineup,
         } },
     });
@@ -137,11 +123,8 @@ describe('table reducer tests', () => {
       lineup: newLineup,
     }));
 
-    // check state after execution
-    const after = before
-      .setIn([tableAddr, '0', 'lineup'], fromJS(newLineup))
-      .setIn([tableAddr, '0', 'changed'], 20);
-    expect(nextState).toEqual(after);
+    // check lineup after execution
+    expect(is(nextState.getIn([tableAddr, '0', 'lineup']), fromJS(newLineup))).toEqual(true);
   });
 
   it('should add distribution to hand', () => {
@@ -157,7 +140,6 @@ describe('table reducer tests', () => {
           dealer: 0,
           state: 'flop',
           changed: 10,
-          lineup,
         } },
     });
 
@@ -165,65 +147,40 @@ describe('table reducer tests', () => {
     // execute action
     const nextState = tableReducer(before, updateReceived(tableAddr, {
       handId: 0,
-      dealer: 0,
       changed: 20,
-      state: 'flop',
       lineup,
       distribution: dist,
     }));
 
     // check state after execution
-    const after = before
-      .setIn([tableAddr, '0', 'changed'], 20)
-      .setIn([tableAddr, '0', 'distribution'], dist);
-    expect(nextState).toEqual(after);
+    expect(nextState.getIn([tableAddr, '0', 'distribution'])).toEqual(dist);
   });
 
-  it('should not recalculate lastRoundMaxBet if state did not change', () => {
+  it('should not reset lastRoundMaxBet if state did not change', () => {
     // set up previous state
-    const bet1 = new EWT(ABI_BET).bet(1, 100).sign(P1_KEY);
     const before = fromJS({
       [tableAddr]: {
         1: {
           dealer: 1,
           changed: 123,
           state: 'flop',
-          lineup: [{
-            address: P1_ADDR,
-            last: bet1,
-          }, {
-            address: P2_ADDR,
-            time: 0,
-            last: new EWT(ABI_BET).bet(1, 100).sign(P2_KEY),
-          }],
           lastRoundMaxBet: 100,
         } },
     });
-
+    const lineup = [{
+      address: P1_ADDR,
+    }, {
+      address: P2_ADDR,
+    }];
     // execute action
-    const newBet = new EWT(ABI_BET).bet(1, 150).sign(P2_KEY);
     const nextState = tableReducer(before, updateReceived(tableAddr, {
       handId: 1,
       dealer: 1,
-      changed: 234,
+      lineup,
+      preMaxBet: 100,
       state: 'flop',
-      lineup: [{
-        address: P1_ADDR,
-        last: bet1,
-      }, {
-        address: P2_ADDR,
-        time: 1,
-        last: newBet,
-      }],
     }));
-
-    // check state after execution
-    const after = before
-      .setIn([tableAddr, '1', 'lineup', 1, 'last'], newBet)
-      .setIn([tableAddr, '1', 'changed'], 234)
-      .setIn([tableAddr, '1', 'lineup', 1, 'time'], 1)
-      .setIn([tableAddr, '1', 'lastRoundMaxBet'], 100);
-    expect(nextState).toEqual(after);
+    expect(nextState.getIn([tableAddr, '1', 'lastRoundMaxBet'])).toEqual(100);
   });
 
   it('should add amount into lineup', () => {

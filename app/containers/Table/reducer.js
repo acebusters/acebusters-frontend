@@ -2,12 +2,8 @@
  * Created by helge on 20.09.16.
  */
 import { Map, List, fromJS } from 'immutable';
-import { PokerHelper, ReceiptCache } from 'poker-helper';
 import * as TableActions from './actions';
 import * as storageService from '../../services/localStorage';
-
-const rc = new ReceiptCache();
-const pokerHelper = new PokerHelper(rc);
 
 // Expecting a structure of the state like this:
   // [tableAddr]: {
@@ -102,14 +98,38 @@ export default function tableReducer(state = initialState, action) {
 
       let hand = table.get(action.hand.handId.toString());
 
+      // in any state but dealing, update maxBet
+      let maxBet;
+      switch (action.hand.state) {
+        case 'preflop': {
+          maxBet = 0;
+          break;
+        }
+        case 'flop': {
+          maxBet = action.hand.preMaxBet;
+          break;
+        }
+        case 'turn': {
+          maxBet = action.hand.flopMaxBet;
+          break;
+        }
+        case 'river': {
+          maxBet = action.hand.turnMaxBet;
+          break;
+        }
+        case 'showdown': {
+          maxBet = action.hand.riverMaxBet;
+          break;
+        }
+        default: {
+          maxBet = 0;
+          break;
+        }
+      }
+      hand = hand.set('lastRoundMaxBet', maxBet);
       // if the hand state changed, make sure to update it
       if (hand.get('changed') !== action.hand.changed ||
         hand.get('distribution') !== action.hand.distribution) {
-        // TODO(ab): remove update maxBet
-        if (action.hand.state !== hand.get('state')) {
-          const maxBet = pokerHelper.findMaxBet(action.hand.lineup, action.hand.dealer).amount;
-          hand = hand.set('lastRoundMaxBet', maxBet);
-        }
         hand = hand.set('state', action.hand.state);
         hand = hand.set('changed', action.hand.changed);
         if (action.hand.cards && action.hand.cards.length > 0) {
