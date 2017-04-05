@@ -40,7 +40,7 @@ const makeMinSelector = () => createSelector(
     // check if there was a raise exclude preflop sb and bb
     const lastRoundMaxBet = hand.get('lastRoundMaxBet');
     const minRaise = pokerHelper.findMinRaiseAmount(lineup, dealer, lastRoundMaxBet);
-    if (!(maxBet === sb * 2 && amountToCall === sb * 2) && minRaise > -1) {
+    if (!(maxBet === sb * 2 && amountToCall <= sb * 2) && minRaise > -1) {
       return minRaise + amountToCall;
     }
     // otherwise return the BB
