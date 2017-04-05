@@ -260,6 +260,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           // update lineup when join successful
           // TODO(AB): tell the backend that event happened
           this.table.getLineup.callPromise().then((rsp) => {
+            this.props.lineupReceived(this.tableAddr, rsp, this.props.data.get('smallBlind'));
             for (let i = 0; i < rsp[1].length; i += 1) {
               if (rsp[1][i] === this.props.signerAddr) {
                 this.props.pendingToggle(this.tableAddr, this.props.params.handId, i);
@@ -425,6 +426,7 @@ Table.propTypes = {
   pendingToggle: React.PropTypes.func,
   modalDismiss: React.PropTypes.func,
   winners: React.PropTypes.object,
+  lineupReceived: React.PropTypes.func,
   updateReceived: React.PropTypes.func,
 };
 
