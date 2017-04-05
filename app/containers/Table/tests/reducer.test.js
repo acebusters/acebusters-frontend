@@ -49,15 +49,14 @@ describe('table reducer tests', () => {
     const nextState = tableReducer(before, updateReceived(tableAddr, {
       handId: 0,
       dealer: 0,
+      changed: 123,
       state: 'turn',
       flopMaxBet: 50,
       lineup,
     }));
 
     // check state after execution
-    const after = before
-      .setIn([tableAddr, '0', 'lastRoundMaxBet'], 50);
-    expect(nextState).toEqual(after);
+    expect(nextState.getIn([tableAddr, '0', 'lastRoundMaxBet'])).toEqual(50);
   });
 
   it('should put sitout at right position into lineup', () => {
