@@ -50,10 +50,11 @@ export default function tableReducer(state = initialState, action) {
         lineup = lineup.push(Map({ address: action.lineup[1][i] }));
         amounts = amounts.push(action.lineup[2][i].toNumber());
       }
+      const sb = (typeof action.smallBlind === 'object') ? action.smallBlind.toNumber() : action.smallBlind;
       return state.setIn([action.tableAddr, 'data', 'seats'], lineup)
         .setIn([action.tableAddr, 'data', 'amounts'], amounts)
         .setIn([action.tableAddr, 'data', 'lastHandNetted'], action.lineup[0].toNumber())
-        .setIn([action.tableAddr, 'data', 'smallBlind'], action.smallBlind.toNumber());
+        .setIn([action.tableAddr, 'data', 'smallBlind'], sb);
     }
 
     case TableActions.PENDING_TOGGLE: {
