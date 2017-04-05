@@ -210,10 +210,6 @@ const makeMyHandValueSelector = () => createSelector(
 const makeSelectWinners = () => createSelector(
   [makeHandSelector(), makeBoardSelector()],
   (hand, board) => {
-    if (hand && hand.get) {
-    //  console.log(hand.get('distribution'));
-    }
-
     if (!hand || !hand.get || !hand.get('distribution')) {
       return {};
     }
