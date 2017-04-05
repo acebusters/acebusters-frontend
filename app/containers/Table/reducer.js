@@ -71,6 +71,11 @@ export default function tableReducer(state = initialState, action) {
       return state.setIn([action.tableAddr, handIdStr, 'holeCards'], fromJS(action.cards));
     }
 
+    case TableActions.RECEIPT_SET: {
+      const handIdStr = action.handId.toString();
+      return state.setIn([action.tableAddr, handIdStr, 'lineup', action.pos, 'last'], action.receipt);
+    }
+
     case TableActions.UPDATE_RECEIVED: {
       const table = state.get(action.tableAddr);
 

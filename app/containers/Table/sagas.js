@@ -11,6 +11,8 @@ import {
   bet,
   show,
   net,
+  receiptSet,
+  pay,
   BET,
   SHOW,
   NET,
@@ -70,12 +72,40 @@ export function* submitSignedNetting(action) {
   }
 }
 
+export function* payFlow() {
+  while (true) { //eslint-disable-line
+    const req = yield take(pay.REQUEST);
+    const action = req.payload;
+    const table = new TableService(action.tableAddr, action.privKey);
+    try {
+      // set toggle flag
+      const newReceipt = table.betReceipt(action.handId, action.amount);
+      yield put(receiptSet(action.tableAddr, action.handId, action.pos, newReceipt));
+      const holeCards = yield table.pay(newReceipt);
+      yield put({ type: pay.SUCCESS, payload: holeCards.cards });
+    } catch (err) {
+      // unset toggle flag
+      yield put(receiptSet(action.tableAddr, action.handId, action.pos, action.prevReceipt));
+      Raven.captureException(err, { tags: {
+        tableAddr: action.tableAddr,
+        handId: action.handId,
+      } });
+      yield put({ type: pay.FAILURE, payload: err });
+    }
+  }
+}
+
 function* performBet(action) {
   const table = new TableService(action.tableAddr, action.privKey);
   try {
-    const holeCards = yield table.bet(action.handId, action.amount);
+    // set toggle flag
+    const newReceipt = table.betReceipt(action.handId, action.amount);
+    yield put(receiptSet(action.tableAddr, action.handId, action.pos, newReceipt));
+    const holeCards = yield table.pay(newReceipt);
     yield put(setCards(action.tableAddr, action.handId, holeCards.cards));
   } catch (err) {
+    // unset toggle flag
+    yield put(receiptSet(action.tableAddr, action.handId, action.pos, action.prevReceipt));
     Raven.captureException(err, { tags: {
       tableAddr: action.tableAddr,
       handId: action.handId,
@@ -166,4 +196,5 @@ export function* tableStateSaga() {
   yield takeEvery(NET, submitSignedNetting);
   yield takeEvery(HAND_REQUEST, handRequest);
   yield fork(updateScanner);
+  yield fork(payFlow);
 }

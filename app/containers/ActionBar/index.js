@@ -8,6 +8,7 @@ import Grid from 'grid-styled';
 import Slider from 'react-rangeslider';
 import 'react-rangeslider/lib/index.css';
 import Raven from 'raven-js';
+
 import SliderWrapper from '../../components/Slider';
 
 import {
@@ -23,14 +24,16 @@ import {
   makeHandStateSelector,
   makeMyMaxBetSelector,
   makeIsMyTurnSelector,
+  makeMyPosSelector,
 } from '../Table/selectors';
 
 import {
   makeMyCardsSelector,
   makeMyStackSelector,
+  makeLastReceiptSelector,
 } from '../Seat/selectors';
 
-import { setCards } from '../Table/actions';
+import { bet, pay, setCards } from '../Table/actions';
 import { ActionBarComponent, ActionButton } from '../../components/ActionBar';
 import TableService from '../../services/tableService';
 
@@ -73,14 +76,16 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
     this.setActive(false);
     const amount = this.state.amount + this.props.myMaxBet;
     const handId = parseInt(this.props.params.handId, 10);
-    return this.table.bet(handId, amount).catch((err) => {
+
+    const betAction = bet(this.props.params.tableAddr, handId, amount, this.props.privKey, this.props.myPos, this.props.lastReceipt);
+    return pay(betAction, this.props.dispatch).then((cards) => {
+      this.props.setCards(this.props.params.tableAddr, handId, cards);
+    }).catch((err) => {
       Raven.captureException(err, { tags: {
         tableAddr: this.props.params.tableAddr,
         handId,
       } });
       this.setActive(true);
-    }).then((data) => {
-      this.props.setCards(this.props.params.tableAddr, handId, data.cards);
     });
   }
 
@@ -197,8 +202,9 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
   }
 }
 
-export function mapDispatchToProps() {
+export function mapDispatchToProps(dispatch) {
   return {
+    dispatch,
     setCards: (tableAddr, handId, cards) => setCards(tableAddr, handId, cards),
   };
 }
@@ -213,6 +219,8 @@ const mapStateToProps = createStructuredSelector({
   minRaise: makeMinSelector(),
   myStack: makeMyStackSelector(),
   max: makeMaxSelector(),
+  myPos: makeMyPosSelector(),
+  lastReceipt: makeLastReceiptSelector(),
   cards: makeMyCardsSelector(),
   state: makeHandStateSelector(),
 });
@@ -220,6 +228,8 @@ const mapStateToProps = createStructuredSelector({
 ActionBar.propTypes = {
   params: React.PropTypes.object,
   privKey: React.PropTypes.string,
+  lastReceipt: React.PropTypes.string,
+  myPos: React.PropTypes.number,
   myMaxBet: React.PropTypes.number,
   isMyTurn: React.PropTypes.bool,
   minRaise: React.PropTypes.number,
@@ -229,6 +239,7 @@ ActionBar.propTypes = {
   callAmount: React.PropTypes.number,
   state: React.PropTypes.string,
   cards: React.PropTypes.array,
+  dispatch: React.PropTypes.func,
   setCards: React.PropTypes.func,
 };
 
