@@ -8,7 +8,7 @@ import {
   green,
   gray,
 } from 'variables';
-import Card from '../Card'; // eslint-disable-line
+import Card from '../Card';
 import { SeatWrapper, ImageContainer, CardContainer, DealerButton, SeatLabel, ChipGreen, Amount } from './SeatWrapper';
 import { StackBox, NameBox, TimeBox, AmountBox } from './Info';
 
