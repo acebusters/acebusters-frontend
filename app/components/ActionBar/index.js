@@ -7,7 +7,6 @@ import styled from 'styled-components';
 
 import {
   baseColor,
-  background,
   white,
 } from '../../variables';
 
@@ -25,26 +24,46 @@ const ActionBarWrapper = styled.div`
   bottom: 0px;
 `;
 
+const Icon = styled.i`
+  color: ${(white)};
+  &:hover {
+    color: ${baseColor};
+    cursor: pointer;
+  }
+  font-size: 2em !important; 
+`;
+
 export const ActionButtonWrapper = styled.button`
   border-radius: 50%;
+  margin-left: 0.5em;
   color: ${white};
   border: 2px solid ${white};
-  width: 5em;
-  height: 5em;
+  ${(props) => {
+    if (props.size === 'medium') {
+      return `width: 5em;
+              height: 5em;`;
+    } else if (props.size === 'small') {
+      return `width: 3.5em;
+              height: 3.5em;`;
+    }
+    return `width: 6em;
+            height: 6em;`;
+  }};
   margin-bottom: 2em;
   cursor: pointer;  
   
   &:hover {
     color: ${baseColor};
-    background-color: transparent;
-    border: 2px solid ${background}
     cursor: pointer;
   }
 `;
 
 export function ActionButton(props) {
   return (
-    <ActionButtonWrapper onClick={props.onClick} >
+    <ActionButtonWrapper onClick={props.onClick} size={props.size}>
+      { !props.text &&
+        <Icon className={props.icon} />
+      }
       { props.text }
     </ActionButtonWrapper>
   );
@@ -61,6 +80,8 @@ export function ActionBarComponent(props) {
 
 ActionButton.propTypes = {
   text: React.PropTypes.string,
+  size: React.PropTypes.string,
+  icon: React.PropTypes.string,
   onClick: React.PropTypes.func,
 };
 

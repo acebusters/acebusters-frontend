@@ -204,8 +204,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
   handleSitout() {
     const handId = parseInt(this.props.params.handId, 10);
-    const amount = (this.props.myMaxbet > -1) ? this.props.myMaxbet : 0;
+    const amount = ((this.props.state !== 'waiting')
+                  && this.props.myMaxbet > -1) ? this.props.myMaxbet + 1 : 0;
     const table = new TableService(this.props.params.tableAddr, this.props.privKey);
+    console.log(`Amount: ${amount}`);
     return table.sitOut(handId, amount).catch((err) => {
       Raven.captureException(err, { tags: {
         tableAddr: this.props.params.tableAddr,
@@ -317,9 +319,9 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     }
   }
 
-  renderSeats() {
+  renderSeats(lineup) {
     const seats = [];
-    const lineup = (this.props.lineup) ? this.props.lineup.toJS() : null;
+
     if (!lineup) {
       return seats;
     }
@@ -358,8 +360,8 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   render() {
-    // Get last Modal Element
-    const seats = this.renderSeats();
+    const lineup = (this.props.lineup) ? this.props.lineup.toJS() : null;
+    const seats = this.renderSeats(lineup);
     const board = this.renderBoard();
     const winners = [];
     Object.keys(this.props.winners).forEach((key, index) => {
@@ -367,7 +369,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       winners.push((<div key={index}>`${winner.addr} won ${winner.amount} with ${winner.hand}`</div>));
     });
     const sb = (this.props.data && this.props.data.get('smallBlind')) ? this.props.data.get('smallBlind') : 0;
-
+    const pending = (lineup && lineup[this.props.myPos]) ? lineup[this.props.myPos].pending : false;
     return (
       <div>
         { this.props.state &&
@@ -377,6 +379,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           sb={sb}
           winners={winners}
           myHand={this.props.myHand}
+          pending={pending}
           board={board}
           seats={seats}
           onLeave={() => this.handleLeave(this.props.myPos)}

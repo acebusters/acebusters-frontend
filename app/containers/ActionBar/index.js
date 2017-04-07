@@ -179,18 +179,18 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
           <Grid xs={1 / 3}>
             { this.props.amountToCall > 0 &&
               <div>
-                <ActionButton onClick={this.handleBet} text={`RAISE ${this.state.amount}`}>
+                <ActionButton size="medium" onClick={this.handleBet} text={`RAISE ${this.state.amount}`}>
                 </ActionButton>
-                <ActionButton onClick={this.handleCall} text={`CALL ${this.props.callAmount}`}>
+                <ActionButton size="medium" onClick={this.handleCall} text={`CALL ${this.props.callAmount}`}>
                 </ActionButton>
-                <ActionButton onClick={this.handleFold} text="FOLD"></ActionButton>
+                <ActionButton size="medium" onClick={this.handleFold} text="FOLD"></ActionButton>
               </div>
             }
             { this.props.amountToCall === 0 &&
               <div>
-                <ActionButton onClick={this.handleBet} text={`BET ${this.state.amount}`}>
+                <ActionButton size="medium" onClick={this.handleBet} text={`BET ${this.state.amount}`}>
                 </ActionButton>
-                <ActionButton onClick={this.handleCheck} text="CHECK">
+                <ActionButton size="medium" onClick={this.handleCheck} text="CHECK">
                 </ActionButton>
               </div>
             }
