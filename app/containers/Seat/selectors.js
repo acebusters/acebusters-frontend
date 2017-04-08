@@ -2,7 +2,7 @@
  * Created by helge on 02.02.17.
  */
 
-import { PokerHelper, ReceiptCache } from 'poker-helper';
+import { ReceiptCache } from 'poker-helper';
 import { createSelector } from 'reselect';
 import EWT from 'ethereum-web-token';
 import {
@@ -10,6 +10,7 @@ import {
   makeLineupSelector,
   makeMyPosSelector,
   tableStateSelector,
+  makeWhosTurnSelector,
 } from '../Table/selectors';
 
 import { createBlocky } from '../../services/blockies';
@@ -20,7 +21,6 @@ import {
 } from '../../app.config';
 
 const rc = new ReceiptCache();
-const pokerHelper = new PokerHelper(rc);
 
 const posSelector = (state, props) => (state && props) ? props.pos : -1;
 
@@ -45,11 +45,6 @@ const makeLastAmountSelector = () => createSelector(
       }
       return 0;
     }
-);
-
-const makeWhosTurnSelector = () => createSelector(
-  makeHandSelector(),
-  (hand) => (hand && hand.toJS) ? pokerHelper.whosTurn(hand.toJS()) : null
 );
 
 const makeLastActionSelector = () => createSelector(

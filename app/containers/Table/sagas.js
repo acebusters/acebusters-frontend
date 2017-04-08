@@ -2,6 +2,7 @@
  * Created by helge on 25.01.17.
  */
 import ethUtil from 'ethereumjs-util';
+import { PokerHelper, ReceiptCache } from 'poker-helper';
 import { call, put, takeEvery, select, fork, take } from 'redux-saga/effects';
 import Raven from 'raven-js';
 
@@ -30,14 +31,13 @@ import {
 } from '../Seat/selectors';
 import {
   lastAmountByAction,
-  isSbTurnByAction,
-  isBbTurnByAction,
-  is0rTurnByAction,
-  isShowTurnByAction,
-  hasNettingInAction,
   makeSbSelector,
 } from './selectors';
+
 import TableService, { getHand } from '../../services/tableService';
+
+const rc = new ReceiptCache();
+const pokerHelper = new PokerHelper(rc);
 
 export function* handRequest(action) {
   try {
@@ -136,6 +136,8 @@ export function* updateScanner() {
     const state = yield select();
     const myAddr = myAddrSelector(state);
     const privKey = privKeySelector(state);
+
+
     const sb = sbSelector(state, { params: { tableAddr: action.tableAddr } });
     const toggleKey = action.tableAddr + action.hand.handId;
 
@@ -143,40 +145,45 @@ export function* updateScanner() {
     if (!action.hand || !action.hand.lineup) {
       continue; // eslint-disable-line no-continue
     }
+    // get my position the active lineup and check if i am active
+    const myPos = pokerHelper.getMyPos(action.hand.lineup, myAddr);
+    const activeLineup = pokerHelper.getActiveLineup(action.hand.lineup, action.hand.dealer, action.hand.state);
+    const active = pokerHelper.isActive(action.hand.lineup[myPos], action.hand.state);
 
-    // check if turn to pay small blind
-    if (isSbTurnByAction(action, { address: myAddr }) && !payedBlind[toggleKey]) {
-      payedBlind[toggleKey] = true;
-      yield put(bet(action.tableAddr, action.hand.handId, sb, privKey));
-      continue; // eslint-disable-line no-continue
-    }
-    // check if turn to pay big blind
-    if (isBbTurnByAction(action, { address: myAddr }) && !payedBlind[toggleKey]) {
-      payedBlind[toggleKey] = true;
-      yield put(bet(action.tableAddr, action.hand.handId, sb * 2, privKey));
-      continue; // eslint-disable-line no-continue
-    }
+    if (activeLineup.length > 0 && active) {
+      // check if turn to pay small blind
+      if (action.hand.state === 'waiting' && activeLineup[0].pos === myPos && !payedBlind[toggleKey]) {
+        payedBlind[toggleKey] = true;
+        yield put(bet(action.tableAddr, action.hand.handId, sb, privKey));
+        continue; // eslint-disable-line no-continue
+      }
+      // check if turn to pay big blind or 0 receipt
+      if (action.hand.state === 'dealing') {
+        if (activeLineup[1].pos === myPos && !payedBlind[toggleKey]) {
+          payedBlind[toggleKey] = true;
+          yield put(bet(action.tableAddr, action.hand.handId, sb * 2, privKey));
+          continue; // eslint-disable-line no-continue
+        } else if (!payedBlind[toggleKey]) {
+          payedBlind[toggleKey] = true;
+          yield put(bet(action.tableAddr, action.hand.handId, 0, privKey));
+          continue; // eslint-disable-line no-continue
+        }
+      }
 
-    // check if turn to pay 0 receipt
-    if (is0rTurnByAction(action, { address: myAddr }) && !payedBlind[toggleKey]) {
-      payedBlind[toggleKey] = true;
-      yield put(bet(action.tableAddr, action.hand.handId, 0, privKey));
-      continue; // eslint-disable-line no-continue
+      const whosTurn = pokerHelper.whosTurn(action.hand, sb * 2);
+      // check if's showtime!
+      const isShow = (action.hand.state === 'showdown' && whosTurn === myPos);
+      if (isShow && !showed[toggleKey]) {
+        showed[toggleKey] = true;
+        const amount = lastAmountByAction(action, { address: myAddr });
+        const holeCards = myCardsSelector(state, { params: { tableAddr: action.tableAddr, handId: action.hand.handId } });
+        yield put(show(action.tableAddr, action.hand.handId, holeCards, amount, privKey));
+        continue; // eslint-disable-line no-continue
+      }
     }
-
-    // check if's showtime!
-    const isShow = isShowTurnByAction(action, { address: myAddr });
-    if (isShow && !showed[toggleKey]) {
-      showed[toggleKey] = true;
-      const amount = lastAmountByAction(action, { address: myAddr });
-      const holeCards = myCardsSelector(state, { params: { tableAddr: action.tableAddr, handId: action.hand.handId } });
-      yield put(show(action.tableAddr, action.hand.handId, holeCards, amount, privKey));
-      continue; // eslint-disable-line no-continue
-    }
-
     // check if netting exists that we need to sign
-    if (hasNettingInAction(action, { address: myAddr })
-      && !netted[toggleKey]) {
+    const netting = (myAddr && action.hand.netting && !action.hand.netting[myAddr]);
+    if (netting && !netted[toggleKey]) {
       netted[toggleKey] = true;
       const balances = action.hand.netting.newBalances;
       yield put(net(action.tableAddr, action.hand.handId, balances, privKey));

@@ -15,7 +15,6 @@ import {
   makeCardsSelector,
   makeLastAmountSelector,
   makeFoldedSelector,
-  makeWhosTurnSelector,
   makeOpenSelector,
   makeSitoutSelector,
   makePendingSelector,
@@ -29,6 +28,7 @@ import {
 import {
   makeMyPosSelector,
   makeHandStateSelector,
+  makeWhosTurnSelector,
 } from '../Table/selectors';
 
 import SeatComponent from '../../components/Seat';
