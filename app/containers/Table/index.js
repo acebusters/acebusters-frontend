@@ -8,10 +8,10 @@ import { browserHistory } from 'react-router';
 import Pusher from 'pusher-js';
 import Raven from 'raven-js';
 // components and styles
-import Card from 'components/Card'; // eslint-disable-line
-import { BoardCardWrapper } from 'components/Table/Board';
-import Seat from '../Seat'; // eslint-disable-lines
-import Button from 'components/Button'; // eslint-disable-line
+import Card from '../../components/Card';
+import { BoardCardWrapper } from '../../components/Table/Board';
+import Seat from '../Seat';
+import Button from '../../components/Button';
 // config data
 import {
   ABI_TABLE,

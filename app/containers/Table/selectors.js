@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect';
 import EWT from 'ethereum-web-token';
 import { PokerHelper, ReceiptCache } from 'poker-helper';
-import Solver from 'pokersolver';
+import Solver from 'ab-pokersolver';
 import { makeSignerAddrSelector } from '../AccountProvider/selectors';
 import {
   valuesShort,
