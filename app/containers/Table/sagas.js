@@ -14,6 +14,7 @@ import {
   net,
   receiptSet,
   pay,
+  sitOutToggle,
   BET,
   SHOW,
   NET,
@@ -108,6 +109,26 @@ function* performBet(action) {
   }
 }
 
+function* sitoutFlow() {
+  while (true) { //eslint-disable-line
+    const req = yield take(sitOutToggle.REQUEST);
+    const action = req.payload;
+    try {
+      const table = new TableService(action.tableAddr, action.privKey);
+      const receipt = yield table.sitOut(action.handId, action.amount);
+      yield put({ type: sitOutToggle.SUCCESS, payload: receipt });
+    } catch (err) {
+      Raven.captureException(err, {
+        tags: {
+          tableAddr: action.tableAddr,
+          handId: action.handId,
+        },
+      });
+      yield put({ type: sitOutToggle.FAILURE, payload: err });
+    }
+  }
+}
+
 function* performShow(action) {
   const table = new TableService(action.tableAddr, action.privKey);
   try {
@@ -149,8 +170,8 @@ export function* updateScanner() {
     const myPos = pokerHelper.getMyPos(action.hand.lineup, myAddr);
     const activeLineup = pokerHelper.getActiveLineup(action.hand.lineup, action.hand.dealer, action.hand.state);
     const active = pokerHelper.isActive(action.hand.lineup[myPos], action.hand.state);
-
-    if (activeLineup.length > 0 && active) {
+    console.log(pokerHelper.checkForNextHand(action.hand));
+    if (activeLineup.length > 1 && active) {
       // check if turn to pay small blind
       if (action.hand.state === 'waiting' && activeLineup[0].pos === myPos && !payedBlind[toggleKey]) {
         payedBlind[toggleKey] = true;
@@ -161,6 +182,7 @@ export function* updateScanner() {
       if (action.hand.state === 'dealing') {
         if (activeLineup[1].pos === myPos && !payedBlind[toggleKey]) {
           payedBlind[toggleKey] = true;
+
           yield put(bet(action.tableAddr, action.hand.handId, sb * 2, privKey));
           continue; // eslint-disable-line no-continue
         } else if (!payedBlind[toggleKey]) {
@@ -197,6 +219,7 @@ export function* tableStateSaga() {
   yield takeEvery(SHOW, performShow);
   yield takeEvery(NET, submitSignedNetting);
   yield takeEvery(HAND_REQUEST, handRequest);
+  yield fork(sitoutFlow);
   yield fork(updateScanner);
   yield fork(payFlow);
 }

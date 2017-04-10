@@ -28,7 +28,7 @@ describe('Table Container Test', () => {
     });
     sinon.spy(Table.prototype, 'componentDidMount');
     const store = createStore(tableReducer, initialState);
-    const table = mount(<Table {...props} store={store} ></Table>); //eslint-disable-line
+    mount(<Table {...props} store={store} ></Table>); //eslint-disable-line
     expect(Table.prototype.componentDidMount.calledOnce).toEqual(true);
   });
 });

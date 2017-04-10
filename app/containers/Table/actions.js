@@ -22,6 +22,8 @@ export function setCards(tableAddr, handId, cards) {
 
 export const pay = createFormAction('PAY');
 
+export const sitOutToggle = createFormAction('SITOUT_TOGGLE');
+
 export function bet(tableAddr, handId, amount, privKey, pos, prevReceipt) {
   return { type: BET, tableAddr, handId, amount, privKey, pos, prevReceipt };
 }

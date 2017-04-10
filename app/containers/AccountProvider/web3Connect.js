@@ -111,6 +111,7 @@ export default function web3Connect(passedMapStateToProps, passedActions) {
       ...stateProps,
       ...ownProps,
       ...customActions,
+      dispatch,
       web3Redux: generateNetworkApi(stateProps.web3Redux, dispatch),
     };
   }

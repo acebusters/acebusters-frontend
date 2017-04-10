@@ -27,6 +27,8 @@ import {
   lineupReceived,
   updateReceived,
   pendingToggle,
+  sitOutToggle,
+  bet,
 } from './actions';
 // selectors
 import {
@@ -34,6 +36,10 @@ import {
   makeSelectProxyAddr,
   makeSignerAddrSelector,
 } from '../AccountProvider/selectors';
+
+import {
+  makeLastReceiptSelector,
+} from '../Seat/selectors';
 
 import { blockNotify } from '../AccountProvider/actions';
 
@@ -47,7 +53,7 @@ import {
   makeLineupSelector,
   makeMyHandValueSelector,
   makeMyPosSelector,
-  makeMyMaxBetSelector,
+  makeSitoutAmountSelector,
   makeMissingHandSelector,
   makeLatestHandSelector,
   makeSelectWinners,
@@ -204,16 +210,12 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
   handleSitout() {
     const handId = parseInt(this.props.params.handId, 10);
-    const amount = ((this.props.state !== 'waiting')
-                  && this.props.myMaxbet > -1) ? this.props.myMaxbet + 1 : 0;
-    const table = new TableService(this.props.params.tableAddr, this.props.privKey);
-    console.log(`Amount: ${amount}`);
-    return table.sitOut(handId, amount).catch((err) => {
-      Raven.captureException(err, { tags: {
-        tableAddr: this.props.params.tableAddr,
-        handId,
-      } });
-    });
+    if (this.props.sitoutAmount > -1) {
+      console.dir(this.props.sitoutAmount);
+      const sitoutAction = bet(this.props.params.tableAddr, handId, this.props.sitoutAmount, this.props.privKey, this.props.myPos, this.props.lastReceipt);
+      return sitOutToggle(sitoutAction, this.props.dispatch);
+    }
+    return null;
   }
 
   handleLeave(pos) {
@@ -256,7 +258,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           this.props.modalDismiss();
           const statusElement = (<div>
             <h2>Join Successful!</h2>
-            <Button onCLick={() => this.props.modalDismiss}>Ok!</Button>
+            <Button onCLick={this.props.modalDismiss}>Ok!</Button>
           </div>);
           this.props.modalAdd(statusElement);
 
@@ -410,14 +412,15 @@ const mapStateToProps = createStructuredSelector({
   board: makeBoardSelector(),
   myHand: makeMyHandValueSelector(),
   data: makeTableDataSelector(),
+  sitoutAmount: makeSitoutAmountSelector(),
   lineup: makeLineupSelector(),
   isMyTurn: makeIsMyTurnSelector(),
   potSize: makePotSizeSelector(),
   myPos: makeMyPosSelector(),
   latestHand: makeLatestHandSelector(),
   signerAddr: makeSignerAddrSelector(),
-  myMaxbet: makeMyMaxBetSelector(),
   privKey: makeSelectPrivKey(),
+  lastReceipt: makeLastReceiptSelector(),
   proxyAddr: makeSelectProxyAddr(),
   winners: makeSelectWinners(),
   missingHands: makeMissingHandSelector(),
@@ -431,18 +434,20 @@ Table.propTypes = {
   lineup: React.PropTypes.object,
   params: React.PropTypes.object,
   privKey: React.PropTypes.string,
+  lastReceipt: React.PropTypes.string,
+  sitoutAmount: React.PropTypes.number,
   proxyAddr: React.PropTypes.string,
   signerAddr: React.PropTypes.string,
   web3Redux: React.PropTypes.any,
   data: React.PropTypes.any,
   myPos: React.PropTypes.any,
-  myMaxbet: React.PropTypes.number,
   modalAdd: React.PropTypes.func,
   blockNotify: React.PropTypes.func,
   handRequest: React.PropTypes.func,
   pendingToggle: React.PropTypes.func,
   modalDismiss: React.PropTypes.func,
   winners: React.PropTypes.object,
+  dispatch: React.PropTypes.func,
   lineupReceived: React.PropTypes.func,
   updateReceived: React.PropTypes.func,
 };

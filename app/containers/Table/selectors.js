@@ -171,6 +171,31 @@ const makeMyPosSelector = () => createSelector(
   (lineup, myAddress) => (lineup && myAddress) ? pokerHelper.getMyPos(lineup.toJS(), myAddress) : -1
 );
 
+const makeSitoutSelector = () => createSelector(
+  [makeLineupSelector(), makeMyPosSelector()],
+  (lineup, myPos) => {
+    if (lineup && myPos > -1) {
+      return (lineup.toJS()[myPos].sitout !== undefined);
+    }
+    return false;
+  }
+);
+
+const makeSitoutAmountSelector = () => createSelector(
+  [makeSitoutSelector(), makeSbSelector(), makeHandStateSelector(), makeMyMaxBetSelector()],
+  (sitout, sb, state, myMaxBet) => {
+    if (sb && state) {
+      if (sitout) {
+        return sb * 2;
+      } else if (state !== 'waiting') {
+        return myMaxBet + 1;
+      }
+      return 0;
+    }
+    return -1;
+  }
+);
+
 const makeIsMyTurnSelector = () => createSelector(
   [makeMyPosSelector(), makeWhosTurnSelector()],
   (myPos, whosTurn) => (myPos > -1 && whosTurn > -1) ? myPos === whosTurn : false
@@ -257,6 +282,8 @@ export {
     makeSbSelector,
     makeLineupSelector,
     makeSelectWinners,
+    makeSitoutSelector,
+    makeSitoutAmountSelector,
     makeHandStateSelector,
     makeLatestHandSelector,
     makeBoardSelector,
