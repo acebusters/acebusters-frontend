@@ -34,9 +34,10 @@ const makeMinSelector = () => createSelector(
     if (stack < sb * 2) {
       return stack;
     }
+    const handState = hand.get('state');
     const lineup = hand.get('lineup').toJS();
     const dealer = hand.get('dealer');
-    const maxBet = pokerHelper.findMaxBet(lineup, dealer).amount;
+    const maxBet = pokerHelper.getMaxBet(lineup, handState).amount;
     // check if there was a raise exclude preflop sb and bb
     const lastRoundMaxBet = hand.get('lastRoundMaxBet');
     const minRaise = pokerHelper.findMinRaiseAmount(lineup, dealer, lastRoundMaxBet);

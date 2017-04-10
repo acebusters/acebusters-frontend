@@ -6,11 +6,13 @@ import {
   makeMissingHandSelector,
   makeSelectWinners,
   makeMyHandValueSelector,
+  makeSitoutAmountSelector,
 } from '../selectors';
 
-import { ABI_DIST } from '../../../app.config';
+import { ABI_DIST, ABI_BET } from '../../../app.config';
 
 const P1_ADDR = '0x6d2f2c0fa568243d2def3e999a791a6df45d816e';
+const P1_KEY = '0x2e39143576f97f6ecd7439a0678f330d7144110cdc58b6476687cc243d7753ca';
 
 const P2_ADDR = '0x1c5a1730ffc44ac21700bb85bf0ceefd12ce71d7';
 
@@ -265,5 +267,116 @@ describe('winnersSelector', () => {
     };
     const selectHandValue = makeMyHandValueSelector();
     expect(selectHandValue(mockedState, props).descr).toEqual('Royal Flush');
+  });
+});
+
+
+describe('sitout Selector', () => {
+  it('should select BB to comeback from sitout`.', () => {
+    const mockedState = fromJS({
+      account: {
+        privKey: P1_KEY,
+      },
+      table: {
+        [TBL_ADDR]: {
+          data: {
+            smallBlind: 50,
+          },
+          2: {
+            state: 'flop',
+            lineup: [{
+              address: P1_ADDR,
+              sitout: 1,
+            }, {
+              address: P2_ADDR,
+              sitout: 1,
+            }],
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 0,
+      myMaxBet: 0,
+      myPos: 0,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 2,
+      },
+    };
+    const selectSitoutAmount = makeSitoutAmountSelector();
+    expect(selectSitoutAmount(mockedState, props)).toEqual(100);
+  });
+
+  it('should return 0 when state is waiting and i am not in sitout.', () => {
+    const mockedState = fromJS({
+      account: {
+        privKey: P1_KEY,
+      },
+      table: {
+        [TBL_ADDR]: {
+          data: {
+            smallBlind: 50,
+          },
+          2: {
+            state: 'waiting',
+            lineup: [{
+              address: P1_ADDR,
+            }, {
+              address: P2_ADDR,
+            }],
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 0,
+      myMaxBet: 0,
+      myPos: 0,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 2,
+      },
+    };
+    const selectSitoutAmount = makeSitoutAmountSelector();
+    expect(selectSitoutAmount(mockedState, props)).toEqual(0);
+  });
+
+  it('should return myMaxBet + 1 when i am not sitout not in dealing.', () => {
+    const mockedState = fromJS({
+      account: {
+        privKey: P1_KEY,
+      },
+      table: {
+        [TBL_ADDR]: {
+          data: {
+            smallBlind: 50,
+          },
+          2: {
+            state: 'dealing',
+            lineup: [{
+              address: P1_ADDR,
+              last: new EWT(ABI_BET).bet(1, 100).sign(P1_KEY),
+            }, {
+              address: P2_ADDR,
+            }],
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 0,
+      myMaxBet: 0,
+      myPos: 0,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 2,
+      },
+    };
+    const selectSitoutAmount = makeSitoutAmountSelector();
+    expect(selectSitoutAmount(mockedState, props)).toEqual(101);
   });
 });

@@ -20,6 +20,32 @@ const actionSelector = (action) => action;
 
 const addressSelector = (state, props) => (props) ? props.address : null;
 
+const makeTableDataSelector = () => createSelector(
+  tableStateSelector,
+  (table) => (table) ? (table.get('data')) : null
+);
+
+// other selectors
+const makeHandSelector = () => createSelector(
+  handSelector,
+  (hand) => hand
+);
+
+const makeSbSelector = () => createSelector(
+  [makeTableDataSelector()],
+  (data) => {
+    if (!data || typeof data.get('smallBlind') === 'undefined') {
+      return null;
+    }
+    return data.get('smallBlind');
+  }
+);
+
+const makeWhosTurnSelector = () => createSelector(
+  [makeHandSelector(), makeSbSelector()],
+  (hand, sb) => (hand && hand.get('lineup').size > 0) ? pokerHelper.whosTurn(hand.toJS(), sb * 2) : -1
+);
+
 const myPosByAction = createSelector(
   [actionSelector, addressSelector],
   (action, myAddr) => {
@@ -50,103 +76,6 @@ const lastAmountByAction = createSelector(
   }
 );
 
-const isSbTurnByAction = createSelector(
-  [actionSelector, myPosByAction],
-  (action, myPos) => {
-    if (!action.hand) {
-      return false;
-    }
-    const sbPos = pokerHelper.getSbPos(action.hand.lineup, action.hand.dealer);
-    if (typeof sbPos === 'undefined' || sbPos < 0) {
-      return false;
-    }
-    const whosTurn = pokerHelper.whosTurn(action.hand);
-    if (typeof whosTurn === 'undefined' || whosTurn < 0) {
-      return false;
-    }
-    if (action.hand.state === 'waiting' && whosTurn === sbPos && sbPos === myPos) {
-      return true;
-    }
-    return false;
-  }
-);
-
-const isBbTurnByAction = createSelector(
-  [actionSelector, myPosByAction],
-  (action, myPos) => {
-    if (!action.hand) {
-      return false;
-    }
-    const bbPos = pokerHelper.getBbPos(action.hand.lineup, action.hand.dealer, action.hand.state);
-    if (typeof bbPos === 'undefined' || bbPos < 0) {
-      return false;
-    }
-    const whosTurn = pokerHelper.whosTurn(action.hand);
-    if (typeof whosTurn === 'undefined' || whosTurn < 0) {
-      return false;
-    }
-    if (action.hand.state === 'dealing' && whosTurn === bbPos && bbPos === myPos) {
-      return true;
-    }
-    return false;
-  }
-);
-
-const is0rTurnByAction = createSelector(
-  [actionSelector, myPosByAction, isSbTurnByAction, isBbTurnByAction],
-  (action, myPos, sbTurn, bbTurn) => {
-    if (!action.hand || !action.hand.lineup) {
-      return false;
-    }
-    const whosTurn = pokerHelper.whosTurn(action.hand);
-    if (typeof whosTurn === 'undefined' || whosTurn < 0) {
-      return false;
-    }
-    if (action.hand.state === 'dealing' && !sbTurn && !bbTurn && whosTurn === myPos) {
-      return true;
-    }
-    return false;
-  }
-);
-
-const isShowTurnByAction = createSelector(
-  [actionSelector, myPosByAction],
-  (action, myPos) => {
-    if (!action || !action.hand || action.hand.state !== 'showdown') {
-      return false;
-    }
-    const whosTurn = pokerHelper.whosTurn(action.hand);
-    if (typeof whosTurn === 'undefined' || whosTurn < 0) {
-      return false;
-    }
-    if (whosTurn === myPos) {
-      return true;
-    }
-    return false;
-  }
-);
-
-const hasNettingInAction = createSelector(
-  [actionSelector, addressSelector],
-  (action, myAddr) => {
-    // check data available
-    if (!myAddr || !action || !action.hand || !action.hand.netting) {
-      return false;
-    }
-    // check already signed
-    if (action.hand.netting[myAddr]) {
-      return false;
-    }
-    return true;
-  }
-);
-
-// other selectors
-const makeHandSelector = () => createSelector(
-  handSelector,
-  (hand) => hand
-);
-
 const makeHandStateSelector = () => createSelector(
   makeHandSelector(),
   (hand) => (hand) ? hand.get('state') : null
@@ -155,21 +84,6 @@ const makeHandStateSelector = () => createSelector(
 const makeBoardSelector = () => createSelector(
   makeHandSelector(),
   (hand) => (hand && hand.get('cards')) ? hand.get('cards').toJS() : []
-);
-
-const makeTableDataSelector = () => createSelector(
-  tableStateSelector,
-  (table) => (table) ? (table.get('data')) : null
-);
-
-const makeSbSelector = () => createSelector(
-  [makeTableDataSelector()],
-  (data) => {
-    if (!data || typeof data.get('smallBlind') === 'undefined') {
-      return null;
-    }
-    return data.get('smallBlind');
-  }
 );
 
 const makeLineupSelector = () => createSelector(
@@ -257,9 +171,37 @@ const makeMyPosSelector = () => createSelector(
   (lineup, myAddress) => (lineup && myAddress) ? pokerHelper.getMyPos(lineup.toJS(), myAddress) : -1
 );
 
-const makeWhosTurnSelector = () => createSelector(
-  makeHandSelector(),
-  (hand) => (hand && hand.get('lineup').size > 0) ? pokerHelper.whosTurn(hand.toJS()) : -1
+const makeSitoutSelector = () => createSelector(
+  [makeLineupSelector(), makeMyPosSelector()],
+  (lineup, myPos) => {
+    if (lineup && myPos > -1) {
+      return (lineup.toJS()[myPos].sitout !== undefined);
+    }
+    return false;
+  }
+);
+
+const makeSitoutAmountSelector = () => createSelector(
+  [makeSitoutSelector(), makeSbSelector(), makeHandStateSelector(), makeMyMaxBetSelector()],
+  (sitout, sb, state, myMaxBet) => {
+    if (sb && state && myMaxBet > -1) {
+      // we should not be able to comeback from sitout in the same hand
+      if (myMaxBet > sb * 2) {
+        return -1;
+      }
+      // in waiting we can always toggle with 0
+      if (state === 'waiting') {
+        return 0;
+      }
+      // if we comeback from sitout we have to pay the BB
+      if (sitout) {
+        return sb * 2;
+      }
+      // If we want to sitout during any other state we have to pay at least 1
+      return myMaxBet + 1;
+    }
+    return -1;
+  }
 );
 
 const makeIsMyTurnSelector = () => createSelector(
@@ -269,7 +211,7 @@ const makeIsMyTurnSelector = () => createSelector(
 
 const makeMaxBetSelector = () => createSelector(
   [makeHandSelector(), makeLineupSelector()],
-  (hand, lineup) => (hand && lineup && lineup.toJS) ? pokerHelper.findMaxBet(lineup.toJS(), hand.get('dealer')).amount : -1
+  (hand, lineup) => (hand && lineup && lineup.toJS) ? pokerHelper.getMaxBet(lineup.toJS(), hand.get('state')).amount : -1
 );
 
 const makeMyMaxBetSelector = () => createSelector(
@@ -343,16 +285,13 @@ export {
     tableStateSelector,
     actionSelector,
     lastAmountByAction,
-    isSbTurnByAction,
-    isBbTurnByAction,
-    is0rTurnByAction,
-    isShowTurnByAction,
-    hasNettingInAction,
     makeMyHandValueSelector,
     makeTableDataSelector,
     makeSbSelector,
     makeLineupSelector,
     makeSelectWinners,
+    makeSitoutSelector,
+    makeSitoutAmountSelector,
     makeHandStateSelector,
     makeLatestHandSelector,
     makeBoardSelector,

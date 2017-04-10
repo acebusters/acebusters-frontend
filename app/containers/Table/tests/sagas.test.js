@@ -30,6 +30,7 @@ describe('Saga Tests', () => {
     const hand = {
       state: 'waiting',
       dealer: 0,
+      handId: 1,
       lineup: [{
         address: PLAYER1.address,
       }, {
@@ -67,6 +68,7 @@ describe('Saga Tests', () => {
     const hand = {
       state: 'dealing',
       dealer: 0,
+      handId: 1,
       lineup: [{
         address: PLAYER1.address,
       }, {

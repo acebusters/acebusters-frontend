@@ -4,14 +4,13 @@
 
 import React from 'react';
 import styled from 'styled-components';
-import Grid from 'grid-styled';
 import {
   black,
   white,
 } from 'variables';
 import { Board } from './Board';
+import { ActionButton } from '../ActionBar';
 import ActionBar from '../../containers/ActionBar';
-import Button from '../../components/Button';
 import tableImage from './tableBG.svg';
 
 export const Pot = styled.div`
@@ -35,7 +34,11 @@ export const TableHeader = styled.div`
 `;
 
 export const Wrapper = styled.div`
-  padding: 1em;
+  position: absolute;
+  left: 2em;
+  height: 10%
+  width: 20%;
+  bottom: 2em;
 `;
 
 export const Winner = styled.div`
@@ -80,10 +83,12 @@ function TableComponent(props) {
   return (
     <div>
       { (props.myPos > -1) &&
-      <Wrapper>
-        <Grid xs={1 / 2} ><Button size="medium" onClick={props.onLeave} >Leave</Button></Grid>
-        <Grid xs={1 / 2} ><Button size="medium" onClick={props.onSitout} >SitOut</Button></Grid>
-      </Wrapper>
+        <Wrapper>
+          <ActionButton size="small" onClick={props.onLeave} icon="fa fa-sign-out" />
+            { !props.pending &&
+              <ActionButton size="small" onClick={props.onSitout} icon="fa fa-coffee" />
+            }
+        </Wrapper>
       }
       <TableHeader>
         { `state: ${props.state}` } <br />
@@ -114,6 +119,7 @@ function TableComponent(props) {
 TableComponent.propTypes = {
   state: React.PropTypes.string,
   onLeave: React.PropTypes.any,
+  pending: React.PropTypes.bool,
   onSitout: React.PropTypes.any,
   board: React.PropTypes.array,
   seats: React.PropTypes.array,
