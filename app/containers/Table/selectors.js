@@ -135,15 +135,16 @@ const makeSelectWinners = () => createSelector(
       const card2 = valuesShort[player.cards[1] % 13] + suits[Math.floor([player.cards[1] / 13])];
       pHand.push(...boardCards, card1, card2);
       const handObj = Solver.Hand.solve(pHand);
-      player.hand = handObj.descr; // eslint-disable-line
+      player.hand = handObj; // eslint-disable-line
       return handObj;
     }));
+
     const winners = {};
     lineup.forEach((player, i) => {
       wHands.forEach((wHand) => {
-        if (wHand.descr === player.hand) {
+        if (wHand === player.hand) {
           winners[i] = {};
-          winners[i].hand = player.hand;
+          winners[i].hand = player.hand.descr;
           winners[i].addr = player.address;
         }
       });

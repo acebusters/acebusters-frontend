@@ -186,6 +186,48 @@ describe('winnersSelector', () => {
     expect(selectWinners(mockedState, props)).toEqual(winners);
   });
 
+
+  it('should have 1 winner with A high and top kicker.', () => {
+    const dists = [];
+    dists.push(EWT.concat(P1_ADDR, 1000).toString('hex'));
+    dists.push(EWT.concat(ORACLE_ADDR, 10).toString('hex')); // rake
+    const distRec = new EWT(ABI_DIST).distribution(2, 0, dists).sign(ORACLE_KEY);
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          2: {
+            lineup: [{
+              address: P1_ADDR,
+              cards: [38, 37],
+            }, {
+              address: P2_ADDR,
+              cards: [25, 6],
+            }],
+            cards: [2, 3, 8],
+            distribution: distRec,
+          },
+        },
+      },
+    });
+    const props = {
+      pos: 0,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 2,
+      },
+    };
+
+    const winners = {
+      0: {
+        addr: P1_ADDR,
+        hand: 'A High',
+        amount: 1000,
+      },
+    };
+    const selectWinners = makeSelectWinners();
+    expect(selectWinners(mockedState, props)).toEqual(winners);
+  });
+
   it('should have 3 winners with 2 pair.', () => {
     const dists = [];
     dists.push(EWT.concat(P3_ADDR, 1000).toString('hex'));
@@ -243,9 +285,7 @@ describe('winnersSelector', () => {
     const selectWinners = makeSelectWinners();
     expect(selectWinners(mockedState, props)).toEqual(winners);
   });
-});
 
-describe('winnersSelector', () => {
   it('should have winner with index 0 with a pair of Aces`.', () => {
     const mockedState = fromJS({
       table: {
