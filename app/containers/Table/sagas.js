@@ -192,7 +192,7 @@ export function* updateScanner() {
       }
 
       const whosTurn = pokerHelper.whosTurn(action.hand, sb * 2);
-      // check if's showtime!
+      // check if it is my turn to show!
       const isShow = (action.hand.state === 'showdown' && whosTurn === myPos);
       if (isShow && !showed[toggleKey]) {
         showed[toggleKey] = true;
