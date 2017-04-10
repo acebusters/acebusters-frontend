@@ -211,7 +211,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   handleSitout() {
     const handId = parseInt(this.props.params.handId, 10);
     if (this.props.sitoutAmount > -1) {
-      console.dir(this.props.sitoutAmount);
       const sitoutAction = bet(this.props.params.tableAddr, handId, this.props.sitoutAmount, this.props.privKey, this.props.myPos, this.props.lastReceipt);
       return sitOutToggle(sitoutAction, this.props.dispatch);
     }
