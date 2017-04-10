@@ -170,8 +170,7 @@ export function* updateScanner() {
     const myPos = pokerHelper.getMyPos(action.hand.lineup, myAddr);
     const activeLineup = pokerHelper.getActiveLineup(action.hand.lineup, action.hand.dealer, action.hand.state);
     const active = pokerHelper.isActive(action.hand.lineup[myPos], action.hand.state);
-    console.log(pokerHelper.checkForNextHand(action.hand));
-    if (activeLineup.length > 1 && active) {
+    if (active) {
       // check if turn to pay small blind
       if (action.hand.state === 'waiting' && activeLineup[0].pos === myPos && !payedBlind[toggleKey]) {
         payedBlind[toggleKey] = true;
@@ -179,7 +178,7 @@ export function* updateScanner() {
         continue; // eslint-disable-line no-continue
       }
       // check if turn to pay big blind or 0 receipt
-      if (action.hand.state === 'dealing') {
+      if (action.hand.state === 'dealing' && activeLineup.length > 1) {
         if (activeLineup[1].pos === myPos && !payedBlind[toggleKey]) {
           payedBlind[toggleKey] = true;
 

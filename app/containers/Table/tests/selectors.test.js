@@ -309,7 +309,7 @@ describe('sitout Selector', () => {
     expect(selectSitoutAmount(mockedState, props)).toEqual(100);
   });
 
-  it('should return 0 when state is waiting and i am not in sitout`.', () => {
+  it('should return 0 when state is waiting and i am not in sitout.', () => {
     const mockedState = fromJS({
       account: {
         privKey: P1_KEY,
