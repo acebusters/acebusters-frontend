@@ -211,7 +211,7 @@ const makeIsMyTurnSelector = () => createSelector(
 
 const makeMaxBetSelector = () => createSelector(
   [makeHandSelector(), makeLineupSelector()],
-  (hand, lineup) => (hand && lineup && lineup.toJS) ? pokerHelper.findMaxBet(lineup.toJS(), hand.get('dealer')).amount : -1
+  (hand, lineup) => (hand && lineup && lineup.toJS) ? pokerHelper.getMaxBet(lineup.toJS(), hand.get('state')).amount : -1
 );
 
 const makeMyMaxBetSelector = () => createSelector(
