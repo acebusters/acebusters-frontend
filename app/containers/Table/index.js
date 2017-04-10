@@ -364,11 +364,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     const lineup = (this.props.lineup) ? this.props.lineup.toJS() : null;
     const seats = this.renderSeats(lineup);
     const board = this.renderBoard();
-    const winners = [];
-    Object.keys(this.props.winners).forEach((key, index) => {
-      const winner = this.props.winners[key];
-      winners.push((<div key={index}>`${winner.addr} won ${winner.amount} with ${winner.hand}`</div>));
-    });
+    const winners = this.props.winners.map((winner, index) => (<div key={index}>`${winner.addr} won ${winner.amount} with ${winner.hand}`</div>));
     const sb = (this.props.data && this.props.data.get('smallBlind')) ? this.props.data.get('smallBlind') : 0;
     const pending = (lineup && lineup[this.props.myPos]) ? lineup[this.props.myPos].pending : false;
     return (
@@ -445,7 +441,7 @@ Table.propTypes = {
   handRequest: React.PropTypes.func,
   pendingToggle: React.PropTypes.func,
   modalDismiss: React.PropTypes.func,
-  winners: React.PropTypes.object,
+  winners: React.PropTypes.array,
   dispatch: React.PropTypes.func,
   lineupReceived: React.PropTypes.func,
   updateReceived: React.PropTypes.func,

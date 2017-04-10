@@ -96,10 +96,10 @@ describe('missingHandSelector', () => {
 
 describe('winnersSelector', () => {
   it('should have winner with index 0 with a pair of Aces`.', () => {
-    const dists = [];
-    dists.push(EWT.concat(P2_ADDR, 1000).toString('hex'));
-    dists.push(EWT.concat(ORACLE_ADDR, 10).toString('hex')); // rake
-    const distRec = new EWT(ABI_DIST).distribution(2, 0, dists).sign(ORACLE_KEY);
+    const distRec = new EWT(ABI_DIST).distribution(2, 0, [
+      EWT.concat(P2_ADDR, 1000).toString('hex'),
+      EWT.concat(ORACLE_ADDR, 10).toString('hex'),
+    ]).sign(ORACLE_KEY);
     const mockedState = fromJS({
       table: {
         [TBL_ADDR]: {
@@ -126,23 +126,23 @@ describe('winnersSelector', () => {
         handId: 2,
       },
     };
-    const winner = {
-      2: {
+    const winner = [
+      {
         addr: P2_ADDR,
         hand: "Four of a Kind, Q's",
         amount: 1000,
-      },
-    };
+      }];
     const selectWinners = makeSelectWinners();
     expect(selectWinners(mockedState, props)).toEqual(winner);
   });
 
   it('should have 2 winners with index 0 and 1 with a pair of Aces.', () => {
-    const dists = [];
-    dists.push(EWT.concat(P2_ADDR, 1000).toString('hex'));
-    dists.push(EWT.concat(P1_ADDR, 1000).toString('hex'));
-    dists.push(EWT.concat(ORACLE_ADDR, 10).toString('hex')); // rake
-    const distRec = new EWT(ABI_DIST).distribution(2, 0, dists).sign(ORACLE_KEY);
+    const distRec = new EWT(ABI_DIST).distribution(2, 0, [
+      EWT.concat(P1_ADDR, 1000).toString('hex'),
+      EWT.concat(P2_ADDR, 1000).toString('hex'),
+      EWT.concat(ORACLE_ADDR, 10).toString('hex'), // rake
+    ]).sign(ORACLE_KEY);
+
     const mockedState = fromJS({
       table: {
         [TBL_ADDR]: {
@@ -150,6 +150,8 @@ describe('winnersSelector', () => {
             lineup: [{
               address: P1_ADDR,
               cards: [25, 38],
+            }, {
+              address: P3_ADDR,
             }, {
               address: P_EMPTY,
             }, {
@@ -170,28 +172,27 @@ describe('winnersSelector', () => {
       },
     };
 
-    const winners = {
-      0: {
+    const winners = [
+      {
         addr: P1_ADDR,
         hand: "Pair, A's",
         amount: 1000,
       },
-      2: {
+      {
         addr: P2_ADDR,
         hand: "Pair, A's",
         amount: 1000,
-      },
-    };
+      }];
     const selectWinners = makeSelectWinners();
     expect(selectWinners(mockedState, props)).toEqual(winners);
   });
 
 
   it('should have 1 winner with A high and top kicker.', () => {
-    const dists = [];
-    dists.push(EWT.concat(P1_ADDR, 1000).toString('hex'));
-    dists.push(EWT.concat(ORACLE_ADDR, 10).toString('hex')); // rake
-    const distRec = new EWT(ABI_DIST).distribution(2, 0, dists).sign(ORACLE_KEY);
+    const distRec = new EWT(ABI_DIST).distribution(2, 0, [
+      EWT.concat(P1_ADDR, 1000).toString('hex'),
+      EWT.concat(ORACLE_ADDR, 10).toString('hex'),
+    ]).sign(ORACLE_KEY);
     const mockedState = fromJS({
       table: {
         [TBL_ADDR]: {
@@ -217,24 +218,22 @@ describe('winnersSelector', () => {
       },
     };
 
-    const winners = {
-      0: {
+    const winners = [
+      {
         addr: P1_ADDR,
         hand: 'A High',
         amount: 1000,
-      },
-    };
+      }];
     const selectWinners = makeSelectWinners();
     expect(selectWinners(mockedState, props)).toEqual(winners);
   });
 
   it('should have 3 winners with 2 pair.', () => {
-    const dists = [];
-    dists.push(EWT.concat(P3_ADDR, 1000).toString('hex'));
-    dists.push(EWT.concat(P1_ADDR, 1000).toString('hex'));
-    dists.push(EWT.concat(P2_ADDR, 1000).toString('hex'));
-    dists.push(EWT.concat(ORACLE_ADDR, 10).toString('hex')); // rake
-    const distRec = new EWT(ABI_DIST).distribution(2, 0, dists).sign(ORACLE_KEY);
+    const distRec = new EWT(ABI_DIST).distribution(2, 0, [
+      EWT.concat(P1_ADDR, 1000).toString('hex'),
+      EWT.concat(P2_ADDR, 1000).toString('hex'),
+      EWT.concat(P3_ADDR, 1000).toString('hex'),
+    ]).sign(ORACLE_KEY);
     const mockedState = fromJS({
       table: {
         [TBL_ADDR]: {
@@ -265,23 +264,22 @@ describe('winnersSelector', () => {
       },
     };
 
-    const winners = {
-      0: {
+    const winners = [
+      {
         addr: P1_ADDR,
         hand: "Two Pair, Q's & J's",
         amount: 1000,
       },
-      2: {
-        addr: P3_ADDR,
-        hand: "Two Pair, Q's & J's",
-        amount: 1000,
-      },
-      1: {
+      {
         addr: P2_ADDR,
         hand: "Two Pair, Q's & J's",
         amount: 1000,
       },
-    };
+      {
+        addr: P3_ADDR,
+        hand: "Two Pair, Q's & J's",
+        amount: 1000,
+      }];
     const selectWinners = makeSelectWinners();
     expect(selectWinners(mockedState, props)).toEqual(winners);
   });
