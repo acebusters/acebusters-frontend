@@ -129,22 +129,25 @@ const makeSelectWinners = () => createSelector(
     }
     const boardCards = board.map((c) => valuesShort[c % 13] + suits[Math.floor([c / 13])]);
     const lineup = hand.get('lineup').toJS();
-    const wHands = Solver.Hand.winners(lineup.filter((obj) => obj.cards).map((player) => {
+    const tmp = [];
+    const winners = [];
+    const players = [];
+    Solver.Hand.winners(lineup.filter((obj) => obj.cards).map((player) => {
       const pHand = [];
       const card1 = valuesShort[player.cards[0] % 13] + suits[Math.floor([player.cards[0] / 13])];
       const card2 = valuesShort[player.cards[1] % 13] + suits[Math.floor([player.cards[1] / 13])];
       pHand.push(...boardCards, card1, card2);
       const handObj = Solver.Hand.solve(pHand);
-      player.hand = handObj.descr; // eslint-disable-line
+      players.push(Object.assign(player, { hand: handObj }));
       return handObj;
-    }));
-    const winners = {};
-    lineup.forEach((player, i) => {
-      wHands.forEach((wHand) => {
-        if (wHand.descr === player.hand) {
-          winners[i] = {};
-          winners[i].hand = player.hand;
-          winners[i].addr = player.address;
+    })).forEach((wHand) => {
+      players.forEach((player) => {
+        if (player.hand === wHand) {
+          const winner = {
+            addr: player.address,
+            hand: player.hand.descr,
+          };
+          tmp.push(winner);
         }
       });
     });
@@ -155,9 +158,9 @@ const makeSelectWinners = () => createSelector(
       const dists = rc.get(distsRec);
       dists.values[2].forEach((dist) => {
         const pDist = EWT.separate(dist);
-        Object.keys(winners).forEach((key) => {
-          if (pDist.address === winners[key].addr) {
-            winners[key].amount = pDist.amount;
+        tmp.forEach((winner) => {
+          if (pDist.address === winner.addr) {
+            winners.push(Object.assign(winner, { amount: pDist.amount }));
           }
         });
       });
