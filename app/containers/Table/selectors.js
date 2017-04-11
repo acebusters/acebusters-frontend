@@ -125,7 +125,7 @@ const makeSelectWinners = () => createSelector(
   [makeHandSelector(), makeBoardSelector()],
   (hand, board) => {
     if (!hand || !hand.get || !hand.get('distribution')) {
-      return {};
+      return [];
     }
     const boardCards = board.map((c) => valuesShort[c % 13] + suits[Math.floor([c / 13])]);
     const lineup = hand.get('lineup').toJS();
