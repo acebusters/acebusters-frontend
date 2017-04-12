@@ -15,7 +15,7 @@ class JoinDialog extends React.Component { // eslint-disable-line react/prefer-s
   constructor(props) {
     super(props);
     this.state = {
-      amount: 0,
+      amount: props.sb * 40,
     };
     this.updateAmount = this.updateAmount.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -27,9 +27,7 @@ class JoinDialog extends React.Component { // eslint-disable-line react/prefer-s
   }
 
   handleSubmit() {
-    const min = this.props.sb * 40;
-    const amount = (this.state) ? this.state.amount : min;
-    this.props.handleJoin(this.props.pos, amount);
+    this.props.handleJoin(this.props.pos, this.state.amount);
   }
 
   render() {
@@ -37,7 +35,7 @@ class JoinDialog extends React.Component { // eslint-disable-line react/prefer-s
     const tableMax = this.props.sb * 200;
     const max = (this.props.balance < tableMax) ? this.props.balance : tableMax;
     return (
-      <div style={{ minWidth: '10em' }}>
+      <div style={{ minWidth: '20em' }}>
         <Slider
           data-orientation="vertical"
           value={this.state.amount}
