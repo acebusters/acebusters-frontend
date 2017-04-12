@@ -20,6 +20,112 @@ const actionSelector = (action) => action;
 
 const addressSelector = (state, props) => (props) ? props.address : null;
 
+const myPosByAction = createSelector(
+  [actionSelector, addressSelector],
+  (action, myAddr) => {
+    if (!myAddr || !action.hand || !action.hand.lineup) {
+      return -1;
+    }
+    for (let i = 0; i < action.hand.lineup.length; i += 1) {
+      if (myAddr === action.hand.lineup[i].address) {
+        return i;
+      }
+    }
+    return -1;
+  }
+);
+
+const isSbTurnByAction = createSelector(
+  [actionSelector, myPosByAction],
+  (action, myPos) => {
+    if (!action.hand) {
+      return false;
+    }
+    const sbPos = pokerHelper.getSbPos(action.hand.lineup, action.hand.dealer);
+    if (typeof sbPos === 'undefined' || sbPos < 0) {
+      return false;
+    }
+    const whosTurn = pokerHelper.whosTurn(action.hand, action.hand.sb * 2);
+    if (typeof whosTurn === 'undefined' || whosTurn < 0) {
+      return false;
+    }
+    if (action.hand.state === 'waiting' && whosTurn === sbPos && sbPos === myPos) {
+      return true;
+    }
+    return false;
+  }
+);
+
+const isBbTurnByAction = createSelector(
+  [actionSelector, myPosByAction],
+  (action, myPos) => {
+    if (!action.hand) {
+      return false;
+    }
+    const bbPos = pokerHelper.getBbPos(action.hand.lineup, action.hand.dealer, action.hand.state);
+    if (typeof bbPos === 'undefined' || bbPos < 0) {
+      return false;
+    }
+    const whosTurn = pokerHelper.whosTurn(action.hand, action.hand.sb * 2);
+    if (typeof whosTurn === 'undefined' || whosTurn < 0) {
+      return false;
+    }
+    if (action.hand.state === 'dealing' && whosTurn === bbPos && bbPos === myPos) {
+      return true;
+    }
+    return false;
+  }
+);
+
+const is0rTurnByAction = createSelector(
+  [actionSelector, myPosByAction, isSbTurnByAction, isBbTurnByAction],
+  (action, myPos, sbTurn, bbTurn) => {
+    if (!action.hand || !action.hand.lineup) {
+      return false;
+    }
+    const whosTurn = pokerHelper.whosTurn(action.hand, action.hand.sb * 2);
+    if (typeof whosTurn === 'undefined' || whosTurn < 0) {
+      return false;
+    }
+    if (action.hand.state === 'dealing' && !sbTurn && !bbTurn && whosTurn === myPos) {
+      return true;
+    }
+    return false;
+  }
+);
+
+const isShowTurnByAction = createSelector(
+  [actionSelector, myPosByAction],
+  (action, myPos) => {
+    if (!action || !action.hand || action.hand.state !== 'showdown') {
+      return false;
+    }
+    const whosTurn = pokerHelper.whosTurn(action.hand, action.hand.sb * 2);
+    if (typeof whosTurn === 'undefined' || whosTurn < 0) {
+      return false;
+    }
+    if (whosTurn === myPos) {
+      return true;
+    }
+    return false;
+  }
+);
+
+const hasNettingInAction = createSelector(
+  [actionSelector, addressSelector],
+  (action, myAddr) => {
+    // check data available
+    if (!myAddr || !action || !action.hand || !action.hand.netting) {
+      return false;
+    }
+    // check already signed
+    if (action.hand.netting[myAddr]) {
+      return false;
+    }
+    return true;
+  }
+);
+
 const makeTableDataSelector = () => createSelector(
   tableStateSelector,
   (table) => (table) ? (table.get('data')) : null
@@ -44,21 +150,6 @@ const makeSbSelector = () => createSelector(
 const makeWhosTurnSelector = () => createSelector(
   [makeHandSelector(), makeSbSelector()],
   (hand, sb) => (hand && hand.get('lineup').size > 0) ? pokerHelper.whosTurn(hand.toJS(), sb * 2) : -1
-);
-
-const myPosByAction = createSelector(
-  [actionSelector, addressSelector],
-  (action, myAddr) => {
-    if (!myAddr || !action.hand || !action.hand.lineup) {
-      return -1;
-    }
-    for (let i = 0; i < action.hand.lineup.length; i += 1) {
-      if (myAddr === action.hand.lineup[i].address) {
-        return i;
-      }
-    }
-    return -1;
-  }
 );
 
 const lastAmountByAction = createSelector(
@@ -287,6 +378,11 @@ const makePotSizeSelector = () => createSelector(
 export {
     tableStateSelector,
     actionSelector,
+    isSbTurnByAction,
+    isBbTurnByAction,
+    is0rTurnByAction,
+    isShowTurnByAction,
+    hasNettingInAction,
     lastAmountByAction,
     makeMyHandValueSelector,
     makeTableDataSelector,

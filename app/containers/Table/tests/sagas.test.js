@@ -30,6 +30,7 @@ describe('Saga Tests', () => {
     const hand = {
       state: 'waiting',
       dealer: 0,
+      sb: 50,
       handId: 1,
       lineup: [{
         address: PLAYER1.address,
@@ -69,6 +70,7 @@ describe('Saga Tests', () => {
       state: 'dealing',
       dealer: 0,
       handId: 1,
+      sb: 50,
       lineup: [{
         address: PLAYER1.address,
       }, {
@@ -108,6 +110,7 @@ describe('Saga Tests', () => {
       handId: 3,
       state: 'showdown',
       dealer: 0,
+      sb: 50,
       lineup: [{
       }, {
         address: PLAYER1.address,
@@ -147,11 +150,12 @@ describe('Saga Tests', () => {
     expect(sagaTester.getCalledActions().length).toEqual(3);
   });
 
-  it('should dispatch show action when its showtime as all-in player!', () => {
+  it('should dispatch show action when its showtime as all-in player!', async () => {
     const hand = {
       handId: 4,
       state: 'showdown',
       dealer: 1,
+      sb: 50,
       lineup: [{
       }, {
         address: PLAYER1.address,
@@ -179,7 +183,7 @@ describe('Saga Tests', () => {
 
     const sagaTester = new SagaTester({ initialState });
     sagaTester.start(updateScanner);
-    sagaTester.dispatch(updateReceived(tableAddr, hand));
+    await sagaTester.dispatch(updateReceived(tableAddr, hand));
     const show = sagaTester.getLatestCalledAction();
     expect(show.type).toEqual(SHOW);
     expect(show.amount).toEqual(1000);
