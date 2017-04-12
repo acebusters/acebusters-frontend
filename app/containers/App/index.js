@@ -81,8 +81,8 @@ export function App(props) {
       </StyledDashboard>
 
       { modalContent &&
-        <ModalContainer onClose={props.modalDismiss}>
-          <ModalDialog onClose={props.modalDismiss}>
+        <ModalContainer>
+          <ModalDialog onClose={props.modalDismiss} dismissOnBackgroundClick={false}>
             { modalContent }
           </ModalDialog>
         </ModalContainer>
