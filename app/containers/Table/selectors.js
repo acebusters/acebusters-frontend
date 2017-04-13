@@ -41,7 +41,7 @@ const isSbTurnByAction = createSelector(
     if (!action.hand) {
       return false;
     }
-    const sbPos = pokerHelper.getSbPos(action.hand.lineup, action.hand.dealer);
+    const sbPos = pokerHelper.getSbPos(action.hand.lineup, action.hand.dealer, action.hand.state);
     if (typeof sbPos === 'undefined' || sbPos < 0) {
       return false;
     }

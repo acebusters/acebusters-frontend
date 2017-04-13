@@ -21,7 +21,7 @@ import {
   NET,
 } from '../actions';
 
-import { ABI_BET, ABI_SHOW } from '../../../app.config';
+import { ABI_BET, ABI_SHOW, ABI_SIT_OUT } from '../../../app.config';
 
 const tableAddr = '0x112233';
 
@@ -46,6 +46,41 @@ describe('Saga Tests', () => {
     const initialState = fromJS({
       account: {
         privKey: PLAYER2.key,
+      },
+      table: {
+        [tableAddr]: { data: { smallBlind: 500 } },
+      },
+    });
+
+    const sagaTester = new SagaTester({ initialState });
+    sagaTester.start(updateScanner);
+    sagaTester.dispatch(updateReceived(tableAddr, hand));
+    expect(sagaTester.getLatestCalledAction().type).toEqual(BET);
+    expect(sagaTester.getLatestCalledAction().amount).toEqual(500);
+    expect(sagaTester.getCalledActions().length).toEqual(2);
+    // do the same thing again, and make sure the request
+    // is deduplicated
+    sagaTester.dispatch(updateReceived(tableAddr, hand));
+    expect(sagaTester.getLatestCalledAction().type).toEqual(UPDATE_RECEIVED);
+    expect(sagaTester.getCalledActions().length).toEqual(3);
+  });
+
+  it('should disptach sb action when when player comes back from sitout', () => {
+    const hand = {
+      state: 'waiting',
+      dealer: 0,
+      handId: 1,
+      lineup: [{
+        address: PLAYER1.address,
+      }, {
+        address: PLAYER2.address,
+        last: new EWT(ABI_SIT_OUT).sitOut(1, 0).sign(PLAYER2.key),
+      }],
+    };
+
+    const initialState = fromJS({
+      account: {
+        privKey: PLAYER1.key,
       },
       table: {
         [tableAddr]: { data: { smallBlind: 500 } },
@@ -112,7 +147,6 @@ describe('Saga Tests', () => {
       dealer: 0,
       sb: 50,
       lineup: [{
-      }, {
         address: PLAYER1.address,
         last: new EWT(ABI_SHOW).show(1, 1000).sign(PLAYER1.key),
       }, {
@@ -154,10 +188,9 @@ describe('Saga Tests', () => {
     const hand = {
       handId: 4,
       state: 'showdown',
-      dealer: 1,
+      dealer: 0,
       sb: 50,
       lineup: [{
-      }, {
         address: PLAYER1.address,
         last: new EWT(ABI_SHOW).show(1, 1000).sign(PLAYER1.key),
       }, {
@@ -201,7 +234,15 @@ describe('Saga Tests', () => {
         newBalances: '0x1234',
         [PLAYER1.address]: '0x',
       },
-      lineup: [],
+      lineup: [{
+        address: PLAYER1.address,
+        last: new EWT(ABI_BET).bet(1, 1000).sign(PLAYER1.key),
+      }, {
+        address: PLAYER_EMPTY.address,
+      }, {
+        address: PLAYER2.address,
+        last: new EWT(ABI_BET).bet(1, 1000).sign(PLAYER2.key),
+      }],
     };
 
     const initialState = fromJS({

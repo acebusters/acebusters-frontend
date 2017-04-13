@@ -167,6 +167,7 @@ export function* updateScanner() {
     }
 
     // check if turn to pay small blind
+
     if (isSbTurnByAction(action, { address: myAddr, sb }) && !payedBlind[toggleKey]) {
       payedBlind[toggleKey] = true;
       yield put(bet(action.tableAddr, action.hand.handId, sb, privKey));
@@ -187,6 +188,7 @@ export function* updateScanner() {
     }
 
     // check if's showtime!
+
     const isShow = isShowTurnByAction(action, { address: myAddr, sb });
     if (isShow && !showed[toggleKey]) {
       showed[toggleKey] = true;
