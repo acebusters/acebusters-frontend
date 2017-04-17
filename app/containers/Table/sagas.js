@@ -4,6 +4,7 @@
 import ethUtil from 'ethereumjs-util';
 import { call, put, takeEvery, select, fork, take } from 'redux-saga/effects';
 import Raven from 'raven-js';
+import { PokerHelper, ReceiptCache } from 'poker-helper';
 
 import {
   setCards,
@@ -40,6 +41,9 @@ import {
 } from './selectors';
 
 import TableService, { getHand } from '../../services/tableService';
+
+const rc = new ReceiptCache();
+const pokerHelper = new PokerHelper(rc);
 
 export function* handRequest(action) {
   try {
@@ -167,37 +171,36 @@ export function* updateScanner() {
     }
 
     // check if turn to pay small blind
+    if (!pokerHelper.isHandComplete(action.hand.lineup, action.hand.dealer, action.hand.state)) {
+      if (isSbTurnByAction(action, { address: myAddr, sb }) && !payedBlind[toggleKey]) {
+        payedBlind[toggleKey] = true;
+        yield put(bet(action.tableAddr, action.hand.handId, sb, privKey));
+        continue; // eslint-disable-line no-continue
+      }
+      // check if turn to pay big blind
+      if (isBbTurnByAction(action, { address: myAddr, sb }) && !payedBlind[toggleKey]) {
+        payedBlind[toggleKey] = true;
+        yield put(bet(action.tableAddr, action.hand.handId, sb * 2, privKey));
+        continue; // eslint-disable-line no-continue
+      }
 
-    if (isSbTurnByAction(action, { address: myAddr, sb }) && !payedBlind[toggleKey]) {
-      payedBlind[toggleKey] = true;
-      yield put(bet(action.tableAddr, action.hand.handId, sb, privKey));
-      continue; // eslint-disable-line no-continue
+      // check if turn to pay 0 receipt
+      if (is0rTurnByAction(action, { address: myAddr, sb }) && !payedBlind[toggleKey]) {
+        payedBlind[toggleKey] = true;
+        yield put(bet(action.tableAddr, action.hand.handId, 0, privKey));
+        continue; // eslint-disable-line no-continue
+      }
+
+      // check if's showtime!
+      const isShow = isShowTurnByAction(action, { address: myAddr, sb });
+      if (isShow && !showed[toggleKey]) {
+        showed[toggleKey] = true;
+        const amount = lastAmountByAction(action, { address: myAddr });
+        const holeCards = myCardsSelector(state, { params: { tableAddr: action.tableAddr, handId: action.hand.handId } });
+        yield put(show(action.tableAddr, action.hand.handId, holeCards, amount, privKey));
+        continue; // eslint-disable-line no-continue
+      }
     }
-    // check if turn to pay big blind
-    if (isBbTurnByAction(action, { address: myAddr, sb }) && !payedBlind[toggleKey]) {
-      payedBlind[toggleKey] = true;
-      yield put(bet(action.tableAddr, action.hand.handId, sb * 2, privKey));
-      continue; // eslint-disable-line no-continue
-    }
-
-    // check if turn to pay 0 receipt
-    if (is0rTurnByAction(action, { address: myAddr, sb }) && !payedBlind[toggleKey]) {
-      payedBlind[toggleKey] = true;
-      yield put(bet(action.tableAddr, action.hand.handId, 0, privKey));
-      continue; // eslint-disable-line no-continue
-    }
-
-    // check if's showtime!
-
-    const isShow = isShowTurnByAction(action, { address: myAddr, sb });
-    if (isShow && !showed[toggleKey]) {
-      showed[toggleKey] = true;
-      const amount = lastAmountByAction(action, { address: myAddr });
-      const holeCards = myCardsSelector(state, { params: { tableAddr: action.tableAddr, handId: action.hand.handId } });
-      yield put(show(action.tableAddr, action.hand.handId, holeCards, amount, privKey));
-      continue; // eslint-disable-line no-continue
-    }
-
     // check if netting exists that we need to sign
     if (hasNettingInAction(action, { address: myAddr })
       && !netted[toggleKey]) {

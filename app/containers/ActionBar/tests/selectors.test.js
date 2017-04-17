@@ -122,6 +122,7 @@ describe('minSelector', () => {
           4: {
             state: 'flop',
             lastRoundMaxBet: 1000,
+            dealer: 0,
             lineup: [{
               address: P1_ADDR,
               last: new EWT(ABI_BET).bet(1, 1000).sign(P1_KEY),

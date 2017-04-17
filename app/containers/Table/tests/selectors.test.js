@@ -15,6 +15,7 @@ const P1_ADDR = '0x6d2f2c0fa568243d2def3e999a791a6df45d816e';
 const P1_KEY = '0x2e39143576f97f6ecd7439a0678f330d7144110cdc58b6476687cc243d7753ca';
 
 const P2_ADDR = '0x1c5a1730ffc44ac21700bb85bf0ceefd12ce71d7';
+const P2_KEY = '0x99e69145c6e7f44ba04d579faac9ef4ce5e942dc02b96a9d42b5fcb03e508729';
 
 const P3_ADDR = '0xdd7acad75b52bd206777a36bc41a3b65ad1c44fc';
 
@@ -327,7 +328,6 @@ describe('sitout Selector', () => {
               sitout: 1,
             }, {
               address: P2_ADDR,
-              sitout: 1,
             }],
           },
         },
@@ -382,7 +382,7 @@ describe('sitout Selector', () => {
     expect(selectSitoutAmount(mockedState, props)).toEqual(0);
   });
 
-  it('should return myMaxBet + 1 when i am not sitout not in dealing.', () => {
+  it('should return myMaxBet + 1 when i am not sitout not in waiting.', () => {
     const mockedState = fromJS({
       account: {
         privKey: P1_KEY,
@@ -393,12 +393,13 @@ describe('sitout Selector', () => {
             smallBlind: 50,
           },
           2: {
-            state: 'dealing',
+            state: 'flop',
             lineup: [{
               address: P1_ADDR,
-              last: new EWT(ABI_BET).bet(1, 100).sign(P1_KEY),
+              last: new EWT(ABI_BET).bet(1, 200).sign(P1_KEY),
             }, {
               address: P2_ADDR,
+              last: new EWT(ABI_BET).bet(1, 200).sign(P2_KEY),
             }],
           },
         },
@@ -415,6 +416,6 @@ describe('sitout Selector', () => {
       },
     };
     const selectSitoutAmount = makeSitoutAmountSelector();
-    expect(selectSitoutAmount(mockedState, props)).toEqual(101);
+    expect(selectSitoutAmount(mockedState, props)).toEqual(201);
   });
 });

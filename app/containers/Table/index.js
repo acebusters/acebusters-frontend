@@ -365,9 +365,9 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     const lineup = (this.props.lineup) ? this.props.lineup.toJS() : null;
     const seats = this.renderSeats(lineup);
     const board = this.renderBoard();
-    const winners = [];
+    let winners = [];
     if (this.props.winners.length > 0) {
-      this.props.winners.map((winner, index) => (<div key={index}>`${winner.addr} won ${winner.amount} with ${winner.hand}`</div>));
+      winners = this.props.winners.map((winner, index) => (<div key={index}>`${winner.addr} won ${winner.amount} with ${winner.hand}`</div>));
     }
     const sb = (this.props.data && this.props.data.get('smallBlind')) ? this.props.data.get('smallBlind') : 0;
     const pending = (lineup && lineup[this.props.myPos]) ? lineup[this.props.myPos].pending : false;

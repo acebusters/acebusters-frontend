@@ -27,7 +27,7 @@ const makeAmountToCallSelector = () => createSelector(
 const makeMinSelector = () => createSelector(
   [makeSbSelector(), makeHandSelector(), makeMyStackSelector(), makeAmountToCallSelector()],
   (sb, hand, stack, amountToCall) => {
-    if (!sb || !hand) {
+    if (!sb || !hand || hand.get('state') === 'waiting') {
       return -1;
     }
     // if my stack smaller than BB return the left behind stack
@@ -40,11 +40,19 @@ const makeMinSelector = () => createSelector(
     const maxBet = pokerHelper.getMaxBet(lineup, handState).amount;
     // check if there was a raise exclude preflop sb and bb
     const lastRoundMaxBet = hand.get('lastRoundMaxBet');
-    const minRaise = pokerHelper.findMinRaiseAmount(lineup, dealer, lastRoundMaxBet);
-    if (!(maxBet === sb * 2 && amountToCall <= sb * 2) && minRaise > -1) {
+    let minRaise;
+    try {
+      minRaise = pokerHelper.findMinRaiseAmount(lineup, dealer, lastRoundMaxBet);
+    } catch (e) {
+      // there was no raise
+      if (e.message === 'can not find minRaiseAmount.') {
+        return (sb * 2) + amountToCall;
+      }
+      throw (e);
+    }
+    if (!(maxBet === sb * 2 && amountToCall <= sb * 2)) {
       return minRaise + amountToCall;
     }
-    // otherwise return the BB
     return (sb * 2) + amountToCall;
   }
 );
