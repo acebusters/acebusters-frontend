@@ -50,7 +50,7 @@ const isSbTurnByAction = createSelector(
       return false;
     }
 
-    const whosTurn = pokerHelper.whosTurn(action.hand, action.hand.sb * 2);
+    const whosTurn = pokerHelper.getWhosTurn(action.hand.lineup, action.hand.dealer, action.hand.state, action.hand.sb * 2);
     if (typeof whosTurn === 'undefined' || whosTurn < 0) {
       return false;
     }
@@ -71,7 +71,7 @@ const isBbTurnByAction = createSelector(
     if (typeof bbPos === 'undefined' || bbPos < 0) {
       return false;
     }
-    const whosTurn = pokerHelper.whosTurn(action.hand, action.hand.sb * 2);
+    const whosTurn = pokerHelper.getWhosTurn(action.hand.lineup, action.hand.dealer, action.hand.state, action.hand.sb * 2);
     if (typeof whosTurn === 'undefined' || whosTurn < 0) {
       return false;
     }
@@ -88,7 +88,7 @@ const is0rTurnByAction = createSelector(
     if (!action.hand || !action.hand.lineup) {
       return false;
     }
-    const whosTurn = pokerHelper.whosTurn(action.hand, action.hand.sb * 2);
+    const whosTurn = pokerHelper.getWhosTurn(action.hand.lineup, action.hand.dealer, action.hand.state, action.hand.sb * 2);
     if (typeof whosTurn === 'undefined' || whosTurn < 0) {
       return false;
     }
@@ -105,7 +105,7 @@ const isShowTurnByAction = createSelector(
     if (!action || !action.hand || action.hand.state !== 'showdown') {
       return false;
     }
-    const whosTurn = pokerHelper.whosTurn(action.hand, action.hand.sb * 2);
+    const whosTurn = pokerHelper.getWhosTurn(action.hand.lineup, action.hand.dealer, action.hand.state, action.hand.sb * 2);
     if (typeof whosTurn === 'undefined' || whosTurn < 0) {
       return false;
     }

@@ -197,7 +197,7 @@
         "statements": 43,
         "branches": 47,
         "functions": 46,
-        "lines": 69
+        "lines": 68
       }
     },
     "moduleDirectories": [
@@ -231,7 +231,7 @@
     "lodash": "4.17.2",
     "minimist": "1.2.0",
     "node-uuid": "^1.4.8",
-    "poker-helper": "^0.3.13",
+    "poker-helper": "^0.3.14",
     "ab-pokersolver": "^2.1.3",
     "pusher-js": "^4.0.0",
     "qrcode.react": "^0.6.1",

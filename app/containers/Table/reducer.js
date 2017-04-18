@@ -136,6 +136,7 @@ export default function tableReducer(state = initialState, action) {
         }
         hand = hand.set('lastRoundMaxBet', maxBet);
         hand = hand.set('state', action.hand.state);
+        hand = hand.set('dealer', action.hand.dealer);
         hand = hand.set('changed', action.hand.changed);
         if (action.hand.cards && action.hand.cards.length > 0) {
           hand = hand.set('cards', List(action.hand.cards));
