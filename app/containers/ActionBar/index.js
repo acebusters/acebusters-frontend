@@ -55,7 +55,7 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
 
   componentWillReceiveProps(nextProps) {
     const min = nextProps.minRaise;
-    const amount = (nextProps.myStack < min) ? nextProps.myStack : min;
+    const amount = (min && nextProps.myStack < min) ? nextProps.myStack : min;
     this.setState({ amount });
     if (nextProps.isMyTurn === true) {
       this.setActive(true);

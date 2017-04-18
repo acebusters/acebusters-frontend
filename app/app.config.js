@@ -29,12 +29,11 @@ export const ABI_SIT_OUT = [{ name: 'sitOut', type: 'function', inputs: [{ type:
 export const ABI_SHOW = [{ name: 'show', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
 export const ABI_LEAVE = [{ name: 'leave', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
 export const ABI_DIST = [{ name: 'distribution', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }, { type: 'bytes32[]' }] }];
-
 export const TIMEOUT_PERIOD = 179;
 
 export const SEAT_COORDS = {
   2: [[110, 65, 0], [-10, 65, 0]],
-  4: [[30, -15], [70, 115], [30, 115], [70, -15]],
+  4: [[30, -15], [70, 115], [70, 150, 1], [30, 150, 0]],
   6: [[30, -15, 0], [70, -15, 0], [110, 65, 0], [70, 150, 1], [30, 150, 0], [-10, 65, 0]],
   10: [[10, -28], [100, 72], [12, 102], [-12, 72], [-12, 0], [75, 102], [75, -28], [100, 0], [44, -30], [44, 102]],
 };

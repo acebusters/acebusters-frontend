@@ -306,12 +306,33 @@ const makeIsMyTurnSelector = () => createSelector(
 
 const makeMaxBetSelector = () => createSelector(
   [makeHandSelector(), makeLineupSelector()],
-  (hand, lineup) => (hand && lineup && lineup.toJS && hand.get('state') !== 'waiting') ? pokerHelper.getMaxBet(lineup.toJS(), hand.get('state')).amount : -1
+  (hand, lineup) => {
+    if (!hand || !lineup || !lineup.toJS || !hand.get('state')) {
+      return undefined;
+    }
+    try {
+      return pokerHelper.getMaxBet(lineup.toJS(), hand.get('state')).amount;
+    } catch (e) {
+      if (e.message === 'could not find max bet.') {
+        return undefined;
+      }
+      throw (e);
+    }
+  }
 );
 
 const makeMyMaxBetSelector = () => createSelector(
   [makeLineupSelector(), makeSignerAddrSelector(), makeMyPosSelector()],
-  (lineup, myAddress, myPos) => (lineup && lineup.toJS && myAddress && myPos > -1) ? pokerHelper.getMyMaxBet(lineup.toJS(), myAddress) : -1
+  (lineup, myAddress, myPos) => {
+    if (!lineup || !lineup.toJS || !myAddress || myPos === -1) {
+      return undefined;
+    }
+    try {
+      return pokerHelper.getMyMaxBet(lineup.toJS(), myAddress);
+    } catch (e) {
+      return undefined;
+    }
+  }
 );
 
 const makeMissingHandSelector = () => createSelector(

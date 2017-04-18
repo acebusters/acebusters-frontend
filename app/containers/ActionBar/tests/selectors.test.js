@@ -10,6 +10,8 @@ import {
   makeAmountToCallSelector,
 } from '../selectors';
 
+import { checkABIs } from '../../../app.config';
+
 const ABI_BET = [{ name: 'bet', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
 
 // secretSeed: 'rural tent tests net drip fatigue uncle action repeat couple lawn rival'
@@ -121,22 +123,19 @@ describe('minSelector', () => {
         [TBL_ADDR]: {
           4: {
             state: 'flop',
-            lastRoundMaxBet: 1000,
+            lastRoundMaxBet: 400,
             dealer: 0,
             lineup: [{
-              address: P1_ADDR,
-              last: new EWT(ABI_BET).bet(1, 1000).sign(P1_KEY),
-            }, {
               address: P2_ADDR,
-              last: new EWT(ABI_BET).bet(1, 1000).sign(P2_KEY),
+              last: new EWT(ABI_BET).bet(1, 400).sign(P2_KEY),
             }, {
               address: P3_ADDR,
-              last: new EWT(ABI_BET).bet(1, 1000).sign(P3_KEY),
+              last: new EWT(checkABIs.flop).checkFlop(1, 400).sign(P3_KEY),
             }],
           },
           data: {
             amounts: [30000, 50000, 20000],
-            smallBlind: 500,
+            smallBlind: 50,
             lastHandNetted: 3,
           },
         },
@@ -145,13 +144,13 @@ describe('minSelector', () => {
 
     const minSelector = makeMinSelector();
     const props = {
-      pos: 2,
+      pos: 0,
       params: {
         handId: 4,
         tableAddr: TBL_ADDR,
       },
     };
-    expect(minSelector(mockedState, props)).toEqual(1000);
+    expect(minSelector(mockedState, props)).toEqual(100);
   });
 
   it('should return the stacksize when player does not have enough to bet min', () => {
