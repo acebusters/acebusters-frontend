@@ -192,7 +192,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   isTaken(open, myPos, pending, pos) {
-    if (open && myPos === -1 && !pending) {
+    if (open && myPos === undefined && !pending) {
       this.props.modalAdd((
         <JoinDialog
           pos={pos}
@@ -201,7 +201,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           balance={this.balance}
         />
       ));
-    } else if (open && this.props.myPos !== -1 && !pending) {
+    } else if (open && this.props.myPos !== undefined && !pending) {
       this.props.modalAdd((
         <InviteDialog />
       ));

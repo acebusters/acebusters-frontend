@@ -13,7 +13,6 @@ import SliderWrapper from '../../components/Slider';
 
 import {
   makeMinSelector,
-  makeMaxSelector,
   makeCallAmountSelector,
   makeAmountToCallSelector,
 } from './selectors';
@@ -160,6 +159,7 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
         && this.props.state !== 'waiting'
         && this.props.state !== 'dealing'
         && this.props.state !== 'showdown') {
+      const raiseButton = (this.props.myStack > this.props.amountToCall) ? (<ActionButton size="medium" onClick={this.handleBet} text={`RAISE ${this.state.amount}`} />) : null;
       return (
         <ActionBarComponent>
           <SliderWrapper>
@@ -169,8 +169,8 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
                 data-orientation="vertical"
                 value={this.state.amount}
                 min={this.props.minRaise}
-                max={this.props.max}
-                step={10} // this should be the smallest unit of our token
+                max={this.props.myStack}
+                step={1}
                 onChange={this.updateAmount}
               >
               </Slider>
@@ -179,8 +179,7 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
           <Grid xs={1 / 3}>
             { this.props.amountToCall > 0 &&
               <div>
-                <ActionButton size="medium" onClick={this.handleBet} text={`RAISE ${this.state.amount}`}>
-                </ActionButton>
+                { raiseButton }
                 <ActionButton size="medium" onClick={this.handleCall} text={`CALL ${this.props.callAmount}`}>
                 </ActionButton>
                 <ActionButton size="medium" onClick={this.handleFold} text="FOLD"></ActionButton>
@@ -218,7 +217,6 @@ const mapStateToProps = createStructuredSelector({
   callAmount: makeCallAmountSelector(),
   minRaise: makeMinSelector(),
   myStack: makeMyStackSelector(),
-  max: makeMaxSelector(),
   myPos: makeMyPosSelector(),
   lastReceipt: makeLastReceiptSelector(),
   cards: makeMyCardsSelector(),
@@ -233,7 +231,6 @@ ActionBar.propTypes = {
   myMaxBet: React.PropTypes.number,
   isMyTurn: React.PropTypes.bool,
   minRaise: React.PropTypes.number,
-  max: React.PropTypes.number,
   amountToCall: React.PropTypes.number,
   myStack: React.PropTypes.number,
   callAmount: React.PropTypes.number,

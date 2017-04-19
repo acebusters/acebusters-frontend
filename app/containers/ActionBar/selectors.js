@@ -66,14 +66,8 @@ const makeCallAmountSelector = () => createSelector(
   (amountToCall, stack) => (amountToCall > stack) ? stack : amountToCall
 );
 
-const makeMaxSelector = () => createSelector(
-  [makeMinSelector(), makeMyStackSelector()],
-  (min, stack) => (Math.floor(stack / min) * min) + min
-);
-
 export {
   makeAmountToCallSelector,
   makeMinSelector,
-  makeMaxSelector,
   makeCallAmountSelector,
 };

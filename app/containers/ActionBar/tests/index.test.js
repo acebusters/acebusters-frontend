@@ -162,11 +162,30 @@ describe('ActionBar', () => {
       isMyTurn: true,
       callAmount: 1000,
       amountToCall: 1000,
+      myStack: 2000,
     };
     const actionBar = shallow(
       <ActionBar {...props} />
     );
     expect(actionBar.find(ActionButton).nodes[1].props.text).toEqual('CALL 1000');
+  });
+
+  it('should not render the Raise Button if amount to call is bigger than my stack', () => {
+    const props = {
+      state: 'preflop',
+      params: {
+        tableAddr: '0x123',
+      },
+      isMyTurn: true,
+      callAmount: 800,
+      amountToCall: 1000,
+      myStack: 800,
+    };
+    const actionBar = shallow(
+      <ActionBar {...props} />
+    );
+    expect(actionBar.find(ActionButton).nodes[0].props.text).toEqual('CALL 800');
+    expect(actionBar.find(ActionButton).nodes.length).toEqual(2);
   });
 
   it('should disappear after action was taken', () => {

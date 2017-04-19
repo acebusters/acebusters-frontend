@@ -19,7 +19,7 @@ function SeatComponent(props) {
   let status = '';
   if (props.pending) {
     status = 'PENDING';
-  } else if (props.myPos === -1) {
+  } else if (props.myPos === undefined) {
     status = 'JOIN';
   } else {
     status = 'EMPTY';
