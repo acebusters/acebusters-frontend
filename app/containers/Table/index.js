@@ -55,6 +55,7 @@ import {
   makeMyPosSelector,
   makeSitoutAmountSelector,
   makeMissingHandSelector,
+  makeMySitoutSelector,
   makeLatestHandSelector,
   makeSelectWinners,
 } from './selectors';
@@ -366,8 +367,11 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     const seats = this.renderSeats(lineup);
     const board = this.renderBoard();
     let winners = [];
-    if (this.props.winners.length > 0) {
-      winners = this.props.winners.map((winner, index) => (<div key={index}>`${winner.addr} won ${winner.amount} with ${winner.hand}`</div>));
+    if (this.props.winners && this.props.winners.length > 0) {
+      winners = this.props.winners.map((winner, index) => {
+        const handString = (winner.hand) ? `with ${winner.hand}` : '';
+        return (<div key={index}>`${winner.addr} won ${winner.amount} ${handString}`</div>);
+      });
     }
     const sb = (this.props.data && this.props.data.get('smallBlind')) ? this.props.data.get('smallBlind') : 0;
     const pending = (lineup && lineup[this.props.myPos]) ? lineup[this.props.myPos].pending : false;
@@ -381,6 +385,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           winners={winners}
           myHand={this.props.myHand}
           pending={pending}
+          sitout={this.props.sitout}
           board={board}
           seats={seats}
           onLeave={() => this.handleLeave(this.props.myPos)}
@@ -419,6 +424,7 @@ const mapStateToProps = createStructuredSelector({
   latestHand: makeLatestHandSelector(),
   signerAddr: makeSignerAddrSelector(),
   privKey: makeSelectPrivKey(),
+  sitout: makeMySitoutSelector(),
   lastReceipt: makeLastReceiptSelector(),
   proxyAddr: makeSelectProxyAddr(),
   winners: makeSelectWinners(),
@@ -431,6 +437,7 @@ Table.propTypes = {
   hand: React.PropTypes.object,
   myHand: React.PropTypes.object,
   lineup: React.PropTypes.object,
+  sitout: React.PropTypes.bool,
   params: React.PropTypes.object,
   privKey: React.PropTypes.string,
   lastReceipt: React.PropTypes.string,

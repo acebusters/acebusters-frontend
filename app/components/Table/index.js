@@ -36,6 +36,7 @@ export const TableHeader = styled.div`
 export const Wrapper = styled.div`
   position: absolute;
   left: 2em;
+  z-index: 10;
   height: 10%
   width: 20%;
   bottom: 2em;
@@ -80,13 +81,14 @@ export const PokerTable = styled.div`
 `;
 
 function TableComponent(props) {
+  const icon = (props.sitout) ? 'fa fa-play' : 'fa fa-pause';
   return (
     <div>
       { (props.myPos > -1) &&
         <Wrapper>
           <ActionButton size="small" onClick={props.onLeave} icon="fa fa-sign-out" />
             { !props.pending &&
-              <ActionButton size="small" onClick={props.onSitout} icon="fa fa-coffee" />
+              <ActionButton size="small" onClick={props.onSitout} icon={icon} />
             }
         </Wrapper>
       }
@@ -122,6 +124,7 @@ TableComponent.propTypes = {
   pending: React.PropTypes.bool,
   onSitout: React.PropTypes.any,
   board: React.PropTypes.array,
+  sitout: React.PropTypes.bool,
   seats: React.PropTypes.array,
   potSize: React.PropTypes.number,
   myPos: React.PropTypes.number,

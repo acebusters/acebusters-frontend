@@ -77,7 +77,7 @@ const makeOpenSelector = () => createSelector(
 
 const makeSitoutSelector = () => createSelector(
   [makeLineupSelector(), posSelector],
-  (lineup, pos) => (lineup && pos > -1 && lineup.toJS()[pos]) ? lineup.toJS()[pos].sitout : false
+  (lineup, pos) => (lineup && pos !== undefined && typeof lineup.getIn([pos, 'sitout']) === 'number')
 );
 
 const makePendingSelector = () => createSelector(

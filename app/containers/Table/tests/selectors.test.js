@@ -9,22 +9,9 @@ import {
   makeSitoutAmountSelector,
 } from '../selectors';
 
-import { ABI_DIST, ABI_BET } from '../../../app.config';
+import { PLAYER1, PLAYER2, PLAYER3, PLAYER4, PLAYER_EMPTY } from './consts';
 
-const P1_ADDR = '0x6d2f2c0fa568243d2def3e999a791a6df45d816e';
-const P1_KEY = '0x2e39143576f97f6ecd7439a0678f330d7144110cdc58b6476687cc243d7753ca';
-
-const P2_ADDR = '0x1c5a1730ffc44ac21700bb85bf0ceefd12ce71d7';
-const P2_KEY = '0x99e69145c6e7f44ba04d579faac9ef4ce5e942dc02b96a9d42b5fcb03e508729';
-
-const P3_ADDR = '0xdd7acad75b52bd206777a36bc41a3b65ad1c44fc';
-
-const P4_ADDR = '0x0dfbfdf730c7d3612cf605e6629be369aa4eceeb';
-
-const P_EMPTY = '0x0000000000000000000000000000000000000000';
-
-const ORACLE_ADDR = '0x82e8c6cf42c8d1ff9594b17a3f50e94a12cc860f';
-const ORACLE_KEY = '0x94890218f2b0d04296f30aeafd13655eba4c5bbf1770273276fee52cbe3f2cb4';
+import { ABI_FOLD, ABI_BET, ABI_SHOW } from '../../../app.config';
 
 
 const TBL_ADDR = '0x77aabb1133';
@@ -97,25 +84,23 @@ describe('missingHandSelector', () => {
 
 describe('winnersSelector', () => {
   it('should have winner with index 0 with a pair of Aces`.', () => {
-    const distRec = new EWT(ABI_DIST).distribution(2, 0, [
-      EWT.concat(P2_ADDR, 1000).toString('hex'),
-      EWT.concat(ORACLE_ADDR, 10).toString('hex'),
-    ]).sign(ORACLE_KEY);
     const mockedState = fromJS({
       table: {
         [TBL_ADDR]: {
           2: {
             lineup: [{
-              address: P_EMPTY,
+              address: PLAYER_EMPTY,
             }, {
-              address: P1_ADDR,
+              address: PLAYER1.address,
+              last: new EWT(ABI_SHOW).show(1, 1000).sign(PLAYER1.key),
               cards: [21, 32],
             }, {
-              address: P2_ADDR,
+              address: PLAYER2.address,
+              last: new EWT(ABI_SHOW).show(1, 1000).sign(PLAYER2.key),
               cards: [36, 49],
             }],
             cards: [8, 23, 10],
-            distribution: distRec,
+            state: 'showdown',
           },
         },
       },
@@ -129,38 +114,35 @@ describe('winnersSelector', () => {
     };
     const winner = [
       {
-        addr: P2_ADDR,
+        addr: PLAYER2.address,
         hand: "Four of a Kind, Q's",
-        amount: 1000,
+        amount: 2000,
       }];
     const selectWinners = makeSelectWinners();
     expect(selectWinners(mockedState, props)).toEqual(winner);
   });
 
   it('should have 2 winners with index 0 and 1 with a pair of Aces.', () => {
-    const distRec = new EWT(ABI_DIST).distribution(2, 0, [
-      EWT.concat(P1_ADDR, 1000).toString('hex'),
-      EWT.concat(P2_ADDR, 1000).toString('hex'),
-      EWT.concat(ORACLE_ADDR, 10).toString('hex'), // rake
-    ]).sign(ORACLE_KEY);
-
     const mockedState = fromJS({
       table: {
         [TBL_ADDR]: {
           2: {
             lineup: [{
-              address: P1_ADDR,
+              address: PLAYER1.address,
+              last: new EWT(ABI_SHOW).show(1, 1000).sign(PLAYER1.key),
               cards: [25, 38],
             }, {
-              address: P3_ADDR,
+              address: PLAYER3.address,
+              last: new EWT(ABI_BET).bet(1, 500).sign(PLAYER3.key),
             }, {
-              address: P_EMPTY,
+              address: PLAYER_EMPTY,
             }, {
-              address: P2_ADDR,
+              address: PLAYER2.address,
+              last: new EWT(ABI_SHOW).show(1, 1000).sign(PLAYER2.key),
               cards: [12, 51],
             }],
             cards: [8, 9, 10],
-            distribution: distRec,
+            state: 'showdown',
           },
         },
       },
@@ -175,14 +157,14 @@ describe('winnersSelector', () => {
 
     const winners = [
       {
-        addr: P1_ADDR,
+        addr: PLAYER1.address,
         hand: "Pair, A's",
-        amount: 1000,
+        amount: 1250,
       },
       {
-        addr: P2_ADDR,
+        addr: PLAYER2.address,
         hand: "Pair, A's",
-        amount: 1000,
+        amount: 1250,
       }];
     const selectWinners = makeSelectWinners();
     expect(selectWinners(mockedState, props)).toEqual(winners);
@@ -190,23 +172,21 @@ describe('winnersSelector', () => {
 
 
   it('should have 1 winner with A high and top kicker.', () => {
-    const distRec = new EWT(ABI_DIST).distribution(2, 0, [
-      EWT.concat(P1_ADDR, 1000).toString('hex'),
-      EWT.concat(ORACLE_ADDR, 10).toString('hex'),
-    ]).sign(ORACLE_KEY);
     const mockedState = fromJS({
       table: {
         [TBL_ADDR]: {
           2: {
             lineup: [{
-              address: P1_ADDR,
+              address: PLAYER1.address,
+              last: new EWT(ABI_SHOW).show(1, 1000).sign(PLAYER1.key),
               cards: [38, 37],
             }, {
-              address: P2_ADDR,
+              address: PLAYER2.address,
+              last: new EWT(ABI_SHOW).show(1, 1000).sign(PLAYER2.key),
               cards: [25, 6],
             }],
             cards: [2, 3, 8],
-            distribution: distRec,
+            state: 'showdown',
           },
         },
       },
@@ -221,38 +201,36 @@ describe('winnersSelector', () => {
 
     const winners = [
       {
-        addr: P1_ADDR,
+        addr: PLAYER1.address,
         hand: 'A High',
-        amount: 1000,
+        amount: 2000,
       }];
     const selectWinners = makeSelectWinners();
     expect(selectWinners(mockedState, props)).toEqual(winners);
   });
 
   it('should have 3 winners with 2 pair.', () => {
-    const distRec = new EWT(ABI_DIST).distribution(2, 0, [
-      EWT.concat(P1_ADDR, 1000).toString('hex'),
-      EWT.concat(P2_ADDR, 1000).toString('hex'),
-      EWT.concat(P3_ADDR, 1000).toString('hex'),
-    ]).sign(ORACLE_KEY);
     const mockedState = fromJS({
       table: {
         [TBL_ADDR]: {
           2: {
             lineup: [{
-              address: P1_ADDR,
+              address: PLAYER1.address,
+              last: new EWT(ABI_SHOW).show(1, 1000).sign(PLAYER1.key),
               cards: [35, 36],
             }, {
-              address: P2_ADDR,
+              address: PLAYER2.address,
+              last: new EWT(ABI_SHOW).show(1, 1000).sign(PLAYER2.key),
               cards: [22, 23],
             }, {
-              address: P3_ADDR,
+              address: PLAYER3.address,
+              last: new EWT(ABI_SHOW).show(1, 1000).sign(PLAYER3.key),
               cards: [48, 49],
             }, {
-              address: P4_ADDR,
+              address: PLAYER4.address,
             }],
             cards: [8, 9, 10],
-            distribution: distRec,
+            state: 'showdown',
           },
         },
       },
@@ -267,17 +245,17 @@ describe('winnersSelector', () => {
 
     const winners = [
       {
-        addr: P1_ADDR,
+        addr: PLAYER1.address,
         hand: "Two Pair, Q's & J's",
         amount: 1000,
       },
       {
-        addr: P2_ADDR,
+        addr: PLAYER2.address,
         hand: "Two Pair, Q's & J's",
         amount: 1000,
       },
       {
-        addr: P3_ADDR,
+        addr: PLAYER3.address,
         hand: "Two Pair, Q's & J's",
         amount: 1000,
       }];
@@ -292,6 +270,7 @@ describe('winnersSelector', () => {
           2: {
             holeCards: [11, 12],
             cards: [8, 9, 10],
+            state: 'showdown',
           },
         },
       },
@@ -307,6 +286,90 @@ describe('winnersSelector', () => {
     const selectHandValue = makeMyHandValueSelector();
     expect(selectHandValue(mockedState, props).descr).toEqual('Royal Flush');
   });
+
+  it('should have winner before showdown.', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          2: {
+            lineup: [{
+              address: PLAYER2.address,
+              last: new EWT(ABI_FOLD).fold(1, 800).sign(PLAYER2.key),
+            }, {
+              address: PLAYER1.address,
+              last: new EWT(ABI_BET).bet(1, 1200).sign(PLAYER1.key),
+            }, {
+              address: PLAYER3.address,
+              last: new EWT(ABI_FOLD).fold(1, 800).sign(PLAYER3.key),
+            }, {
+              address: PLAYER4.address,
+              last: new EWT(ABI_FOLD).fold(1, 800).sign(PLAYER4.key),
+            }, {
+              address: PLAYER_EMPTY.address,
+            }],
+            holeCards: [11, 12],
+            cards: [8, 9, 10],
+            dealer: 0,
+            state: 'turn',
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 0,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 2,
+      },
+    };
+
+    const winners = [
+      {
+        addr: PLAYER1.address,
+        amount: 3600,
+      }];
+    const selectWinners = makeSelectWinners();
+    expect(selectWinners(mockedState, props)).toEqual(winners);
+  });
+
+  it('should return empty when hand is not complete', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          2: {
+            lineup: [{
+              address: PLAYER2.address,
+              last: new EWT(ABI_BET).bet(1, 1200).sign(PLAYER2.key),
+            }, {
+              address: PLAYER1.address,
+              last: new EWT(ABI_BET).bet(1, 1200).sign(PLAYER1.key),
+            }, {
+              address: PLAYER4.address,
+              last: new EWT(ABI_FOLD).fold(1, 800).sign(PLAYER1.key),
+            }, {
+              address: PLAYER_EMPTY.address,
+            }],
+            holeCards: [11, 12],
+            dealer: 0,
+            cards: [8, 9, 10],
+            state: 'turn',
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 0,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 2,
+      },
+    };
+
+    const selectWinners = makeSelectWinners();
+    expect(selectWinners(mockedState, props)).toEqual(null);
+  });
 });
 
 
@@ -314,7 +377,7 @@ describe('sitout Selector', () => {
   it('should select BB to comeback from sitout`.', () => {
     const mockedState = fromJS({
       account: {
-        privKey: P1_KEY,
+        privKey: PLAYER1.key,
       },
       table: {
         [TBL_ADDR]: {
@@ -324,10 +387,11 @@ describe('sitout Selector', () => {
           2: {
             state: 'flop',
             lineup: [{
-              address: P1_ADDR,
+              address: PLAYER1.address,
               sitout: 1,
             }, {
-              address: P2_ADDR,
+              address: PLAYER2.address,
+              sitout: 1,
             }],
           },
         },
@@ -350,7 +414,7 @@ describe('sitout Selector', () => {
   it('should return 0 when state is waiting and i am not in sitout.', () => {
     const mockedState = fromJS({
       account: {
-        privKey: P1_KEY,
+        privKey: PLAYER1.key,
       },
       table: {
         [TBL_ADDR]: {
@@ -360,9 +424,9 @@ describe('sitout Selector', () => {
           2: {
             state: 'waiting',
             lineup: [{
-              address: P1_ADDR,
+              address: PLAYER1.address,
             }, {
-              address: P2_ADDR,
+              address: PLAYER2.address,
             }],
           },
         },
@@ -382,10 +446,10 @@ describe('sitout Selector', () => {
     expect(selectSitoutAmount(mockedState, props)).toEqual(0);
   });
 
-  it('should return myMaxBet + 1 when i am not sitout not in waiting.', () => {
+  it('should return myMaxBet + 1 when i am not sitout not in dealing.', () => {
     const mockedState = fromJS({
       account: {
-        privKey: P1_KEY,
+        privKey: PLAYER1.key,
       },
       table: {
         [TBL_ADDR]: {
@@ -393,13 +457,12 @@ describe('sitout Selector', () => {
             smallBlind: 50,
           },
           2: {
-            state: 'flop',
+            state: 'dealing',
             lineup: [{
-              address: P1_ADDR,
-              last: new EWT(ABI_BET).bet(1, 200).sign(P1_KEY),
+              address: PLAYER1.address,
+              last: new EWT(ABI_BET).bet(1, 100).sign(PLAYER1.key),
             }, {
-              address: P2_ADDR,
-              last: new EWT(ABI_BET).bet(1, 200).sign(P2_KEY),
+              address: PLAYER2.address,
             }],
           },
         },
@@ -416,6 +479,6 @@ describe('sitout Selector', () => {
       },
     };
     const selectSitoutAmount = makeSitoutAmountSelector();
-    expect(selectSitoutAmount(mockedState, props)).toEqual(201);
+    expect(selectSitoutAmount(mockedState, props)).toEqual(101);
   });
 });

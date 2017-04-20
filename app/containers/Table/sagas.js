@@ -170,8 +170,16 @@ export function* updateScanner() {
       continue; // eslint-disable-line no-continue
     }
 
+    let complete;
+
+    try {
+      complete = pokerHelper.isHandComplete(action.hand.lineup, action.hand.dealer, action.hand.state);
+    } catch (e) {
+      continue; // eslint-disable-line no-continue
+    }
+
     // check if turn to pay small blind
-    if (!pokerHelper.isHandComplete(action.hand.lineup, action.hand.dealer, action.hand.state)) {
+    if (!complete) {
       if (isSbTurnByAction(action, { address: myAddr, sb }) && !payedBlind[toggleKey]) {
         payedBlind[toggleKey] = true;
         yield put(bet(action.tableAddr, action.hand.handId, sb, privKey));
