@@ -4,13 +4,14 @@ import Slider from 'react-rangeslider';
 import 'react-rangeslider/lib/index.css';
 import { createStructuredSelector } from 'reselect';
 import Button from '../../components/Button';
+import H2 from '../../components/H2';
 
 import { makeSbSelector } from '../Table/selectors';
 import {
   makeSelectProxyAddr,
 } from '../AccountProvider/selectors';
 
-class JoinDialog extends React.Component { // eslint-disable-line react/prefer-stateless-function
+export class JoinDialog extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   constructor(props) {
     super(props);
@@ -34,6 +35,15 @@ class JoinDialog extends React.Component { // eslint-disable-line react/prefer-s
     const min = this.props.sb * 40;
     const tableMax = this.props.sb * 200;
     const max = (this.props.balance < tableMax) ? this.props.balance : tableMax;
+    if (this.props.balance < min) {
+      return (
+        <div style={{ minWidth: '20em' }}>
+          <H2>Sorry!</H2>
+          <p>Your balance is not sufficient to join this table!</p>
+          <Button onClick={this.props.modalDismiss}>OK</Button>
+        </div>
+      );
+    }
     return (
       <div style={{ minWidth: '20em' }}>
         <Slider
@@ -68,9 +78,10 @@ const mapStateToProps = createStructuredSelector({
 
 JoinDialog.propTypes = {
   handleJoin: PropTypes.func,
+  modalDismiss: PropTypes.func,
   pos: PropTypes.any,
   sb: PropTypes.number,
-  balance: React.PropTypes.string,
+  balance: React.PropTypes.number,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(JoinDialog);

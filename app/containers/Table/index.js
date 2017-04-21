@@ -136,8 +136,8 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     }
 
     // get balance of player
-    const balance = this.token.balanceOf(this.props.proxyAddr);
-    if (!balance && nextProps.proxyAddr) {
+    this.balance = this.token.balanceOf(this.props.proxyAddr);
+    if (!this.balance && nextProps.proxyAddr) {
       this.token.balanceOf.call(nextProps.proxyAddr);
     }
 
@@ -193,13 +193,18 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   isTaken(open, myPos, pending, pos) {
+    let balance;
+    if (this.balance) {
+      balance = parseInt(this.balance.toString(), 10);
+    }
     if (open && myPos === undefined && !pending) {
       this.props.modalAdd((
         <JoinDialog
           pos={pos}
           handleJoin={this.handleJoin}
+          modalDismiss={this.props.modalDismiss}
           params={this.props.params}
-          balance={this.balance}
+          balance={balance}
         />
       ));
     } else if (open && this.props.myPos !== undefined && !pending) {
