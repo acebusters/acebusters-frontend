@@ -248,7 +248,7 @@ const makeSelectWinners = () => createSelector(
       return null;
     }
 
-    if (!complete) {
+    if (!complete || handState === 'waiting') {
       return null;
     }
 
