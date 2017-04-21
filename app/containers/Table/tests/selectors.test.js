@@ -374,7 +374,7 @@ describe('winnersSelector', () => {
 
 
 describe('sitout Selector', () => {
-  it('should select BB to comeback from sitout`.', () => {
+  it('should select 1 to comeback from sitout.', () => {
     const mockedState = fromJS({
       account: {
         privKey: PLAYER1.key,
@@ -408,10 +408,46 @@ describe('sitout Selector', () => {
       },
     };
     const selectSitoutAmount = makeSitoutAmountSelector();
-    expect(selectSitoutAmount(mockedState, props)).toEqual(100);
+    expect(selectSitoutAmount(mockedState, props)).toEqual(1);
   });
 
-  it('should return 0 when state is waiting and i am not in sitout.', () => {
+  it('should return 0 when state is waiting when i am in sitout.', () => {
+    const mockedState = fromJS({
+      account: {
+        privKey: PLAYER1.key,
+      },
+      table: {
+        [TBL_ADDR]: {
+          data: {
+            smallBlind: 50,
+          },
+          2: {
+            state: 'waiting',
+            lineup: [{
+              address: PLAYER1.address,
+              sitout: 1,
+            }, {
+              address: PLAYER2.address,
+            }],
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 0,
+      myMaxBet: 0,
+      myPos: 0,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 2,
+      },
+    };
+    const selectSitoutAmount = makeSitoutAmountSelector();
+    expect(selectSitoutAmount(mockedState, props)).toEqual(0);
+  });
+
+  it('should return 0 when state is waiting when i am active.', () => {
     const mockedState = fromJS({
       account: {
         privKey: PLAYER1.key,
@@ -446,7 +482,7 @@ describe('sitout Selector', () => {
     expect(selectSitoutAmount(mockedState, props)).toEqual(0);
   });
 
-  it('should return myMaxBet + 1 when i am not sitout not in dealing.', () => {
+  it('should return myMaxBet  when i am not sitout.', () => {
     const mockedState = fromJS({
       account: {
         privKey: PLAYER1.key,
@@ -479,6 +515,6 @@ describe('sitout Selector', () => {
       },
     };
     const selectSitoutAmount = makeSitoutAmountSelector();
-    expect(selectSitoutAmount(mockedState, props)).toEqual(101);
+    expect(selectSitoutAmount(mockedState, props)).toEqual(100);
   });
 });
