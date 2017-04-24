@@ -38,14 +38,13 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
   componentWillReceiveProps(nextProps) {
     // Show Action;
     this.opacity = (nextProps.lastAmount !== this.props.lastAmount) ? '1' : 0;
-
+    let timeLeft = 100;
     // manage timer
     if (nextProps.whosTurn === nextProps.pos) {
       if (!this.interval) {
         this.interval = setInterval(() => {
-          let timeLeft;
-          if (nextProps.hand && nextProps.hand.get('changed')) {
-            const deadline = nextProps.hand.get('changed') + 60;
+          if (this.props.changed) {
+            const deadline = this.props.changed + 180;
             timeLeft = deadline - Math.floor(Date.now() / 1000);
             if (timeLeft <= 0) {
               clearInterval(this.interval);
@@ -60,6 +59,7 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
       clearInterval(this.interval);
       this.interval = null;
     }
+    this.setState({ timeLeft });
   }
 
   componentWillUnmount() {
@@ -70,8 +70,7 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
   }
 
   render() {
-    const timeLeft = (this.state) ? this.state.timeLeft : 0;
-
+    const timeLeft = (this.state && this.props.whosTurn === this.props.pos) ? this.state.timeLeft * (100 / 60) : 100;
     return (
       <SeatComponent
         {...this.props}
@@ -110,6 +109,9 @@ const mapStateToProps = createStructuredSelector({
 
 Seat.propTypes = {
   lastAmount: React.PropTypes.number,
+  changed: React.PropTypes.number,
+  whosTurn: React.PropTypes.number,
+  pos: React.PropTypes.number,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Seat);

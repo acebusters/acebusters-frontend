@@ -111,7 +111,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   componentWillReceiveProps(nextProps) {
     const handId = parseInt(this.props.params.handId, 10);
     // take care of timing out players
-    if (this.props.myPos > -1 && this.props.hand
+    if (this.props.myPos !== undefined && this.props.hand
       && this.props.hand.get('changed') < nextProps.hand.get('changed')) {
       if (this.timeOut) {
         clearTimeout(this.timeOut);
@@ -327,7 +327,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     }
   }
 
-  renderSeats(lineup) {
+  renderSeats(lineup, changed) {
     const seats = [];
 
     if (!lineup) {
@@ -342,6 +342,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           sitout={sitout}
           signerAddr={lineup[i].address}
           params={this.props.params}
+          changed={changed}
           isTaken={this.isTaken}
         >
         </Seat>);
@@ -369,7 +370,8 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
   render() {
     const lineup = (this.props.lineup) ? this.props.lineup.toJS() : null;
-    const seats = this.renderSeats(lineup);
+    const changed = (this.props.hand) ? this.props.hand.get('changed') : null;
+    const seats = this.renderSeats(lineup, changed);
     const board = this.renderBoard();
     let winners = [];
     if (this.props.winners && this.props.winners.length > 0) {

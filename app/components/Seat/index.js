@@ -9,8 +9,9 @@ import {
   gray,
 } from 'variables';
 import Card from '../Card';
-import { SeatWrapper, ImageContainer, CardContainer, DealerButton, SeatLabel, ChipGreen, Amount } from './SeatWrapper';
-import { StackBox, NameBox, TimeBox, AmountBox } from './Info';
+import Radial from '../RadialProgress';
+import { SeatWrapper, CardContainer, DealerButton, ChipGreen, Amount } from './SeatWrapper';
+import { StackBox, NameBox, AmountBox } from './Info';
 
 
 function SeatComponent(props) {
@@ -30,15 +31,12 @@ function SeatComponent(props) {
         onClick={() => props.isTaken(props.open, props.myPos, props.pending, props.pos)}
         coords={props.coords}
       >
-        <ImageContainer
-          pos={props.pos}
+        <Radial
           color={'#fff'}
           cursor={'pointer'}
+          label={status}
         >
-          <SeatLabel>
-            { status }
-          </SeatLabel>
-        </ImageContainer>
+        </Radial>
       </SeatWrapper>
       );
   } else {
@@ -54,52 +52,52 @@ function SeatComponent(props) {
       <SeatWrapper
         coords={props.coords}
       >
-        <ImageContainer
-          blocky={props.blocky}
-          color={color}
+        <Radial
+          percent={props.timeLeft}
+          strokeWidth="10"
+          strokeColor={color}
+          bgImg={props.blocky}
+        />
+        <DealerButton
+          dealer={props.dealer}
+          pos={props.pos}
         >
-          <DealerButton
-            dealer={props.dealer}
-            pos={props.pos}
+        </DealerButton>
+        <CardContainer>
+          <Card
+            cardNumber={props.holeCards[0]}
+            folded={props.folded}
+            size={cardSize}
+            offset={[0, 0]}
           >
-          </DealerButton>
-          <CardContainer>
-            <Card
-              cardNumber={props.holeCards[0]}
-              folded={props.folded}
-              size={cardSize}
-              offset={[0, 0]}
-            >
-            </Card>
-            <Card
-              cardNumber={props.holeCards[1]}
-              folded={props.folded}
-              size={cardSize}
-              offset={[-100, -133]}
-            >
-            </Card>
-          </CardContainer>
-          <AmountBox
-            amountCoords={props.amountCoords}
+          </Card>
+          <Card
+            cardNumber={props.holeCards[1]}
+            folded={props.folded}
+            size={cardSize}
+            offset={[-100, -133]}
           >
-            { (props.lastAmount > 0) &&
-            <div>
-              <ChipGreen>
-              </ChipGreen>
-              <Amount>
-                { props.lastAmount }
-              </Amount>
-            </div>
-            }
-          </AmountBox>
+          </Card>
+        </CardContainer>
+        <AmountBox
+          amountCoords={props.amountCoords}
+        >
+          { (props.lastAmount > 0) &&
           <div>
-            <NameBox> { props.signerAddr }
-              <hr />
-            </NameBox>
-            <StackBox> { props.stackSize }</StackBox>
+            <ChipGreen>
+            </ChipGreen>
+            <Amount>
+              { props.lastAmount }
+            </Amount>
           </div>
-          <TimeBox>{ (props.timeLeft > 0) ? props.timeLeft : '' } </TimeBox>
-        </ImageContainer>
+          }
+        </AmountBox>
+        <div>
+          <NameBox> { props.signerAddr }
+            <hr />
+          </NameBox>
+          <StackBox> { props.stackSize }</StackBox>
+        </div>
       </SeatWrapper>
     );
   }

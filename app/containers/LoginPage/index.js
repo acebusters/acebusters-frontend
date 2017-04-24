@@ -153,7 +153,12 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
         <iframe src={workerPath} style={{ display: 'none' }} onLoad={(event) => { this.frame = event.target; }} />
         { this.props.progress && submitting &&
           <div>
-            <Radial progress={this.props.progress}></Radial>
+            <Radial
+              percent={this.props.progress}
+              strokeWidth="2"
+              trailColor="white"
+              strokeLinecap="round"
+            />
           </div>
         }
       </div>
