@@ -1,8 +1,7 @@
 import { createFormAction } from '../../services/reduxFormSaga';
-import {
-  WORKER_ERROR,
-  WALLET_EXPORTED,
-} from './constants';
+
+export const WORKER_ERROR = 'acebusters/RegisterPage/WORKER_ERROR';
+export const WALLET_EXPORTED = 'acebusters/RegisterPage/WALLET_EXPORTED';
 
 export function workerError(error) {
   return {

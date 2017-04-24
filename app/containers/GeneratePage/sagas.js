@@ -1,10 +1,8 @@
 import { take, put, race } from 'redux-saga/effects';
-
-import { WORKER_ERROR, WALLET_EXPORTED } from './constants';
-import { register } from './actions';
+import { WORKER_ERROR, WALLET_EXPORTED, register } from './actions';
 
 // The root saga is what we actually send to Redux's middleware.
-export function* registerSaga() {
+export function* generateSaga() {
   while (true) { // eslint-disable-line no-constant-condition
     // We either expect successful encryption or error from worker.
     const worker = yield race({
@@ -21,5 +19,5 @@ export function* registerSaga() {
 }
 
 export default [
-  registerSaga,
+  generateSaga,
 ];
