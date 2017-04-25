@@ -121,8 +121,38 @@ export default function createRoutes(store) {
       name: 'register',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
-          import('containers/RegisterPage/sagas'),
           import('containers/RegisterPage'),
+        ]);
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/reset',
+      name: 'reset',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/ResetPage'),
+        ]);
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/generate',
+      name: 'generate',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/GeneratePage/sagas'),
+          import('containers/GeneratePage'),
         ]);
         const renderRoute = loadModule(cb);
 

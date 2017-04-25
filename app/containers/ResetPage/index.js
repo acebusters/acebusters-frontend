@@ -54,7 +54,7 @@ const renderField = ({ input, label, type, meta: { touched, error, warning } }) 
 );
 /* eslint-enable react/prop-types */
 
-export class RegisterPage extends React.Component { // eslint-disable-line react/prefer-stateless-function
+export class ResetPage extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   constructor(props) {
     super(props);
@@ -62,13 +62,13 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
   }
 
   handleSubmit(values) {
-    account.register(values.get('email'), values.get('captchaResponse'), window.location.origin).catch((err) => {
+    account.reset(values.get('email'), values.get('captchaResponse'), window.location.origin).catch((err) => {
       // If store account failed, ...
-      const errMsg = 'Registration failed!';
-      if (err === 409) {
-        throw new SubmissionError({ email: 'Email taken.', _error: errMsg });
+      const errMsg = 'Reset failed!';
+      if (err === 404) {
+        throw new SubmissionError({ email: 'Email not found.', _error: errMsg });
       } else {
-        throw new SubmissionError({ _error: `Registration failed with error code ${err}` });
+        throw new SubmissionError({ _error: `Reset failed with error code ${err}` });
       }
     }).then(() => {
       // If store account success, ...
@@ -82,16 +82,15 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
     return (
       <Container>
         <div>
-          <H1> Register a new account!</H1>
+          <H1> Reset existing account!</H1>
           <Form
             onSubmit={handleSubmit(this.handleSubmit)}
           >
             <Field name="email" type="text" component={renderField} label="e-mail" />
-            <Field name="referral" type="text" component={renderField} label="referral code" />
             <Field name="captchaResponse" component={Captcha} />
             {error && <ErrorMessage error={error} />}
             <Button type="submit" disabled={submitting} size="large">
-              { (!submitting) ? 'Register' : 'Please wait ...' }
+              { (!submitting) ? 'Reset' : 'Please wait ...' }
             </Button>
           </Form>
         </div>
@@ -100,7 +99,7 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
   }
 }
 
-RegisterPage.propTypes = {
+ResetPage.propTypes = {
   ...propTypes,
   input: React.PropTypes.any,
 };
@@ -115,4 +114,4 @@ function mapDispatchToProps(dispatch) {
 const mapStateToProps = () => ({});
 
 // Wrap the component to inject dispatch and state into it
-export default connect(mapStateToProps, mapDispatchToProps)(reduxForm({ form: 'register', validate, warn })(RegisterPage));
+export default connect(mapStateToProps, mapDispatchToProps)(reduxForm({ form: 'reset', validate, warn })(ResetPage));

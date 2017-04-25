@@ -161,6 +161,7 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
             />
           </div>
         }
+        <a href={'reset'}>forgot password</a>
       </div>
     </Container>);
   }

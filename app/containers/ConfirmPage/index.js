@@ -2,25 +2,36 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Form, Field, reduxForm, SubmissionError, propTypes } from 'redux-form/immutable';
 import { browserHistory } from 'react-router';
+import { Receipt, Type } from 'poker-helper';
 
 import account from '../../services/account';
+import * as storageService from '../../services/localStorage';
 
 // components
 import FormGroup from '../../components/Form/FormGroup';
 import Container from '../../components/Container';
-import { ErrorMessage } from '../../components/FormMessages';
+import { ErrorMessage, WarningMessage } from '../../components/FormMessages';
 import Input from '../../components/Input';
+import Label from '../../components/Label';
 import Button from '../../components/Button';
 import H1 from '../../components/H1';
-
-const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 const validate = (values) => {
   const errors = {};
   if (!values.get('confCode')) {
     errors.confCode = 'Required';
-  } else if (!uuidRegex.test(values.get('confCode'))) {
-    errors.confCode = 'Invalid confirmation code';
+  } else {
+    let receipt;
+    const confCode = decodeURIComponent(values.get('confCode'));
+    try {
+      receipt = Receipt.parse(confCode);
+    } catch (err) {
+      errors.confCode = `Invalid confirmation code: ${err.message}`;
+    }
+    if (receipt.type !== Type.CREATE_CONF &&
+      receipt.type !== Type.RESET_CONF) {
+      errors.confCode = `Invalid receipt type: ${receipt.type}`;
+    }
   }
   return errors;
 };
@@ -31,11 +42,11 @@ const warn = () => {
 };
 
 /* eslint-disable react/prop-types */
-const renderField = ({ input, label, type, meta: { touched, error, warning } }) => (
+const renderField = ({ placeholder, input, label, type, meta: { touched, error, warning } }) => (
   <FormGroup>
-    <label htmlFor={input.name}>{label}</label>
-    <Input {...input} placeholder={label} type={type} />
-    {touched && ((error && <ErrorMessage error={error} />) || (warning && <span>{warning}</span>))}
+    <Label htmlFor={input.name}>{label}</Label>
+    <Input {...input} placeholder={placeholder} type={type} />
+    {touched && ((error && <ErrorMessage error={error} />) || (warning && <WarningMessage warning={warning}></WarningMessage>))}
   </FormGroup>
 );
 /* eslint-enable react/prop-types */
@@ -47,18 +58,27 @@ export class ConfirmPage extends React.PureComponent { // eslint-disable-line re
   }
 
   handleSubmit(values) {
-    return account.confirm(values.get('confCode')).catch((err) => {
-      const errMsg = 'Email Confirmation failed!';
-      if (err === 404) {
-        throw new SubmissionError({ confCode: 'Unknown conf code.', _error: errMsg });
-      } else if (err === 409) {
-        throw new SubmissionError({ confCode: 'Conf code expired.', _error: errMsg });
-      } else {
-        throw new SubmissionError({ _error: `Email Confirmation failed with error code ${err}` });
-      }
-    }).then(() => {
-      browserHistory.push('/login');
-    });
+    const confCode = decodeURIComponent(values.get('confCode'));
+    const receipt = Receipt.parse(confCode);
+    if (receipt.type === Type.CREATE_CONF) {
+      return account.confirm(confCode).catch((err) => {
+        const errMsg = 'Email Confirmation failed!';
+        if (err === 409) {
+          throw new SubmissionError({ confCode: 'Email already confirmed.', _error: errMsg });
+        } else {
+          throw new SubmissionError({ _error: `Email Confirmation failed with error code ${err}` });
+        }
+      }).then(() => {
+        storageService.setItem('ab-confCode', values.get('confCode'));
+        browserHistory.push('/generate');
+      });
+    }
+    if (receipt.type === Type.RESET_CONF) {
+      storageService.setItem('ab-confCode', values.get('confCode'));
+      browserHistory.push('/generate');
+      return Promise.resolve({});
+    }
+    throw new SubmissionError({ _error: 'Unknown receipt type' });
   }
 
   render() {
@@ -67,9 +87,11 @@ export class ConfirmPage extends React.PureComponent { // eslint-disable-line re
       <Container>
         <H1>Please confirm your registration!</H1>
         <Form onSubmit={handleSubmit(this.handleSubmit)}>
-          <Field name="confCode" component={renderField} type="text" placeholder="code" />
+          <Field name="confCode" component={renderField} type="text" placeholder="code" label="Please enter the code you received via email:" />
           {error && <strong>{error}</strong>}
-          <Button size="large" type="submit" disabled={submitting}>Submit</Button>
+          <Button type="submit" size="large" disabled={submitting}>
+            { (!submitting) ? 'Submit' : 'Please wait ...' }
+          </Button>
         </Form>
       </Container>
     );
