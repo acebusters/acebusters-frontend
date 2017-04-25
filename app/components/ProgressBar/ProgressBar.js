@@ -103,10 +103,8 @@ class ProgressBar extends React.Component {
 
   render() {
     const { percent } = this.state;
-
     // Hide progress bar if percent is less than 0.
     const isHidden = percent < 0 || percent >= 100;
-
     // Set `state.percent` as width.
     const style = { width: `${(percent <= 0 ? 0 : percent)}%` };
 

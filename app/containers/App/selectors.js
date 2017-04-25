@@ -3,8 +3,12 @@
  */
 
 import { createSelector } from 'reselect';
+import { formValueSelector } from 'redux-form/immutable';
 
 const selectGlobal = (state) => state.get('global');
+
+const formSelector = formValueSelector('login');
+const selectWorkerProgress = (state) => formSelector(state, 'workerProgress');
 
 const makeSelectTransferShow = () => createSelector(
   selectGlobal,
@@ -34,6 +38,7 @@ const makeSelectLocationState = () => {
 
 export {
   selectGlobal,
+  selectWorkerProgress,
   makeSelectTransferShow,
   makeModalStackSelector,
   makeSelectLocationState,

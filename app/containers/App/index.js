@@ -13,6 +13,7 @@ import makeSelectAccountData, { makeSignerAddrSelector } from '../AccountProvide
 import {
   makeSelectTransferShow,
   makeModalStackSelector,
+  selectWorkerProgress,
 } from './selectors';
 import { setAuthState } from '../AccountProvider/actions';
 import { modalDismiss } from './actions';
@@ -124,6 +125,7 @@ function mapDispatchToProps(dispatch) {
 const mapStateToProps = createStructuredSelector({
   account: makeSelectAccountData(),
   signerAddr: makeSignerAddrSelector(),
+  workerProgress: selectWorkerProgress,
   isModalOpen: makeSelectTransferShow(),
   modalStack: makeModalStackSelector(),
 });

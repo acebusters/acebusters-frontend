@@ -13,7 +13,6 @@ import { workerError, walletImported, login } from './actions';
 import { modalAdd, modalDismiss } from '../App/actions';
 import { setAuthState } from '../AccountProvider/actions';
 import H1 from '../../components/H1';
-import Radial from '../../components/RadialProgress';
 
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
 
@@ -151,16 +150,6 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
           </Button>
         </Form>
         <iframe src={workerPath} style={{ display: 'none' }} onLoad={(event) => { this.frame = event.target; }} />
-        { this.props.progress && submitting &&
-          <div>
-            <Radial
-              percent={this.props.progress}
-              strokeWidth="2"
-              trailColor="white"
-              strokeLinecap="round"
-            />
-          </div>
-        }
         <a href={'reset'}>forgot password</a>
       </div>
     </Container>);

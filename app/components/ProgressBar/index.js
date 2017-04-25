@@ -1,5 +1,6 @@
 import React from 'react';
 import ProgressBar from './ProgressBar';
+import LoginProgressBar from './LoginProgressBar';
 
 function withProgressBar(WrappedComponent) {
   class AppWithProgressBar extends React.Component {
@@ -49,15 +50,18 @@ function withProgressBar(WrappedComponent) {
       return (
         <div>
           <ProgressBar percent={this.state.progress} updateProgress={this.updateProgress} />
+          <LoginProgressBar loginProgress={this.props.workerProgress} />
           <WrappedComponent {...this.props} />
         </div>
       );
     }
   }
 
+
   AppWithProgressBar.propTypes = {
     location: React.PropTypes.object,
     router: React.PropTypes.object,
+    workerProgress: React.PropTypes.number,
   };
 
   return AppWithProgressBar;
