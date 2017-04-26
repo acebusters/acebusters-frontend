@@ -1,7 +1,8 @@
+/* eslint no-multi-spaces: "off", key-spacing: "off" */
+
 import React from 'react';
 import { connect } from 'react-redux';
 import { Form, Field, reduxForm, SubmissionError, propTypes, change, formValueSelector } from 'redux-form/immutable';
-import crypto from 'crypto';
 import { browserHistory } from 'react-router';
 import { Receipt, Type } from 'poker-helper';
 // components
@@ -11,6 +12,7 @@ import Label from '../../components/Label';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 import H1 from '../../components/H1';
+import MouseEntropy from '../../components/MouseEntropy';
 import { ErrorMessage, WarningMessage } from '../../components/FormMessages';
 import Radial from '../../components/RadialProgress';
 
@@ -28,6 +30,9 @@ const validate = (values) => {
   if (values.get('password') !== values.get('confirmedPassword')) {
     errors.confirmedPassword = 'Passwords dont match';
   }
+  if (!values.get('entropy') || !values.get('entropy').length) {
+    errors.entropy = 'Required';
+  }
   return errors;
 };
 
@@ -44,7 +49,7 @@ const warn = (values) => {
 const renderField = ({ input, label, type, meta: { touched, error, warning } }) => (
   <FormGroup>
     <Label htmlFor={input.name}>{label}</Label>
-    <Input {...input} placeholder={label} type={type} />
+    <Input {...input} placeholder={label} type={type} value={input.value || ''} />
     {touched && ((error && <ErrorMessage error={error} />) || (warning && <WarningMessage warning={warning} />))}
   </FormGroup>
 );
@@ -112,15 +117,17 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
       throw new SubmissionError({ _error: `Error: unknown session type ${receipt.type}.` });
     }
 
-    // TODO(ace): create a separate screen to collect real entropy.
-    const seed = crypto.randomBytes(32);
+    const entropy = JSON.parse(values.get('entropy'));
+    const seed    = Buffer.from(entropy.slice(0, 32));
+    const secret  = Buffer.from(entropy.slice(32));
+
     // Strating the worker here.
     // Worker will encrypt seed with password in many rounds of crypt.
     this.frame.contentWindow.postMessage({
       action: 'export',
       hexSeed: seed.toString('hex'),
       password: values.get('password'),
-      randomBytes: crypto.randomBytes(64),
+      randomBytes: secret,
     }, '*');
     // Register saga is called, we return the promise here,
     // so we can display form errors if any of the async ops fail.
@@ -146,7 +153,10 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
 
   render() {
     const workerPath = this.props.workerPath + encodeURIComponent(location.origin);
-    const { error, handleSubmit, submitting } = this.props;
+    const { error, handleSubmit, submitting, entropy } = this.props;
+    const updateEntropy = (data) => {
+      this.props.onEntropyUpdated(JSON.stringify(data ? data.raw : null));
+    };
 
     return (
       <Container>
@@ -155,6 +165,9 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
           <Form
             onSubmit={handleSubmit(this.handleSubmit)}
           >
+            <Label style={{ float: 'none' }}>Random Secret</Label>
+            <MouseEntropy totalBits={768} width="100%" height="200px" onFinish={updateEntropy} sampleRate={0} />
+            <Field name="entropy" type="hidden" component={renderField} label="" value={entropy} />
             <Field name="password" type="password" component={renderField} label="password" />
             <Field name="confirmedPassword" type="password" component={renderField} label="confirm password" />
             {error && <ErrorMessage error={error} />}
@@ -199,6 +212,7 @@ function mapDispatchToProps(dispatch) {
     onWorkerInitialized: () => dispatch(change('register', 'isWorkerInitialized', true)),
     onWorkerProgress: (percent) => dispatch(change('register', 'workerProgress', percent)),
     onWalletExported: (data) => dispatch(walletExported(data)),
+    onEntropyUpdated: (data) => dispatch(change('register', 'entropy', data)),
   };
 }
 
@@ -210,6 +224,7 @@ const mapStateToProps = (state) => ({
   },
   progress: selector(state, 'workerProgress'),
   isWorkerInitialized: selector(state, 'isWorkerInitialized'),
+  entropy: selector(state, 'entropy'),
 });
 
 // Wrap the component to inject dispatch and state into it
