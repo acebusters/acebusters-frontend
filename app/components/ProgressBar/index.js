@@ -1,13 +1,12 @@
 import React from 'react';
 import ProgressBar from './ProgressBar';
-import LoginProgressBar from './LoginProgressBar';
 
 function withProgressBar(WrappedComponent) {
   class AppWithProgressBar extends React.Component {
     constructor(props) {
       super(props);
       this.state = {
-        progress: -1,
+        progress: 0,
         loadedRoutes: props.location && [props.location.pathname],
       };
       this.updateProgress = this.updateProgress.bind(this);
@@ -19,7 +18,8 @@ function withProgressBar(WrappedComponent) {
       this.unsubscribeHistory = this.props.router && this.props.router.listenBefore((location) => {
         // Do not show progress bar for already loaded routes.
         if (this.state.loadedRoutes.indexOf(location.pathname) === -1) {
-          this.updateProgress(0);
+          // Note: progress auto increase to 99% in 1000 ms
+          this.updateProgress(-1000);
         }
       });
     }
@@ -29,11 +29,13 @@ function withProgressBar(WrappedComponent) {
       const { pathname } = newProps.location;
 
       // Complete progress when route changes. But prevent state update while re-rendering.
-      if (loadedRoutes.indexOf(pathname) === -1 && progress !== -1 && newState.progress < 100) {
+      if (loadedRoutes.indexOf(pathname) === -1 && progress !== 0 && newState.progress < 100) {
         this.updateProgress(100);
         this.setState({
           loadedRoutes: loadedRoutes.concat([pathname]),
         });
+      } else if (newProps.progress !== this.props.progress) {
+        this.updateProgress(newProps.progress);
       }
     }
 
@@ -47,10 +49,11 @@ function withProgressBar(WrappedComponent) {
     }
 
     render() {
+      const { progress } = this.state;
+
       return (
         <div>
-          <ProgressBar percent={this.state.progress} updateProgress={this.updateProgress} />
-          <LoginProgressBar loginProgress={this.props.workerProgress} />
+          <ProgressBar progress={progress} />
           <WrappedComponent {...this.props} />
         </div>
       );
@@ -61,7 +64,7 @@ function withProgressBar(WrappedComponent) {
   AppWithProgressBar.propTypes = {
     location: React.PropTypes.object,
     router: React.PropTypes.object,
-    workerProgress: React.PropTypes.number,
+    progress: React.PropTypes.number,
   };
 
   return AppWithProgressBar;

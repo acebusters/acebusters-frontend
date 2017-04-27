@@ -12,6 +12,7 @@ import Button from '../../components/Button';
 import H1 from '../../components/H1';
 import { ErrorMessage, WarningMessage } from '../../components/FormMessages';
 
+import { setProgress } from '../App/actions';
 import account from '../../services/account';
 
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
@@ -62,7 +63,10 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
   }
 
   handleSubmit(values) {
-    account.register(values.get('email'), values.get('captchaResponse'), window.location.origin).catch((err) => {
+    // Note: auto increase progress for 3 seconds;
+    this.props.setProgress(-3000);
+
+    return account.register(values.get('email'), values.get('captchaResponse'), window.location.origin).catch((err) => {
       // If store account failed, ...
       const errMsg = 'Registration failed!';
       if (err === 409) {
@@ -71,6 +75,7 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
         throw new SubmissionError({ _error: `Registration failed with error code ${err}` });
       }
     }).then(() => {
+      this.props.setProgress(100);
       // If store account success, ...
       browserHistory.push('/confirm');
     });
@@ -108,6 +113,7 @@ RegisterPage.propTypes = {
 function mapDispatchToProps(dispatch) {
   return {
     dispatch,
+    setProgress: (percent) => dispatch(setProgress(percent)),
   };
 }
 

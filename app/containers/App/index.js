@@ -11,6 +11,7 @@ import withProgressBar from 'components/ProgressBar';
 import { landingPageUrl } from '../../app.config';
 import makeSelectAccountData, { makeSignerAddrSelector } from '../AccountProvider/selectors';
 import {
+  makeSelectProgress,
   makeSelectTransferShow,
   makeModalStackSelector,
   selectWorkerProgress,
@@ -128,8 +129,8 @@ const mapStateToProps = createStructuredSelector({
   workerProgress: selectWorkerProgress,
   isModalOpen: makeSelectTransferShow(),
   modalStack: makeModalStackSelector(),
+  progress: makeSelectProgress(),
 });
 
 // Wrap the component to inject dispatch and state into it
 export default connect(mapStateToProps, mapDispatchToProps)(withProgressBar(App));
-

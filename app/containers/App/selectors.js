@@ -15,6 +15,11 @@ const makeSelectTransferShow = () => createSelector(
   (globalState) => globalState.get('transferShow')
 );
 
+const makeSelectProgress = () => createSelector(
+  selectGlobal,
+  (globalState) => globalState.get('progress')
+);
+
 const makeModalStackSelector = () => createSelector(
   selectGlobal,
   (state) => (state && state.get('modalStack')) ? state.get('modalStack').toJS() : []
@@ -40,6 +45,7 @@ export {
   selectGlobal,
   selectWorkerProgress,
   makeSelectTransferShow,
+  makeSelectProgress,
   makeModalStackSelector,
   makeSelectLocationState,
 };

@@ -1,112 +1,95 @@
-/**
- *
- * ProgressBar
- *
-*/
-
 import React, { PropTypes } from 'react';
 import Wrapper from './Wrapper';
 import Percent from './Percent';
 
+
 class ProgressBar extends React.Component {
 
   static defaultProps = {
-    percent: -1,
-    autoIncrement: true,
-    intervalTime: 75,
+    progress: 0,
   };
 
   constructor(props) {
     super(props);
-    this.handleProps = this.handleProps.bind(this);
-    this.increment = this.increment.bind(this);
     this.state = {
-      percent: props.percent,
+      progress: 0,
+      timer: null,
     };
   }
 
   componentDidMount() {
-    this.handleProps(this.props);
+    this.setProgressFromProp(this.props.progress);
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.interval) {
-      // stop progress when new props come in.
-      clearInterval(this.interval);
-      this.interval = undefined;
+  componentWillReceiveProps(newProps) {
+    if (newProps.progress !== this.props.progress) {
+      this.setProgressFromProp(newProps.progress);
     }
-    if (this.timeout) {
-      // clear timeout when new props come in.
-      clearTimeout(this.timeout);
-      this.timeout = undefined;
-    }
-    // start progress with updated props.
-    this.handleProps(nextProps);
   }
 
   componentWillUnmount() {
-    // cleaning up interval and timeout.
-    if (this.interval) {
-      clearInterval(this.interval);
-      this.interval = undefined;
-    }
-    if (this.timeout) {
-      clearTimeout(this.timeout);
-      this.timeout = undefined;
-    }
+    this.stopTimer();
   }
 
-  increment() {
-    /**
-     * Increment the percent randomly.
-     * Only used when autoIncrement is set to true.
-    */
-    let { percent } = this.state;
-    percent += ((Math.random() + 1) - Math.random());
-    percent = percent < 99 ? percent : 99;
-    this.setState({
-      percent,
-    });
-  }
+  setProgressFromProp(_progress) {
+    // Note: always stop the old timer before we set any value to progress.
+    this.stopTimer();
 
-  handleProps(props) {
-    /**
-     * Increment progress bar if auto increment is set to true
-     * and progress percent is less than 99.
-    */
-    if (props.autoIncrement && props.percent >= 0 && props.percent < 99) {
-      this.interval = setInterval(this.increment, props.intervalTime);
-    }
+    let progress = _progress;
+    let timer = null;
+    const AUTO_STEP = 15;
 
-    /**
-     * Reset the progress bar when percent hits 100
-     * For better visual effects, percent is set to 99.9
-     * and then cleared in the callback after some time.
-    */
+    // Note: when progress is negative, take its abs as the interval of random increment.
+    // And only support negative number less than -10
+    // auto increment progress should be at most 99 percent.
+    if (progress < -10) {
+      // Note: totalTime is in milliseconds
+      const totalTime = Math.abs(progress);
+      const interval = (AUTO_STEP * totalTime) / 100;
 
-    if (props.percent >= 100) {
-      this.setState({
-        percent: 99.9,
-      }, () => {
-        this.timeout = setTimeout(() => {
-          this.setState({
-            percent: -1,
-          }, () => props.updateProgress(-1));
-        }, 300);
-      });
+      timer = setInterval(() => {
+        const newProgress = this.state.progress + (AUTO_STEP * Math.random());
+
+        this.setState({
+          progress: Math.min(99, newProgress),
+        });
+
+        // Note: If the auto progress already hits the upper bound,
+        // no more need for the timer
+        if (newProgress >= 99) {
+          clearInterval(timer);
+        }
+      }, interval);
+
+      progress = 0;
     } else {
-      this.setState({
-        percent: props.percent,
-      });
+      progress = Math.max(0, progress);
+
+      if (progress === 100) {
+        timer = setTimeout(() => {
+          this.setState({ progress: 0 });
+        }, 300);
+      }
+    }
+
+    // Note: after each all, progress is at least 0.
+    this.setState({ progress, timer });
+  }
+
+  stopTimer() {
+    const { timer } = this.state;
+
+    if (timer) {
+      // Note: try both
+      clearInterval(timer);
+      clearTimeout(timer);
     }
   }
 
   render() {
-    const { percent } = this.state;
-    // Hide progress bar if percent is less than 0.
-    const isHidden = percent < 0 || percent >= 100;
-    // Set `state.percent` as width.
-    const style = { width: `${(percent <= 0 ? 0 : percent)}%` };
+    const { progress } = this.state;
+    const isHidden = progress === 0 || progress > 100;
+    const style = { width: `${Math.max(0, progress)}%` };
 
     return (
       <Wrapper hidden={isHidden}>
@@ -117,7 +100,7 @@ class ProgressBar extends React.Component {
 }
 
 ProgressBar.propTypes = {
-  percent: PropTypes.number.isRequired,
+  progress: PropTypes.number,
 };
 
 export default ProgressBar;
