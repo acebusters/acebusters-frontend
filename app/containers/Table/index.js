@@ -12,6 +12,8 @@ import Card from '../../components/Card';
 import { BoardCardWrapper } from '../../components/Table/Board';
 import Seat from '../Seat';
 import Button from '../../components/Button';
+import Slides from '../../components/Slides';
+
 // config data
 import {
   ABI_TABLE,
@@ -183,12 +185,27 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   handleJoin(pos, amount) {
     this.token.approve.sendTransaction(this.tableAddr, amount);
     this.table.join.sendTransaction(amount, this.props.signerAddr, pos + 1, '');
-    const statusElement = (<div>
-      <p> Request send Please wait!</p>
-      <Button onClick={this.props.modalDismiss}>OK!</Button>
-    </div>);
+
+    const slides = (
+      <Slides width={600} height={400}>
+        <div>
+          <h1>Request sent! Please wait!</h1>
+          <p>Here is the introduction to the online poker game</p>
+        </div>
+        <div>
+          <h1>FAQ</h1>
+          <dl>
+            <dt>Q: How long shall I wait before I can finally join the game?</dt>
+            <dd>A: It depends on the blockchain network, normally it would take no more than 2 minutes</dd>
+            <dt>Q: Why shall I wait for every moves I make?</dt>
+            <dd>A: Blockchain the basis for this whole online poker game, and every move our users make are taken as a transaction. And each transaction need to be confirmed by the whole blockchain.</dd>
+          </dl>
+        </div>
+      </Slides>
+    );
+
     this.props.modalDismiss();
-    this.props.modalAdd(statusElement);
+    this.props.modalAdd(slides);
     this.props.pendingToggle(this.tableAddr, this.props.params.handId, pos);
   }
 
