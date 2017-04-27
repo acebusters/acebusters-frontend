@@ -62,7 +62,7 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
   }
 
   handleSubmit(values) {
-    account.register(values.get('email'), values.get('captchaResponse'), window.location.origin).catch((err) => {
+    return account.register(values.get('email'), values.get('captchaResponse'), window.location.origin).catch((err) => {
       // If store account failed, ...
       const errMsg = 'Registration failed!';
       if (err === 409) {
