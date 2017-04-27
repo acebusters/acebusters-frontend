@@ -9,7 +9,7 @@ describe('<MouseEntropy />', () => {
   it('onFinished triggered', () => {
     const onFinish = sinon.spy();
     const wrapper  = mount(
-      <MouseEntropy totalBits={10} size={200} sampleRate={-1} onFinish={onFinish} />
+      <MouseEntropy totalBits={10} width="200px" height="200px" sampleRate={-1} onFinish={onFinish} />
     );
 
     for (let i = 0; i < 100; i += 1) {
