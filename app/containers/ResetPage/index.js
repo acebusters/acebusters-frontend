@@ -62,7 +62,7 @@ export class ResetPage extends React.Component { // eslint-disable-line react/pr
   }
 
   handleSubmit(values) {
-    account.reset(values.get('email'), values.get('captchaResponse'), window.location.origin).catch((err) => {
+    return account.reset(values.get('email'), values.get('captchaResponse'), window.location.origin).catch((err) => {
       // If store account failed, ...
       const errMsg = 'Reset failed!';
       if (err === 404) {
