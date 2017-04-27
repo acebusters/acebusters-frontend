@@ -1,11 +1,8 @@
 import styled from 'styled-components';
-import {
-  navbarHeight,
-} from '../../variables';
 
 export default styled.div`
   position: fixed;
-  top: ${navbarHeight};
+  top: 0;
   left: 0;
   width: 100%;
   visibility: ${(props) => props.hidden ? 'hidden' : 'visible'};
