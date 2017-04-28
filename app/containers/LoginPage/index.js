@@ -96,11 +96,16 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
           email: values.get('email'),
           loggedIn: true,
         }));
+
         const { location } = this.props;
         let nextPath = '/lobby';
+
         if (location.state && location.state.nextPathname) {
           nextPath = location.state.nextPathname;
+        } else if (location.query && location.query.redirect) {
+          nextPath = decodeURIComponent(location.query.redirect);
         }
+
         browserHistory.push(nextPath); // Go to page that was requested
       });
     });

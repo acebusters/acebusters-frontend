@@ -33,7 +33,7 @@ import {
   bet,
 } from './actions';
 // selectors
-import {
+import makeSelectAccountData, {
   makeSelectPrivKey,
   makeSelectProxyAddr,
   makeSignerAddrSelector,
@@ -210,10 +210,20 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   isTaken(open, myPos, pending, pos) {
+    if (!this.props.account.loggedIn) {
+      const loc = this.props.location;
+      const curUrl = `${loc.pathname}${loc.search}${loc.hash}`;
+
+      browserHistory.push(`/login?redirect=${curUrl}`);
+      return;
+    }
+
     let balance;
+
     if (this.balance) {
       balance = parseInt(this.balance.toString(), 10);
     }
+
     if (open && myPos === undefined && !pending) {
       this.props.modalAdd((
         <JoinDialog
@@ -435,6 +445,7 @@ export function mapDispatchToProps() {
 }
 
 const mapStateToProps = createStructuredSelector({
+  account: makeSelectAccountData(),
   state: makeHandStateSelector(),
   hand: makeHandSelector(),
   board: makeBoardSelector(),
@@ -480,6 +491,8 @@ Table.propTypes = {
   dispatch: React.PropTypes.func,
   lineupReceived: React.PropTypes.func,
   updateReceived: React.PropTypes.func,
+  location: React.PropTypes.object,
+  account: React.PropTypes.object,
 };
 
 
