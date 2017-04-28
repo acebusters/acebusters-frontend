@@ -1,7 +1,8 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { Form, Field, reduxForm, SubmissionError, propTypes } from 'redux-form/immutable';
+import { Form, reduxForm, SubmissionError, propTypes } from 'redux-form/immutable';
 import { browserHistory } from 'react-router';
+import { FormattedMessage } from 'react-intl';
 import { Receipt, Type } from 'poker-helper';
 
 import account from '../../services/account';
@@ -15,6 +16,9 @@ import Input from '../../components/Input';
 import Label from '../../components/Label';
 import Button from '../../components/Button';
 import H1 from '../../components/H1';
+import FieldIntl from '../../components/FieldIntl';
+
+import messages from './messages';
 
 const validate = (values) => {
   const errors = {};
@@ -28,7 +32,7 @@ const validate = (values) => {
     } catch (err) {
       errors.confCode = `Invalid confirmation code: ${err.message}`;
     }
-    if (receipt.type !== Type.CREATE_CONF &&
+    if (receipt && receipt.type !== Type.CREATE_CONF &&
       receipt.type !== Type.RESET_CONF) {
       errors.confCode = `Invalid receipt type: ${receipt.type}`;
     }
@@ -55,6 +59,74 @@ export class ConfirmPage extends React.PureComponent { // eslint-disable-line re
   constructor(props) {
     super(props);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.onChangeCode = this.onChangeCode.bind(this);
+
+    this.state = {
+      msg: {
+        header: messages.header,
+        label: messages.label,
+        placeholder: messages.placeholder,
+        button: messages.button,
+      },
+    };
+  }
+
+  componentDidMount() {
+    if (this.props.params.confCode) {
+      this.updateMesseageByCode(this.props.params.confCode);
+    }
+  }
+
+  onChangeCode(e) {
+    const code = e.target.value;
+    this.updateMesseageByCode(code);
+  }
+
+  updateMesseageByCode(code) {
+    let receipt;
+    let msg;
+
+    try {
+      receipt = Receipt.parse(code);
+    } catch (e) {
+      // Note: means that it is an invalid code
+      receipt = {};
+    }
+
+    switch (receipt.type) {
+      case Type.CREATE_CONF: {
+        msg = {
+          header: messages.registerHeader,
+          label: messages.registerLabel,
+          placeholder: messages.registerPlaceholder,
+          button: messages.registerButton,
+        };
+
+        break;
+      }
+      case Type.RESET_CONF: {
+        msg = {
+          header: messages.resetHeader,
+          label: messages.resetLabel,
+          placeholder: messages.resetPlaceholder,
+          button: messages.resetButton,
+        };
+
+        break;
+      }
+      default: {
+        msg = {
+          header: messages.header,
+          label: messages.label,
+          placeholder: messages.placeholder,
+          button: messages.button,
+        };
+
+        break;
+      }
+    }
+
+    this.setState({ msg });
   }
 
   handleSubmit(values) {
@@ -83,14 +155,25 @@ export class ConfirmPage extends React.PureComponent { // eslint-disable-line re
 
   render() {
     const { error, handleSubmit, submitting } = this.props;
+    const { msg } = this.state;
+
     return (
       <Container>
-        <H1>Please confirm your registration!</H1>
+        <H1>
+          <FormattedMessage {...msg.header} />
+        </H1>
         <Form onSubmit={handleSubmit(this.handleSubmit)}>
-          <Field name="confCode" component={renderField} type="text" placeholder="code" label="Please enter the code you received via email:" />
+          <FieldIntl
+            name="confCode"
+            type="text"
+            component={renderField}
+            label={msg.label}
+            placeholder={msg.placeholder}
+            onChange={this.onChangeCode}
+          />
           {error && <strong>{error}</strong>}
           <Button type="submit" size="large" disabled={submitting}>
-            { (!submitting) ? 'Submit' : 'Please wait ...' }
+            { (!submitting) ? (<FormattedMessage {...msg.button} />) : 'Please wait ...' }
           </Button>
         </Form>
       </Container>
