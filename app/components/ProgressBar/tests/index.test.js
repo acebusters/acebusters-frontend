@@ -48,7 +48,7 @@ describe('withProgressBar()', () => {
       <HocComponent />
     );
 
-    expect(renderedComponent.state().progress).toBe(-1);
+    expect(renderedComponent.state().progress).toBe(0);
   });
 
   it('Should initially have state.loadedRoutes = current route', () => {
