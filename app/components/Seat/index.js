@@ -10,7 +10,8 @@ import {
 } from 'variables';
 import Card from '../Card';
 import Radial from '../RadialProgress';
-import { SeatWrapper, CardContainer, DealerButton, ChipGreen, Amount } from './SeatWrapper';
+import Pot from '../Pot';
+import { SeatWrapper, CardContainer, DealerButton } from './SeatWrapper';
 import { StackBox, NameBox, AmountBox } from './Info';
 
 
@@ -84,11 +85,7 @@ function SeatComponent(props) {
         >
           { (props.lastAmount > 0) &&
           <div>
-            <ChipGreen>
-            </ChipGreen>
-            <Amount>
-              { props.lastAmount }
-            </Amount>
+            <Pot potSize={props.lastAmount} left="0%" top="0%" />
           </div>
           }
         </AmountBox>

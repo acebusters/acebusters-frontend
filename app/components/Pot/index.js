@@ -4,9 +4,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import { chipValues } from '../../app.config';
+import {
+  white,
+} from '../../variables';
 
 export const Chip = styled.div`
-  color: ${(props) => props.color};
+  background: ${(props) => props.color};
   position: absolute;
   font-size:1.2em;
   position:relative;
@@ -30,9 +33,16 @@ export const Chip = styled.div`
   -2px 2px 2px #555;
 `;
 
+const Amount = styled.div`
+  position: absolute;
+  top: -5%;
+  left: 140%;
+  color: ${white};
+`;
+
 const Wrapper = styled.div`
   position: absolute;
-  right: ${(props) => props.right};
+  top: ${(props) => props.top};
   left: ${(props) => props.left};
 `;
 
@@ -55,16 +65,17 @@ function Pot(props) {
   const chipsArray = calculateChipStacks(props.potSize, 0);
   const chips = chipsArray.map((chip, i) => (<Chip color={chip[1]} key={i} />));
   return (
-    <Wrapper right={props.right} left={props.left}>
+    <Wrapper top={props.top} left={props.left}>
       { chips }
+      <Amount>{ props.potSize }</Amount>
     </Wrapper>
   );
 }
 
 Pot.propTypes = {
   potSize: React.PropTypes.number,
-  right: React.PropTypes.number,
-  left: React.PropTypes.number,
+  top: React.PropTypes.string,
+  left: React.PropTypes.string,
 };
 
 export default Pot;

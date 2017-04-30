@@ -7,7 +7,6 @@ describe('calculateChipStacks()', () => {
     const renderedComponent = shallow(
       <Pot potSize={5501} right={0} left={0} />
     );
-
     expect(renderedComponent.find(Chip).length).toBe(3);
   });
 });

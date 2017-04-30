@@ -34,13 +34,13 @@ export const TIMEOUT_PERIOD = 179;
 
 // chip values and colors
 export const chipValues = [
-  [5000, '#FFFFF'],
-  [1000, '#FFFFF'],
-  [500, '#FFFFF'],
-  [100, '#FFFFF'],
-  [50, '#FFFFF'],
-  [10, '#FFFFF'],
-  [1, '#FFFFF'],
+  [5000, '#080B0F'],
+  [1000, '#317DDD'],
+  [500, '#080B0F'],
+  [100, '#009688'],
+  [50, '#FEB300'],
+  [10, '#080B0F'],
+  [1, '#009688'],
 ];
 
 export const SEAT_COORDS = {

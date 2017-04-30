@@ -63,6 +63,10 @@ export const HandBox = styled.div`
   transform: translate(-50%,-20%);
 `;
 
+export const PotSize = styled.div`
+  left: 10%;
+`;
+
 export const PokerTable = styled.div`
   position: absolute;
   margin-top: 10%;
@@ -95,7 +99,7 @@ function TableComponent(props) {
             { props.winners.length > 0 &&
               <Winner>{ props.winners }</Winner>
             }
-            <Pot potSize={props.potSize} />
+            <Pot potSize={props.potSize} top="85%" left="45%" />
             { props.seats }
             <Board id="board" board={props.board}>
               { props.board }

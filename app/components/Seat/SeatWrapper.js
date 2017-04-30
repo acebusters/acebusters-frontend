@@ -7,7 +7,6 @@ import styled from 'styled-components';
 import {
   baseColor,
   background,
-  green,
   white,
 } from 'variables';
 
@@ -29,22 +28,6 @@ export const DealerButton = styled.div`
   background: ${background};
   text-align: center;
   color: white;
-  position: absolute;
-`;
-
-export const ChipGreen = styled.p`
-  border-radius: 50%;
-  width: 1em;
-  height: 1em;
-  float: left;
-  background: ${green}
-`;
-
-export const Amount = styled.p`
-  display: inline-block;
-  margin-left: 0.5em;
-  font: inherit;
-  line-height: 1em;
   position: absolute;
 `;
 
