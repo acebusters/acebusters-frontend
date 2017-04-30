@@ -63,10 +63,6 @@ export const HandBox = styled.div`
   transform: translate(-50%,-20%);
 `;
 
-export const PotSize = styled.div`
-  left: 10%;
-`;
-
 export const PokerTable = styled.div`
   position: absolute;
   margin-top: 10%;
