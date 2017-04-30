@@ -12,14 +12,7 @@ import { Board } from './Board';
 import { ActionButton } from '../ActionBar';
 import ActionBar from '../../containers/ActionBar';
 import tableImage from './tableBG.svg';
-
-export const Pot = styled.div`
-  position: absolute;
-  color: ${white};
-  left: 50%;
-  top: 10%
-  transform: translateX(-50%);
-`;
+import Pot from '../Pot';
 
 export const TableContainer = styled.div`
   margin-right: auto;
@@ -102,7 +95,7 @@ function TableComponent(props) {
             { props.winners.length > 0 &&
               <Winner>{ props.winners }</Winner>
             }
-            <Pot>Pot: { props.potSize }</Pot>
+            <Pot potSize={props.potSize} top="85%" left="45%" />
             { props.seats }
             <Board id="board" board={props.board}>
               { props.board }
