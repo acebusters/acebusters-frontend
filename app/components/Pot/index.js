@@ -1,6 +1,9 @@
 /**
- * Created by helge on 30.04.17.
- */
+ * Copyright (c) 2017 Acebusters
+ * Use of this source code is governed by an ISC
+ * license that can be found in the LICENSE file.
+*/
+
 import React from 'react';
 import styled from 'styled-components';
 import { chipValues } from '../../app.config';
