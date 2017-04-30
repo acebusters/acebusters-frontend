@@ -24,12 +24,24 @@ export const checkABIs = {
   turn: [{ name: 'checkTurn', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }],
   river: [{ name: 'checkRiver', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }],
 };
+
 export const ABI_FOLD = [{ name: 'fold', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
 export const ABI_SIT_OUT = [{ name: 'sitOut', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
 export const ABI_SHOW = [{ name: 'show', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
 export const ABI_LEAVE = [{ name: 'leave', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
 export const ABI_DIST = [{ name: 'distribution', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }, { type: 'bytes32[]' }] }];
 export const TIMEOUT_PERIOD = 179;
+
+// chip values and colors
+export const chipValues = [
+  [5000, '#FFFFF'],
+  [1000, '#FFFFF'],
+  [500, '#FFFFF'],
+  [100, '#FFFFF'],
+  [50, '#FFFFF'],
+  [10, '#FFFFF'],
+  [1, '#FFFFF'],
+];
 
 export const SEAT_COORDS = {
   2: [[110, 65, 0], [-10, 65, 0]],
