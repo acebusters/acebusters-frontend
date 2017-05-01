@@ -82,7 +82,7 @@ export class ResetPage extends React.Component { // eslint-disable-line react/pr
   }
 
   render() {
-    const { error, handleSubmit, submitting } = this.props;
+    const { error, handleSubmit, invalid, submitting } = this.props;
 
     return (
       <Container>
@@ -94,7 +94,7 @@ export class ResetPage extends React.Component { // eslint-disable-line react/pr
             <Field name="email" type="text" component={renderField} label="e-mail" />
             <Field name="captchaResponse" component={Captcha} />
             {error && <ErrorMessage error={error} />}
-            <Button type="submit" disabled={submitting} size="large">
+            <Button type="submit" disabled={submitting || invalid} size="large">
               { (!submitting) ? 'Reset' : 'Please wait ...' }
             </Button>
           </Form>

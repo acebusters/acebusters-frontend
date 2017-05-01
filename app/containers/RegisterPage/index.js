@@ -82,7 +82,7 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
   }
 
   render() {
-    const { error, handleSubmit, submitting } = this.props;
+    const { error, handleSubmit, invalid, submitting } = this.props;
 
     return (
       <Container>
@@ -95,7 +95,7 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
             <Field name="referral" type="text" component={renderField} label="referral code" />
             <Field name="captchaResponse" component={Captcha} />
             {error && <ErrorMessage error={error} />}
-            <Button type="submit" disabled={submitting} size="large">
+            <Button type="submit" disabled={submitting || invalid} size="large">
               { (!submitting) ? 'Register' : 'Please wait ...' }
             </Button>
           </Form>

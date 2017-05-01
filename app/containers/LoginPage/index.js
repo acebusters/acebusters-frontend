@@ -141,7 +141,7 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
 
   render() {
     const workerPath = this.props.workerPath + encodeURIComponent(location.origin);
-    const { error, handleSubmit, submitting } = this.props;
+    const { error, handleSubmit, invalid, submitting } = this.props;
 
     return (<Container>
       <div>
@@ -150,7 +150,7 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
           <Field name="email" type="text" component={renderField} label="Email" />
           <Field name="password" type="password" component={renderField} label="Password" />
           {error && <ErrorMessage error={error} />}
-          <Button type="submit" size="large" disabled={submitting}>
+          <Button type="submit" size="large" disabled={submitting || invalid}>
             { (!submitting) ? 'Login' : 'Please wait ...' }
           </Button>
         </Form>

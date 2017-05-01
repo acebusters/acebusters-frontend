@@ -75,11 +75,11 @@ const Large = styled.button`
     background-color: ${hover};
   }
   
-  
   &:disabled {
     color: ${background};
     background-color: ${disabled};
     border-color: ${disabled};
+    cursor: not-allowed;
   }
 `;
 
