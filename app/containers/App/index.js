@@ -5,6 +5,7 @@ import { createStructuredSelector } from 'reselect';
 import { ModalContainer, ModalDialog } from 'react-modal-dialog';
 import { browserHistory } from 'react-router';
 import Header from 'components/Header';
+import Footer from 'components/Footer';
 import Content from 'components/Content';
 import withProgressBar from 'components/ProgressBar';
 
@@ -80,8 +81,11 @@ export function App(props) {
         >
           {React.Children.toArray(props.children)}
         </Content>
-      </StyledDashboard>
 
+      </StyledDashboard>
+      { props.location.pathname.indexOf('table') === -1 &&
+        <Footer />
+      }
       { modalContent &&
         <ModalContainer>
           <ModalDialog onClose={props.modalDismiss} dismissOnBackgroundClick={false}>
@@ -108,6 +112,7 @@ App.propTypes = {
   logoHref: React.PropTypes.string,
   fixed: React.PropTypes.bool,
   params: React.PropTypes.object,
+  location: React.PropTypes.object,
   signerAddr: React.PropTypes.string,
   modalStack: React.PropTypes.array,
 };
