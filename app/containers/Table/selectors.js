@@ -40,6 +40,9 @@ const isSbTurnByAction = createSelector(
     if (!action.hand) {
       return false;
     }
+    if (action.hand.state !== 'waiting') {
+      return false;
+    }
     const active = pokerHelper.countActivePlayers(action.hand.lineup, action.hand.state);
     if (active <= 1) {
       return false;
@@ -65,7 +68,9 @@ const isBbTurnByAction = createSelector(
     if (!action.hand) {
       return false;
     }
-
+    if (action.hand.state !== 'dealing') {
+      return false;
+    }
     const bbPos = pokerHelper.getBbPos(action.hand.lineup, action.hand.dealer, action.hand.state);
     if (typeof bbPos === 'undefined' || bbPos < 0) {
       return false;
@@ -87,6 +92,9 @@ const is0rTurnByAction = createSelector(
     if (!action.hand || !action.hand.lineup) {
       return false;
     }
+    if (action.hand.state !== 'dealing') {
+      return false;
+    }
     const whosTurn = pokerHelper.getWhosTurn(action.hand.lineup, action.hand.dealer, action.hand.state, action.hand.sb * 2);
     if (typeof whosTurn === 'undefined' || whosTurn < 0) {
       return false;
@@ -105,7 +113,6 @@ const isShowTurnByAction = createSelector(
       return false;
     }
     const whosTurn = pokerHelper.getWhosTurn(action.hand.lineup, action.hand.dealer, action.hand.state, action.hand.sb * 2);
-
     if (typeof whosTurn === 'undefined' || whosTurn < 0) {
       return false;
     }
