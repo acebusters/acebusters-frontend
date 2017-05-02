@@ -14,7 +14,6 @@ import Button from '../../components/Button';
 import H1 from '../../components/H1';
 import MouseEntropy from '../../components/MouseEntropy';
 import { ErrorMessage, WarningMessage } from '../../components/FormMessages';
-import Radial from '../../components/RadialProgress';
 
 import account from '../../services/account';
 import * as storageService from '../../services/localStorage';
@@ -183,7 +182,6 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
         </div>
         { this.props.progress && submitting &&
           <div>
-            <Radial progress={this.props.progress}></Radial>
             <H1>Registering please wait ...</H1>
           </div>
         }
