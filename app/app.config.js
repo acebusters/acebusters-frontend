@@ -36,11 +36,11 @@ export const TIMEOUT_PERIOD = 179;
 export const chipValues = [
   [5000, '#080B0F'],
   [1000, '#317DDD'],
-  [500, '#080B0F'],
+  [500, '#192A39'],
   [100, '#009688'],
   [50, '#FEB300'],
   [10, '#080B0F'],
-  [1, '#009688'],
+  [1, '#FFFFFF'],
 ];
 
 export const SEAT_COORDS = {
