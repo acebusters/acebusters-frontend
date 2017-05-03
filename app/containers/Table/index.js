@@ -41,6 +41,7 @@ import makeSelectAccountData, {
 
 import {
   makeLastReceiptSelector,
+  makeMyStackSelector,
 } from '../Seat/selectors';
 
 import { blockNotify } from '../AccountProvider/actions';
@@ -66,6 +67,7 @@ import TableComponent from '../../components/Table';
 import web3Connect from '../AccountProvider/web3Connect';
 import TableService, { getHand } from '../../services/tableService';
 import JoinDialog from '../JoinDialog';
+import RebuyDialog from '../RebuyDialog';
 import InviteDialog from '../InviteDialog';
 
 const getTableData = (table, props) => {
@@ -86,6 +88,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.handleLeave = this.handleLeave.bind(this);
     this.handleSitout = this.handleSitout.bind(this);
     this.handleJoin = this.handleJoin.bind(this);
+    this.handleRebuy = this.handleRebuy.bind(this);
     this.isTaken = this.isTaken.bind(this);
 
     this.tableAddr = props.params.tableAddr;
@@ -168,6 +171,23 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
         }
       }
     }
+
+    // display Rebuy modal if state === 'waiting' and user stack is no greater than 0
+    if (nextProps.state === 'waiting' && nextProps.myStack <= 0
+        && (nextProps.state !== this.props.state || nextProps.myStack !== this.props.myStack)) {
+      const balance = parseInt(this.balance.toString(), 10);
+
+      this.props.modalDismiss();
+      this.props.modalAdd((
+        <RebuyDialog
+          handleRebuy={this.handleRebuy}
+          handleLeave={this.handleLeave}
+          modalDismiss={this.props.modalDismiss}
+          params={this.props.params}
+          balance={balance}
+        />
+      ));
+    }
   }
 
   componentWillUnmount() {
@@ -180,6 +200,25 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
   handleUpdate(hand) {
     this.props.updateReceived(this.tableAddr, hand);
+  }
+
+  handleRebuy(amount) {
+    this.table.rebuy.sendTransaction(amount);
+
+    const slides = (
+      <Slides width={600} height={400}>
+        <div>
+          <h1>Request for rebuy sent! Please wait!</h1>
+          <p>Here is the introduction to the online poker game</p>
+        </div>
+        <div>
+          <h1>FAQ</h1>
+        </div>
+      </Slides>
+    );
+
+    this.props.modalDismiss();
+    this.props.modalAdd(slides);
   }
 
   handleJoin(pos, amount) {
@@ -263,7 +302,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       </p>
       <Button onClick={this.props.modalDismiss}>OK!</Button>
     </div>);
+
+    this.props.modalDismiss();
     this.props.modalAdd(statusElement);
+
     return table.leave(exitHand).catch((err) => {
       Raven.captureException(err, { tags: {
         tableAddr: this.props.params.tableAddr,
@@ -450,6 +492,7 @@ const mapStateToProps = createStructuredSelector({
   hand: makeHandSelector(),
   board: makeBoardSelector(),
   myHand: makeMyHandValueSelector(),
+  myStack: makeMyStackSelector(),
   data: makeTableDataSelector(),
   sitoutAmount: makeSitoutAmountSelector(),
   lineup: makeLineupSelector(),
@@ -471,6 +514,7 @@ Table.propTypes = {
   board: React.PropTypes.array,
   hand: React.PropTypes.object,
   myHand: React.PropTypes.object,
+  myStack: React.PropTypes.number,
   lineup: React.PropTypes.object,
   sitout: React.PropTypes.bool,
   params: React.PropTypes.object,
