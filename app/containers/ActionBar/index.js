@@ -32,7 +32,7 @@ import {
   makeLastReceiptSelector,
 } from '../Seat/selectors';
 
-import { bet, pay, fold, setCards } from '../Table/actions';
+import { bet, pay, fold, check, setCards } from '../Table/actions';
 import { ActionBarComponent, ActionButton } from '../../components/ActionBar';
 import TableService from '../../services/tableService';
 
@@ -106,33 +106,25 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
   handleCheck() {
     this.setActive(false);
     const amount = this.props.myMaxBet;
-    const state = this.props.state;
     const handId = parseInt(this.props.params.handId, 10);
-    let call;
-    switch (state) {
-      case 'preflop': {
-        call = this.table.checkPreflop(handId, amount);
-        break;
-      }
-      case 'turn': {
-        call = this.table.checkTurn(handId, amount);
-        break;
-      }
-      case 'river': {
-        call = this.table.checkRiver(handId, amount);
-        break;
-      }
-      default: {
-        call = this.table.checkFlop(handId, amount);
-      }
-    }
-    return call.catch((err) => {
-      Raven.captureException(err, { tags: {
-        tableAddr: this.props.params.tableAddr,
-        handId,
-      } });
-      this.setActive(true);
-    });
+    const checkStates = ['preflop', 'turn', 'river', 'flop'];
+    const state = this.props.state;
+    const checkType = checkStates.indexOf(state) !== -1 ? state : 'flop';
+    const action = check(
+      this.props.params.tableAddr,
+      handId,
+      amount,
+      this.props.privKey,
+      this.props.myPos,
+      this.props.lastReceipt,
+      checkType,
+    );
+
+    return pay(action, this.props.dispatch)
+      .then((cards) => {
+        this.props.setCards(this.props.params.tableAddr, handId, cards);
+      })
+      .catch(this.captureError(handId));
   }
 
   handleShow() {

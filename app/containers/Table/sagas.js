@@ -17,6 +17,7 @@ import {
   sitOutToggle,
   BET,
   FOLD,
+  CHECK,
   SHOW,
   NET,
   HAND_REQUEST,
@@ -92,12 +93,26 @@ export function* payFlow() {
             return table.betReceipt(action.handId, action.amount);
           case FOLD:
             return table.foldReceipt(action.handId, action.amount);
+          case CHECK: {
+            switch (action.checkType) {
+              case 'preflop':
+                return table.checkPreflopReceipt(action.handId, action.amount);
+              case 'flop':
+                return table.checkFlopReceipt(action.handId, action.amount);
+              case 'river':
+                return table.checkRiverReceipt(action.handId, action.amount);
+              case 'turn':
+                return table.checkTurnReceipt(action.handId, action.amount);
+              default:
+                throw new Error('Invalid check type in payFlow. check type: ', action.checkType);
+            }
+          }
           default:
             throw new Error('Invalid action type in payFlow. type: ', action.type);
         }
       }());
-      yield put(receiptSet(action.tableAddr, action.handId, action.pos, newReceipt));
 
+      yield put(receiptSet(action.tableAddr, action.handId, action.pos, newReceipt));
       const holeCards = yield table.pay(newReceipt);
       yield put({ type: pay.SUCCESS, payload: holeCards.cards });
     } catch (err) {
