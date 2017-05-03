@@ -3,9 +3,8 @@
  */
 
 export const apiBasePath = 'https://evm4rumeob.execute-api.eu-west-1.amazonaws.com/v0';
-export const ethNode = 'http://geth.ocolin.com:8545';
 export const landingPageUrl = 'http://www.acebusters.com';
-export const ethNodeUrl = 'http://geth.ocolin.com:8545';
+export const ethNodeUrl = 'ws://geth.ocolin.com:8546';
 export const tokenContractAddress = '0xd56fb602475a6bf067e5998bd02764df5219bcb5';
 export const accountFactoryAddress = '0xecc669f51460e729eb8a386dc779398a5482b9f1';
 export const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'jack', 'queen', 'king', 'ace'];
