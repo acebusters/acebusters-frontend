@@ -5,6 +5,7 @@ import { delay, eventChannel, END } from 'redux-saga';
 import fetch from 'isomorphic-fetch';
 import Raven from 'raven-js';
 
+import WebsocketProvider from '../../services/wsProvider';
 import {
   ethNodeUrl,
   ABI_TOKEN_CONTRACT,
@@ -38,7 +39,7 @@ let web3Instance;
 
 export function getWeb3() {
   if (typeof web3Instance === 'undefined') {
-    web3Instance = new Web3(new Web3.providers.HttpProvider(ethNodeUrl));
+    web3Instance = new Web3(new WebsocketProvider(ethNodeUrl));
   }
   return web3Instance;
 }
@@ -166,45 +167,6 @@ function* accountLoginSaga() {
     }
   }
 }
-
-
-    // this.tokenEvents = this.token.allEvents({ fromBlock: 'latest' });
-    // this.tokenEvents.watch(this.watchToken);
-
-
-  // watchToken(error, result) {
-  //   if (error) {
-  //     const errorElement = (<h2>{errorElement}/</h2>);
-  //     this.props.modalAdd(errorElement);
-  //     return;
-  //   }
-
-  //   // dispatch action according to event type
-  //   switch (result.event) {
-  //     case 'Approval': {
-  //       this.props.modalDismiss();
-  //       const statusElement = (<h2>Sufficient Balance</h2>);
-  //       this.props.modalAdd(statusElement);
-  //       break;
-  //     }
-  //     case 'Transfer': {
-  //       this.props.modalDismiss();
-  //       const statusElement = (<h2>Amount Transferred</h2>);
-  //       this.props.modalAdd(statusElement);
-  //       break;
-  //     }
-  //     case 'Issuance': {
-  //       this.props.modalDismiss();
-  //       const statusElement = (<h2>Amount Issued</h2>);
-  //       this.props.modalAdd(statusElement);
-  //       break;
-  //     }
-
-  //     default: {
-  //       break;
-  //     }
-  //   }
-  // }
 
 const workerUrl = 'https://khengvfg6c.execute-api.eu-west-1.amazonaws.com/v0';
 
