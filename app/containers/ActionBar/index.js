@@ -32,7 +32,7 @@ import {
   makeLastReceiptSelector,
 } from '../Seat/selectors';
 
-import { bet, pay, setCards } from '../Table/actions';
+import { bet, pay, fold, setCards } from '../Table/actions';
 import { ActionBarComponent, ActionButton } from '../../components/ActionBar';
 import TableService from '../../services/tableService';
 
@@ -71,21 +71,29 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
     this.setState({ amount });
   }
 
+  captureError(handId) {
+    const self = this;
+
+    return (err) => {
+      Raven.captureException(err, { tags: {
+        tableAddr: self.props.params.tableAddr,
+        handId,
+      } });
+      self.setActive(true);
+    };
+  }
+
   handleBet() {
     this.setActive(false);
     const amount = this.state.amount + this.props.myMaxBet;
     const handId = parseInt(this.props.params.handId, 10);
 
     const betAction = bet(this.props.params.tableAddr, handId, amount, this.props.privKey, this.props.myPos, this.props.lastReceipt);
-    return pay(betAction, this.props.dispatch).then((cards) => {
+    return pay(betAction, this.props.dispatch)
+    .then((cards) => {
       this.props.setCards(this.props.params.tableAddr, handId, cards);
-    }).catch((err) => {
-      Raven.captureException(err, { tags: {
-        tableAddr: this.props.params.tableAddr,
-        handId,
-      } });
-      this.setActive(true);
-    });
+    })
+    .catch(this.captureError(handId));
   }
 
   handleCall() {
@@ -144,13 +152,20 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
     this.setActive(false);
     const amount = this.props.myMaxBet;
     const handId = parseInt(this.props.params.handId, 10);
-    return this.table.fold(handId, amount).catch((err) => {
-      Raven.captureException(err, { tags: {
-        tableAddr: this.props.params.tableAddr,
-        handId,
-      } });
-      this.setActive(true);
-    });
+    const action = fold(
+      this.props.params.tableAddr,
+      handId,
+      amount,
+      this.props.privKey,
+      this.props.myPos,
+      this.props.lastReceipt
+    );
+
+    return pay(action, this.props.dispatch)
+      .then((cards) => {
+        this.props.setCards(this.props.params.tableAddr, handId, cards);
+      })
+      .catch(this.captureError(handId));
   }
 
   render() {

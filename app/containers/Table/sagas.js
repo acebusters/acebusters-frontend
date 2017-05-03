@@ -16,6 +16,7 @@ import {
   pay,
   sitOutToggle,
   BET,
+  FOLD,
   SHOW,
   NET,
   HAND_REQUEST,
@@ -85,8 +86,18 @@ export function* payFlow() {
     const table = new TableService(action.tableAddr, action.privKey);
     try {
       // set toggle flag
-      const newReceipt = table.betReceipt(action.handId, action.amount);
+      const newReceipt = (function getNewReceipt() {
+        switch (action.type) {
+          case BET:
+            return table.betReceipt(action.handId, action.amount);
+          case FOLD:
+            return table.foldReceipt(action.handId, action.amount);
+          default:
+            throw new Error('Invalid action type in payFlow. type: ', action.type);
+        }
+      }());
       yield put(receiptSet(action.tableAddr, action.handId, action.pos, newReceipt));
+
       const holeCards = yield table.pay(newReceipt);
       yield put({ type: pay.SUCCESS, payload: holeCards.cards });
     } catch (err) {

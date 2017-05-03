@@ -10,6 +10,7 @@ export const LINEUP_RECEIVED = 'acebusters/Table/LINEUP_RECEIVED';
 export const LEAVE_REQUEST = 'acebusters/Table/LEAVE_REQUEST';
 export const JOIN_TABLE = 'acebusters/Table/JOIN_TABLE';
 export const BET = 'acebusters/Table/BET';
+export const FOLD = 'acebusters/Table/FOLD';
 export const SHOW = 'acebusters/Table/SHOW';
 export const NET = 'acebusters/Table/NET';
 export const PENDING_TOGGLE = 'acebusters/Table/PENDING_TOGGLE';
@@ -26,6 +27,10 @@ export const sitOutToggle = createFormAction('SITOUT_TOGGLE');
 
 export function bet(tableAddr, handId, amount, privKey, pos, prevReceipt) {
   return { type: BET, tableAddr, handId, amount, privKey, pos, prevReceipt };
+}
+
+export function fold(tableAddr, handId, amount, privKey, pos, prevReceipt) {
+  return { type: FOLD, tableAddr, handId, amount, privKey, pos, prevReceipt };
 }
 
 export function show(tableAddr, handId, holeCards, amount, privKey) {

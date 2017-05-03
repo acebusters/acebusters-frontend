@@ -19,8 +19,12 @@ TableService.prototype.bet = function bet(handId, amount) {
   return this.pay(receipt);
 };
 
+TableService.prototype.foldReceipt = function foldReceipt(handId, amount) {
+  return new EWT(ABI_FOLD).fold(handId, amount).sign(this.privKey);
+};
+
 TableService.prototype.fold = function fold(handId, amount) {
-  const receipt = new EWT(ABI_FOLD).fold(handId, amount).sign(this.privKey);
+  const receipt = this.foldReceipt(handId, amount);
   return this.pay(receipt);
 };
 
