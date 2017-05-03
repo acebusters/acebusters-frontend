@@ -43,7 +43,6 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
     this.handleBet = this.handleBet.bind(this);
     this.handleCheck = this.handleCheck.bind(this);
     this.handleCall = this.handleCall.bind(this);
-    this.handleShow = this.handleShow.bind(this);
     this.handleFold = this.handleFold.bind(this);
     this.updateAmount = this.updateAmount.bind(this);
     this.table = new TableService(props.params.tableAddr, this.props.privKey);
@@ -125,19 +124,6 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
         this.props.setCards(this.props.params.tableAddr, handId, cards);
       })
       .catch(this.captureError(handId));
-  }
-
-  handleShow() {
-    this.setActive(false);
-    const amount = this.props.myMaxBet;
-    const cards = this.props.cards;
-    const handId = parseInt(this.props.params.handId, 10);
-    return this.table.show(handId, amount, cards).catch((err) => {
-      Raven.captureException(err, { tags: {
-        tableAddr: this.props.params.tableAddr,
-        handId,
-      } });
-    });
   }
 
   handleFold() {
@@ -242,7 +228,6 @@ ActionBar.propTypes = {
   myStack: React.PropTypes.number,
   callAmount: React.PropTypes.number,
   state: React.PropTypes.string,
-  cards: React.PropTypes.array,
   dispatch: React.PropTypes.func,
   setCards: React.PropTypes.func,
 };
