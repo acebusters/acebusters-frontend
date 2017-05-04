@@ -19,28 +19,48 @@ TableService.prototype.bet = function bet(handId, amount) {
   return this.pay(receipt);
 };
 
+TableService.prototype.foldReceipt = function foldReceipt(handId, amount) {
+  return new EWT(ABI_FOLD).fold(handId, amount).sign(this.privKey);
+};
+
 TableService.prototype.fold = function fold(handId, amount) {
-  const receipt = new EWT(ABI_FOLD).fold(handId, amount).sign(this.privKey);
+  const receipt = this.foldReceipt(handId, amount);
   return this.pay(receipt);
+};
+
+TableService.prototype.checkPreflopReceipt = function checkPreflopReceipt(handId, amount) {
+  return new EWT(checkABIs.preflop).checkPre(handId, amount).sign(this.privKey);
 };
 
 TableService.prototype.checkPreflop = function checkPreflop(handId, amount) {
-  const receipt = new EWT(checkABIs.preflop).checkPre(handId, amount).sign(this.privKey);
+  const receipt = this.checkPreflopReceipt(handId, amount);
   return this.pay(receipt);
+};
+
+TableService.prototype.checkFlopReceipt = function checkFlopReceipt(handId, amount) {
+  return new EWT(checkABIs.flop).checkFlop(handId, amount).sign(this.privKey);
 };
 
 TableService.prototype.checkFlop = function checkFlop(handId, amount) {
-  const receipt = new EWT(checkABIs.flop).checkFlop(handId, amount).sign(this.privKey);
+  const receipt = this.checkFlopReceipt(handId, amount);
   return this.pay(receipt);
+};
+
+TableService.prototype.checkTurnReceipt = function checkTurnReceipt(handId, amount) {
+  return new EWT(checkABIs.turn).checkTurn(handId, amount).sign(this.privKey);
 };
 
 TableService.prototype.checkTurn = function checkTurn(handId, amount) {
-  const receipt = new EWT(checkABIs.turn).checkTurn(handId, amount).sign(this.privKey);
+  const receipt = this.checkTurnReceipt(handId, amount);
   return this.pay(receipt);
 };
 
+TableService.prototype.checkRiverReceipt = function checkRiverReceipt(handId, amount) {
+  return new EWT(checkABIs.river).checkRiver(handId, amount).sign(this.privKey);
+};
+
 TableService.prototype.checkRiver = function checkRiver(handId, amount) {
-  const receipt = new EWT(checkABIs.river).checkRiver(handId, amount).sign(this.privKey);
+  const receipt = this.checkRiverReceipt(handId, amount);
   return this.pay(receipt);
 };
 

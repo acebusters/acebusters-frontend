@@ -32,7 +32,7 @@ import {
   makeLastReceiptSelector,
 } from '../Seat/selectors';
 
-import { bet, pay, setCards } from '../Table/actions';
+import { bet, pay, fold, check, setCards } from '../Table/actions';
 import { ActionBarComponent, ActionButton } from '../../components/ActionBar';
 import TableService from '../../services/tableService';
 
@@ -43,7 +43,6 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
     this.handleBet = this.handleBet.bind(this);
     this.handleCheck = this.handleCheck.bind(this);
     this.handleCall = this.handleCall.bind(this);
-    this.handleShow = this.handleShow.bind(this);
     this.handleFold = this.handleFold.bind(this);
     this.updateAmount = this.updateAmount.bind(this);
     this.table = new TableService(props.params.tableAddr, this.props.privKey);
@@ -71,21 +70,29 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
     this.setState({ amount });
   }
 
+  captureError(handId) {
+    const self = this;
+
+    return (err) => {
+      Raven.captureException(err, { tags: {
+        tableAddr: self.props.params.tableAddr,
+        handId,
+      } });
+      self.setActive(true);
+    };
+  }
+
   handleBet() {
     this.setActive(false);
     const amount = this.state.amount + this.props.myMaxBet;
     const handId = parseInt(this.props.params.handId, 10);
 
     const betAction = bet(this.props.params.tableAddr, handId, amount, this.props.privKey, this.props.myPos, this.props.lastReceipt);
-    return pay(betAction, this.props.dispatch).then((cards) => {
+    return pay(betAction, this.props.dispatch)
+    .then((cards) => {
       this.props.setCards(this.props.params.tableAddr, handId, cards);
-    }).catch((err) => {
-      Raven.captureException(err, { tags: {
-        tableAddr: this.props.params.tableAddr,
-        handId,
-      } });
-      this.setActive(true);
-    });
+    })
+    .catch(this.captureError(handId));
   }
 
   handleCall() {
@@ -98,59 +105,45 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
   handleCheck() {
     this.setActive(false);
     const amount = this.props.myMaxBet;
+    const handId = parseInt(this.props.params.handId, 10);
+    const checkStates = ['preflop', 'turn', 'river', 'flop'];
     const state = this.props.state;
-    const handId = parseInt(this.props.params.handId, 10);
-    let call;
-    switch (state) {
-      case 'preflop': {
-        call = this.table.checkPreflop(handId, amount);
-        break;
-      }
-      case 'turn': {
-        call = this.table.checkTurn(handId, amount);
-        break;
-      }
-      case 'river': {
-        call = this.table.checkRiver(handId, amount);
-        break;
-      }
-      default: {
-        call = this.table.checkFlop(handId, amount);
-      }
-    }
-    return call.catch((err) => {
-      Raven.captureException(err, { tags: {
-        tableAddr: this.props.params.tableAddr,
-        handId,
-      } });
-      this.setActive(true);
-    });
-  }
+    const checkType = checkStates.indexOf(state) !== -1 ? state : 'flop';
+    const action = check(
+      this.props.params.tableAddr,
+      handId,
+      amount,
+      this.props.privKey,
+      this.props.myPos,
+      this.props.lastReceipt,
+      checkType,
+    );
 
-  handleShow() {
-    this.setActive(false);
-    const amount = this.props.myMaxBet;
-    const cards = this.props.cards;
-    const handId = parseInt(this.props.params.handId, 10);
-    return this.table.show(handId, amount, cards).catch((err) => {
-      Raven.captureException(err, { tags: {
-        tableAddr: this.props.params.tableAddr,
-        handId,
-      } });
-    });
+    return pay(action, this.props.dispatch)
+      .then((cards) => {
+        this.props.setCards(this.props.params.tableAddr, handId, cards);
+      })
+      .catch(this.captureError(handId));
   }
 
   handleFold() {
     this.setActive(false);
     const amount = this.props.myMaxBet;
     const handId = parseInt(this.props.params.handId, 10);
-    return this.table.fold(handId, amount).catch((err) => {
-      Raven.captureException(err, { tags: {
-        tableAddr: this.props.params.tableAddr,
-        handId,
-      } });
-      this.setActive(true);
-    });
+    const action = fold(
+      this.props.params.tableAddr,
+      handId,
+      amount,
+      this.props.privKey,
+      this.props.myPos,
+      this.props.lastReceipt
+    );
+
+    return pay(action, this.props.dispatch)
+      .then((cards) => {
+        this.props.setCards(this.props.params.tableAddr, handId, cards);
+      })
+      .catch(this.captureError(handId));
   }
 
   render() {
@@ -235,7 +228,6 @@ ActionBar.propTypes = {
   myStack: React.PropTypes.number,
   callAmount: React.PropTypes.number,
   state: React.PropTypes.string,
-  cards: React.PropTypes.array,
   dispatch: React.PropTypes.func,
   setCards: React.PropTypes.func,
 };
