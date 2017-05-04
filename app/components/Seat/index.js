@@ -8,6 +8,7 @@ import {
   green,
   gray,
 } from 'variables';
+import { nickNameByAddress } from '../../services/nicknames';
 import Card from '../Card';
 import Radial from '../RadialProgress';
 import Pot from '../Pot';
@@ -90,7 +91,7 @@ function SeatComponent(props) {
           }
         </AmountBox>
         <div>
-          <NameBox> { props.signerAddr }
+          <NameBox> { nickNameByAddress(props.signerAddr) }
             <hr />
           </NameBox>
           <StackBox> { props.stackSize }</StackBox>
