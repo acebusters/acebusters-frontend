@@ -154,7 +154,8 @@ export class ConfirmPage extends React.PureComponent { // eslint-disable-line re
   }
 
   render() {
-    const { error, handleSubmit, submitting } = this.props;
+    const { error, handleSubmit, invalid, submitting } = this.props;
+
     const { msg } = this.state;
 
     return (
@@ -172,8 +173,9 @@ export class ConfirmPage extends React.PureComponent { // eslint-disable-line re
             onChange={this.onChangeCode}
           />
           {error && <strong>{error}</strong>}
-          <Button type="submit" size="large" disabled={submitting}>
+          <Button type="submit" size="large" disabled={submitting || invalid}>
             { (!submitting) ? (<FormattedMessage {...msg.button} />) : 'Please wait ...' }
+
           </Button>
         </Form>
       </Container>

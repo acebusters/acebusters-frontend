@@ -18,63 +18,50 @@ import {
   hover,
 } from '../../variables';
 
-const Medium = styled.button`{
+const SharedButton = styled.button`
   display: block;
   box-sizing: border-box;
   text-decoration: none;
   margin: 0 auto;
-  padding: 0.1em 0.5em;
-  font-size: 10em;
   border-radius: 4px;
-  -webkit-font-smoothing: antialiased;
-  -webkit-touch-callout: none;
   user-select: none;
   cursor: pointer;
   outline: 0;
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: bold;
+  color: ${white};
+`;
+
+const Medium = styled(SharedButton)`{
+  padding: 0.1em 0.5em;
   font-size: 16px;
   background-color: ${black};
-  color: ${white};
- 
-  &:active {
+
+  &:hover {
     color: ${baseColor};
   }
-  
-  &:hover {
+
+  &:active {
     color: ${baseColor};
   }
 }`;
 
-const Large = styled.button`
-  display: block;
-  box-sizing: border-box;
-  text-decoration: none;
-  margin: 0 auto;
+const Large = styled(SharedButton)`
   padding: 10px;
-  font-size: 10em;
-  border-radius: 4px;
-  -webkit-font-smoothing: antialiased;
-  -webkit-touch-callout: none;
-  user-select: none;
-  cursor: pointer;
-  outline: 0;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-weight: bold;
   font-size: 24px;
-  color: ${white};
   width: 100%;
   background-color: ${baseColor};
-  &:active {
-    color: ${baseColor};
-    background-color: ${background};
-  }
-  
+
   &:hover {
     color: ${white};
     background-color: ${hover};
   }
-  
+
+  &:active {
+    color: ${baseColor};
+    background-color: ${background};
+  }
+
   &:disabled {
     color: ${background};
     background-color: ${disabled};

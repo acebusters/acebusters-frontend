@@ -6,7 +6,7 @@ import tinycolor from 'tinycolor2';
 export const baseColor = '#FD5E60';
 export const black = '#080B0F';
 export const background = '#ECECEC';
-export const disabled = '#FF755C';
+export const disabled = '#FFC7BD';
 export const gray = '#999999';
 export const green = '#A0FFB1';
 export const white = '#FFF';
