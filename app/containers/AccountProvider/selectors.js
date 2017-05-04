@@ -2,6 +2,7 @@ import EthUtil from 'ethereumjs-util';
 import { createSelector } from 'reselect';
 
 import { ABI_TOKEN_CONTRACT, tokenContractAddress } from '../../app.config';
+import { READY_STATE } from './actions';
 
 /**
  * Direct selector to the accountProvider state domain
@@ -25,6 +26,16 @@ const makeSignerAddrSelector = () => createSelector(
     }
     return null;
   }
+);
+
+const makeSelectIsWeb3Connected = () => createSelector(
+  selectAccount,
+  (account) => account.get('web3ReadyState') === READY_STATE.OPEN
+);
+
+const makeSelectWeb3ErrMsg = () => createSelector(
+  selectAccount,
+  (account) => account.get('web3ErrMsg')
 );
 
 const makeSelectEmail = () => createSelector(
@@ -66,4 +77,6 @@ export {
   makeSelectPrivKey,
   makeSelectProxyAddr,
   makeSelectEmail,
+  makeSelectIsWeb3Connected,
+  makeSelectWeb3ErrMsg,
 };

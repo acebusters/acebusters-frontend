@@ -165,6 +165,8 @@ WebsocketProvider.prototype.parseResponse = function parseResponse(dataChunked) 
  @method addResponseCallback
  */
 WebsocketProvider.prototype.addResponseCallback = function addResponseCallback(payload, callback) {
+  if (!callback) return;
+
   const id = payload.id || payload[0].id;
   const method = payload.method || payload[0].method;
 
@@ -221,21 +223,27 @@ WebsocketProvider.prototype.on = function on(type, callback) {
     throw new Error('The second parameter callback must be a function.');
   }
 
+  const noop = () => {};
+  let oldCallback;
+
   switch (type) {
     case 'notification':
       this.notificationCallbacks.push(callback);
       break;
 
     case 'connect':
-      this.connection.onopen = callback;
+      oldCallback = this.connection.onopen || noop;
+      this.connection.onopen = (e) => callback(e, oldCallback);
       break;
 
-    case 'end':
-      this.connection.onclose = callback;
+    case 'close':
+      oldCallback = this.connection.onclose || noop;
+      this.connection.onclose = (e) => callback(e, oldCallback);
       break;
 
     case 'error':
-      this.connection.onerror = callback;
+      oldCallback = this.connection.onerror || noop;
+      this.connection.onerror = (e) => callback(e, oldCallback);
       break;
 
     default:
@@ -322,4 +330,3 @@ WebsocketProvider.prototype.reset = function reset() {
 };
 
 module.exports = WebsocketProvider;
-

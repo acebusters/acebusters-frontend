@@ -23,6 +23,7 @@ import {
   SET_AUTH,
   WEB3_CONNECTED,
   BLOCK_NOTIFY,
+  web3Error,
   web3Connected,
   web3Disconnected,
   web3MethodSuccess,
@@ -67,6 +68,58 @@ const getAccount = (web3, signer) => (
     });
   })
 );
+
+function websocketChannel() {
+  return eventChannel((emitter) => {
+    const ws = getWeb3().currentProvider;
+    let firstConnect = true;
+
+    ws.on('connect', (e, oldCallback) => {
+      // Note: when websocket first emit this connect event, it seems to be still not initialized yet.
+      // and it could cause `accountLoginSaga` get called and throw an error in web3
+      if (!firstConnect) {
+        emitter(web3Connected({ web3: web3Instance, isConnected: true }));
+      }
+
+      // Note: wsProvider has some default behavior for all these events.
+      // it's better to keep the old callback
+      oldCallback();
+      firstConnect = false;
+    });
+
+    // Note: if you just turn off the wifi, you won't get this close event immediately
+    // It may take about 1 min to detect that connection loss
+    // refer to:
+    // 1. https://github.com/http-kit/http-kit/issues/111#issuecomment-32988134
+    // 2. http://stackoverflow.com/questions/14227007/howto-detect-that-a-network-cable-has-been-unplugged-in-a-tcp-connection
+    // FIXME: Websocket doen't seem to be back online after you lose connection first and then turn on your wifi again.
+    ws.on('close', (e, oldCallback) => {
+      emitter(web3Disconnected());
+      oldCallback();
+    });
+
+    ws.on('error', (e, oldCallback) => {
+      emitter(web3Error(e));
+      oldCallback();
+    });
+
+    return () => {
+      ws.reset();
+    };
+  });
+}
+
+function* websocketSaga() {
+  const chan = yield call(websocketChannel);
+  try {
+    while (true) { // eslint-disable-line no-constant-condition
+      const action = yield take(chan);
+      yield put(action);
+    }
+  } finally {
+    chan.close();
+  }
+}
 
 function* web3ConnectSaga() {
   try {
@@ -293,6 +346,7 @@ export function* ethEventListenerSaga(contract) {
 export function* accountSaga() {
   yield takeLatest(WEB3_CONNECT, web3ConnectSaga);
   yield takeLatest(BLOCK_NOTIFY, notifyBlock);
+  yield fork(websocketSaga);
   yield fork(web3MethodCallSaga);
   yield fork(accountLoginSaga);
   yield fork(contractMethodCallSaga);

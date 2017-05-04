@@ -2,6 +2,7 @@ import { fromJS } from 'immutable';
 import Raven from 'raven-js';
 import {
   SET_AUTH,
+  WEB3_ERROR,
   WEB3_CONNECTED,
   WEB3_DISCONNECTED,
   WEB3_METHOD_SUCCESS,
@@ -13,6 +14,7 @@ import {
   CONTRACT_TX_ERROR,
   CONTRACT_EVENT,
   ACCOUNT_LOADED,
+  READY_STATE,
 } from './actions';
 import * as storageService from '../../services/localStorage';
 
@@ -26,15 +28,19 @@ const initialState = fromJS({
   privKey: storageService.getItem('privKey'),
   email: storageService.getItem('email'),
   loggedIn: isLoggedIn(),
+  web3ReadyState: READY_STATE.CONNECTING,
+  web3ErrMsg: null,
 });
 
 function accountProviderReducer(state = initialState, action) {
   let newState = state;
   switch (action.type) {
     case WEB3_CONNECTED:
-      return state;
+      return state.set('web3ReadyState', READY_STATE.OPEN);
     case WEB3_DISCONNECTED:
-      return state;
+      return state.set('web3ReadyState', READY_STATE.CLOSED);
+    case WEB3_ERROR:
+      return state.set('web3ErrMsg', action.err ? (action.err.message || 'Connection Error') : null);
     case ACCOUNT_LOADED:
       return state.set('proxy', action.data.proxy).set('controller', action.data.controller).set('lastNonce', action.data.lastNonce);
     case WEB3_METHOD_SUCCESS:

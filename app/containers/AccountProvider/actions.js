@@ -1,6 +1,7 @@
 export const SET_AUTH = 'acebusters/AccountProvider/SET_AUTH';
 export const ACCOUNT_LOADED = 'acebusters/AccountProvider/ACCOUNT_LOADED';
 
+export const WEB3_ERROR = 'acebusters/AccountProvider/WEB3_ERROR';
 export const WEB3_CONNECT = 'acebusters/AccountProvider/WEB3_CONNECT';
 export const WEB3_CONNECTED = 'acebusters/AccountProvider/WEB3_CONNECTED';
 export const WEB3_DISCONNECTED = 'acebusters/AccountProvider/WEB3_DISCONNECTED';
@@ -19,6 +20,14 @@ export const CONTRACT_TX_ERROR = 'acebusters/AccountProvider/CONTRACT_TX_ERROR';
 
 export const CONTRACT_EVENT = 'acebusters/AccountProvider/CONTRACT_EVENT';
 export const BLOCK_NOTIFY = 'acebusters/AccountProvider/BLOCK_NOTIFY';
+
+// Note: refer to  https://developer.mozilla.org/en-US/docs/Web/API/WebSocket#Ready_state_constants
+export const READY_STATE = {
+  CONNECTING: 0,
+  OPEN: 1,
+  CLOSING: 2,
+  CLOSED: 3,
+};
 
 export const SUPPORTED_WEB3_METHODS = {
   net: {
@@ -68,6 +77,14 @@ export function accountLoaded(data) {
 
 export function blockNotify() {
   return { type: BLOCK_NOTIFY };
+}
+
+export function web3Error(err) {
+  return { type: WEB3_ERROR, err };
+}
+
+export function clearWeb3Error() {
+  return { type: WEB3_ERROR, err: null };
 }
 
 export function web3Connect() {
