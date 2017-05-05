@@ -46,12 +46,34 @@ export default function tableReducer(state = initialState, action) {
     case TableActions.LINEUP_RECEIVED: {
       let lineup = List([]);
       let amounts = List([]);
+      let newState = state;
+
       for (let i = 0; i < action.lineup[1].length; i += 1) {
         lineup = lineup.push(Map({ address: action.lineup[1][i] }));
         amounts = amounts.push(action.lineup[2][i].toNumber());
       }
+
+      // Note: not every LINEUP_RECEIVED provide a handId param. LINEUP_RECEIVED is triggered in 2 cases:
+      // 1. Lobby: LobbyItem fires LINEUP_RECEIVED when loaded
+      // 2. Table: after Join Successful (table events)
+      // The 2nd case will provide a handId, and we'll use it to update lineup data in 'hand'
+      if (action.handId) {
+        const table = state.get(action.tableAddr);
+        let hand = table.get(action.handId);
+
+        for (let j = 0; j < action.lineup.length; j += 1) {
+          if (hand.getIn(['lineup', j, 'address']) !== action.lineup[1][j]) {
+            hand = hand.setIn(['lineup', j], Map({
+              address: action.lineup[1][j],
+            }));
+          }
+        }
+
+        newState = newState.setIn([action.tableAddr, action.handId], hand);
+      }
+
       const sb = (typeof action.smallBlind === 'object') ? action.smallBlind.toNumber() : action.smallBlind;
-      return state.setIn([action.tableAddr, 'data', 'seats'], lineup)
+      return newState.setIn([action.tableAddr, 'data', 'seats'], lineup)
         .setIn([action.tableAddr, 'data', 'amounts'], amounts)
         .setIn([action.tableAddr, 'data', 'lastHandNetted'], action.lineup[0].toNumber())
         .setIn([action.tableAddr, 'data', 'smallBlind'], sb);

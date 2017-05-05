@@ -325,6 +325,13 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     // dispatch action according to event type
     switch (result.event) {
       case 'Join': {
+        const lineupReceivedArgs = (rsp) => [
+          this.tableAddr,
+          rsp,
+          this.props.data.get('smallBlind'),
+          this.props.params.handId,
+        ];
+
         if (result.args && result.args.addr === this.props.proxyAddr) {
           // notify backend about new block
           this.props.blockNotify();
@@ -336,23 +343,13 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           </div>);
           this.props.modalDismiss();
           this.props.modalAdd(statusElement);
-
-          // update lineup when join successful
-          this.table.getLineup.callPromise().then((rsp) => {
-            this.props.lineupReceived(this.tableAddr, rsp, this.props.data.get('smallBlind'));
-            for (let i = 0; i < rsp[1].length; i += 1) {
-              if (rsp[1][i] === this.props.signerAddr) {
-                this.props.pendingToggle(this.tableAddr, this.props.params.handId, i);
-                break;
-              }
-            }
-          });
-        } else {
-          // update lineup when when other players joined
-          this.table.getLineup.callPromise().then((rsp) => {
-            this.props.lineupReceived(this.tableAddr, rsp, this.props.data.get('smallBlind'));
-          });
         }
+
+        // update lineup when join successful
+        this.table.getLineup.callPromise().then((rsp) => {
+          this.props.lineupReceived(...lineupReceivedArgs(rsp));
+        });
+
         break;
       }
 
@@ -477,7 +474,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 export function mapDispatchToProps() {
   return {
     handRequest: (tableAddr, handId) => handRequest(tableAddr, handId),
-    lineupReceived: (tableAddr, lineup, smallBlind) => (lineupReceived(tableAddr, lineup, smallBlind)),
+    lineupReceived: (...args) => (lineupReceived(...args)),
     modalAdd: (node) => (modalAdd(node)),
     modalDismiss: () => (modalDismiss()),
     pendingToggle: (tableAddr, handId, pos) => (pendingToggle(tableAddr, handId, pos)),
