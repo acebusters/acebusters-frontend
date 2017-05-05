@@ -9,6 +9,8 @@ describe('account reducer tests', () => {
       privKey: undefined,
       email: undefined,
       loggedIn: false,
+      web3ReadyState: 0,
+      web3ErrMsg: null,
     });
   });
 

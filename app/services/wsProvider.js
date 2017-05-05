@@ -76,31 +76,30 @@ const WebsocketProvider = function WebsocketProvider(path) {
  @method addDefaultEvents
  */
 WebsocketProvider.prototype.addDefaultEvents = function addDefaultEvents() {
-  const self = this;
-
-  this.connection.onerror = function onerror() {
-    self.timeout();
-  };
-
-  this.connection.onclose = function onclose(e) {
-    self.timeout();
-
-    const noteCb = self.notificationCallbacks;
-
-        // reset all requests and callbacks
-    self.reset();
-
-        // cancel subscriptions
-    noteCb.forEach((callback) => {
-      if (_.isFunction(callback)) {
-        callback(e);
-      }
-    });
-  };
-
+  this.connection.onerror = this.defaultOnError.bind(this);
+  this.connection.onclose = this.defaultOnClose.bind(this);
     // this.connection.on('timeout', function(){
     //     self.timeout();
     // });
+};
+
+WebsocketProvider.prototype.defaultOnError = function defaultOnError() {
+  this.timeout();
+};
+
+WebsocketProvider.prototype.defaultOnClose = function defaultOnClose(e) {
+  this.timeout();
+
+  const noteCb = this.notificationCallbacks;
+  // reset all requests and callbacks
+  this.reset();
+
+  // cancel subscriptions
+  noteCb.forEach((callback) => {
+    if (_.isFunction(callback)) {
+      callback(e);
+    }
+  });
 };
 
 /**
@@ -223,27 +222,27 @@ WebsocketProvider.prototype.on = function on(type, callback) {
     throw new Error('The second parameter callback must be a function.');
   }
 
-  const noop = () => {};
-  let oldCallback;
-
   switch (type) {
     case 'notification':
       this.notificationCallbacks.push(callback);
       break;
 
     case 'connect':
-      oldCallback = this.connection.onopen || noop;
-      this.connection.onopen = (e) => callback(e, oldCallback);
+      this.connection.onopen = callback;
       break;
 
     case 'close':
-      oldCallback = this.connection.onclose || noop;
-      this.connection.onclose = (e) => callback(e, oldCallback);
+      this.connection.onclose = (e) => {
+        callback(e);
+        this.defaultOnClose(e);
+      };
       break;
 
     case 'error':
-      oldCallback = this.connection.onerror || noop;
-      this.connection.onerror = (e) => callback(e, oldCallback);
+      this.connection.onerror = (e) => {
+        callback(e);
+        this.defaultOnError(e);
+      };
       break;
 
     default:

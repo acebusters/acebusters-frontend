@@ -6,6 +6,8 @@ import Navbar from './Navbar';
 import UserMenu from './UserMenu';
 import NavItem from './NavItem';
 
+import { nickNameByAddress } from '../../services/nicknames';
+
 import {
   screenXsMax,
 } from '../../variables';
@@ -84,7 +86,7 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
         title="Lobby"
       />,
       <UserMenu
-        name={`${this.props.signerAddr.substring(0, 8)}...`}
+        name={nickNameByAddress(this.props.signerAddr)}
         image={this.props.imageUrl}
         profileAction={() => browserHistory.push('/dashboard')}
         signOutAction={this.props.onClickLogout}
