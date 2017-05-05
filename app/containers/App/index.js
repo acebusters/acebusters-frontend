@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import { ModalContainer, ModalDialog } from 'react-modal-dialog';
+import { ModalContainer, ModalDialog } from 'kd-react-modal-dialog';
 import { browserHistory } from 'react-router';
 import Header from 'components/Header';
 import Footer from 'components/Footer';
@@ -88,7 +88,11 @@ export function App(props) {
       }
       { modalContent &&
         <ModalContainer>
-          <ModalDialog onClose={props.modalDismiss} dismissOnBackgroundClick={false}>
+          <ModalDialog
+            onClose={props.modalDismiss}
+            dismissOnBackgroundClick={false}
+            closeButtonParam={{ margin: 5 }}
+          >
             { modalContent }
           </ModalDialog>
         </ModalContainer>
