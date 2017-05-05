@@ -1,7 +1,18 @@
 import EWT from 'ethereum-web-token';
 import fetch from 'isomorphic-fetch';
+import { getWeb3 } from '../containers/AccountProvider/sagas';
 
-import { ABI_BET, ABI_SHOW, ABI_FOLD, ABI_LEAVE, ABI_SIT_OUT, checkABIs, apiBasePath } from '../app.config';
+import {
+  ABI_BET,
+  ABI_SHOW,
+  ABI_FOLD,
+  ABI_LEAVE,
+  ABI_SIT_OUT,
+  ABI_TABLE_FACTORY,
+  checkABIs,
+  apiBasePath,
+  tableFactoryAddress,
+} from '../app.config';
 
 
 function TableService(tableAddr, privKey) {
@@ -215,14 +226,13 @@ export function getHand(tableAddr, handId) {
 }
 
 export function fetchTables() {
+  const tableFactoryContract = getWeb3().eth.contract(ABI_TABLE_FACTORY).at(tableFactoryAddress);
+
   return new Promise((resolve, reject) => {
-    fetch(`${apiBasePath}/config`).then(
-      (res) => res.json(),
-      (error) => reject(error)
-    ).then(
-      (tables) => resolve(tables.tableContracts),
-      (err) => reject(err)
-    );
+    tableFactoryContract.getTables.call((e, a) => {
+      if (e) return reject(e);
+      return resolve(a);
+    });
   });
 }
 

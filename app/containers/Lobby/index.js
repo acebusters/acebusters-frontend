@@ -4,12 +4,12 @@
 
 import React from 'react';
 import Grid from 'grid-styled';
+import { connect } from 'react-redux';
 import Button from 'components/Button';
 import Container from 'components/Container';
 import { TableStriped } from 'components/List';
 import H2 from 'components/H2';
 import { createStructuredSelector } from 'reselect';
-import { connect } from 'react-redux';
 import LobbyItem from '../LobbyItem';
 import { tableReceived } from '../Table/actions';
 import { makeSelectLobby } from './selectors';
