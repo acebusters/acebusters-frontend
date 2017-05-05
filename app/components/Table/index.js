@@ -92,14 +92,14 @@ function TableComponent(props) {
         <TableAndChairs id="table-and-chairs" >
           <PokerTable id="poker-table">
             <img src={tableImage} alt="" />
-            { props.winners.length > 0 &&
-              <Winner>{ props.winners }</Winner>
-            }
             <Pot potSize={props.potSize} top="85%" left="45%" />
             { props.seats }
             <Board id="board" board={props.board}>
               { props.board }
             </Board>
+            { props.winners.length > 0 &&
+              <Winner>{ props.winners }</Winner>
+            }
           </PokerTable>
         </TableAndChairs>
         { props.myHand &&

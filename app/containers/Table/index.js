@@ -173,7 +173,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     }
 
     // display Rebuy modal if state === 'waiting' and user stack is no greater than 0
-    if (nextProps.state === 'waiting' && nextProps.myStack <= 0
+    if (nextProps.state === 'waiting' && nextProps.myStack !== null && nextProps.myStack <= 0
         && (nextProps.state !== this.props.state || nextProps.myStack !== this.props.myStack)) {
       const balance = parseInt(this.balance.toString(), 10);
 
@@ -195,7 +195,13 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       clearInterval(this.timeOut);
     }
     this.channel.unbind('update', this.handleUpdate);
-    this.tableEvents.stopWatching();
+
+    // Note: with wsProvider, the request made by stopWatching will throw an error
+    try {
+      this.tableEvents.stopWatching();
+    } catch (e) {
+      this.tableEvents = null;
+    }
   }
 
   handleUpdate(hand) {
