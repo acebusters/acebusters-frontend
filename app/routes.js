@@ -100,6 +100,9 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
+      path: '/table/:tableAddr',
+      onEnter: ({ params }, replace) => replace(`/table/${params.tableAddr}/hand/1`),
+    }, {
       path: '/login',
       name: 'login',
       getComponent(nextState, cb) {
