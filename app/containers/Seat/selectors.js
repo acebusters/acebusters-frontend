@@ -22,7 +22,15 @@ import {
 
 const rc = new ReceiptCache();
 
-const posSelector = (state, props) => (state && props) ? props.pos : -1;
+// Note: in Seat, position is stored in props.pos; in ActionBar, position is stored in props.myPos
+// FIXME: there should be a better way than hard coding these 2 fields
+const posSelector = (state, props) => {
+  if (!state || !props) return -1;
+  if (props.pos !== undefined) return props.pos;
+  if (props.myPos !== undefined) return props.myPos;
+
+  return -1;
+};
 
 const makeLastReceiptSelector = () => createSelector(
     [makeHandSelector(), posSelector],
