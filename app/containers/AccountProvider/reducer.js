@@ -55,7 +55,8 @@ function accountProviderReducer(state = initialState, action) {
     case CONTRACT_METHOD_ERROR:
       return state;
     case CONTRACT_TX_SEND:
-      return state.setIn([action.payload.dest, 'pending', action.payload.nonce, 'call'], action.payload.key);
+      // Note: CONTRACT_TX_SEND is useless at this moment, but still keep it for consistency with the relevant actions.
+      return state;
 
     case CONTRACT_TX_SUCCESS:
       // the nonce is only increased after the call was successfull.

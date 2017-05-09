@@ -8,9 +8,7 @@ import {
 } from '../../variables';
 
 const Container = styled.div`
-  margin-right: auto;
-  margin-left: auto;
-  margin-top: 3em;
+  margin: 3em auto;
   padding-right: 2em;
   padding-left: 2em;
   padding-top: 2em;

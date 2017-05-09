@@ -17,6 +17,7 @@ import Container from '../../components/Container';
 import Button from '../../components/Button';
 import Blocky from '../../components/Blocky';
 import FormGroup from '../../components/Form/FormGroup';
+import WithLoading from '../../components/WithLoading';
 
 export class Dashboard extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
@@ -53,20 +54,41 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     if (balance) {
       balance = balance.toString();
     }
-    let listPending = [];
-    let listTxns = [];
+    let listPending = null;
+    let listTxns = null;
     if (this.props.account[tokenContractAddress]) {
       listPending = pendingToList(this.props.account[tokenContractAddress].pending);
       listTxns = txnsToList(this.props.account[tokenContractAddress].transactions, this.props.account.proxy);
     }
+
     return (
       <Container>
         <h1><FormattedMessage {...messages.header} /></h1>
         <Blocky blocky={createBlocky(this.props.signerAddr)} />
         <h3> Your address:</h3>
-        <p> { this.props.account.proxy } </p>
-        <QRCode value={qrUrl} size={120} />
-        <p>Balance: {balance}</p>
+
+        <WithLoading
+          isLoading={!this.props.account.proxy}
+          loadingSize="40px"
+          styles={{ layout: { transform: 'translateY(-50%)', left: 0 } }}
+        >
+          <p> { this.props.account.proxy } </p>
+          <QRCode value={qrUrl} size={120} />
+        </WithLoading>
+
+        <p>
+          <span>Balance: </span>
+          <WithLoading
+            isLoading={balance === undefined || balance === null}
+            loadingSize="14px"
+            type="inline"
+            styles={{ layout: { marginLeft: '15px' } }}
+          >
+            <span>{balance}</span>
+          </WithLoading>
+
+        </p>
+
         <FormGroup>
           <Button
             onClick={() => {
@@ -80,9 +102,9 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
         </FormGroup>
         <hr />
         <h2><FormattedMessage {...messages.pending} /></h2>
-        <List items={listPending} headers={['#', 'data', 'txHash']} />
+        <List items={listPending} headers={['#', 'txHash']} noDataMsg="No Pending Transactions" />
         <h2><FormattedMessage {...messages.included} /></h2>
-        <List items={listTxns} headers={['txHash', 'from', 'to', 'amount']} />
+        <List items={listTxns} headers={['txHash', 'from', 'to', 'amount']} noDataMsg="No Transactions Yet" />
 
       </Container>
     );
@@ -92,15 +114,17 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
 const pendingToList = (pending) => {
   let list = [];
   if (pending) {
-    list = Object.keys(pending).map((key) => [key, pending[key].call, pending[key].txHash]);
+    list = Object.keys(pending).map((key) => [key, pending[key].txHash]);
   }
   return list;
 };
 
 const txnsToList = (txns, proxyAddr) => {
-  let list = [];
+  let list = null;
+
   if (txns) {
     const onlyMine = [];
+
     Object.keys(txns).forEach((key) => {
       if (key && txns[key] && txns[key].from && txns[key].to) {
         if (txns[key].from === proxyAddr || txns[key].to === proxyAddr) {

@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import WithLoading from '../WithLoading';
 import ListItem from '../ListItem';
 
 const Table = styled.table`
@@ -50,23 +51,37 @@ function List(props) {
       <th key={header} > {header} </th>
     ));
   }
+
   return (
-    <TableStriped>
-      <thead>
-        <tr>
-          {headers}
-        </tr>
-      </thead>
-      <tbody>
-        {content}
-      </tbody>
-    </TableStriped>
+    <div>
+      <TableStriped>
+        <thead>
+          <tr>
+            {headers}
+          </tr>
+        </thead>
+        {props.items && props.items.length > 0 && (
+          <tbody>
+            {content}
+          </tbody>
+        )}
+      </TableStriped>
+      <WithLoading
+        isLoading={props.items === null || props.items === undefined}
+        styles={{}}
+      >
+        {props.items && props.items.length === 0 && (
+          <div style={{ textAlign: 'center' }}>{props.noDataMsg || 'No Data'}</div>
+        )}
+      </WithLoading>
+    </div>
   );
 }
 
 List.propTypes = {
   items: React.PropTypes.any,
   headers: React.PropTypes.any,
+  noDataMsg: React.PropTypes.string,
 };
 
 export default List;

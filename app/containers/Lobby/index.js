@@ -14,6 +14,7 @@ import LobbyItem from '../LobbyItem';
 import { tableReceived } from '../Table/actions';
 import { makeSelectLobby } from './selectors';
 import { fetchTables } from '../../services/tableService';
+import WithLoading from '../../components/WithLoading';
 
 
 class LobbyComponent extends React.PureComponent {  // eslint-disable-line
@@ -33,9 +34,11 @@ class LobbyComponent extends React.PureComponent {  // eslint-disable-line
   }
 
   render() {
+    const { lobby } = this.props;
     let content = [];
-    if (this.props.lobby) {
-      content = this.props.lobby.map((tableAddr, i) =>
+
+    if (lobby) {
+      content = lobby.map((tableAddr, i) =>
         <LobbyItem key={i} tableAddr={tableAddr} />
       );
     }
@@ -53,10 +56,17 @@ class LobbyComponent extends React.PureComponent {  // eslint-disable-line
               <th key="actn"> Action </th>
             </tr>
           </thead>
-          <tbody>
-            {content}
-          </tbody>
+          {lobby && lobby.length > 0 && (
+            <tbody>
+              {content}
+            </tbody>
+          )}
         </TableStriped>
+
+        <WithLoading
+          isLoading={lobby.length === 0}
+        />
+
         <Grid xs={1 / 4} >
           <div style={{ float: 'left' }}>
             <Button onClick={this.handleGetTables} size="medium" icon="fa fa-refresh">REFRESH</Button>
