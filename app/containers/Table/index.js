@@ -7,6 +7,7 @@ import { createStructuredSelector } from 'reselect';
 import { browserHistory } from 'react-router';
 import Pusher from 'pusher-js';
 import Raven from 'raven-js';
+import { FormattedMessage } from 'react-intl';
 // components and styles
 import Card from '../../components/Card';
 import { BoardCardWrapper } from '../../components/Table/Board';
@@ -14,6 +15,7 @@ import Seat from '../Seat';
 import Button from '../../components/Button';
 import Slides from '../../components/Slides';
 import { nickNameByAddress } from '../../services/nicknames';
+import messages from './messages';
 
 // config data
 import {
@@ -68,6 +70,7 @@ import TableComponent from '../../components/Table';
 import web3Connect from '../AccountProvider/web3Connect';
 import TableService, { getHand } from '../../services/tableService';
 import JoinDialog from '../JoinDialog';
+import JoinSlides from '../JoinDialog/slides';
 import RebuyDialog from '../RebuyDialog';
 import InviteDialog from '../InviteDialog';
 
@@ -233,21 +236,12 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.table.join.sendTransaction(amount, this.props.signerAddr, pos + 1, '');
 
     const slides = (
-      <Slides width={600} height={400}>
-        <div>
-          <h1>Request sent! Please wait!</h1>
-          <p>Here is the introduction to the online poker game</p>
-        </div>
-        <div>
-          <h1>FAQ</h1>
-          <dl>
-            <dt>Q: How long shall I wait before I can finally join the game?</dt>
-            <dd>A: It depends on the blockchain network, normally it would take no more than 2 minutes</dd>
-            <dt>Q: Why shall I wait for every moves I make?</dt>
-            <dd>A: Blockchain the basis for this whole online poker game, and every move our users make are taken as a transaction. And each transaction need to be confirmed by the whole blockchain.</dd>
-          </dl>
-        </div>
-      </Slides>
+      <div>
+        <JoinSlides></JoinSlides>
+        <Button size="large" onClick={this.props.modalDismiss}>
+          <FormattedMessage {...messages.joinModal.buttonDismiss} />
+        </Button>
+      </div>
     );
 
     this.props.modalDismiss();
