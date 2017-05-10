@@ -37,12 +37,12 @@ export const TIMEOUT_PERIOD = 179;
 
 // chip values and colors
 export const chipValues = [
-  [5000, '#080B0F'],
-  [1000, '#317DDD'],
-  [500, '#192A39'],
-  [100, '#009688'],
-  [50, '#FEB300'],
-  [10, '#080B0F'],
+  [5000, '#f056c5'],
+  [1000, '#e7e401'],
+  [500, '#774ac1'],
+  [100, '#ac2a2a'],
+  [50, '#328eee'],
+  [10, '#745f2a'],
   [1, '#FFFFFF'],
 ];
 

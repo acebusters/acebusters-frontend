@@ -12,28 +12,33 @@ import {
 } from '../../variables';
 
 export const Chip = styled.div`
-  background: ${(props) => props.color};
   position: absolute;
-  font-size:1.2em;
-  position:relative;
-  display:inline-block;
-  -webkit-box-sizing:border-box;
-  -moz-box-sizing:border-box;
-  box-sizing:border-box;
-  width:1em;
-  height:1em;
-  border-radius:50%;
-  position:relative;
-  border:.1em dashed white;
-  transition:all .1s ease;
-  backface-visibility:hidden;
+  box-sizing: border-box;
+  left: 0;
+  bottom: ${(props) => `${0.3 * props.index}em`};
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  border: .1em dashed white;
+  transition: all .1s ease;
   transform: perspective(200px) rotateX(55deg) rotateZ(-40deg);
   box-shadow:
-  -1px 1px 0px #555,
-  -2px 2px 0px #555,
-  -3px 3px 0px #555,
-  -4px 4px 0px #555,
-  -2px 2px 2px #555;
+    -1px 1px 0px #555,
+    -2px 2px 0px #555,
+    -3px 3px 0px #555,
+    -4px 4px 0px #555,
+    -2px 2px 2px #555;
+  font-size: 1.2em;
+  backface-visibility: hidden;
+  background: ${(props) => props.color};
+`;
+
+const ChipStack = styled.div`
+  float: left;
+  position: relative;
+  margin-right: 0.5em;
+  width: 1em;
+  height: 2em;
 `;
 
 const Amount = styled.div`
@@ -49,27 +54,52 @@ const Wrapper = styled.div`
   left: ${(props) => props.left};
 `;
 
-const calculateChipStacks = (potSize, index, chipStacks = []) => {
-  let remaining = potSize;
-  let newIndex = index;
-  if (remaining <= 0) {
-    return chipStacks;
+const createChipStacks = (chipVals, potSize) => {
+  // Note: chipValue format is [value, color]
+  const ret = chipVals.reduce((prev, chipValue) => {
+    const { stacks, remain } = prev;
+    const value = chipValue[0];
+
+    if (remain <= 0 || remain < value) return prev;
+
+    return {
+      remain: remain % value,
+      stacks: [
+        ...stacks,
+        {
+          value: chipValue[0],
+          color: chipValue[1],
+          count: Math.floor(remain / value),
+        },
+      ],
+    };
+  }, { stacks: [], remain: potSize });
+
+  return ret.stacks;
+};
+
+const range = (start, end, step = 1) => {
+  const ret = [];
+
+  for (let i = start; i < end; i += step) {
+    ret.push(i);
   }
-  if (chipValues[index][0] <= remaining) {
-    remaining -= chipValues[index][0];
-    chipStacks.push(chipValues[index]);
-  } else {
-    newIndex += 1;
-  }
-  return calculateChipStacks(remaining, newIndex, chipStacks);
+
+  return ret;
 };
 
 function Pot(props) {
-  const chipsArray = calculateChipStacks(props.potSize, 0);
-  const chips = chipsArray.map((chip, i) => (<Chip color={chip[1]} key={i} />));
+  const chipStacks = createChipStacks(chipValues, props.potSize);
+
   return (
     <Wrapper top={props.top} left={props.left}>
-      { chips }
+      {chipStacks.map((stack, i) => (
+        <ChipStack index={i} key={i}>
+          {range(0, stack.count).map((j) => (
+            <Chip color={stack.color} index={j} key={j} />
+          ))}
+        </ChipStack>
+      ))}
       <Amount>{ props.potSize }</Amount>
     </Wrapper>
   );
