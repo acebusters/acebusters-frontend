@@ -38,10 +38,11 @@ export const fontWeightBase = '400';
 export const lineHeightComputed = `${Math.floor(parseInt(fontSizeBase, 10) * lineHeightBase)}px`;
 export const gridGutterWidth = '30px';
 
-// Navbar heights
+// Navbar
 export const navbarHeight = '50px';
 export const navbarPaddingHorizontal = `${Math.floor(parseInt(gridGutterWidth, 10) / 2)}px`;
 export const navbarPaddingVertical = `${(parseInt(navbarHeight, 10) - parseInt(lineHeightComputed, 10)) / 2}px`;
+export const navbarColorCurrent = '#333';
 // Side bar and logo width
 export const sidebarWidth = '230px';
 export const sidebarMiniWidth = '50px';

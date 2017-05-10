@@ -69,6 +69,7 @@ export function App(props) {
         params={props.params}
       >
         <Header
+          location={props.location}
           loggedIn={props.account.loggedIn}
           onClickLogout={props.handleClickLogout}
           logoHref={props.logoHref}

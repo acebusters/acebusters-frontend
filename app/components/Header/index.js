@@ -78,12 +78,14 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
         collapsed={collapsed}
         key="2"
         title="Dashboard"
+        location={this.props.location}
       />,
       <NavItem
         onClick={() => browserHistory.push('/lobby')}
         key="3"
         collapsed={collapsed}
         title="Lobby"
+        location={this.props.location}
       />,
       <UserMenu
         name={nickNameByAddress(this.props.signerAddr)}
@@ -99,11 +101,13 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
         onClick={() => browserHistory.push('/register')}
         key="1"
         title="Register"
+        location={this.props.location}
       />,
       <NavItem
         onClick={() => browserHistory.push('/login')}
         key="2"
         title="Login"
+        location={this.props.location}
       />,
     ]);
     return (
@@ -120,6 +124,7 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
 
 Header.propTypes = {
   fixed: React.PropTypes.bool,
+  location: React.PropTypes.object,
   loggedIn: React.PropTypes.bool,
   imageUrl: React.PropTypes.string,
   signerAddr: React.PropTypes.string,
