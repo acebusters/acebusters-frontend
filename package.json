@@ -194,10 +194,10 @@
     ],
     "coverageThreshold": {
       "global": {
-        "statements": 43,
-        "branches": 47,
+        "statements": 41,
+        "branches": 45,
         "functions": 46,
-        "lines": 65
+        "lines": 62
       }
     },
     "moduleDirectories": [

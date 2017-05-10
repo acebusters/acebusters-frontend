@@ -63,9 +63,11 @@ export default function tableReducer(state = initialState, action) {
 
         for (let j = 0; j < action.lineup.length; j += 1) {
           if (hand.getIn(['lineup', j, 'address']) !== action.lineup[1][j]) {
-            hand = hand.setIn(['lineup', j], Map({
-              address: action.lineup[1][j],
-            }));
+            const seat = { address: action.lineup[1][j] };
+            if (hand.get('state') !== 'waiting') {
+              seat.sitout = Math.floor(Date.now() / 1000);
+            }
+            hand = hand.setIn(['lineup', j], Map(seat));
           }
         }
 
