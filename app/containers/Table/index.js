@@ -92,6 +92,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.handleLeave = this.handleLeave.bind(this);
     this.handleSitout = this.handleSitout.bind(this);
     this.handleJoin = this.handleJoin.bind(this);
+    this.handleJoinComplete = this.handleJoinComplete.bind(this);
     this.handleRebuy = this.handleRebuy.bind(this);
     this.isTaken = this.isTaken.bind(this);
 
@@ -315,6 +316,15 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     });
   }
 
+  handleJoinComplete() {
+    if (this.props.state !== 'waiting') {
+      const handId = parseInt(this.props.params.handId, 10);
+      const sitoutAction = bet(this.props.params.tableAddr, handId, 1, this.props.privKey, this.props.myPos);
+      sitOutToggle(sitoutAction, this.props.dispatch);
+    }
+    this.props.modalDismiss();
+  }
+
 
   watchTable(error, result) {
     if (error) {
@@ -340,7 +350,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
           const statusElement = (<div>
             <h2>Join Successful!</h2>
-            <Button onClick={this.props.modalDismiss}>OK!</Button>
+            <Button onClick={this.handleJoinComplete}>OK!</Button>
           </div>);
           this.props.modalDismiss();
           this.props.modalAdd(statusElement);
