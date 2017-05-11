@@ -40,6 +40,9 @@ import {
   isShowTurnByAction,
   hasNettingInAction,
   makeSbSelector,
+  makeLatestHandSelector,
+  makeLineupSelector,
+  makeHandSelector,
 } from './selectors';
 
 import TableService, { getHand } from '../../services/tableService';
@@ -85,8 +88,17 @@ export function* payFlow() {
     const req = yield take(pay.REQUEST);
     const action = req.payload;
     const table = new TableService(action.tableAddr, action.privKey);
+
     try {
-      // set toggle flag
+      const wholeState = yield select();
+      const tableAddr = action.tableAddr;
+      const lastHandId = makeLatestHandSelector()(wholeState, { params: { tableAddr } });
+      const fakeProps = { params: { tableAddr, handId: lastHandId } };
+      const lastHand = makeHandSelector()(wholeState, fakeProps);
+      const sb = makeSbSelector()(wholeState, fakeProps);
+      const bb = sb * 2;
+      const dealer = lastHand.get('dealer');
+      const state = lastHand.get('state');
       const newReceipt = (function getNewReceipt() {
         switch (action.type) {
           case BET:
@@ -112,7 +124,18 @@ export function* payFlow() {
         }
       }());
 
-      yield put(receiptSet(action.tableAddr, action.handId, action.pos, newReceipt));
+      const lineup = makeLineupSelector()(wholeState, fakeProps).toJS();
+      lineup[action.pos].last = newReceipt;
+
+      const isBettingDone = pokerHelper.isBettingDone(lineup, dealer, state, bb);
+
+      // Note: the only case we want to prevent faking receipt in advance is that
+      // after preflop there could be chances that the last player in preflop hand
+      // becomes the first player in this flop hand
+      if (!(isBettingDone && state === 'preflop')) {
+        yield put(receiptSet(action.tableAddr, action.handId, action.pos, newReceipt));
+      }
+
       const holeCards = yield table.pay(newReceipt);
       yield put({ type: pay.SUCCESS, payload: holeCards.cards });
     } catch (err) {
