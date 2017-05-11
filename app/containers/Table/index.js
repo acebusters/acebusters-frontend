@@ -317,7 +317,8 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   handleJoinComplete() {
-    if (this.props.state !== 'waiting') {
+    const lineup = (this.props.lineup) ? this.props.lineup.toJS() : null;
+    if (lineup && this.props.state !== 'waiting' && typeof lineup[this.props.myPos].sitout === 'number') {
       const handId = parseInt(this.props.params.handId, 10);
       const sitoutAction = bet(this.props.params.tableAddr, handId, 1, this.props.privKey, this.props.myPos);
       sitOutToggle(sitoutAction, this.props.dispatch);
