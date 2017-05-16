@@ -15,6 +15,7 @@ import {
   receiptSet,
   pay,
   sitOutToggle,
+  preToggleSitout,
   BET,
   FOLD,
   CHECK,
@@ -167,6 +168,16 @@ function* sitoutFlow() {
   while (true) { //eslint-disable-line
     const req = yield take(sitOutToggle.REQUEST);
     const action = req.payload;
+
+    // Note: fake sitout first, if the request fails, roll back to the old one.
+    const pre = preToggleSitout({
+      tableAddr: action.tableAddr,
+      handId: action.handId,
+      pos: action.pos,
+      sitout: action.nextSitoutState,
+    });
+    yield put(pre);
+
     try {
       const table = new TableService(action.tableAddr, action.privKey);
       const receipt = yield table.sitOut(action.handId, action.amount);
@@ -178,7 +189,15 @@ function* sitoutFlow() {
           handId: action.handId,
         },
       });
-      yield put({ type: sitOutToggle.FAILURE, payload: err });
+
+      yield put({
+        type: sitOutToggle.FAILURE,
+        payload: err,
+        tableAddr: action.tableAddr,
+        handId: action.handId,
+        pos: action.pos,
+        sitout: action.originalSitout,
+      });
     }
   }
 }

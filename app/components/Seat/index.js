@@ -45,7 +45,7 @@ function SeatComponent(props) {
     let color;
     if (props.state !== 'showdown' && props.pos === props.whosTurn) {
       color = green;
-    } else if (props.sitout) {
+    } else if (typeof props.sitout === 'number') {
       color = gray;
     } else {
       color = baseColor;

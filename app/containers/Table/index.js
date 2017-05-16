@@ -283,12 +283,35 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   handleSitout() {
+    // Note: sitout value possibilities
+    //    sitout > 0, for enabled "play"
+    //    sitout === 0, for disabled "play"
+    //    sitout === undefined, for enabled "pause"
+    //    sitout === null, for disabled "pause"
+    // And we are only able to toggle sitout when it's enabled.
+    const sitout = this.props.sitout;
+
+    if (sitout !== undefined && sitout <= 0) return null;
+    if (this.props.sitoutAmount <= -1) return null;
+
+    // Note: if it's enabled "play" (> 0), then set it to disabled "pause" (null)
+    // otherwise it's enabled "pause", then set it to disabled "play" (0)
+    const nextSitoutState = sitout > 0 ? null : 0;
     const handId = parseInt(this.props.params.handId, 10);
-    if (this.props.sitoutAmount > -1) {
-      const sitoutAction = bet(this.props.params.tableAddr, handId, this.props.sitoutAmount, this.props.privKey, this.props.myPos, this.props.lastReceipt);
-      return sitOutToggle(sitoutAction, this.props.dispatch);
-    }
-    return null;
+
+    const sitoutAction = bet(
+      this.props.params.tableAddr,
+      handId,
+      this.props.sitoutAmount,
+      this.props.privKey,
+      this.props.myPos,
+      this.props.lastReceipt,
+      {
+        originalSitout: sitout,
+        nextSitoutState,
+      }
+    );
+    return sitOutToggle(sitoutAction, this.props.dispatch);
   }
 
   handleLeave(pos) {
@@ -527,7 +550,7 @@ Table.propTypes = {
   myHand: React.PropTypes.object,
   myStack: React.PropTypes.number,
   lineup: React.PropTypes.object,
-  sitout: React.PropTypes.bool,
+  sitout: React.PropTypes.any,
   params: React.PropTypes.object,
   privKey: React.PropTypes.string,
   lastReceipt: React.PropTypes.string,

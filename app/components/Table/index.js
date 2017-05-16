@@ -74,14 +74,26 @@ export const PokerTable = styled.div`
 `;
 
 function TableComponent(props) {
-  const icon = (props.sitout) ? 'fa fa-play' : 'fa fa-pause';
+  // Note: sitout value possibilities
+  // sitout > 0, for enabled "play"
+  // sitout === 0, for disabled "play"
+  // sitout === undefined, for enabled "pause"
+  // sitout === null, for disabled "pause"
+  const icon = (typeof props.sitout === 'number') ? 'fa fa-play' : 'fa fa-pause';
+  const isToggleSitoutDisabled = props.sitout === 0 || props.sitout === null;
+
   return (
     <div>
       { (props.myPos > -1) &&
         <Wrapper>
           <ActionButton size="small" onClick={props.onLeave} icon="fa fa-sign-out" />
             { !props.pending &&
-              <ActionButton size="small" onClick={props.onSitout} icon={icon} />
+              <ActionButton
+                size="small"
+                icon={icon}
+                onClick={props.onSitout}
+                disabled={isToggleSitoutDisabled}
+              />
             }
         </Wrapper>
       }
@@ -117,7 +129,7 @@ TableComponent.propTypes = {
   pending: React.PropTypes.bool,
   onSitout: React.PropTypes.any,
   board: React.PropTypes.array,
-  sitout: React.PropTypes.bool,
+  sitout: React.PropTypes.any,
   seats: React.PropTypes.array,
   potSize: React.PropTypes.number,
   myPos: React.PropTypes.number,

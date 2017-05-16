@@ -169,7 +169,8 @@ const makeWhosTurnSelector = () => createSelector(
       return undefined;
     }
     try {
-      whosTurn = pokerHelper.whosTurn(hand.toJS(), sb * 2);
+      const h = hand.toJS();
+      whosTurn = pokerHelper.getWhosTurn(h.lineup, h.dealer, h.state, sb * 2);
     } catch (e) {
       return undefined;
     }
@@ -285,7 +286,7 @@ const makeSelectWinners = () => createSelector(
 
 const makeMySitoutSelector = () => createSelector(
   [makeLineupSelector(), makeMyPosSelector()],
-  (lineup, myPos) => (lineup && myPos !== undefined && typeof lineup.getIn([myPos, 'sitout']) === 'number')
+  (lineup, myPos) => (lineup && myPos !== undefined && lineup.getIn([myPos, 'sitout']))
 );
 
 const makeMyPosSelector = () => createSelector(
