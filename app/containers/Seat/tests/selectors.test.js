@@ -161,8 +161,10 @@ describe('cardSelector', () => {
             state: 'flop',
             lineup: [{
               address: P1_ADDR,
+              last: 'eyJ0eXBlIjoiRVdUIiwiYWxnIjoiRVMyNTZrIn0.eyJzaXRPdXQiOlt7InVpbnQiOjIxfSx7InVpbnQiOjEwMH1dLCJ2IjoxfQ.Tk6rY4rOwb6qrKsU6fTe3DmH_TqDtWKiVDlNutwzCqkbQ22jnMP8qUBcrhL5Eh9vT1SIVAYWXT6gJPnBEDqWPQ',
             }, {
               address: P2_ADDR,
+              last: 'eyJ0eXBlIjoiRVdUIiwiYWxnIjoiRVMyNTZrIn0.eyJiZXQiOlt7InVpbnQiOjIxfSx7InVpbnQiOjB9XSwidiI6MH0.JdL0EshJbVv9TO-oKqhYkOJcjSb4rTeFpwfAK3G_M9BkdWBYdIeAyDqJwhddJdId-7S5oJRkX9tg1AuLnXfnfA',
               cards: [12, 21],
             }],
             holeCards: [15, 25],
@@ -196,8 +198,10 @@ describe('cardSelector', () => {
             state: 'flop',
             lineup: [{
               address: P1_ADDR,
+              last: 'eyJ0eXBlIjoiRVdUIiwiYWxnIjoiRVMyNTZrIn0.eyJzaXRPdXQiOlt7InVpbnQiOjIxfSx7InVpbnQiOjEwMH1dLCJ2IjoxfQ.Tk6rY4rOwb6qrKsU6fTe3DmH_TqDtWKiVDlNutwzCqkbQ22jnMP8qUBcrhL5Eh9vT1SIVAYWXT6gJPnBEDqWPQ',
             }, {
               address: P2_ADDR,
+              last: 'eyJ0eXBlIjoiRVdUIiwiYWxnIjoiRVMyNTZrIn0.eyJiZXQiOlt7InVpbnQiOjIxfSx7InVpbnQiOjB9XSwidiI6MH0.JdL0EshJbVv9TO-oKqhYkOJcjSb4rTeFpwfAK3G_M9BkdWBYdIeAyDqJwhddJdId-7S5oJRkX9tg1AuLnXfnfA',
             }],
             holeCards: [15, 25],
           },

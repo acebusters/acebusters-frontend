@@ -2,7 +2,7 @@
  * Created by helge on 02.02.17.
  */
 
-import { ReceiptCache } from 'poker-helper';
+import { PokerHelper, ReceiptCache } from 'poker-helper';
 import { createSelector } from 'reselect';
 import EWT from 'ethereum-web-token';
 import {
@@ -21,6 +21,7 @@ import {
 } from '../../app.config';
 
 const rc = new ReceiptCache();
+const pokerHelper = new PokerHelper(rc);
 
 // Note: in Seat, position is stored in props.pos; in ActionBar, position is stored in props.myPos
 // FIXME: there should be a better way than hard coding these 2 fields
@@ -66,14 +67,30 @@ const makeLastActionSelector = () => createSelector(
 );
 
 const makeCardsSelector = () => createSelector(
-  [posSelector, makeHandSelector(), makeMyPosSelector()],
-  (pos, hand, myPos) => {
-    if (pos === -1 || myPos === undefined || !hand || !hand.get('lineup')) {
-      return [-1, -1];
+  [posSelector, makeHandSelector(), makeMyPosSelector(), makeLineupSelector()],
+  (pos, hand, myPos, lineupImmu) => {
+    // Note: meaning of card numbers
+    //  * -1 stands for back side of cards,
+    //  * null stands for no card
+    //  * > 0  stands for normal cards
+
+    if (pos === -1 || !hand || !hand.get('lineup')) {
+      return [null, null];
     }
+
     if (pos === myPos && hand.get('holeCards')) {
       return hand.get('holeCards').toJS();
     }
+
+    const lineup = lineupImmu.toJS();
+    const state = hand.get('state');
+
+    // Note: no players should have cards shown on table if it's still waiting
+    // and show his cards only if he is an active player
+    if (state === 'waiting' || !pokerHelper.isActivePlayer(lineup, pos, hand.get('state'))) {
+      return [null, null];
+    }
+
     return (hand.get('lineup').toJS()[pos].cards) ? hand.get('lineup').toJS()[pos].cards : [-1, -1];
   }
 );
