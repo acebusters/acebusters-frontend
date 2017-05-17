@@ -175,6 +175,14 @@ export default function createRoutes(store) {
           .catch(errorLoading);
       },
     }, {
+      path: '/uitest',
+      name: 'uitest',
+      getComponent(location, cb) {
+        import('containers/UiTestPage')
+          .then(loadModule(cb))
+          .catch(errorLoading);
+      },
+    }, {
       path: '*',
       name: 'notfound',
       getComponent(nextState, cb) {
