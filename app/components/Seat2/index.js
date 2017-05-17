@@ -20,6 +20,7 @@ const username = 'Username12';
 const chipcount = '1,000';
 const avatarSize = [38, 38]; // x,y
 const statusText = 'Call';
+const statusType = 'success'; // success(green), info(grey), warning(yellow), danger(orange)
 
 const SeatComponent = () => (
   <SeatWrapper>
@@ -35,7 +36,7 @@ const SeatComponent = () => (
       </DetailWrapper>
     </InfoWrapper>
     <StatusWrapper>
-      <Status>{statusText}</Status>
+      <Status type={statusType}>{statusText}</Status>
     </StatusWrapper>
   </SeatWrapper>
 );
