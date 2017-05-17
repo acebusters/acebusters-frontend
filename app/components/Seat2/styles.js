@@ -86,6 +86,8 @@ export const StatusWrapper = styled.div`
 
 export const Status = styled.div`
   margin-left: 10px;
+  padding: 0 10px;
+  font-weight: 600;
 
   color: ${(props) => {
     if (props.type === 'success') return successColor;
