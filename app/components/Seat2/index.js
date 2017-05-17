@@ -16,17 +16,12 @@ import {
   Status,
 } from './styles';
 
-const username = 'Username12';
-const chipcount = '1,000';
-const cardShow = true;
+// const componentSize = 'small'; // small, medium, large
 const avatarSize = [38, 38]; // x,y
-const statusShow = true;
-const statusText = 'All-in';
-const statusType = 'warning'; // success(green), info(grey), warning(yellow), danger(orange)
 
-const SeatComponent = () => (
-  <SeatWrapper>
-    {cardShow ?
+const SeatComponent = ({ activePlayer, cards, chipCount, statusMsg, username }) => (
+  <SeatWrapper activePlayer={activePlayer}>
+    {cards ?
       <CardWrapper>
         <Card />
         <Card />
@@ -37,16 +32,25 @@ const SeatComponent = () => (
       <AvatarImage src={`https://baconmockup.com/${avatarSize[0]}/${avatarSize[1]}`} />
       <DetailWrapper>
         <Username>{username}</Username>
-        <ChipCount>{chipcount}</ChipCount>
+        <ChipCount>{chipCount}</ChipCount>
       </DetailWrapper>
     </InfoWrapper>
-    {statusShow ?
+    {statusMsg ?
       <StatusWrapper>
-        <Status type={statusType}>{statusText}</Status>
+        <Status type={statusMsg.type} recent={statusMsg.recent}>
+          {statusMsg.text}
+        </Status>
       </StatusWrapper>
       : null
     }
   </SeatWrapper>
 );
+SeatComponent.propTypes = {
+  activePlayer: React.PropTypes.bool,
+  cards: React.PropTypes.array,
+  chipCount: React.PropTypes.string,
+  statusMsg: React.PropTypes.object,
+  username: React.PropTypes.string,
+};
 
 export default SeatComponent;

@@ -33,6 +33,7 @@ export const SeatWrapper = styled.div`
 
   color: white;
   background-color: none;
+  opacity: ${(props) => props.activePlayer ? 1 : 0.5};
 `;
 
 // cards
@@ -127,4 +128,5 @@ export const Status = styled.div`
   }};
   box-shadow: ${smallShadow};
   border-radius: 0 0 ${calcSize(2)} ${calcSize(2)};
+  opacity: ${(props) => props.recent ? 1 : 0.4};
 `;
