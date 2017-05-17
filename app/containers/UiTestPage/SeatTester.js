@@ -1,11 +1,7 @@
 import React from 'react';
-import SeatComponent from '../../components/Seat2';
+import set from 'lodash/set';
 
-  // statusMsg={{
-  //   type: 'danger',
-  //   text: 'Raise',
-  //   recent: true,
-  // }}
+import SeatComponent from '../../components/Seat2';
 
 const buttonStyle = {
   margin: '0.5em',
@@ -21,34 +17,35 @@ class SeatTester extends React.Component {
       chipCount: '0',
       username: 'bob',
       statusMsg: {},
+      statusRecent: false,
     };
     this.handleActiveClick = this.handleActiveClick.bind(this);
     this.handleChipCountChange = this.handleChipCountChange.bind(this);
     this.handleStatusChange = this.handleStatusChange.bind(this);
     this.handleUsernameChange = this.handleUsernameChange.bind(this);
+    this.toggleStatusRecent = this.toggleStatusRecent.bind(this);
   }
-  handleActiveClick(e) {
-    if (e.target.value === 'sit-out') {
+  handleActiveClick(e, state) {
+    e.preventDefault();
+    if (state === 'sit-out') {
       this.setState({
         activePlayer: false,
         statusMsg: {
           type: 'info',
           text: 'Sitting-out',
-          recent: true,
         },
       });
     }
-    if (e.target.value === 'stand-up') {
+    if (state === 'stand-up') {
       this.setState({
         activePlayer: false,
         statusMsg: {
           type: 'info',
           text: 'Standing-up',
-          recent: true,
         },
       });
     }
-    if (e.target.value === 'join-table') {
+    if (state === 'join-table') {
       this.setState({
         activePlayer: true,
         statusMsg: {},
@@ -116,6 +113,11 @@ class SeatTester extends React.Component {
     e.preventDefault();
     this.setState({ username: e.target.value });
   }
+  toggleStatusRecent() {
+    const { statusMsg } = this.state;
+    set(statusMsg, 'recent', !this.state.statusMsg.recent);
+    this.setState({ statusMsg });
+  }
   render() {
     return (
       <div>
@@ -132,11 +134,12 @@ class SeatTester extends React.Component {
                 type="text"
                 onChange={(e) => this.handleChipCountChange(e)}
               /><br />
-              <button style={buttonStyle} onClick={() => this.handleActiveClick('join-table')}> Join Table</button>
-              <button style={buttonStyle} onClick={() => this.handleActiveClick('sit-out')}> Sit-out</button>
-              <button style={buttonStyle} onClick={() => this.handleActiveClick('stand-up')}> Stand-up</button>
+              <button style={buttonStyle} onClick={(e) => this.handleActiveClick(e, 'join-table')}> Join Table</button>
+              <button style={buttonStyle} onClick={(e) => this.handleActiveClick(e, 'sit-out')}> Sit-out</button>
+              <button style={buttonStyle} onClick={(e) => this.handleActiveClick(e, 'stand-up')}> Stand-up</button>
             </div>
             <div style={{ marginLeft: '2em' }}>
+              <input type="radio" name="status" value="none" onClick={(e) => this.handleStatusChange(e)} /> None<br />
               <input type="radio" name="status" value="call" onClick={(e) => this.handleStatusChange(e)} /> Call<br />
               <input type="radio" name="status" value="check" onClick={(e) => this.handleStatusChange(e)} /> Check<br />
               <input type="radio" name="status" value="bet" onClick={(e) => this.handleStatusChange(e)} /> Bet<br />
@@ -144,6 +147,9 @@ class SeatTester extends React.Component {
               <input type="radio" name="status" value="all-in" onClick={(e) => this.handleStatusChange(e)} /> All-In<br />
               <input type="radio" name="status" value="fold" onClick={(e) => this.handleStatusChange(e)} /> Fold<br />
               <input type="radio" name="status" value="winner" onClick={(e) => this.handleStatusChange(e)} /> Winner<br />
+            </div>
+            <div style={{ marginLeft: '2em' }}>
+              <input type="checkbox" checked={this.state.statusMsg.recent} onClick={() => this.toggleStatusRecent()} /> Recent<br />
             </div>
           </div>
         </form>
