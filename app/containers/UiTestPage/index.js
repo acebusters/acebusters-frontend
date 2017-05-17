@@ -1,30 +1,20 @@
-import React, { Component } from 'react';
+/**
+* Created by jzobro 20170517
+*/
+import React from 'react';
 
 // components
 import Container from '../../components/Container';
-import Button from '../../components/Button';
 import H1 from '../../components/H1';
+import H2 from '../../components/H2';
+import SeatComponent from '../../components/Seat2';
 
-class UiTestPage extends Component {
-  constructor(props) {
-    super(props);
-    this.handleClick = this.handleClick.bind(this);
-  }
-  handleClick() {
-    console.log('hello');
-  }
-  render() {
-    return (
-      <Container>
-        <div>
-          <H1>Test Page</H1>
-          <Button onClick={this.handleClick} size="large">
-            Press Me
-          </Button>
-        </div>
-      </Container>
-    );
-  }
-}
-
-export default UiTestPage;
+export default () => (
+  <Container>
+    <div>
+      <H1>UI Test Page</H1>
+      <H2>SeatComponent</H2>
+      <SeatComponent />
+    </div>
+  </Container>
+);
