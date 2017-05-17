@@ -1,4 +1,6 @@
-
+/**
+* Created by jzobro 20170517
+*/
 import styled from 'styled-components';
 
 // colors
@@ -14,12 +16,20 @@ const dangerColor = '#63430F';  // orangish
 // shadows
 const smallShadow = '0 1px 4px 0 rgba(0,0,0,0.50)';
 const medShadow = '0 2px 4px 0 rgba(0,0,0,0.50)';
+// size
+const scaleSize = 128;
+
+const calcSize = (originalRatio) => {
+  const originalWidth = 128;
+  const convertedNum = Math.round((originalRatio / originalWidth) * scaleSize);
+  return `${convertedNum}px`;
+};
 
 // components
 export const SeatWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  width: 128px;
+  width: ${calcSize(128)};
 
   color: white;
   background-color: none;
@@ -28,22 +38,22 @@ export const SeatWrapper = styled.div`
 // cards
 export const CardWrapper = styled.div`
   display: flex;
-  margin-left: 48px;
+  margin-left: ${calcSize(48)};
 
   background-color: none;
 `;
 
 export const Card = styled.div`
   background-color: ${cardBg};
-  border-top: 1px solid white;
-  border-left: 1px solid white;
-  border-right: 1px solid white;
+  border-top: ${calcSize(1)} solid white;
+  border-left: ${calcSize(1)} solid white;
+  border-right: ${calcSize(1)} solid white;
   border-bottom: none;
-  border-radius: 2px 2px 0 0;
+  border-radius: ${calcSize(2)} ${calcSize(2)} 0 0;
   box-shadow: ${smallShadow};
-  height: 12px;
-  margin-right: 2px;
-  width: 36px;
+  height: ${calcSize(12)};
+  margin-right: ${calcSize(2)};
+  width:${calcSize(36)};
 `;
 
 // info
@@ -52,7 +62,7 @@ export const InfoWrapper = styled.div`
 
   background-color: #333;
   background-image: linear-gradient(-180deg, #787878 0%, #393939 50%, #1F1F1F 50%, #3C3C3C 100%);
-  border-radius: 4px;
+  border-radius: ${calcSize(4)};
   box-shadow: ${medShadow};
   color: #D5D5D5;
   font-weight: 400;
@@ -61,8 +71,10 @@ export const InfoWrapper = styled.div`
 
 export const AvatarImage = styled.img`
   background-color: AliceBlue;
-  border-radius: 3px;
-  margin: 3px 4px;
+  width: ${calcSize(38)};
+  height: ${calcSize(38)};
+  border-radius: ${calcSize(3)};
+  margin: ${calcSize(3)} ${calcSize(4)};
 `;
 
 export const DetailWrapper = styled.div`
@@ -71,17 +83,17 @@ export const DetailWrapper = styled.div`
   justify-content: center;
 
   background-color: none;
-  margin-left: 2px;
+  margin-left: ${calcSize(2)};
 `;
 
 export const Username = styled.div`
-  font-size: 0.9em;
+  font-size: ${calcSize(11)};
   background-color: none;
   color: white;
 `;
 
 export const ChipCount = styled.div`
-  font-size: 0.9em;
+  font-size: ${calcSize(11)};
   background-color: none;
   color: white;
 `;
@@ -94,8 +106,9 @@ export const StatusWrapper = styled.div`
 `;
 
 export const Status = styled.div`
-  margin-left: 10px;
-  padding: 0 10px;
+  margin-left: ${calcSize(10)};
+  padding: 0 ${calcSize(10)};
+  font-size: ${calcSize(11)};
   font-weight: 600;
 
   color: ${(props) => {
@@ -113,5 +126,5 @@ export const Status = styled.div`
     return infoBg;
   }};
   box-shadow: ${smallShadow};
-  border-radius: 0 0 2px 2px;
+  border-radius: 0 0 ${calcSize(2)} ${calcSize(2)};
 `;
