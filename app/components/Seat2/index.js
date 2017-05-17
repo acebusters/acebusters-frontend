@@ -19,6 +19,7 @@ import {
 const username = 'Username12';
 const chipcount = '1,000';
 const avatarSize = [38, 38]; // x,y
+const statusShow = true;
 const statusText = 'All-in';
 const statusType = 'warning'; // success(green), info(grey), warning(yellow), danger(orange)
 
@@ -35,9 +36,12 @@ const SeatComponent = () => (
         <ChipCount>{chipcount}</ChipCount>
       </DetailWrapper>
     </InfoWrapper>
-    <StatusWrapper>
-      <Status type={statusType}>{statusText}</Status>
-    </StatusWrapper>
+    {statusShow ?
+      <StatusWrapper>
+        <Status type={statusType}>{statusText}</Status>
+      </StatusWrapper>
+      : null
+    }
   </SeatWrapper>
 );
 
