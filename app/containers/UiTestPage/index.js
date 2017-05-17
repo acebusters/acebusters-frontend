@@ -21,6 +21,9 @@ export default () => (
       <H1>UI Test Page</H1>
       <H2>SeatComponent</H2>
       <SeatComponent />
+      <SeatComponent />
+      <SeatComponent />
+      <SeatComponent />
     </div>
   </Container>
 );

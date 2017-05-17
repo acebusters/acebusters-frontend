@@ -18,6 +18,7 @@ import {
 
 const username = 'Username12';
 const chipcount = '1,000';
+const cardShow = true;
 const avatarSize = [38, 38]; // x,y
 const statusShow = true;
 const statusText = 'All-in';
@@ -25,10 +26,13 @@ const statusType = 'warning'; // success(green), info(grey), warning(yellow), da
 
 const SeatComponent = () => (
   <SeatWrapper>
-    <CardWrapper>
-      <Card>DA</Card>
-      <Card>S9</Card>
-    </CardWrapper>
+    {cardShow ?
+      <CardWrapper>
+        <Card />
+        <Card />
+      </CardWrapper>
+      : null
+    }
     <InfoWrapper>
       <AvatarImage src={`https://baconmockup.com/${avatarSize[0]}/${avatarSize[1]}`} />
       <DetailWrapper>

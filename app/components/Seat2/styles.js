@@ -2,6 +2,7 @@
 import styled from 'styled-components';
 
 // colors
+const cardBg = '#A3BFE0';
 const successBg = 'linear-gradient(0deg, #B4ED50 0%, #78D049 100%)';
 const infoBg = 'linear-gradient(0deg, #D4D4D4 0%, #4D4D4D 100%)';
 const warningBg = 'linear-gradient(0deg, #F7F8CB 0%, #F7F51C 100%)';
@@ -33,8 +34,16 @@ export const CardWrapper = styled.div`
 `;
 
 export const Card = styled.div`
-  background-color: green;
-  width: 2em;
+  background-color: ${cardBg};
+  border-top: 1px solid white;
+  border-left: 1px solid white;
+  border-right: 1px solid white;
+  border-bottom: none;
+  border-radius: 2px 2px 0 0;
+  box-shadow: ${smallShadow};
+  height: 12px;
+  margin-right: 2px;
+  width: 36px;
 `;
 
 // info
