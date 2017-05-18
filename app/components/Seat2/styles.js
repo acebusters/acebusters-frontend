@@ -177,9 +177,9 @@ export const ButtonWrapper = styled.button`
 
 export const ButtonIcon = styled.i`
   flex: auto;
-  padding-top: ${scaleButtonJoin(8)};
+  padding-top: ${scaleButtonJoin(6)};
   padding-right: ${scaleButtonJoin(8)};
-  padding-bottom: ${scaleButtonJoin(4)};
+  padding-bottom: ${scaleButtonJoin(6)};
   padding-left: ${scaleButtonJoin(8)};
   &:before {
     font-size: ${scaleButtonJoin(16)};
@@ -187,7 +187,9 @@ export const ButtonIcon = styled.i`
 `;
 
 export const ButtonText = styled.div`
-  font-size: ${scaleButtonJoin(11)};
+  font-size: ${scaleButtonJoin(14)};
+  font-weight: 600;
   flex: auto;
-  padding: ${scaleButtonJoin(8)};
+  padding-top: ${scaleButtonJoin(4)};
+  padding-bottom: ${scaleButtonJoin(6)};
 `;
