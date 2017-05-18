@@ -14,6 +14,7 @@ import {
   ChipCount,
   StatusWrapper,
   Status,
+  StyledWrapper,
 } from './styles';
 
 // const componentSize = 'small'; // small, medium, large
@@ -28,13 +29,15 @@ const SeatComponent = ({ activePlayer, cards, chipCount, statusMsg, username }) 
       </CardWrapper>
       : null
     }
-    <InfoWrapper>
-      <AvatarImage src={`https://baconmockup.com/${avatarSize[0]}/${avatarSize[1]}`} />
-      <DetailWrapper>
-        <Username>{username}</Username>
-        <ChipCount>{chipCount}</ChipCount>
-      </DetailWrapper>
-    </InfoWrapper>
+    <StyledWrapper>
+      <InfoWrapper>
+        <AvatarImage src={`https://baconmockup.com/${avatarSize[0]}/${avatarSize[1]}`} />
+        <DetailWrapper>
+          <Username>{username}</Username>
+          <ChipCount>{chipCount}</ChipCount>
+        </DetailWrapper>
+      </InfoWrapper>
+    </StyledWrapper>
     {statusMsg ?
       <StatusWrapper>
         <Status type={statusMsg.type} recent={statusMsg.recent}>

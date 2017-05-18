@@ -9,6 +9,7 @@ const successBg = 'linear-gradient(0deg, #B4ED50 0%, #78D049 100%)';
 const infoBg = 'linear-gradient(0deg, #D4D4D4 0%, #4D4D4D 100%)';
 const warningBg = 'linear-gradient(0deg, #F7F8CB 0%, #F7F51C 100%)';
 const dangerBg = 'linear-gradient(0deg, #FBDA61 0%, #F76B1C 100%)';
+const activeColor = '#35C5E3'; // tealish
 const successColor = '#305209'; // greenish
 const infoColor = '#FFFFFF'; // white
 const warningColor = '#5E5F3B'; // yellowish
@@ -58,13 +59,16 @@ export const Card = styled.div`
 `;
 
 // info
-export const InfoWrapper = styled.div`
-  display: flex;
-
+export const StyledWrapper = styled.div`
   background-color: #333;
   background-image: linear-gradient(-180deg, #787878 0%, #393939 50%, #1F1F1F 50%, #3C3C3C 100%);
   border-radius: ${calcSize(4)};
   box-shadow: ${medShadow};
+`;
+
+export const InfoWrapper = styled.div`
+  display: flex;
+
   color: #D5D5D5;
   font-weight: 400;
   z-index: 100;
@@ -129,4 +133,37 @@ export const Status = styled.div`
   box-shadow: ${smallShadow};
   border-radius: 0 0 ${calcSize(2)} ${calcSize(2)};
   opacity: ${(props) => props.recent ? 1 : 0.4};
+`;
+
+// Button
+export const ButtonWrapper = styled.button`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  color: #D5D5D5;
+  font-weight: 400;
+  &:hover {
+    color: white;
+    transform: scale(1.1, 1.1);
+    ${''/* box-shadow: inset 0 1px 3px 0 rgba(0,0,0,0.50); */}
+  }
+  &:active {
+    color: ${activeColor};
+    transform: scale(1.0, 1.0);
+  }
+`;
+
+export const ButtonIcon = styled.i`
+  flex: auto;
+  padding: 0.5em 0.5em 0.25em 0.5em;
+  width: 4em;
+`;
+
+export const ButtonText = styled.div`
+  font-size: 11px;
+  flex: auto;
+  padding: 0.5em;
 `;
