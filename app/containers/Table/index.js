@@ -8,6 +8,8 @@ import { browserHistory } from 'react-router';
 import Pusher from 'pusher-js';
 import Raven from 'raven-js';
 import { FormattedMessage } from 'react-intl';
+import { Receipt } from 'poker-helper';
+
 // components and styles
 import Card from '../../components/Card';
 import { BoardCardWrapper } from '../../components/Table/Board';
@@ -31,6 +33,7 @@ import {
   handRequest,
   lineupReceived,
   updateReceived,
+  addMessage,
   pendingToggle,
   sitOutToggle,
   bet,
@@ -210,7 +213,12 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   handleUpdate(hand) {
-    this.props.updateReceived(this.tableAddr, hand);
+    if (typeof hand === 'string') {
+      const msg = Receipt.parse(hand);
+      this.props.addMessage(msg.message, msg.tableAddr, msg.signer);
+    } else {
+      this.props.updateReceived(this.tableAddr, hand);
+    }
   }
 
   handleRebuy(amount) {
@@ -516,6 +524,7 @@ export function mapDispatchToProps() {
     modalDismiss: () => (modalDismiss()),
     pendingToggle: (tableAddr, handId, pos) => (pendingToggle(tableAddr, handId, pos)),
     updateReceived: (tableAddr, hand) => (updateReceived(tableAddr, hand)),
+    addMessage: (message, tableAddr, privKey) => (addMessage(message, tableAddr, privKey)),
     blockNotify: () => (blockNotify()),
   };
 }
@@ -569,6 +578,7 @@ Table.propTypes = {
   dispatch: React.PropTypes.func,
   lineupReceived: React.PropTypes.func,
   updateReceived: React.PropTypes.func,
+  addMessage: React.PropTypes.func,
   location: React.PropTypes.object,
   account: React.PropTypes.object,
 };

@@ -144,6 +144,11 @@ const makeTableDataSelector = () => createSelector(
 );
 
 // other selectors
+const makeMessagesSelector = () => createSelector(
+  tableStateSelector,
+  (table) => (table) ? table.get('messages') : null
+);
+
 const makeHandSelector = () => createSelector(
   handSelector,
   (hand) => hand
@@ -457,4 +462,5 @@ export {
     makeMaxBetSelector,
     makeMyMaxBetSelector,
     makeMissingHandSelector,
+    makeMessagesSelector,
 };

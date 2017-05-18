@@ -23,6 +23,7 @@ import {
   NET,
   HAND_REQUEST,
   UPDATE_RECEIVED,
+  SEND_MESSAGE,
 } from './actions';
 
 import {
@@ -148,6 +149,17 @@ export function* payFlow() {
       } });
       yield put({ type: pay.FAILURE, payload: err });
     }
+  }
+}
+
+function* sendMessage(action) {
+  const table = new TableService(action.tableAddr, action.privKey);
+  try {
+    yield table.sendMessage(action.message);
+  } catch (err) {
+    Raven.captureException(err, { tags: {
+      tableAddr: action.tableAddr,
+    } });
   }
 }
 
@@ -289,6 +301,7 @@ export function* updateScanner() {
 }
 
 export function* tableStateSaga() {
+  yield takeEvery(SEND_MESSAGE, sendMessage);
   yield takeEvery(BET, performBet);
   yield takeEvery(SHOW, performShow);
   yield takeEvery(NET, submitSignedNetting);

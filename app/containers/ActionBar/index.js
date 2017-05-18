@@ -10,6 +10,8 @@ import 'react-rangeslider/lib/index.css';
 import Raven from 'raven-js';
 
 import SliderWrapper from '../../components/Slider';
+import ChatWrapper from '../../components/Chat';
+import Chat from '../../containers/Chat';
 
 import {
   makeMinSelector,
@@ -24,6 +26,7 @@ import {
   makeMyMaxBetSelector,
   makeIsMyTurnSelector,
   makeMyPosSelector,
+  makeMessagesSelector,
 } from '../Table/selectors';
 
 import {
@@ -32,7 +35,7 @@ import {
   makeLastReceiptSelector,
 } from '../Seat/selectors';
 
-import { bet, pay, fold, check, setCards } from '../Table/actions';
+import { bet, pay, fold, check, setCards, sendMessage } from '../Table/actions';
 import { ActionBarComponent, ActionButton } from '../../components/ActionBar';
 import TableService from '../../services/tableService';
 
@@ -45,6 +48,7 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
     this.handleCall = this.handleCall.bind(this);
     this.handleFold = this.handleFold.bind(this);
     this.updateAmount = this.updateAmount.bind(this);
+    this.sendMessage = this.sendMessage.bind(this);
     this.table = new TableService(props.params.tableAddr, this.props.privKey);
     this.state = {
       active: true,
@@ -146,6 +150,10 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
       .catch(this.captureError(handId));
   }
 
+  sendMessage(message) {
+    this.props.sendMessage(message, this.props.params.tableAddr, this.props.privKey);
+  }
+
   render() {
     if (this.state.active
         && this.props.isMyTurn
@@ -189,6 +197,15 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
           </Grid>
         </ActionBarComponent>
       );
+    } else if (!this.props.isMyTurn
+               && this.props.state !== 'waiting'
+               && this.props.state !== 'dealing'
+               && this.props.state !== 'showdown') {
+      return (
+        <ChatWrapper>
+          <Chat onAddMessage={this.sendMessage} messages={this.props.messages} />
+        </ChatWrapper>
+      );
     }
     return null;
   }
@@ -198,6 +215,7 @@ export function mapDispatchToProps(dispatch) {
   return {
     dispatch,
     setCards: (tableAddr, handId, cards) => setCards(tableAddr, handId, cards),
+    sendMessage: (message, tableAddr, privKey) => dispatch(sendMessage(message, tableAddr, privKey)),
   };
 }
 
@@ -214,6 +232,7 @@ const mapStateToProps = createStructuredSelector({
   lastReceipt: makeLastReceiptSelector(),
   cards: makeMyCardsSelector(),
   state: makeHandStateSelector(),
+  messages: makeMessagesSelector(),
 });
 
 ActionBar.propTypes = {
@@ -230,6 +249,8 @@ ActionBar.propTypes = {
   state: React.PropTypes.string,
   dispatch: React.PropTypes.func,
   setCards: React.PropTypes.func,
+  sendMessage: React.PropTypes.func,
+  messages: React.PropTypes.object,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ActionBar);

@@ -36,6 +36,17 @@ export const initialState = fromJS({});
 export default function tableReducer(state = initialState, action) {
   switch (action.type) {
 
+    case TableActions.ADD_MESSAGE: {
+      const message = {
+        message: action.message,
+        signer: action.privKey,
+      };
+      if (!state.getIn([action.tableAddr, 'messages'])) {
+        return state.setIn([action.tableAddr, 'messages'], List([message]));
+      }
+      return state.updateIn([action.tableAddr, 'messages'], (list) => list.push(message));
+    }
+
     case TableActions.TABLE_RECEIVED: {
       if (!state.get(action.tableAddr)) {
         return state.set(action.tableAddr, Map({}));

@@ -1,5 +1,7 @@
 import EWT from 'ethereum-web-token';
 import fetch from 'isomorphic-fetch';
+import { Receipt } from 'poker-helper';
+
 import { getWeb3 } from '../containers/AccountProvider/sagas';
 
 import {
@@ -20,6 +22,15 @@ function TableService(tableAddr, privKey) {
   this.tableAddr = tableAddr;
   this.privKey = privKey;
 }
+
+TableService.prototype.sendMessageReceipt = function sendMessageReceipt(text) {
+  return new Receipt(this.tableAddr).message(text).sign(this.privKey);
+};
+
+TableService.prototype.sendMessage = function sendMessage(text) {
+  const receipt = this.sendMessageReceipt(text);
+  return this.message(receipt);
+};
 
 TableService.prototype.betReceipt = function betReceipt(handId, amount) {
   return new EWT(ABI_BET).bet(handId, amount).sign(this.privKey);
@@ -73,6 +84,22 @@ TableService.prototype.checkRiverReceipt = function checkRiverReceipt(handId, am
 TableService.prototype.checkRiver = function checkRiver(handId, amount) {
   const receipt = this.checkRiverReceipt(handId, amount);
   return this.pay(receipt);
+};
+
+TableService.prototype.message = function message(receipt) {
+  return new Promise((resolve, reject) => {
+    const header = new Headers({ 'Content-Type': 'application/json' });
+    const data = JSON.stringify({ msgReceipt: receipt });
+    const requestInit = { headers: header, body: data, method: 'POST' };
+    const request = new Request(`${this.apiBasePath}/table/${this.tableAddr}/message`, requestInit);
+    fetch(request).then((res) => res.json(), (err) => {
+      reject(err);
+    }).then((response) => {
+      resolve(response);
+    }, (err) => {
+      reject(err);
+    });
+  });
 };
 
 TableService.prototype.pay = function pay(receipt) {
