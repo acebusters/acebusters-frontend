@@ -18,19 +18,37 @@ const dangerColor = '#63430F';  // orangish
 const smallShadow = '0 1px 4px 0 rgba(0,0,0,0.50)';
 const medShadow = '0 2px 4px 0 rgba(0,0,0,0.50)';
 // size
-const scaleSize = 128;
+const seatScale = 128;
+const joinButtonScale = 64;
 
-const calcSize = (originalRatio) => {
-  const originalWidth = 128;
-  const convertedNum = Math.round((originalRatio / originalWidth) * scaleSize);
+
+const calcSize = (baseSize, scaleSize, dimToScale) => {
+  const convertedNum = Math.round((scaleSize / baseSize) * dimToScale);
   return `${convertedNum}px`;
 };
+
+const scaleSeat = (dimToScale) => {
+  const baseSeatSize = 128;
+  return calcSize(baseSeatSize, seatScale, dimToScale);
+};
+
+const scaleButtonJoin = (dimToScale) => {
+  const baseJoinButtonSize = 64;
+  return calcSize(baseJoinButtonSize, joinButtonScale, dimToScale);
+};
+
+// shared styles
+export const SharedWrapper = styled.div`
+  background-color: #333;
+  background-image: linear-gradient(-180deg, #787878 0%, #393939 50%, #1F1F1F 50%, #3C3C3C 100%);
+  box-shadow: ${medShadow};
+`;
 
 // components
 export const SeatWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  width: ${calcSize(128)};
+  width: ${scaleSeat(128)};
 
   color: white;
   background-color: none;
@@ -40,34 +58,28 @@ export const SeatWrapper = styled.div`
 // cards
 export const CardWrapper = styled.div`
   display: flex;
-  margin-left: ${calcSize(48)};
+  margin-left: ${scaleSeat(48)};
 
   background-color: none;
 `;
 
 export const Card = styled.div`
   background-color: ${cardBg};
-  border-top: ${calcSize(1)} solid white;
-  border-left: ${calcSize(1)} solid white;
-  border-right: ${calcSize(1)} solid white;
+  border-top: ${scaleSeat(1)} solid white;
+  border-left: ${scaleSeat(1)} solid white;
+  border-right: ${scaleSeat(1)} solid white;
   border-bottom: none;
-  border-radius: ${calcSize(2)} ${calcSize(2)} 0 0;
+  border-radius: ${scaleSeat(2)} ${scaleSeat(2)} 0 0;
   box-shadow: ${smallShadow};
-  height: ${calcSize(12)};
-  margin-right: ${calcSize(2)};
-  width:${calcSize(36)};
+  height: ${scaleSeat(12)};
+  margin-right: ${scaleSeat(2)};
+  width:${scaleSeat(36)};
 `;
 
 // info
-export const StyledWrapper = styled.div`
-  background-color: #333;
-  background-image: linear-gradient(-180deg, #787878 0%, #393939 50%, #1F1F1F 50%, #3C3C3C 100%);
-  border-radius: ${calcSize(4)};
-  box-shadow: ${medShadow};
-`;
-
-export const InfoWrapper = styled.div`
+export const InfoWrapper = styled(SharedWrapper)`
   display: flex;
+  border-radius: ${scaleSeat(4)};
 
   color: #D5D5D5;
   font-weight: 400;
@@ -76,10 +88,10 @@ export const InfoWrapper = styled.div`
 
 export const AvatarImage = styled.img`
   background-color: AliceBlue;
-  width: ${calcSize(38)};
-  height: ${calcSize(38)};
-  border-radius: ${calcSize(3)};
-  margin: ${calcSize(3)} ${calcSize(4)};
+  width: ${scaleSeat(38)};
+  height: ${scaleSeat(38)};
+  border-radius: ${scaleSeat(3)};
+  margin: ${scaleSeat(3)} ${scaleSeat(4)};
 `;
 
 export const DetailWrapper = styled.div`
@@ -88,17 +100,19 @@ export const DetailWrapper = styled.div`
   justify-content: center;
 
   background-color: none;
-  margin-left: ${calcSize(2)};
+  margin-left: ${scaleSeat(2)};
 `;
 
 export const Username = styled.div`
-  font-size: ${calcSize(11)};
+  padding-bottom: ${scaleSeat(2)};
+  font-size: ${scaleSeat(11)};
   background-color: none;
   color: white;
 `;
 
 export const ChipCount = styled.div`
-  font-size: ${calcSize(11)};
+  padding-top: ${scaleSeat(2)};
+  font-size: ${scaleSeat(11)};
   background-color: none;
   color: white;
 `;
@@ -111,9 +125,9 @@ export const StatusWrapper = styled.div`
 `;
 
 export const Status = styled.div`
-  margin-left: ${calcSize(10)};
-  padding: 0 ${calcSize(10)};
-  font-size: ${calcSize(11)};
+  margin-left: ${scaleSeat(10)};
+  padding: 0 ${scaleSeat(10)};
+  font-size: ${scaleSeat(11)};
   font-weight: 600;
 
   color: ${(props) => {
@@ -131,11 +145,16 @@ export const Status = styled.div`
     return infoBg;
   }};
   box-shadow: ${smallShadow};
-  border-radius: 0 0 ${calcSize(2)} ${calcSize(2)};
+  border-radius: 0 0 ${scaleSeat(2)} ${scaleSeat(2)};
   opacity: ${(props) => props.recent ? 1 : 0.4};
 `;
 
-// Button
+// ButtonJoin
+export const ButtonStyle = styled(SharedWrapper)`
+  border-radius: ${scaleButtonJoin(4)};
+  width: ${scaleButtonJoin(64)};
+`;
+
 export const ButtonWrapper = styled.button`
   display: flex;
   flex-direction: column;
@@ -158,12 +177,17 @@ export const ButtonWrapper = styled.button`
 
 export const ButtonIcon = styled.i`
   flex: auto;
-  padding: 0.5em 0.5em 0.25em 0.5em;
-  width: 4em;
+  padding-top: ${scaleButtonJoin(8)};
+  padding-right: ${scaleButtonJoin(8)};
+  padding-bottom: ${scaleButtonJoin(4)};
+  padding-left: ${scaleButtonJoin(8)};
+  &:before {
+    font-size: ${scaleButtonJoin(16)};
+  }
 `;
 
 export const ButtonText = styled.div`
-  font-size: 11px;
+  font-size: ${scaleButtonJoin(11)};
   flex: auto;
-  padding: 0.5em;
+  padding: ${scaleButtonJoin(8)};
 `;

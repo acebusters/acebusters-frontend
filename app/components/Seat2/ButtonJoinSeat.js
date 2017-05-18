@@ -4,17 +4,17 @@
 import React from 'react';
 import {
   ButtonIcon,
+  ButtonStyle,
   ButtonText,
   ButtonWrapper,
-  StyledWrapper,
 } from './styles';
 
 const ButtonJoinSeat = () => (
   <ButtonWrapper>
-    <StyledWrapper>
+    <ButtonStyle>
       <ButtonIcon className="fa fa-plus" aria-hidden="true" />
       <ButtonText>Join</ButtonText>
-    </StyledWrapper>
+    </ButtonStyle>
   </ButtonWrapper>
 );
 
