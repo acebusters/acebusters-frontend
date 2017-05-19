@@ -38,10 +38,16 @@ const scaleButtonJoin = (dimToScale) => {
 };
 
 // shared styles
-export const SharedWrapper = styled.div`
+export const SharedMiddle = styled.div`
   background-color: #333;
   background-image: linear-gradient(-180deg, #787878 0%, #393939 50%, #1F1F1F 50%, #3C3C3C 100%);
   box-shadow: ${medShadow};
+`;
+
+export const SharedLower = styled.div`
+  margin-left: ${scaleSeat(8)};
+  box-shadow: ${smallShadow};
+  border-radius: 0 0 ${scaleSeat(3)} ${scaleSeat(3)};
 `;
 
 // components
@@ -77,7 +83,7 @@ export const Card = styled.div`
 `;
 
 // info
-export const InfoWrapper = styled(SharedWrapper)`
+export const InfoWrapper = styled(SharedMiddle)`
   display: flex;
   border-radius: ${scaleSeat(4)};
 
@@ -124,11 +130,13 @@ export const StatusWrapper = styled.div`
   background-color: none;
 `;
 
-export const Status = styled.div`
-  margin-left: ${scaleSeat(10)};
-  padding: 0 ${scaleSeat(10)};
-  font-size: ${scaleSeat(11)};
+export const Status = styled(SharedLower)`
+  padding-top: 0;
+  padding-left: ${scaleSeat(10)};
+  padding-bottom: ${scaleSeat(1)};
+  padding-right: ${scaleSeat(10)};
   font-weight: 600;
+  font-size: ${scaleSeat(11)};
 
   color: ${(props) => {
     if (props.type === 'success') return successColor;
@@ -144,17 +152,43 @@ export const Status = styled.div`
     if (props.type === 'danger') return dangerBg;
     return infoBg;
   }};
-  box-shadow: ${smallShadow};
-  border-radius: 0 0 ${scaleSeat(2)} ${scaleSeat(2)};
   opacity: ${(props) => props.recent ? 1 : 0.4};
 `;
 
-export const Timer = styled.div`
-  background-color: red;
+// timer
+export const TimerWrapper = styled(SharedLower)`
+  width: ${scaleSeat(112)};
+  background-color: #272727;
+`;
+
+export const TimerBackground = styled.div`
+  position: relative;
+  height: ${scaleSeat(7)};
+  margin-top: 0;
+  margin-right: ${scaleSeat(3)};
+  margin-bottom: ${scaleSeat(3)};
+  margin-left: ${scaleSeat(3)};
+  background-color: #727272;
+  border-radius: 0 0 ${scaleSeat(2)} ${scaleSeat(2)};
+`;
+
+export const TimerBar = styled.div`
+  position: absolute;
+  height: 100%;
+  top: 0px;
+  left: 0px;
+  width: ${(props) => props.width};
+  border-radius: 0 0 ${scaleSeat(2)} ${scaleSeat(2)};
+  background: ${(props) => {
+    if (props.type === 'active') return activeColor;
+    if (props.type === 'warning') return warningBg;
+    if (props.type === 'danger') return dangerBg;
+    return infoBg;
+  }};
 `;
 
 // ButtonJoin
-export const ButtonStyle = styled(SharedWrapper)`
+export const ButtonStyle = styled(SharedMiddle)`
   border-radius: ${scaleButtonJoin(4)};
   width: ${scaleButtonJoin(64)};
 `;

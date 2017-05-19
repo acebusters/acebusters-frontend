@@ -49,6 +49,33 @@ const SeatExamples = () => (
         />
       </div>
       <div style={colStyle}>
+        <H2>Timer</H2>
+        <H3>Normal</H3>
+        <SeatComponent
+          activePlayer
+          cards={['d2', 's2']}
+          chipCount="0"
+          username="Username123"
+          timerProgress={0.9}
+        />
+        <H3>Warning</H3>
+        <SeatComponent
+          activePlayer
+          cards={['d2', 's2']}
+          chipCount="0"
+          username="Username123"
+          timerProgress={0.5}
+        />
+        <H3>Danger</H3>
+        <SeatComponent
+          activePlayer
+          cards={['d2', 's2']}
+          chipCount="0"
+          username="Username123"
+          timerProgress={0.2}
+        />
+      </div>
+      <div style={colStyle}>
         <H2>Recent Action</H2>
         <h3>Call, Check</h3>
         <SeatComponent
@@ -124,33 +151,6 @@ const SeatExamples = () => (
             text: 'All-in',
             recent: false,
           }}
-        />
-      </div>
-      <div style={colStyle}>
-        <H2>Timer</H2>
-        <H3>Normal</H3>
-        <SeatComponent
-          activePlayer={false}
-          cards={['d2', 's2']}
-          chipCount="0"
-          username="Username123"
-          timerProgress={0.9}
-        />
-        <H3>Warning</H3>
-        <SeatComponent
-          activePlayer={false}
-          cards={['d2', 's2']}
-          chipCount="0"
-          username="Username123"
-          timerProgress={0.5}
-        />
-        <H3>Danger</H3>
-        <SeatComponent
-          activePlayer={false}
-          cards={['d2', 's2']}
-          chipCount="0"
-          username="Username123"
-          timerProgress={0.2}
         />
       </div>
     </div>
