@@ -50,8 +50,17 @@ export const SharedLower = styled.div`
   border-radius: 0 0 ${scaleSeat(3)} ${scaleSeat(3)};
 `;
 
-// components
+// seat
 export const SeatWrapper = styled.div`
+  position: absolute;
+  left: ${(props) => props.coords[0]}%;
+  top: ${(props) => props.coords[1]}%;
+  color: 'white';
+  width: 10%;
+  height: 25%;
+`;
+
+export const SeatContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: ${scaleSeat(128)};
@@ -59,7 +68,7 @@ export const SeatWrapper = styled.div`
   color: white;
   background-color: none;
   opacity: ${(props) => props.activePlayer ? 1 : 0.5};
-`;
+ `;
 
 // cards
 export const CardContainer = styled.div`
