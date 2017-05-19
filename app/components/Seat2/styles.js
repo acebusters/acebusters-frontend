@@ -157,13 +157,13 @@ export const Status = styled(SharedLower)`
 
 // timer
 export const TimerWrapper = styled(SharedLower)`
-  width: ${scaleSeat(112)};
-  background-color: #272727;
+  width: ${scaleSeat(110)};
+  background-color: #393939;
 `;
 
 export const TimerBackground = styled.div`
   position: relative;
-  height: ${scaleSeat(7)};
+  height: ${scaleSeat(6)};
   margin-top: 0;
   margin-right: ${scaleSeat(3)};
   margin-bottom: ${scaleSeat(3)};
