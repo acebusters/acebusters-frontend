@@ -17,8 +17,8 @@ const SeatExamples = () => (
         <H3>Sitting-in</H3>
         <SeatComponent
           activePlayer={false}
-          chipCount="0"
-          username="Username123"
+          stackSize={0}
+          signerAddr="Username123"
           statusMsg={{
             type: 'info',
             text: 'Sitting-in',
@@ -28,8 +28,8 @@ const SeatExamples = () => (
         <H3>Standing-up</H3>
         <SeatComponent
           activePlayer={false}
-          chipCount="0"
-          username="Username123"
+          stackSize={0}
+          signerAddr="Username123"
           statusMsg={{
             type: 'info',
             text: 'Standing-in',
@@ -39,8 +39,8 @@ const SeatExamples = () => (
         <H3>Sit-out</H3>
         <SeatComponent
           activePlayer={false}
-          chipCount="0"
-          username="Username123"
+          stackSize={0}
+          signerAddr="Username123"
           statusMsg={{
             type: 'info',
             text: 'Sit-out',
@@ -54,24 +54,24 @@ const SeatExamples = () => (
         <SeatComponent
           activePlayer
           cards={['d2', 's2']}
-          chipCount="0"
-          username="Username123"
+          stackSize={0}
+          signerAddr="Username123"
           timerProgress={0.9}
         />
         <H3>Warning</H3>
         <SeatComponent
           activePlayer
           cards={['d2', 's2']}
-          chipCount="0"
-          username="Username123"
+          stackSize={0}
+          signerAddr="Username123"
           timerProgress={0.5}
         />
         <H3>Danger</H3>
         <SeatComponent
           activePlayer
           cards={['d2', 's2']}
-          chipCount="0"
-          username="Username123"
+          stackSize={0}
+          signerAddr="Username123"
           timerProgress={0.2}
         />
       </div>
@@ -81,8 +81,8 @@ const SeatExamples = () => (
         <SeatComponent
           activePlayer
           cards={['d2', 's2']}
-          chipCount="10,000"
-          username="123456789012"
+          stackSize={10000}
+          signerAddr="123456789012"
           statusMsg={{
             type: 'success',
             text: 'Call',
@@ -93,8 +93,8 @@ const SeatExamples = () => (
         <SeatComponent
           activePlayer
           cards={['d2', 's2']}
-          chipCount="10,000"
-          username="123456789012"
+          stackSize={10000}
+          signerAddr="123456789012"
           statusMsg={{
             type: 'danger',
             text: 'Raise',
@@ -105,8 +105,8 @@ const SeatExamples = () => (
         <SeatComponent
           activePlayer
           cards={['d2', 's2']}
-          chipCount="999"
-          username="Edith"
+          stackSize={999}
+          signerAddr="Edith"
           statusMsg={{
             type: 'warning',
             text: 'All-in',
@@ -120,8 +120,8 @@ const SeatExamples = () => (
         <SeatComponent
           activePlayer
           cards={['d2', 's2']}
-          chipCount="10,000"
-          username="123456789012"
+          stackSize={10000}
+          signerAddr="123456789012"
           statusMsg={{
             type: 'success',
             text: 'Call',
@@ -132,8 +132,8 @@ const SeatExamples = () => (
         <SeatComponent
           activePlayer
           cards={['d2', 's2']}
-          chipCount="10,000"
-          username="123456789012"
+          stackSize={10000}
+          signerAddr="123456789012"
           statusMsg={{
             type: 'danger',
             text: 'Raise',
@@ -144,8 +144,8 @@ const SeatExamples = () => (
         <SeatComponent
           activePlayer
           cards={['d2', 's2']}
-          chipCount="999"
-          username="Edith"
+          stackSize={999}
+          signerAddr="Edith"
           statusMsg={{
             type: 'warning',
             text: 'All-in',

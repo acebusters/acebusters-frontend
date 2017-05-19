@@ -7,13 +7,13 @@ import SeatTimer from './SeatTimer';
 
 import {
   SeatWrapper,
-  CardWrapper,
+  CardContainer,
   Card,
   InfoWrapper,
   AvatarImage,
   DetailWrapper,
-  Username,
-  ChipCount,
+  NameBox,
+  StackBox,
   StatusWrapper,
   Status,
 } from './styles';
@@ -21,20 +21,27 @@ import {
 // const componentSize = 'small'; // small, medium, large
 const avatarSize = [38, 38]; // x,y
 
-const SeatComponent = ({ activePlayer, cards, chipCount, statusMsg, timerProgress, username }) => (
+const stackToString = (stackSize) => (
+  stackSize.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+);
+
+// temp to be replaced by imported function
+const nickNameByAddress = (signerAddr) => signerAddr;
+
+const SeatComponent = ({ activePlayer, cards, stackSize, statusMsg, timerProgress, signerAddr }) => (
   <SeatWrapper activePlayer={activePlayer}>
     {cards ?
-      <CardWrapper>
+      <CardContainer>
         <Card />
         <Card />
-      </CardWrapper>
+      </CardContainer>
       : null
     }
     <InfoWrapper>
       <AvatarImage src={`https://baconmockup.com/${avatarSize[0]}/${avatarSize[1]}`} />
       <DetailWrapper>
-        <Username>{username}</Username>
-        <ChipCount>{chipCount}</ChipCount>
+        <NameBox>{nickNameByAddress(signerAddr)}</NameBox>
+        <StackBox>{stackToString(stackSize)}</StackBox>
       </DetailWrapper>
     </InfoWrapper>
     {statusMsg ?
@@ -54,10 +61,10 @@ const SeatComponent = ({ activePlayer, cards, chipCount, statusMsg, timerProgres
 SeatComponent.propTypes = {
   activePlayer: React.PropTypes.bool,
   cards: React.PropTypes.array,
-  chipCount: React.PropTypes.string,
+  stackSize: React.PropTypes.number,
   statusMsg: React.PropTypes.object,
   timerProgress: React.PropTypes.number,
-  username: React.PropTypes.string,
+  signerAddr: React.PropTypes.string,
 };
 
 export default SeatComponent;

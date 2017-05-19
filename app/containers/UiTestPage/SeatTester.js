@@ -14,8 +14,8 @@ class SeatTester extends React.Component {
     this.state = {
       activePlayer: false,
       cards: null,
-      chipCount: '0',
-      username: 'bob',
+      stackSize: 1000,
+      signerAddr: 'bob1234',
       statusMsg: {},
       statusRecent: false,
     };
@@ -156,8 +156,8 @@ class SeatTester extends React.Component {
         <SeatComponent
           activePlayer={this.state.activePlayer}
           cards={this.state.cards}
-          chipCount={this.state.chipCount}
-          username={this.state.username}
+          stackSize={this.state.stackSize}
+          signerAddr={this.state.signerAddr}
           statusMsg={this.state.statusMsg}
         />
       </div>

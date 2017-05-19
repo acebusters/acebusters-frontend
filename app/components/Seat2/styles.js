@@ -62,7 +62,7 @@ export const SeatWrapper = styled.div`
 `;
 
 // cards
-export const CardWrapper = styled.div`
+export const CardContainer = styled.div`
   display: flex;
   margin-left: ${scaleSeat(48)};
 
@@ -109,14 +109,14 @@ export const DetailWrapper = styled.div`
   margin-left: ${scaleSeat(2)};
 `;
 
-export const Username = styled.div`
+export const NameBox = styled.div`
   padding-bottom: ${scaleSeat(2)};
   font-size: ${scaleSeat(11)};
   background-color: none;
   color: white;
 `;
 
-export const ChipCount = styled.div`
+export const StackBox = styled.div`
   padding-top: ${scaleSeat(2)};
   font-size: ${scaleSeat(11)};
   background-color: none;
