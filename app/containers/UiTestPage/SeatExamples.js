@@ -6,13 +6,11 @@ import SeatComponent from '../../components/Seat2';
 
 const SeatExamples = () => (
   <div>
-    <H2>SeatComponent</H2>
+    <H2>Seats</H2>
     <div style={{ display: 'flex' }}>
       <div>
-        <H2>Transitions</H2>
-        <H3>Empty</H3>
-        <SeatComponent />
-        <H3>Paused</H3>
+        <H2>Paused</H2>
+        <H3>Sitting-in, <br />Standing-up, <br />Sit-out</H3>
         <SeatComponent
           activePlayer={false}
           chipCount="0"
@@ -25,7 +23,7 @@ const SeatExamples = () => (
         />
       </div>
       <div style={{ marginLeft: '4em' }}>
-        <H2>Recent Move</H2>
+        <H2>Recent Action</H2>
         <h3>Call, Check</h3>
         <SeatComponent
           activePlayer
@@ -64,7 +62,7 @@ const SeatExamples = () => (
         />
       </div>
       <div style={{ marginLeft: '4em' }}>
-        <H2>Old Move</H2>
+        <H2>Past Action</H2>
         <h3>Call, Check</h3>
         <SeatComponent
           activePlayer
