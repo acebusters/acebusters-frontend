@@ -4,25 +4,51 @@ import H2 from '../../components/H2';
 import H3 from '../../components/H3';
 import SeatComponent from '../../components/Seat2';
 
+const colStyle = {
+  marginRight: '3em',
+};
+
 const SeatExamples = () => (
   <div>
     <H2>Seats</H2>
     <div style={{ display: 'flex' }}>
-      <div>
+      <div style={colStyle}>
         <H2>Paused</H2>
-        <H3>Sitting-in, <br />Standing-up, <br />Sit-out</H3>
+        <H3>Sitting-in</H3>
         <SeatComponent
           activePlayer={false}
           chipCount="0"
           username="Username123"
           statusMsg={{
             type: 'info',
-            text: 'sitting-in',
+            text: 'Sitting-in',
+            recent: true,
+          }}
+        />
+        <H3>Standing-up</H3>
+        <SeatComponent
+          activePlayer={false}
+          chipCount="0"
+          username="Username123"
+          statusMsg={{
+            type: 'info',
+            text: 'Standing-in',
+            recent: true,
+          }}
+        />
+        <H3>Sit-out</H3>
+        <SeatComponent
+          activePlayer={false}
+          chipCount="0"
+          username="Username123"
+          statusMsg={{
+            type: 'info',
+            text: 'Sit-out',
             recent: true,
           }}
         />
       </div>
-      <div style={{ marginLeft: '4em' }}>
+      <div style={colStyle}>
         <H2>Recent Action</H2>
         <h3>Call, Check</h3>
         <SeatComponent
@@ -61,7 +87,7 @@ const SeatExamples = () => (
           }}
         />
       </div>
-      <div style={{ marginLeft: '4em' }}>
+      <div style={colStyle}>
         <H2>Past Action</H2>
         <h3>Call, Check</h3>
         <SeatComponent
@@ -97,6 +123,45 @@ const SeatExamples = () => (
             type: 'warning',
             text: 'All-in',
             recent: false,
+          }}
+        />
+      </div>
+      <div style={colStyle}>
+        <H2>Timer</H2>
+        <H3>Normal</H3>
+        <SeatComponent
+          activePlayer={false}
+          cards={['d2', 's2']}
+          chipCount="0"
+          username="Username123"
+          statusMsg={{
+            type: 'info',
+            text: 'sitting-in',
+            recent: true,
+          }}
+        />
+        <H3>Warning</H3>
+        <SeatComponent
+          activePlayer={false}
+          cards={['d2', 's2']}
+          chipCount="0"
+          username="Username123"
+          statusMsg={{
+            type: 'info',
+            text: 'sitting-in',
+            recent: true,
+          }}
+        />
+        <H3>Danger</H3>
+        <SeatComponent
+          activePlayer={false}
+          cards={['d2', 's2']}
+          chipCount="0"
+          username="Username123"
+          statusMsg={{
+            type: 'info',
+            text: 'sitting-in',
+            recent: true,
           }}
         />
       </div>
