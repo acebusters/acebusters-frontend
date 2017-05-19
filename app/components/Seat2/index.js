@@ -3,6 +3,8 @@
 */
 import React from 'react';
 
+import SeatTimer from './SeatTimer';
+
 import {
   SeatWrapper,
   CardWrapper,
@@ -19,7 +21,7 @@ import {
 // const componentSize = 'small'; // small, medium, large
 const avatarSize = [38, 38]; // x,y
 
-const SeatComponent = ({ activePlayer, cards, chipCount, statusMsg, username }) => (
+const SeatComponent = ({ activePlayer, cards, chipCount, statusMsg, timerProgress, username }) => (
   <SeatWrapper activePlayer={activePlayer}>
     {cards ?
       <CardWrapper>
@@ -43,6 +45,10 @@ const SeatComponent = ({ activePlayer, cards, chipCount, statusMsg, username }) 
       </StatusWrapper>
       : null
     }
+    {(timerProgress > 0) ?
+      <SeatTimer timerProgress={timerProgress} />
+      : null
+    }
   </SeatWrapper>
 );
 SeatComponent.propTypes = {
@@ -50,6 +56,7 @@ SeatComponent.propTypes = {
   cards: React.PropTypes.array,
   chipCount: React.PropTypes.string,
   statusMsg: React.PropTypes.object,
+  timerProgress: React.PropTypes.number,
   username: React.PropTypes.string,
 };
 

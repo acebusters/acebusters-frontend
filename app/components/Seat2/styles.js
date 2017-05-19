@@ -149,6 +149,10 @@ export const Status = styled.div`
   opacity: ${(props) => props.recent ? 1 : 0.4};
 `;
 
+export const Timer = styled.div`
+  background-color: red;
+`;
+
 // ButtonJoin
 export const ButtonStyle = styled(SharedWrapper)`
   border-radius: ${scaleButtonJoin(4)};

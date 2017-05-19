@@ -134,11 +134,7 @@ const SeatExamples = () => (
           cards={['d2', 's2']}
           chipCount="0"
           username="Username123"
-          statusMsg={{
-            type: 'info',
-            text: 'sitting-in',
-            recent: true,
-          }}
+          timerProgress={0.9}
         />
         <H3>Warning</H3>
         <SeatComponent
@@ -146,11 +142,7 @@ const SeatExamples = () => (
           cards={['d2', 's2']}
           chipCount="0"
           username="Username123"
-          statusMsg={{
-            type: 'info',
-            text: 'sitting-in',
-            recent: true,
-          }}
+          timerProgress={0.5}
         />
         <H3>Danger</H3>
         <SeatComponent
@@ -158,11 +150,7 @@ const SeatExamples = () => (
           cards={['d2', 's2']}
           chipCount="0"
           username="Username123"
-          statusMsg={{
-            type: 'info',
-            text: 'sitting-in',
-            recent: true,
-          }}
+          timerProgress={0.2}
         />
       </div>
     </div>
