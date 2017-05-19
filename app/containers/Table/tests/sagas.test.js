@@ -294,7 +294,19 @@ describe('Saga Tests', () => {
       .post('/')
       .reply(200, '{"cards":[12,13]}');
 
-    const sagaTester = new SagaTester({});
+    const initialState = fromJS({
+      table: {
+        [tableAddr]: {
+          data: {},
+          3: {
+            dealer: 0,
+            state: 'flop',
+            lineup: [{}, {}],
+          },
+        },
+      },
+    });
+    const sagaTester = new SagaTester({ initialState });
     sagaTester.start(formActionSaga);
     sagaTester.start(payFlow);
     const payAction = bet(tableAddr, 3, 500, PLAYER2.key, 1, 'prevReceipt');
@@ -315,7 +327,19 @@ describe('Saga Tests', () => {
       .post('/')
       .reply(401, '{"errorMessage":"unauthorized"}');
 
-    const sagaTester = new SagaTester({});
+    const initialState = fromJS({
+      table: {
+        [tableAddr]: {
+          data: {},
+          3: {
+            dealer: 0,
+            state: 'flop',
+            lineup: [{}, {}],
+          },
+        },
+      },
+    });
+    const sagaTester = new SagaTester({ initialState });
     sagaTester.start(formActionSaga);
     sagaTester.start(payFlow);
     const payAction = bet(tableAddr, 3, 500, PLAYER2.key, 1, 'prevReceipt');
@@ -331,4 +355,3 @@ describe('Saga Tests', () => {
     });
   });
 });
-

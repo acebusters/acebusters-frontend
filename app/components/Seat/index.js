@@ -43,9 +43,10 @@ function SeatComponent(props) {
       );
   } else {
     let color;
-    if (props.state !== 'showdown' && props.pos === props.whosTurn) {
+    if (['showdown', 'waiting', 'dealing'].indexOf(props.state) === -1
+          && props.pos === props.whosTurn) {
       color = green;
-    } else if (props.sitout) {
+    } else if (typeof props.sitout === 'number') {
       color = gray;
     } else {
       color = baseColor;

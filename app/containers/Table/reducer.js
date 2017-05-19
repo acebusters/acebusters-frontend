@@ -36,6 +36,17 @@ export const initialState = fromJS({});
 export default function tableReducer(state = initialState, action) {
   switch (action.type) {
 
+    case TableActions.ADD_MESSAGE: {
+      const message = {
+        message: action.message,
+        signer: action.privKey,
+      };
+      if (!state.getIn([action.tableAddr, 'messages'])) {
+        return state.setIn([action.tableAddr, 'messages'], List([message]));
+      }
+      return state.updateIn([action.tableAddr, 'messages'], (list) => list.push(message));
+    }
+
     case TableActions.TABLE_RECEIVED: {
       if (!state.get(action.tableAddr)) {
         return state.set(action.tableAddr, Map({}));
@@ -99,6 +110,26 @@ export default function tableReducer(state = initialState, action) {
     case TableActions.RECEIPT_SET: {
       const handIdStr = action.handId.toString();
       return state.setIn([action.tableAddr, handIdStr, 'lineup', action.pos, 'last'], action.receipt);
+    }
+
+    case TableActions.PRE_TOGGLE_SITOUT: {
+      return state.setIn([
+        action.tableAddr,
+        action.handId.toString(),
+        'lineup',
+        action.pos,
+        'sitout',
+      ], action.sitout);
+    }
+
+    case TableActions.sitOutToggle.FAILURE: {
+      return state.setIn([
+        action.tableAddr,
+        action.handId.toString(),
+        'lineup',
+        action.pos,
+        'sitout',
+      ], action.sitout);
     }
 
     case TableActions.UPDATE_RECEIVED: {

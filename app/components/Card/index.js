@@ -27,7 +27,12 @@ function Card(props) {
   } else {
     link = vc.getBackData(props.size, '#7A7BB8', '#2E319C');
   }
-  if (!props.folded) {
+
+  // Note: meaning of card numbers
+  //  * -1 stands for back side of cards,
+  //  * null stands for no card
+  //  * > 0  stands for normal cards
+  if (!props.folded && props.cardNumber !== null) {
     return (
       <CardWrapper offset={props.offset}>
         <img

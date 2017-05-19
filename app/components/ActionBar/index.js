@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import {
   baseColor,
   white,
+  gray,
 } from '../../variables';
 
 const ControlPanel = styled.div`
@@ -25,19 +26,19 @@ const ActionBarWrapper = styled.div`
 `;
 
 const Icon = styled.i`
-  color: ${(white)};
+  color: ${(props) => props.disabled ? gray : white};
   &:hover {
-    color: ${baseColor};
-    cursor: pointer;
+    color: ${(props) => props.disabled ? gray : baseColor};
+    cursor: ${(props) => props.disabled ? 'not-allowed' : 'pointer'};
   }
-  font-size: 2em !important; 
+  font-size: 2em !important;
 `;
 
 export const ActionButtonWrapper = styled.button`
   border-radius: 50%;
   margin-left: 0.5em;
-  color: ${white};
-  border: 2px solid ${white};
+  color: ${(props) => props.disabled ? gray : white};
+  border: 2px solid ${(props) => props.disabled ? gray : white};
   ${(props) => {
     if (props.size === 'medium') {
       return `width: 5em;
@@ -50,19 +51,24 @@ export const ActionButtonWrapper = styled.button`
             height: 6em;`;
   }};
   margin-bottom: 2em;
-  cursor: pointer;  
-  
+  cursor: pointer;
+
   &:hover {
-    color: ${baseColor};
-    cursor: pointer;
+    color: ${(props) => props.disabled ? gray : baseColor};
+    cursor: ${(props) => props.disabled ? 'not-allowed' : 'pointer'};
   }
 `;
 
 export function ActionButton(props) {
+  const onClick = (e) => {
+    if (props.disabled) return;
+    props.onClick(e);
+  };
+
   return (
-    <ActionButtonWrapper onClick={props.onClick} size={props.size}>
+    <ActionButtonWrapper onClick={onClick} size={props.size} disabled={props.disabled} >
       { !props.text &&
-        <Icon className={props.icon} />
+        <Icon className={props.icon} disabled={props.disabled} />
       }
       { props.text }
     </ActionButtonWrapper>
@@ -83,6 +89,7 @@ ActionButton.propTypes = {
   size: React.PropTypes.string,
   icon: React.PropTypes.string,
   onClick: React.PropTypes.func,
+  disabled: React.PropTypes.bool,
 };
 
 ActionBarComponent.propTypes = {};

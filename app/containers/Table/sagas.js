@@ -15,6 +15,7 @@ import {
   receiptSet,
   pay,
   sitOutToggle,
+  preToggleSitout,
   BET,
   FOLD,
   CHECK,
@@ -22,6 +23,7 @@ import {
   NET,
   HAND_REQUEST,
   UPDATE_RECEIVED,
+  SEND_MESSAGE,
 } from './actions';
 
 import {
@@ -40,6 +42,9 @@ import {
   isShowTurnByAction,
   hasNettingInAction,
   makeSbSelector,
+  makeLatestHandSelector,
+  makeLineupSelector,
+  makeHandSelector,
 } from './selectors';
 
 import TableService, { getHand } from '../../services/tableService';
@@ -85,8 +90,17 @@ export function* payFlow() {
     const req = yield take(pay.REQUEST);
     const action = req.payload;
     const table = new TableService(action.tableAddr, action.privKey);
+
     try {
-      // set toggle flag
+      const wholeState = yield select();
+      const tableAddr = action.tableAddr;
+      const lastHandId = makeLatestHandSelector()(wholeState, { params: { tableAddr } });
+      const fakeProps = { params: { tableAddr, handId: lastHandId } };
+      const lastHand = makeHandSelector()(wholeState, fakeProps);
+      const sb = makeSbSelector()(wholeState, fakeProps);
+      const bb = sb * 2;
+      const dealer = lastHand.get('dealer');
+      const state = lastHand.get('state');
       const newReceipt = (function getNewReceipt() {
         switch (action.type) {
           case BET:
@@ -112,7 +126,18 @@ export function* payFlow() {
         }
       }());
 
-      yield put(receiptSet(action.tableAddr, action.handId, action.pos, newReceipt));
+      const lineup = makeLineupSelector()(wholeState, fakeProps).toJS();
+      lineup[action.pos].last = newReceipt;
+
+      const isBettingDone = pokerHelper.isBettingDone(lineup, dealer, state, bb);
+
+      // Note: the only case we want to prevent faking receipt in advance is that
+      // after preflop there could be chances that the last player in preflop hand
+      // becomes the first player in this flop hand
+      if (!(isBettingDone && state === 'preflop')) {
+        yield put(receiptSet(action.tableAddr, action.handId, action.pos, newReceipt));
+      }
+
       const holeCards = yield table.pay(newReceipt);
       yield put({ type: pay.SUCCESS, payload: holeCards.cards });
     } catch (err) {
@@ -124,6 +149,17 @@ export function* payFlow() {
       } });
       yield put({ type: pay.FAILURE, payload: err });
     }
+  }
+}
+
+function* sendMessage(action) {
+  const table = new TableService(action.tableAddr, action.privKey);
+  try {
+    yield table.sendMessage(action.message);
+  } catch (err) {
+    Raven.captureException(err, { tags: {
+      tableAddr: action.tableAddr,
+    } });
   }
 }
 
@@ -144,6 +180,16 @@ function* sitoutFlow() {
   while (true) { //eslint-disable-line
     const req = yield take(sitOutToggle.REQUEST);
     const action = req.payload;
+
+    // Note: fake sitout first, if the request fails, roll back to the old one.
+    const pre = preToggleSitout({
+      tableAddr: action.tableAddr,
+      handId: action.handId,
+      pos: action.pos,
+      sitout: action.nextSitoutState,
+    });
+    yield put(pre);
+
     try {
       const table = new TableService(action.tableAddr, action.privKey);
       const receipt = yield table.sitOut(action.handId, action.amount);
@@ -155,7 +201,15 @@ function* sitoutFlow() {
           handId: action.handId,
         },
       });
-      yield put({ type: sitOutToggle.FAILURE, payload: err });
+
+      yield put({
+        type: sitOutToggle.FAILURE,
+        payload: err,
+        tableAddr: action.tableAddr,
+        handId: action.handId,
+        pos: action.pos,
+        sitout: action.originalSitout,
+      });
     }
   }
 }
@@ -247,6 +301,7 @@ export function* updateScanner() {
 }
 
 export function* tableStateSaga() {
+  yield takeEvery(SEND_MESSAGE, sendMessage);
   yield takeEvery(BET, performBet);
   yield takeEvery(SHOW, performShow);
   yield takeEvery(NET, submitSignedNetting);
