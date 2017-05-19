@@ -36,7 +36,7 @@ const Seat = ({
   cards,
   stackSize,
   statusMsg,
-  timerProgress,
+  timeLeft,
   signerAddr,
 }) => (
   <SeatContainer activePlayer={activePlayer}>
@@ -62,8 +62,8 @@ const Seat = ({
       </StatusWrapper>
       : null
     }
-    {(timerProgress > 0) ?
-      <SeatTimer timerProgress={timerProgress} />
+    {(timeLeft > 0) ?
+      <SeatTimer timerProgress={timeLeft} />
       : null
     }
   </SeatContainer>
@@ -74,17 +74,17 @@ Seat.propTypes = {
   signerAddr: React.PropTypes.string,
   stackSize: React.PropTypes.number,
   statusMsg: React.PropTypes.object,
-  timerProgress: React.PropTypes.number,
+  timeLeft: React.PropTypes.number, // progress 0 - 1
 };
 
 const SeatComponent = (props) => {
-  const { myPos, open, pending, pos, state, whosTurn } = props;
+  const { myPos, open, pending, pos, sitout, state, whosTurn } = props;
   let status = '';
   let seat = null;
   if (pending) {
     status = 'PENDING';
   } else if (myPos === undefined) {
-    status = 'JOIN';
+    status = 'JOINING';
   } else {
     status = 'EMPTY';
   }
@@ -105,7 +105,7 @@ const SeatComponent = (props) => {
     if (['showdown', 'waiting', 'dealing'].indexOf(state) === -1
           && pos === whosTurn) {
       color = 'green';
-    } else if (typeof props.sitout === 'number') {
+    } else if (typeof sitout === 'number') {
       color = 'gray';
     } else {
       color = 'blue';
@@ -127,6 +127,7 @@ SeatComponent.propTypes = {
   myPos: React.PropTypes.array, // seat component position?
   pending: React.PropTypes.bool,
   pos: React.PropTypes.number, // dealer button position?
+  sitout: React.PropTypes.bool, // ?
 };
 
 

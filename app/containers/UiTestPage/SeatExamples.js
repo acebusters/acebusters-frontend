@@ -85,7 +85,7 @@ const SeatExamples = () => (
             pending={false}
             stackSize={0}
             signerAddr="Username123"
-            timerProgress={0.9}
+            timeLeft={0.9}
           />
         </div>
         <H3>Warning</H3>
@@ -97,7 +97,7 @@ const SeatExamples = () => (
             pending={false}
             stackSize={0}
             signerAddr="Username123"
-            timerProgress={0.5}
+            timeLeft={0.5}
           />
         </div>
         <H3>Danger</H3>
@@ -109,7 +109,7 @@ const SeatExamples = () => (
             pending={false}
             stackSize={0}
             signerAddr="Username123"
-            timerProgress={0.2}
+            timeLeft={0.2}
           />
         </div>
       </div>
