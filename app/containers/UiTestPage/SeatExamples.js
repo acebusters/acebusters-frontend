@@ -3,7 +3,6 @@ import React from 'react';
 import H2 from '../../components/H2';
 import H3 from '../../components/H3';
 import SeatComponent from '../../components/Seat2';
-import ButtonJoinSeat from '../../components/Seat2/ButtonJoinSeat';
 
 const SeatExamples = () => (
   <div>
@@ -11,8 +10,6 @@ const SeatExamples = () => (
     <div style={{ display: 'flex' }}>
       <div>
         <H2>Transitions</H2>
-        <H3>Join Seat</H3>
-        <ButtonJoinSeat />
         <H3>Empty</H3>
         <SeatComponent />
         <H3>Paused</H3>

@@ -9,6 +9,7 @@ import Button from '../../components/Button';
 import ContainerBase from '../../components/Container';
 import SeatExamples from './SeatExamples';
 import SeatTester from './SeatTester';
+import ButtonExamples from './ButtonExamples';
 
 const Container = styled(ContainerBase)`
   background-color: darkgray;
@@ -19,7 +20,7 @@ class UiTestPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentTestPage: 'examples',
+      currentTestPage: 'seats',
     };
     this.handleClick = this.handleClick.bind(this);
   }
@@ -29,17 +30,21 @@ class UiTestPage extends React.Component {
   render() {
     const { currentTestPage } = this.state;
     const showMain = () => {
-      if (currentTestPage === 'examples') return (<SeatExamples />);
+      if (currentTestPage === 'seats') return (<SeatExamples />);
+      if (currentTestPage === 'buttons') return (<ButtonExamples />);
       if (currentTestPage === 'tester') return (<SeatTester />);
       return (<SeatExamples />);
     };
     return (
       <Container>
         <div style={{ display: 'flex' }}>
-          <Button onClick={() => this.handleClick('examples')} value="examples">
-            Seat Examples
+          <Button onClick={() => this.handleClick('seats')}>
+            Seats
           </Button>
-          <Button onClick={() => this.handleClick('tester')} value="tester">
+          <Button onClick={() => this.handleClick('buttons')}>
+            Buttons
+          </Button>
+          <Button onClick={() => this.handleClick('tester')}>
             Test Transitions
           </Button>
         </div>
