@@ -19,7 +19,6 @@ import {
 } from './styles';
 
 // const componentSize = 'small'; // small, medium, large
-const avatarSize = [38, 38]; // x,y
 const cardSize = 48;
 
 const stackToString = (stackSize) => {
@@ -33,6 +32,7 @@ const nickNameByAddress = (signerAddr) => signerAddr;
 const Seat = (props) => {
   const {
     activePlayer,
+    blocky,
     holeCards,
     folded,
     seatStatus,
@@ -77,7 +77,7 @@ const Seat = (props) => {
       }
 
       <InfoWrapper>
-        <AvatarImage src={`https://baconmockup.com/${avatarSize[0]}/${avatarSize[1]}`} />
+        <AvatarImage bgImg={blocky} />
         <DetailWrapper>
           <NameBox>{nickNameByAddress(signerAddr)}</NameBox>
           <StackBox>{stackToString(stackSize)}</StackBox>
@@ -98,6 +98,7 @@ const Seat = (props) => {
 };
 Seat.propTypes = {
   activePlayer: React.PropTypes.bool,
+  blocky: React.PropTypes.string,
   folded: React.PropTypes.bool,
   holeCards: React.PropTypes.array, // array of cards
   seatStatus: React.PropTypes.string,

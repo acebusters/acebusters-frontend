@@ -27,6 +27,7 @@ function Card(props) {
   //  * > 0  stands for normal cards
   if (!props.folded && props.cardNumber === -1) {
     return (
+      // TODO: remove offset prop and from CardShared style?
       <CardBack offset={props.offset}>
         <CardStyle
           key={suit + value}
@@ -38,6 +39,7 @@ function Card(props) {
   }
   if (!props.folded && props.cardNumber !== null) {
     return (
+      // TODO: remove offset prop and from CardShared style?
       <CardFront offset={props.offset}>
         <CardStyle
           key={suit + value}

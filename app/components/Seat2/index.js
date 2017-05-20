@@ -21,7 +21,6 @@ const SeatComponent = (props) => {
     open,
     pending,
     sitout,
-    // whosTurn, state, pos
   } = props;
   let seatStatus = '';
   let seat = null;
@@ -67,13 +66,11 @@ const SeatComponent = (props) => {
   return seat;
 };
 SeatComponent.propTypes = {
-  // coords: React.PropTypes.array,
   folded: React.PropTypes.bool,
   lastAction: React.PropTypes.string,
   lastAmount: React.PropTypes.number,
   myPos: React.PropTypes.number, // action bar position
   pending: React.PropTypes.bool,
-  // pos: React.PropTypes.number, // player position
   sitout: React.PropTypes.number, // amount of time left in sitou
 };
 

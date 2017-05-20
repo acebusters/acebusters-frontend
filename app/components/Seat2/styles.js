@@ -82,6 +82,8 @@ export const CardContainer = styled.div`
 // referenced in components/Card
 export const CardShared = styled.div`
   background-color: none;
+  ${''/* margin-left: ${(props) => props.offset[0]}%;
+  margin-top: ${(props) => props.offset[1]}%; */}
   margin-right: ${scaleSeat(2)};
   width:${scaleSeat(36)};
 `;
@@ -111,8 +113,10 @@ export const InfoWrapper = styled(SharedMiddle)`
   z-index: 100;
 `;
 
-export const AvatarImage = styled.img`
+export const AvatarImage = styled.div`
   background-color: AliceBlue;
+  background-image: url(${(props) => props.bgImg});
+  background-size: ${scaleSeat(38)} ${scaleSeat(38)};
   width: ${scaleSeat(38)};
   height: ${scaleSeat(38)};
   border-radius: ${scaleSeat(3)};
