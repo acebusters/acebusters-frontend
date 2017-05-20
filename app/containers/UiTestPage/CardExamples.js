@@ -27,6 +27,7 @@ const CardExamples = () => (
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
           <SeatComponent
+            activePlayer
             holeCards={[null, null]}
             myPos={0}
             stackSize={stackSize}
@@ -38,19 +39,8 @@ const CardExamples = () => (
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
           <SeatComponent
+            activePlayer
             holeCards={[-1, -1]}
-            myPos={0}
-            stackSize={stackSize}
-            signerAddr={signerAddr}
-          />
-        </div>
-
-        <H3>Folded</H3>
-        <div style={{ position: 'relative' }}>
-          <div style={colWidth} />
-          <SeatComponent
-            folded
-            holeCards={[4, 8]}
             myPos={0}
             stackSize={stackSize}
             signerAddr={signerAddr}
@@ -61,6 +51,7 @@ const CardExamples = () => (
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
           <SeatComponent
+            activePlayer
             holeCards={[4, 8]}
             myPos={0}
             stackSize={stackSize}

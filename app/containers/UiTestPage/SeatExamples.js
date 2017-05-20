@@ -4,6 +4,10 @@ import H2 from '../../components/H2';
 import H3 from '../../components/H3';
 import SeatComponent from '../../components/Seat2';
 
+// temp constants
+const signerAddr = 'Username123';
+const stackSize = 1000;
+
 const colStyle = {
   marginRight: '3em',
 };
@@ -93,7 +97,6 @@ const SeatExamples = () => (
             activePlayer
             holeCards={[-1, -1]}
             myPos={0}
-            pending={false}
             stackSize={0}
             signerAddr="Username123"
             timeLeft={0.5}
@@ -107,10 +110,22 @@ const SeatExamples = () => (
             activePlayer
             holeCards={[-1, -1]}
             myPos={0}
-            pending={false}
             stackSize={0}
             signerAddr="Username123"
             timeLeft={0.2}
+          />
+        </div>
+
+        <H3>Before Hole Cards</H3>
+        <div style={{ position: 'relative' }}>
+          <div style={colWidth} />
+          <SeatComponent
+            activePlayer
+            holeCards={[null, null]}
+            myPos={0}
+            stackSize={0}
+            signerAddr="Username123"
+            timeLeft={0.4}
           />
         </div>
 
@@ -164,6 +179,19 @@ const SeatExamples = () => (
           />
         </div>
 
+        <H3>Folded</H3>
+        <div style={{ position: 'relative' }}>
+          <div style={colWidth} />
+          <SeatComponent
+            activePlayer
+            folded
+            holeCards={[4, 8]}
+            myPos={0}
+            stackSize={stackSize}
+            signerAddr={signerAddr}
+          />
+        </div>
+
       </div>
 
       <div style={colStyle}>
@@ -208,6 +236,18 @@ const SeatExamples = () => (
             stackSize={999}
             signerAddr="Edith"
             lastAction="all-in"
+          />
+        </div>
+
+        <H3>Folded</H3>
+        <div style={{ position: 'relative' }}>
+          <div style={colWidth} />
+          <SeatComponent
+            folded
+            holeCards={[4, 8]}
+            myPos={0}
+            stackSize={stackSize}
+            signerAddr={signerAddr}
           />
         </div>
 
