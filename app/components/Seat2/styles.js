@@ -80,11 +80,18 @@ export const CardContainer = styled.div`
 `;
 
 // referenced in components/Card
-export const CardWrapper = styled.div`
+export const CardShared = styled.div`
   background-color: none;
-  height: ${scaleSeat(12)};
   margin-right: ${scaleSeat(2)};
   width:${scaleSeat(36)};
+`;
+
+export const CardBack = styled(CardShared)`
+  height: ${scaleSeat(12)};
+`;
+
+export const CardFront = styled(CardShared)`
+  height: ${scaleSeat(40)};
 `;
 
 export const CardStyle = styled.img`
