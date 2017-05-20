@@ -29,6 +29,7 @@ const CardExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
+            amountCoords={[1, 1]}
             blocky={blocky}
             dealer={1}
             holeCards={[null, null]}
@@ -44,6 +45,7 @@ const CardExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
+            amountCoords={[1, 1]}
             blocky={blocky}
             dealer={1}
             holeCards={[-1, -1]}
@@ -59,6 +61,7 @@ const CardExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
+            amountCoords={[1, 1]}
             blocky={blocky}
             dealer={1}
             holeCards={[4, 8]}
@@ -78,6 +81,7 @@ const CardExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
+            amountCoords={[1, 1]}
             blocky={blocky}
             dealer={0}
             holeCards={[null, null]}
@@ -93,6 +97,7 @@ const CardExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
+            amountCoords={[1, 1]}
             blocky={blocky}
             dealer={0}
             holeCards={[-1, -1]}
@@ -108,9 +113,64 @@ const CardExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
+            amountCoords={[1, 1]}
             blocky={blocky}
             dealer={0}
             holeCards={[4, 8]}
+            myPos={0}
+            pos={0}
+            stackSize={stackSize}
+            signerAddr={signerAddr}
+          />
+        </div>
+      </div>
+      <div style={colStyle}>
+        <H2>Chips</H2>
+
+        <H3>None</H3>
+        <div style={{ position: 'relative' }}>
+          <div style={colWidth} />
+          <SeatComponent
+            activePlayer
+            amountCoords={[0, 100]}
+            blocky={blocky}
+            dealer={0}
+            holeCards={[null, null]}
+            lastAmount={1}
+            myPos={0}
+            pos={0}
+            stackSize={stackSize}
+            signerAddr={signerAddr}
+          />
+        </div>
+
+        <H3>Hidden</H3>
+        <div style={{ position: 'relative' }}>
+          <div style={colWidth} />
+          <SeatComponent
+            activePlayer
+            amountCoords={[1, 1]}
+            blocky={blocky}
+            dealer={0}
+            holeCards={[-1, -1]}
+            lastAmount={100}
+            myPos={0}
+            pos={0}
+            stackSize={stackSize}
+            signerAddr={signerAddr}
+          />
+        </div>
+
+        <H3>Reveal</H3>
+        <div style={{ position: 'relative' }}>
+          <div style={colWidth} />
+          <SeatComponent
+            activePlayer
+            amountCoords={[1, 1]}
+            blocky={blocky}
+            dealer={0}
+            holeCards={[4, 8]}
+            lastAmount={1000}
             myPos={0}
             pos={0}
             stackSize={stackSize}

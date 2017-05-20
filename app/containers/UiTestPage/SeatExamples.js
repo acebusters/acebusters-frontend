@@ -29,6 +29,7 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
+            amountCoords={[1, 1]}
             open
           />
         </div>
@@ -38,6 +39,7 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer={false}
+            amountCoords={[1, 1]}
             blocky={blocky}
             pending
             stackSize={0}
@@ -50,6 +52,7 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer={false}
+            amountCoords={[1, 1]}
             blocky={blocky}
             stackSize={0}
             signerAddr="Username123"
@@ -60,6 +63,7 @@ const SeatExamples = () => (
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
           <SeatComponent
+            amountCoords={[1, 1]}
             blocky={blocky}
             stackSize={0}
             signerAddr="Username123"
@@ -70,6 +74,7 @@ const SeatExamples = () => (
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
           <SeatComponent
+            amountCoords={[1, 1]}
             blocky={blocky}
             myPos={0}
             sitout={0.6}
@@ -87,6 +92,7 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
+            amountCoords={[1, 1]}
             blocky={blocky}
             dealer={1}
             holeCards={[-1, -1]}
@@ -103,6 +109,7 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
+            amountCoords={[1, 1]}
             blocky={blocky}
             dealer={1}
             holeCards={[-1, -1]}
@@ -119,6 +126,7 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
+            amountCoords={[1, 1]}
             blocky={blocky}
             dealer={1}
             holeCards={[-1, -1]}
@@ -135,6 +143,7 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
+            amountCoords={[1, 1]}
             blocky={blocky}
             dealer={1}
             holeCards={[null, null]}
@@ -156,6 +165,7 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
+            amountCoords={[1, 1]}
             blocky={blocky}
             dealer={1}
             holeCards={[-1, -1]}
@@ -174,6 +184,7 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
+            amountCoords={[1, 1]}
             blocky={blocky}
             dealer={1}
             holeCards={[-1, -1]}
@@ -192,6 +203,7 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
+            amountCoords={[1, 1]}
             blocky={blocky}
             dealer={1}
             holeCards={[-1, -1]}
@@ -210,6 +222,7 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
+            amountCoords={[1, 1]}
             blocky={blocky}
             dealer={1}
             folded
@@ -231,6 +244,7 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
+            amountCoords={[1, 1]}
             blocky={blocky}
             dealer={1}
             holeCards={[-1, -1]}
@@ -248,6 +262,7 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
+            amountCoords={[1, 1]}
             blocky={blocky}
             dealer={1}
             holeCards={[-1, -1]}
@@ -265,6 +280,7 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
+            amountCoords={[1, 1]}
             blocky={blocky}
             dealer={1}
             holeCards={[-1, -1]}
@@ -281,6 +297,7 @@ const SeatExamples = () => (
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
           <SeatComponent
+            amountCoords={[1, 1]}
             blocky={blocky}
             dealer={1}
             folded

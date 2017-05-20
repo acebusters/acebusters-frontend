@@ -94,6 +94,17 @@ export const DealerButton = styled.div`
   color: #353535;
 `;
 
+export const AmountBox = styled.div`
+  position: absolute;
+  left: ${(props) => `${props.amountCoords[0]}%`};
+  top: ${(props) => `${props.amountCoords[1]}%`};
+  border-radius: 25%;
+  color: white;
+  line-height: 3em;
+  text-align: center;
+  width: 100%;
+`;
+
 // cards
 export const CardContainer = styled.div`
   display: flex;

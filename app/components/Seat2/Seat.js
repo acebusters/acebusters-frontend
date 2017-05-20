@@ -6,8 +6,10 @@ import React from 'react';
 import Card from '../Card2';
 import SeatTimer from './SeatTimer';
 import StatusAction from './StatusAction';
+import Pot from '../Pot';
 import {
   AvatarImage,
+  AmountBox,
   CardContainer,
   ChipButtonContainer,
   DealerButton,
@@ -42,11 +44,13 @@ const showChipsButton = (pending, seatStatus) => {
 const Seat = (props) => {
   const {
     activePlayer,
+    amountCoords,
     dealer,
     blocky,
     folded,
     holeCards,
     lastAction,
+    lastAmount,
     pending,
     pos,
     seatStatus,
@@ -83,13 +87,13 @@ const Seat = (props) => {
           <ChipButtonContainer>
             <DealerButton dealer={dealer} pos={pos}>D</DealerButton>
 
-            {/* <AmountBox amountCoords={amountCoords}>
+            <AmountBox amountCoords={amountCoords}>
               { (lastAmount > 0) &&
               <div>
                 <Pot potSize={lastAmount} left="0%" top="0%" />
               </div>
               }
-            </AmountBox> */}
+            </AmountBox>
           </ChipButtonContainer>
           : null
         }
@@ -116,11 +120,13 @@ const Seat = (props) => {
 };
 Seat.propTypes = {
   activePlayer: React.PropTypes.bool,
+  amountCoords: React.PropTypes.array,
   blocky: React.PropTypes.string,
   dealer: React.PropTypes.number, // which seat is dealer
   folded: React.PropTypes.bool,
   holeCards: React.PropTypes.array, // array of cards
   lastAction: React.PropTypes.string,
+  lastAmount: React.PropTypes.number,
   pending: React.PropTypes.bool,
   pos: React.PropTypes.number, // which position is THIS seat
   seatStatus: React.PropTypes.string,
