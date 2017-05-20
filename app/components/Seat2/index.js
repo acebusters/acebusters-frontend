@@ -17,8 +17,10 @@ const coords = [0, 0];
 const SeatComponent = (props) => {
   const {
     folded,
+    isTaken,
     myPos,
     open,
+    pos,
     pending,
     sitout,
   } = props;
@@ -41,7 +43,9 @@ const SeatComponent = (props) => {
   if (open) {
     seat = (
       <SeatWrapper coords={coords}>
-        <ButtonJoinSeat />
+        <ButtonJoinSeat
+          onClickHandler={() => isTaken(open, myPos, pending, pos)}
+        />
       </SeatWrapper>
     );
   } else {
@@ -67,9 +71,10 @@ const SeatComponent = (props) => {
 };
 SeatComponent.propTypes = {
   folded: React.PropTypes.bool,
-  lastAction: React.PropTypes.string,
-  lastAmount: React.PropTypes.number,
+  isTaken: React.PropTypes.func,
   myPos: React.PropTypes.number, // action bar position
+  open: React.PropTypes.bool,
+  pos: React.PropTypes.number,
   pending: React.PropTypes.bool,
   sitout: React.PropTypes.number, // amount of time left in sitou
 };

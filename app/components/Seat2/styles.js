@@ -72,7 +72,7 @@ export const SeatContainer = styled.div`
 
 // dealer button
 export const DealerButton = styled.div`
-  ${(props) => !(props.dealer === props.pos) ? 'display: none;' : ''}
+  display: ${(props) => !(props.dealer === props.pos) ? 'none' : ''};
   position: absolute;
   width: 1.5em;
   height: 1.5em;

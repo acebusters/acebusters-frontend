@@ -9,13 +9,16 @@ import {
   ButtonWrapper,
 } from './styles';
 
-const ButtonJoinSeat = () => (
-  <ButtonWrapper>
+const ButtonJoinSeat = ({ onClickHandler }) => (
+  <ButtonWrapper onClick={onClickHandler}>
     <ButtonStyle>
       <ButtonIcon className="fa fa-plus" aria-hidden="true" />
       <ButtonText>Join</ButtonText>
     </ButtonStyle>
   </ButtonWrapper>
 );
+ButtonJoinSeat.propTypes = {
+  onClickHandler: React.PropTypes.func,
+};
 
 export default ButtonJoinSeat;
