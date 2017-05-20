@@ -27,7 +27,7 @@ const CardExamples = () => (
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
           <SeatComponent
-            holeCards={[]}
+            holeCards={[null, null]}
             stackSize={stackSize}
             signerAddr={signerAddr}
           />
@@ -37,7 +37,7 @@ const CardExamples = () => (
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
           <SeatComponent
-            holeCards={['d2', 's2']}
+            holeCards={[-1, -1]}
             stackSize={stackSize}
             signerAddr={signerAddr}
           />
@@ -47,7 +47,7 @@ const CardExamples = () => (
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
           <SeatComponent
-            holeCards={['d2', 's2']}
+            holeCards={[4, 8]}
             stackSize={stackSize}
             signerAddr={signerAddr}
           />
@@ -57,7 +57,7 @@ const CardExamples = () => (
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
           <SeatComponent
-            holeCards={['d2', 's2']}
+            holeCards={[4, 8]}
             stackSize={stackSize}
             signerAddr={signerAddr}
           />

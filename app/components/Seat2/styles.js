@@ -4,7 +4,6 @@
 import styled from 'styled-components';
 
 // colors
-const cardBg = '#A3BFE0';
 const successBg = 'linear-gradient(0deg, #B4ED50 0%, #78D049 100%)';
 const infoBg = 'linear-gradient(0deg, #D4D4D4 0%, #4D4D4D 100%)';
 const infoReverseBg = 'linear-gradient(0deg, #4D4D4D 0%, #D4D4D4 100%)';
@@ -80,17 +79,19 @@ export const CardContainer = styled.div`
   background-color: none;
 `;
 
-export const Card = styled.div`
-  background-color: ${cardBg};
-  border-top: ${scaleSeat(1)} solid white;
-  border-left: ${scaleSeat(1)} solid white;
-  border-right: ${scaleSeat(1)} solid white;
-  border-bottom: none;
-  border-radius: ${scaleSeat(2)} ${scaleSeat(2)} 0 0;
-  box-shadow: ${smallShadow};
+// referenced in components/Card
+export const CardWrapper = styled.div`
+  background-color: none;
   height: ${scaleSeat(12)};
   margin-right: ${scaleSeat(2)};
   width:${scaleSeat(36)};
+`;
+
+export const CardStyle = styled.img`
+  max-width: 100%;
+  height: auto;
+
+  box-shadow: ${smallShadow};
 `;
 
 // info

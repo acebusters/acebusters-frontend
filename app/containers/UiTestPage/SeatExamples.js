@@ -88,7 +88,7 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
-            holeCards={['d2', 's2']}
+            holeCards={[-1, -1]}
             stackSize={0}
             signerAddr="Username123"
             timeLeft={0.9}
@@ -99,7 +99,7 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
-            holeCards={['d2', 's2']}
+            holeCards={[-1, -1]}
             pending={false}
             stackSize={0}
             signerAddr="Username123"
@@ -111,7 +111,7 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
-            holeCards={['d2', 's2']}
+            holeCards={[-1, -1]}
             pending={false}
             stackSize={0}
             signerAddr="Username123"
@@ -127,7 +127,7 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
-            holeCards={['d2', 's2']}
+            holeCards={[-1, -1]}
             pending={false}
             stackSize={10000}
             signerAddr="123456789012"
@@ -141,7 +141,7 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
-            holeCards={['d2', 's2']}
+            holeCards={[-1, -1]}
             pending={false}
             stackSize={10000}
             signerAddr="123456789012"
@@ -154,7 +154,7 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
-            holeCards={['d2', 's2']}
+            holeCards={[-1, -1]}
             pending={false}
             stackSize={999}
             signerAddr="Edith"
@@ -170,7 +170,7 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
-            holeCards={['d2', 's2']}
+            holeCards={[-1, -1]}
             pending={false}
             stackSize={10000}
             signerAddr="123456789012"
@@ -182,7 +182,7 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
-            holeCards={['d2', 's2']}
+            holeCards={[-1, -1]}
             pending={false}
             stackSize={10000}
             signerAddr="123456789012"
@@ -194,7 +194,7 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
-            holeCards={['d2', 's2']}
+            holeCards={[-1, -1]}
             pending={false}
             stackSize={999}
             signerAddr="Edith"

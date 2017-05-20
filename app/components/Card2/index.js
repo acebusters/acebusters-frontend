@@ -3,18 +3,11 @@
  */
 import React from 'react';
 import { VectorCards } from 'ab-vector-cards';
-import styled from 'styled-components';
+
+import { CardWrapper, CardStyle } from '../Seat2/styles';
 
 const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'j', 'q', 'k', 'a'];
 const suits = ['clubs', 'diamonds', 'hearts', 'spades'];
-
-const CardWrapper = styled.div`
-  position: relative;
-  margin-left: ${(props) => props.offset[0]}%;
-  margin-top: ${(props) => props.offset[1]}%;
-  max-width: 100%;
-  height: auto;
-`;
 
 function Card(props) {
   const vc = new VectorCards();
@@ -35,12 +28,10 @@ function Card(props) {
   if (!props.folded && props.cardNumber !== null) {
     return (
       <CardWrapper offset={props.offset}>
-        <img
+        <CardStyle
           key={suit + value}
           src={link}
-          className="card"
           alt=""
-          style={{ maxWidth: '100%', height: 'auto' }}
         />
       </CardWrapper>
     );
