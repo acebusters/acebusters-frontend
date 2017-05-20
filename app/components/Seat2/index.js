@@ -36,7 +36,7 @@ const SeatComponent = (props) => {
   } else if (folded) {
     seatStatus = 'folded';
   } else {
-    seatStatus = 'EMPTY';
+    seatStatus = 'EMPTY'; // successfully resolves to EMPTY
   }
 
   if (open) {
@@ -67,7 +67,6 @@ const SeatComponent = (props) => {
   return seat;
 };
 SeatComponent.propTypes = {
-  cards: React.PropTypes.array,
   // coords: React.PropTypes.array,
   folded: React.PropTypes.bool,
   lastAction: React.PropTypes.string,

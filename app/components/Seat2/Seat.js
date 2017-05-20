@@ -35,12 +35,12 @@ const Seat = (props) => {
     activePlayer,
     holeCards,
     folded,
+    seatStatus,
+    signerAddr,
     sitout,
     stackSize,
     lastAction,
-    seatStatus,
     timeLeft,
-    signerAddr,
   } = props;
   return (
     <SeatContainer activePlayer={activePlayer}>
@@ -55,7 +55,11 @@ const Seat = (props) => {
         }
       </AmountBox> */}
 
-      {holeCards ?
+      {seatStatus !== 'EMPTY' ?
+        <StatusSeatWrapper>
+          <StatusSeat>{seatStatus}</StatusSeat>
+        </StatusSeatWrapper>
+        :
         <CardContainer>
           <Card
             cardNumber={holeCards[0]}
@@ -70,10 +74,6 @@ const Seat = (props) => {
             offset={[-100, -133]}
           />
         </CardContainer>
-      :
-        <StatusSeatWrapper>
-          <StatusSeat>{seatStatus}</StatusSeat>
-        </StatusSeatWrapper>
       }
 
       <InfoWrapper>

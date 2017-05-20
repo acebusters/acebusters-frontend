@@ -18,15 +18,16 @@ const SeatExamples = () => (
     <div style={{ display: 'flex' }}>
       <div style={colStyle}>
         <H2>Paused</H2>
+
         <H3>Open</H3>
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
           <SeatComponent
             activePlayer
-            pending={false}
             open
           />
         </div>
+
         <H3>Pending</H3>
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
@@ -37,6 +38,7 @@ const SeatExamples = () => (
             signerAddr="Username123"
           />
         </div>
+
         <H3>Sitting-in</H3>
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
@@ -67,58 +69,53 @@ const SeatExamples = () => (
           />
         </div>
 
-        <H3>Folded</H3>
-        <div style={{ position: 'relative' }}>
-          <div style={colWidth} />
-          <SeatComponent
-            activePlayer={false}
-            myPos={0}
-            pending={false}
-            folded
-            stackSize={0}
-            signerAddr="Username123"
-          />
-        </div>
-
       </div>
       <div style={colStyle}>
         <H2>Timer</H2>
+
         <H3>Normal</H3>
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
           <SeatComponent
             activePlayer
             holeCards={[-1, -1]}
+            myPos={0}
             stackSize={0}
             signerAddr="Username123"
             timeLeft={0.9}
           />
         </div>
+
         <H3>Warning</H3>
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
           <SeatComponent
             activePlayer
             holeCards={[-1, -1]}
+            myPos={0}
             pending={false}
             stackSize={0}
             signerAddr="Username123"
             timeLeft={0.5}
           />
         </div>
+
         <H3>Danger</H3>
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
           <SeatComponent
             activePlayer
             holeCards={[-1, -1]}
+            myPos={0}
             pending={false}
             stackSize={0}
             signerAddr="Username123"
             timeLeft={0.2}
           />
         </div>
+
       </div>
+
       <div style={colStyle}>
         <H2>Recent Action</H2>
 
@@ -128,6 +125,7 @@ const SeatExamples = () => (
           <SeatComponent
             activePlayer
             holeCards={[-1, -1]}
+            myPos={0}
             pending={false}
             stackSize={10000}
             signerAddr="123456789012"
@@ -142,6 +140,7 @@ const SeatExamples = () => (
           <SeatComponent
             activePlayer
             holeCards={[-1, -1]}
+            myPos={0}
             pending={false}
             stackSize={10000}
             signerAddr="123456789012"
@@ -149,12 +148,14 @@ const SeatExamples = () => (
             showStatus
           />
         </div>
+
         <h3>All-in, Winner</h3>
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
           <SeatComponent
             activePlayer
             holeCards={[-1, -1]}
+            myPos={0}
             pending={false}
             stackSize={999}
             signerAddr="Edith"
@@ -162,45 +163,54 @@ const SeatExamples = () => (
             showStatus
           />
         </div>
+
       </div>
+
       <div style={colStyle}>
         <H2>Past Action</H2>
+
         <h3>Call, Check</h3>
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
           <SeatComponent
             activePlayer
             holeCards={[-1, -1]}
+            myPos={0}
             pending={false}
             stackSize={10000}
             signerAddr="123456789012"
             lastAction="call"
           />
         </div>
+
         <h3>Raise, Bet</h3>
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
           <SeatComponent
             activePlayer
             holeCards={[-1, -1]}
+            myPos={0}
             pending={false}
             stackSize={10000}
             signerAddr="123456789012"
             lastAction="raise"
           />
         </div>
+
         <h3>All-in, Winner</h3>
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
           <SeatComponent
             activePlayer
             holeCards={[-1, -1]}
+            myPos={0}
             pending={false}
             stackSize={999}
             signerAddr="Edith"
             lastAction="all-in"
           />
         </div>
+
       </div>
     </div>
   </div>
