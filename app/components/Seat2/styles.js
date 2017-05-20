@@ -70,22 +70,29 @@ export const SeatContainer = styled.div`
   opacity: ${(props) => props.activePlayer ? 1 : 0.5};
 `;
 
-// dealer button
+// chips & dealer button
+export const ChipButtonContainer = styled.div`
+  position: relative;
+  height: 0;
+`;
+
 export const DealerButton = styled.div`
-  display: ${(props) => !(props.dealer === props.pos) ? 'none' : ''};
+  display: ${(props) => !(props.dealer === props.pos) ? 'none' : 'inherit'};
   position: absolute;
-  width: 1.5em;
-  height: 1.5em;
+  top: ${scaleSeat(-28)};
+  left: ${scaleSeat(12)};
+  width: ${scaleSeat(20)};
+  height: ${scaleSeat(20)};
 
   background: white;
   border-radius: 50%;
-  border: 4px solid 'green';
+  box-shadow: ${smallShadow};
 
   text-align: center;
   font-weight: 600;
-  color: black;
+  font-size: ${scaleSeat(14)};
+  color: #353535;
 `;
-
 
 // cards
 export const CardContainer = styled.div`

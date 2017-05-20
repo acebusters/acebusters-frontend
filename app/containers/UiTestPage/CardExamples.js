@@ -30,8 +30,10 @@ const CardExamples = () => (
           <SeatComponent
             activePlayer
             blocky={blocky}
+            dealer={1}
             holeCards={[null, null]}
             myPos={0}
+            pos={0}
             stackSize={stackSize}
             signerAddr={signerAddr}
           />
@@ -43,8 +45,10 @@ const CardExamples = () => (
           <SeatComponent
             activePlayer
             blocky={blocky}
+            dealer={1}
             holeCards={[-1, -1]}
             myPos={0}
+            pos={0}
             stackSize={stackSize}
             signerAddr={signerAddr}
           />
@@ -56,13 +60,63 @@ const CardExamples = () => (
           <SeatComponent
             activePlayer
             blocky={blocky}
+            dealer={1}
             holeCards={[4, 8]}
             myPos={0}
+            pos={0}
             stackSize={stackSize}
             signerAddr={signerAddr}
           />
         </div>
 
+      </div>
+      <div style={colStyle}>
+        <H2>Dealer Button</H2>
+
+        <H3>None</H3>
+        <div style={{ position: 'relative' }}>
+          <div style={colWidth} />
+          <SeatComponent
+            activePlayer
+            blocky={blocky}
+            dealer={0}
+            holeCards={[null, null]}
+            myPos={0}
+            pos={0}
+            stackSize={stackSize}
+            signerAddr={signerAddr}
+          />
+        </div>
+
+        <H3>Hidden</H3>
+        <div style={{ position: 'relative' }}>
+          <div style={colWidth} />
+          <SeatComponent
+            activePlayer
+            blocky={blocky}
+            dealer={0}
+            holeCards={[-1, -1]}
+            myPos={0}
+            pos={0}
+            stackSize={stackSize}
+            signerAddr={signerAddr}
+          />
+        </div>
+
+        <H3>Reveal</H3>
+        <div style={{ position: 'relative' }}>
+          <div style={colWidth} />
+          <SeatComponent
+            activePlayer
+            blocky={blocky}
+            dealer={0}
+            holeCards={[4, 8]}
+            myPos={0}
+            pos={0}
+            stackSize={stackSize}
+            signerAddr={signerAddr}
+          />
+        </div>
       </div>
     </div>
   </div>

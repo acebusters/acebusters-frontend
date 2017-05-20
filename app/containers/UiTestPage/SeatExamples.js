@@ -88,8 +88,10 @@ const SeatExamples = () => (
           <SeatComponent
             activePlayer
             blocky={blocky}
+            dealer={1}
             holeCards={[-1, -1]}
             myPos={0}
+            pos={0}
             stackSize={0}
             signerAddr="Username123"
             timeLeft={0.9}
@@ -102,8 +104,10 @@ const SeatExamples = () => (
           <SeatComponent
             activePlayer
             blocky={blocky}
+            dealer={1}
             holeCards={[-1, -1]}
             myPos={0}
+            pos={0}
             stackSize={0}
             signerAddr="Username123"
             timeLeft={0.5}
@@ -116,8 +120,10 @@ const SeatExamples = () => (
           <SeatComponent
             activePlayer
             blocky={blocky}
+            dealer={1}
             holeCards={[-1, -1]}
             myPos={0}
+            pos={0}
             stackSize={0}
             signerAddr="Username123"
             timeLeft={0.2}
@@ -130,8 +136,10 @@ const SeatExamples = () => (
           <SeatComponent
             activePlayer
             blocky={blocky}
+            dealer={1}
             holeCards={[null, null]}
             myPos={0}
+            pos={0}
             stackSize={0}
             signerAddr="Username123"
             timeLeft={0.4}
@@ -149,8 +157,10 @@ const SeatExamples = () => (
           <SeatComponent
             activePlayer
             blocky={blocky}
+            dealer={1}
             holeCards={[-1, -1]}
             myPos={0}
+            pos={0}
             pending={false}
             stackSize={10000}
             signerAddr="123456789012"
@@ -165,8 +175,10 @@ const SeatExamples = () => (
           <SeatComponent
             activePlayer
             blocky={blocky}
+            dealer={1}
             holeCards={[-1, -1]}
             myPos={0}
+            pos={0}
             pending={false}
             stackSize={10000}
             signerAddr="123456789012"
@@ -181,8 +193,10 @@ const SeatExamples = () => (
           <SeatComponent
             activePlayer
             blocky={blocky}
+            dealer={1}
             holeCards={[-1, -1]}
             myPos={0}
+            pos={0}
             pending={false}
             stackSize={999}
             signerAddr="Edith"
@@ -197,9 +211,11 @@ const SeatExamples = () => (
           <SeatComponent
             activePlayer
             blocky={blocky}
+            dealer={1}
             folded
             holeCards={[4, 8]}
             myPos={0}
+            pos={0}
             stackSize={stackSize}
             signerAddr={signerAddr}
           />
@@ -216,8 +232,10 @@ const SeatExamples = () => (
           <SeatComponent
             activePlayer
             blocky={blocky}
+            dealer={1}
             holeCards={[-1, -1]}
             myPos={0}
+            pos={0}
             pending={false}
             stackSize={10000}
             signerAddr="123456789012"
@@ -231,8 +249,10 @@ const SeatExamples = () => (
           <SeatComponent
             activePlayer
             blocky={blocky}
+            dealer={1}
             holeCards={[-1, -1]}
             myPos={0}
+            pos={0}
             pending={false}
             stackSize={10000}
             signerAddr="123456789012"
@@ -246,8 +266,10 @@ const SeatExamples = () => (
           <SeatComponent
             activePlayer
             blocky={blocky}
+            dealer={1}
             holeCards={[-1, -1]}
             myPos={0}
+            pos={0}
             pending={false}
             stackSize={999}
             signerAddr="Edith"
@@ -260,9 +282,11 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             blocky={blocky}
+            dealer={1}
             folded
             holeCards={[4, 8]}
             myPos={0}
+            pos={0}
             stackSize={stackSize}
             signerAddr={signerAddr}
           />

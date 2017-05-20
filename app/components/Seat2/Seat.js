@@ -9,6 +9,7 @@ import StatusAction from './StatusAction';
 import {
   AvatarImage,
   CardContainer,
+  ChipButtonContainer,
   DealerButton,
   DetailWrapper,
   InfoWrapper,
@@ -30,6 +31,14 @@ const stackToString = (stackSize) => {
 // temp to be replaced by imported function
 const nickNameByAddress = (signerAddr) => signerAddr;
 
+const showChipsButton = (pending, seatStatus) => {
+  if (pending) return false;
+  if (seatStatus === 'sit-out' ||
+    seatStatus === 'sitting-in' ||
+    seatStatus === 'standing-up') return false;
+  return true;
+};
+
 const Seat = (props) => {
   const {
     activePlayer,
@@ -38,6 +47,7 @@ const Seat = (props) => {
     folded,
     holeCards,
     lastAction,
+    pending,
     pos,
     seatStatus,
     signerAddr,
@@ -47,17 +57,6 @@ const Seat = (props) => {
   } = props;
   return (
     <SeatContainer activePlayer={activePlayer}>
-
-      <DealerButton dealer={dealer} pos={pos}>D</DealerButton>
-
-      {/* <AmountBox amountCoords={amountCoords}>
-        { (lastAmount > 0) &&
-        <div>
-          <Pot potSize={lastAmount} left="0%" top="0%" />
-        </div>
-        }
-      </AmountBox> */}
-
       {seatStatus !== 'EMPTY' ?
         <StatusSeatWrapper>
           <StatusSeat>{seatStatus}</StatusSeat>
@@ -80,7 +79,23 @@ const Seat = (props) => {
       }
 
       <InfoWrapper>
+        {showChipsButton(pending, seatStatus) ?
+          <ChipButtonContainer>
+            <DealerButton dealer={dealer} pos={pos}>D</DealerButton>
+
+            {/* <AmountBox amountCoords={amountCoords}>
+              { (lastAmount > 0) &&
+              <div>
+                <Pot potSize={lastAmount} left="0%" top="0%" />
+              </div>
+              }
+            </AmountBox> */}
+          </ChipButtonContainer>
+          : null
+        }
+
         <AvatarImage bgImg={blocky} />
+
         <DetailWrapper>
           <NameBox>{nickNameByAddress(signerAddr)}</NameBox>
           <StackBox>{stackToString(stackSize)}</StackBox>
@@ -106,6 +121,7 @@ Seat.propTypes = {
   folded: React.PropTypes.bool,
   holeCards: React.PropTypes.array, // array of cards
   lastAction: React.PropTypes.string,
+  pending: React.PropTypes.bool,
   pos: React.PropTypes.number, // which position is THIS seat
   seatStatus: React.PropTypes.string,
   signerAddr: React.PropTypes.string,
