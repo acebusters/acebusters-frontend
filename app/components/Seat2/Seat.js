@@ -34,6 +34,7 @@ const Seat = ({
   cards,
   stackSize,
   statusMsg,
+  seatStatus,
   timeLeft,
   signerAddr,
 }) => (
@@ -45,7 +46,7 @@ const Seat = ({
       </CardContainer>
     :
       <StatusSeatWrapper>
-        <StatusSeat>Sit-out</StatusSeat>
+        <StatusSeat>{seatStatus}</StatusSeat>
       </StatusSeatWrapper>
     }
     <InfoWrapper>
@@ -72,6 +73,7 @@ const Seat = ({
 Seat.propTypes = {
   activePlayer: React.PropTypes.bool,
   cards: React.PropTypes.array,
+  seatStatus: React.PropTypes.string,
   signerAddr: React.PropTypes.string,
   stackSize: React.PropTypes.number,
   statusMsg: React.PropTypes.object,

@@ -13,25 +13,30 @@ const coords = [0, 0];
 
 const SeatComponent = (props) => {
   const { myPos, open, pending, pos, sitout, state, whosTurn } = props;
-  let status = '';
+  let seatStatus = '';
   let seat = null;
+
   if (pending) {
-    status = 'PENDING';
+    seatStatus = 'Pending';
   } else if (myPos === undefined) {
-    status = 'JOINING';
+    seatStatus = 'Sitting-in';
+    // TODO add 'Standing-up' logic
+  } else if (typeof sitout === 'number') {
+    seatStatus = 'Sit-out';
   } else {
-    status = 'EMPTY';
+    seatStatus = 'EMPTY';
   }
+
   if (open) {
     seat = (
       <SeatWrapper coords={coords}>
-        <ButtonJoinSeat label={status} />
+        <ButtonJoinSeat />
       </SeatWrapper>
     );
   } else if (pending) {
     seat = (
       <SeatWrapper coords={coords}>
-        <Seat label={status} {...props} />
+        <Seat seatStatus={seatStatus} {...props} />
       </SeatWrapper>
     );
   } else {
@@ -39,14 +44,16 @@ const SeatComponent = (props) => {
     if (['showdown', 'waiting', 'dealing'].indexOf(state) === -1
           && pos === whosTurn) {
       color = 'green';
-    } else if (typeof sitout === 'number') {
-      color = 'gray';
     } else {
       color = 'blue';
     }
     seat = (
       <SeatWrapper coords={coords}>
-        <Seat strokeColor={color} {...props} />
+        <Seat
+          seatStatus={seatStatus}
+          strokeColor={color}
+          {...props}
+        />
       </SeatWrapper>
     );
   }
@@ -58,10 +65,10 @@ SeatComponent.propTypes = {
   folded: React.PropTypes.bool,
   lastAction: React.PropTypes.string,
   lastAmount: React.PropTypes.number,
-  myPos: React.PropTypes.array, // seat component position?
+  myPos: React.PropTypes.number, // seat component position?
   pending: React.PropTypes.bool,
   pos: React.PropTypes.number, // dealer button position?
-  sitout: React.PropTypes.bool, // ?
+  sitout: React.PropTypes.number, // amount of time left in sitou
 };
 
 

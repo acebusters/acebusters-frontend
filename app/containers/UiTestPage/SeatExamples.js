@@ -28,51 +28,49 @@ const SeatExamples = () => (
             open
           />
         </div>
+        <H3>Pending</H3>
+        <div style={{ position: 'relative' }}>
+          <div style={colWidth} />
+          <SeatComponent
+            activePlayer={false}
+            pending
+            stackSize={0}
+            signerAddr="Username123"
+          />
+        </div>
         <H3>Sitting-in</H3>
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
           <SeatComponent
             activePlayer={false}
-            pending
             stackSize={0}
             signerAddr="Username123"
-            statusMsg={{
-              type: 'info',
-              text: 'Sitting-in',
-              recent: true,
-            }}
           />
         </div>
+
         <H3>Standing-up</H3>
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
           <SeatComponent
             activePlayer={false}
-            pending
             stackSize={0}
             signerAddr="Username123"
-            statusMsg={{
-              type: 'info',
-              text: 'Standing-in',
-              recent: true,
-            }}
           />
         </div>
+
         <H3>Sit-out</H3>
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
           <SeatComponent
             activePlayer={false}
-            pending
+            myPos={0}
+            pending={false}
+            sitout={0.6}
             stackSize={0}
             signerAddr="Username123"
-            statusMsg={{
-              type: 'info',
-              text: 'Sit-out',
-              recent: true,
-            }}
           />
         </div>
+
       </div>
       <div style={colStyle}>
         <H2>Timer</H2>
@@ -82,6 +80,7 @@ const SeatExamples = () => (
           <SeatComponent
             activePlayer
             cards={['d2', 's2']}
+            open={false}
             pending={false}
             stackSize={0}
             signerAddr="Username123"
