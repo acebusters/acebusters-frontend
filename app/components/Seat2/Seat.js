@@ -7,12 +7,13 @@ import Card from '../Card2';
 import SeatTimer from './SeatTimer';
 import StatusAction from './StatusAction';
 import {
-  SeatContainer,
-  CardContainer,
-  InfoWrapper,
   AvatarImage,
+  CardContainer,
+  DealerButton,
   DetailWrapper,
+  InfoWrapper,
   NameBox,
+  SeatContainer,
   StackBox,
   StatusSeat,
   StatusSeatWrapper,
@@ -32,20 +33,22 @@ const nickNameByAddress = (signerAddr) => signerAddr;
 const Seat = (props) => {
   const {
     activePlayer,
+    dealer,
     blocky,
-    holeCards,
     folded,
+    holeCards,
+    lastAction,
+    pos,
     seatStatus,
     signerAddr,
     sitout,
     stackSize,
-    lastAction,
     timeLeft,
   } = props;
   return (
     <SeatContainer activePlayer={activePlayer}>
 
-      {/* <DealerButton dealer={dealer} pos={pos} /> */}
+      <DealerButton dealer={dealer} pos={pos}>D</DealerButton>
 
       {/* <AmountBox amountCoords={amountCoords}>
         { (lastAmount > 0) &&
@@ -99,13 +102,15 @@ const Seat = (props) => {
 Seat.propTypes = {
   activePlayer: React.PropTypes.bool,
   blocky: React.PropTypes.string,
+  dealer: React.PropTypes.number, // which seat is dealer
   folded: React.PropTypes.bool,
   holeCards: React.PropTypes.array, // array of cards
+  lastAction: React.PropTypes.string,
+  pos: React.PropTypes.number, // which position is THIS seat
   seatStatus: React.PropTypes.string,
   signerAddr: React.PropTypes.string,
   sitout: React.PropTypes.number,
   stackSize: React.PropTypes.number,
-  lastAction: React.PropTypes.string,
   timeLeft: React.PropTypes.number, // progress 0 - 1
 };
 

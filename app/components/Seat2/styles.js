@@ -68,7 +68,24 @@ export const SeatContainer = styled.div`
   color: white;
   background-color: none;
   opacity: ${(props) => props.activePlayer ? 1 : 0.5};
- `;
+`;
+
+// dealer button
+export const DealerButton = styled.div`
+  ${(props) => !(props.dealer === props.pos) ? 'display: none;' : ''}
+  position: absolute;
+  width: 1.5em;
+  height: 1.5em;
+
+  background: white;
+  border-radius: 50%;
+  border: 4px solid 'green';
+
+  text-align: center;
+  font-weight: 600;
+  color: black;
+`;
+
 
 // cards
 export const CardContainer = styled.div`
