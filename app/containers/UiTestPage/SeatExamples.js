@@ -15,7 +15,6 @@ const colWidth = {
 
 const SeatExamples = () => (
   <div>
-    <H2>Seats</H2>
     <div style={{ display: 'flex' }}>
       <div style={colStyle}>
         <H2>Paused</H2>
@@ -127,7 +126,7 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
-            holeCards={['d2', 's2']}
+            cards={['d2', 's2']}
             pending={false}
             stackSize={10000}
             signerAddr="123456789012"

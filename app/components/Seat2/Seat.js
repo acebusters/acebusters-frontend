@@ -21,9 +21,10 @@ import {
 // const componentSize = 'small'; // small, medium, large
 const avatarSize = [38, 38]; // x,y
 
-const stackToString = (stackSize) => (
-  stackSize.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-);
+const stackToString = (stackSize) => {
+  if (!stackSize) return '0';
+  return stackSize.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
 
 // temp to be replaced by imported function
 const nickNameByAddress = (signerAddr) => signerAddr;
@@ -85,7 +86,7 @@ const Seat = (props) => {
 };
 Seat.propTypes = {
   activePlayer: React.PropTypes.bool,
-  holeCards: React.PropTypes.array,
+  holeCards: React.PropTypes.array, // array of cards
   seatStatus: React.PropTypes.string,
   signerAddr: React.PropTypes.string,
   sitout: React.PropTypes.number,
