@@ -80,8 +80,6 @@ const SeatExamples = () => (
           <SeatComponent
             activePlayer
             cards={['d2', 's2']}
-            open={false}
-            pending={false}
             stackSize={0}
             signerAddr="Username123"
             timeLeft={0.9}

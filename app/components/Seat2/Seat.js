@@ -32,6 +32,7 @@ const nickNameByAddress = (signerAddr) => signerAddr;
 const Seat = ({
   activePlayer,
   cards,
+  sitout,
   stackSize,
   statusMsg,
   seatStatus,
@@ -64,8 +65,11 @@ const Seat = ({
       </StatusWrapper>
       : null
     }
-    {(timeLeft > 0) ?
-      <SeatTimer timerProgress={timeLeft} />
+    {(timeLeft > 0) || (sitout > 0) ?
+      <SeatTimer
+        timerProgress={sitout || timeLeft}
+        timerType={(sitout > 0) ? 'sitout' : 'action'}
+      />
       : null
     }
   </SeatContainer>
@@ -75,6 +79,7 @@ Seat.propTypes = {
   cards: React.PropTypes.array,
   seatStatus: React.PropTypes.string,
   signerAddr: React.PropTypes.string,
+  sitout: React.PropTypes.number,
   stackSize: React.PropTypes.number,
   statusMsg: React.PropTypes.object,
   timeLeft: React.PropTypes.number, // progress 0 - 1

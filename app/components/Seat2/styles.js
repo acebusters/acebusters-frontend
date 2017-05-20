@@ -214,6 +214,7 @@ export const TimerBar = styled.div`
   width: ${(props) => props.width};
   border-radius: 0 0 ${scaleSeat(2)} ${scaleSeat(2)};
   background: ${(props) => {
+    if (props.type === 'info') return infoColor;
     if (props.type === 'active') return activeColor;
     if (props.type === 'warning') return warningBg;
     if (props.type === 'danger') return dangerBg;
