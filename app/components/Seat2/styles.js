@@ -141,7 +141,7 @@ export const StatusWrapper = styled.div`
   background-color: none;
 `;
 
-export const StatusHand = styled(SharedLower)`
+export const StatusActionStyle = styled(SharedLower)`
   padding-top: 0;
   padding-left: ${scaleSeat(10)};
   padding-bottom: ${scaleSeat(1)};

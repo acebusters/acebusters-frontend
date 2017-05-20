@@ -5,6 +5,9 @@ import React from 'react';
 
 import Seat from './Seat';
 import ButtonJoinSeat from './ButtonJoinSeat';
+/* TODO Remove radial component?
+imoprt Radial from '../RadialProgress'
+*/
 
 import { SeatWrapper } from './styles';
 
@@ -12,17 +15,26 @@ import { SeatWrapper } from './styles';
 const coords = [0, 0];
 
 const SeatComponent = (props) => {
-  const { myPos, open, pending, pos, sitout, state, whosTurn } = props;
+  const {
+    folded,
+    myPos,
+    open,
+    pending,
+    sitout,
+    // whosTurn, state, pos
+  } = props;
   let seatStatus = '';
   let seat = null;
 
   if (pending) {
-    seatStatus = 'Pending';
+    seatStatus = 'pending';
   } else if (myPos === undefined) {
-    seatStatus = 'Sitting-in';
+    seatStatus = 'sitting-in';
     // TODO add 'Standing-up' logic
   } else if (typeof sitout === 'number') {
-    seatStatus = 'Sit-out';
+    seatStatus = 'sit-out';
+  } else if (folded) {
+    seatStatus = 'folded';
   } else {
     seatStatus = 'EMPTY';
   }
@@ -34,6 +46,7 @@ const SeatComponent = (props) => {
       </SeatWrapper>
     );
   } else {
+    /* TODO: remove because action is tracked by timeLeft and activePlayer?
     let color;
     if (['showdown', 'waiting', 'dealing'].indexOf(state) === -1
           && pos === whosTurn) {
@@ -41,11 +54,11 @@ const SeatComponent = (props) => {
     } else {
       color = 'blue';
     }
+    */
     seat = (
       <SeatWrapper coords={coords}>
         <Seat
           seatStatus={seatStatus}
-          strokeColor={color}
           {...props}
         />
       </SeatWrapper>
@@ -59,9 +72,9 @@ SeatComponent.propTypes = {
   folded: React.PropTypes.bool,
   lastAction: React.PropTypes.string,
   lastAmount: React.PropTypes.number,
-  myPos: React.PropTypes.number, // seat component position?
+  myPos: React.PropTypes.number, // action bar position
   pending: React.PropTypes.bool,
-  pos: React.PropTypes.number, // dealer button position?
+  // pos: React.PropTypes.number, // player position
   sitout: React.PropTypes.number, // amount of time left in sitou
 };
 

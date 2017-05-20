@@ -52,7 +52,6 @@ const SeatExamples = () => (
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
           <SeatComponent
-            activePlayer={false}
             stackSize={0}
             signerAddr="Username123"
           />
@@ -62,10 +61,21 @@ const SeatExamples = () => (
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
           <SeatComponent
+            myPos={0}
+            sitout={0.6}
+            stackSize={0}
+            signerAddr="Username123"
+          />
+        </div>
+
+        <H3>Folded</H3>
+        <div style={{ position: 'relative' }}>
+          <div style={colWidth} />
+          <SeatComponent
             activePlayer={false}
             myPos={0}
             pending={false}
-            sitout={0.6}
+            folded
             stackSize={0}
             signerAddr="Username123"
           />
@@ -79,7 +89,7 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
-            cards={['d2', 's2']}
+            holeCards={['d2', 's2']}
             stackSize={0}
             signerAddr="Username123"
             timeLeft={0.9}
@@ -90,7 +100,7 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
-            cards={['d2', 's2']}
+            holeCards={['d2', 's2']}
             pending={false}
             stackSize={0}
             signerAddr="Username123"
@@ -102,7 +112,7 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
-            cards={['d2', 's2']}
+            holeCards={['d2', 's2']}
             pending={false}
             stackSize={0}
             signerAddr="Username123"
@@ -117,15 +127,12 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
-            cards={['d2', 's2']}
+            holeCards={['d2', 's2']}
             pending={false}
             stackSize={10000}
             signerAddr="123456789012"
-            statusMsg={{
-              type: 'success',
-              text: 'Call',
-              recent: true,
-            }}
+            lastAction="call"
+            showStatus
           />
         </div>
         <h3>Raise, Bet</h3>
@@ -133,15 +140,12 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
-            cards={['d2', 's2']}
+            holeCards={['d2', 's2']}
             pending={false}
             stackSize={10000}
             signerAddr="123456789012"
-            statusMsg={{
-              type: 'danger',
-              text: 'Raise',
-              recent: true,
-            }}
+            lastAction="raise"
+            showStatus
           />
         </div>
         <h3>All-in, Winner</h3>
@@ -149,15 +153,12 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
-            cards={['d2', 's2']}
+            holeCards={['d2', 's2']}
             pending={false}
             stackSize={999}
             signerAddr="Edith"
-            statusMsg={{
-              type: 'warning',
-              text: 'All-in',
-              recent: true,
-            }}
+            lastAction="all-in"
+            showStatus
           />
         </div>
       </div>
@@ -168,15 +169,11 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
-            cards={['d2', 's2']}
+            holeCards={['d2', 's2']}
             pending={false}
             stackSize={10000}
             signerAddr="123456789012"
-            statusMsg={{
-              type: 'success',
-              text: 'Call',
-              recent: false,
-            }}
+            lastAction="call"
           />
         </div>
         <h3>Raise, Bet</h3>
@@ -184,15 +181,11 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
-            cards={['d2', 's2']}
+            holeCards={['d2', 's2']}
             pending={false}
             stackSize={10000}
             signerAddr="123456789012"
-            statusMsg={{
-              type: 'danger',
-              text: 'Raise',
-              recent: false,
-            }}
+            lastAction="raise"
           />
         </div>
         <h3>All-in, Winner</h3>
@@ -200,15 +193,11 @@ const SeatExamples = () => (
           <div style={colWidth} />
           <SeatComponent
             activePlayer
-            cards={['d2', 's2']}
+            holeCards={['d2', 's2']}
             pending={false}
             stackSize={999}
             signerAddr="Edith"
-            statusMsg={{
-              type: 'warning',
-              text: 'All-in',
-              recent: false,
-            }}
+            lastAction="all-in"
           />
         </div>
       </div>
