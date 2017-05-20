@@ -33,12 +33,6 @@ const SeatComponent = (props) => {
         <ButtonJoinSeat />
       </SeatWrapper>
     );
-  } else if (pending) {
-    seat = (
-      <SeatWrapper coords={coords}>
-        <Seat seatStatus={seatStatus} {...props} />
-      </SeatWrapper>
-    );
   } else {
     let color;
     if (['showdown', 'waiting', 'dealing'].indexOf(state) === -1
