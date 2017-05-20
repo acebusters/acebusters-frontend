@@ -7,6 +7,7 @@ import styled from 'styled-components';
 const cardBg = '#A3BFE0';
 const successBg = 'linear-gradient(0deg, #B4ED50 0%, #78D049 100%)';
 const infoBg = 'linear-gradient(0deg, #D4D4D4 0%, #4D4D4D 100%)';
+const infoReverseBg = 'linear-gradient(0deg, #4D4D4D 0%, #D4D4D4 100%)';
 const warningBg = 'linear-gradient(0deg, #F7F8CB 0%, #F7F51C 100%)';
 const dangerBg = 'linear-gradient(0deg, #FBDA61 0%, #F76B1C 100%)';
 const activeColor = '#35C5E3'; // tealish
@@ -73,7 +74,8 @@ export const SeatContainer = styled.div`
 // cards
 export const CardContainer = styled.div`
   display: flex;
-  margin-left: ${scaleSeat(48)};
+  justify-content: flex-end;
+  margin-right: ${scaleSeat(4)};
 
   background-color: none;
 `;
@@ -139,7 +141,7 @@ export const StatusWrapper = styled.div`
   background-color: none;
 `;
 
-export const Status = styled(SharedLower)`
+export const StatusHand = styled(SharedLower)`
   padding-top: 0;
   padding-left: ${scaleSeat(10)};
   padding-bottom: ${scaleSeat(1)};
@@ -162,6 +164,29 @@ export const Status = styled(SharedLower)`
     return infoBg;
   }};
   opacity: ${(props) => props.recent ? 1 : 0.4};
+`;
+
+export const StatusSeatWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-right: ${scaleSeat(6)};
+
+  background-color: none;
+`;
+
+export const StatusSeat = styled.div`
+  padding-top: 0;
+  padding-left: ${scaleSeat(14)};
+  padding-bottom: ${scaleSeat(1)};
+  padding-right: ${scaleSeat(14)};
+
+  font-weight: 600;
+  font-size: ${scaleSeat(11)};
+  color: ${infoColor};
+
+  background: ${infoReverseBg};
+  box-shadow: ${smallShadow};
+  border-radius: ${scaleSeat(3)} ${scaleSeat(3)} 0 0;
 `;
 
 // timer

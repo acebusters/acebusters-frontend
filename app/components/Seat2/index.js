@@ -3,79 +3,13 @@
 */
 import React from 'react';
 
-import SeatTimer from './SeatTimer';
+import Seat from './Seat';
 import ButtonJoinSeat from './ButtonJoinSeat';
 
-import {
-  SeatWrapper,
-  SeatContainer,
-  CardContainer,
-  Card,
-  InfoWrapper,
-  AvatarImage,
-  DetailWrapper,
-  NameBox,
-  StackBox,
-  StatusWrapper,
-  Status,
-} from './styles';
+import { SeatWrapper } from './styles';
 
-// const componentSize = 'small'; // small, medium, large
-const avatarSize = [38, 38]; // x,y
-
-const stackToString = (stackSize) => (
-  stackSize.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-);
-
-// temp to be replaced by imported function
-const nickNameByAddress = (signerAddr) => signerAddr;
+// temp global variables
 const coords = [0, 0];
-
-const Seat = ({
-  activePlayer,
-  cards,
-  stackSize,
-  statusMsg,
-  timeLeft,
-  signerAddr,
-}) => (
-  <SeatContainer activePlayer={activePlayer}>
-    {cards ?
-      <CardContainer>
-        <Card />
-        <Card />
-      </CardContainer>
-      : null
-    }
-    <InfoWrapper>
-      <AvatarImage src={`https://baconmockup.com/${avatarSize[0]}/${avatarSize[1]}`} />
-      <DetailWrapper>
-        <NameBox>{nickNameByAddress(signerAddr)}</NameBox>
-        <StackBox>{stackToString(stackSize)}</StackBox>
-      </DetailWrapper>
-    </InfoWrapper>
-    {statusMsg ?
-      <StatusWrapper>
-        <Status type={statusMsg.type} recent={statusMsg.recent}>
-          {statusMsg.text}
-        </Status>
-      </StatusWrapper>
-      : null
-    }
-    {(timeLeft > 0) ?
-      <SeatTimer timerProgress={timeLeft} />
-      : null
-    }
-  </SeatContainer>
-);
-Seat.propTypes = {
-  activePlayer: React.PropTypes.bool,
-  cards: React.PropTypes.array,
-  signerAddr: React.PropTypes.string,
-  stackSize: React.PropTypes.number,
-  statusMsg: React.PropTypes.object,
-  timeLeft: React.PropTypes.number, // progress 0 - 1
-};
 
 const SeatComponent = (props) => {
   const { myPos, open, pending, pos, sitout, state, whosTurn } = props;
