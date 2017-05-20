@@ -89,9 +89,7 @@ const Seat = (props) => {
 
             <AmountBox amountCoords={amountCoords}>
               { (lastAmount > 0) &&
-              <div>
                 <Pot potSize={lastAmount} left="0%" top="0%" />
-              </div>
               }
             </AmountBox>
           </ChipButtonContainer>

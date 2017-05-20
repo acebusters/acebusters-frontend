@@ -96,8 +96,8 @@ export const DealerButton = styled.div`
 
 export const AmountBox = styled.div`
   position: absolute;
-  left: ${(props) => `${props.amountCoords[0]}%`};
-  top: ${(props) => `${props.amountCoords[1]}%`};
+  left: ${(props) => `${props.amountCoords[0]}px`};
+  top: ${(props) => `${props.amountCoords[1]}px`};
   border-radius: 25%;
   color: white;
   line-height: 3em;

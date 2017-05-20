@@ -127,12 +127,12 @@ const CardExamples = () => (
       <div style={colStyle}>
         <H2>Chips</H2>
 
-        <H3>None</H3>
+        <H3>Top</H3>
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
           <SeatComponent
             activePlayer
-            amountCoords={[0, 100]}
+            amountCoords={[14, -70]}
             blocky={blocky}
             dealer={0}
             holeCards={[null, null]}
@@ -144,12 +144,12 @@ const CardExamples = () => (
           />
         </div>
 
-        <H3>Hidden</H3>
+        <H3>Right</H3>
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
           <SeatComponent
             activePlayer
-            amountCoords={[1, 1]}
+            amountCoords={[140, 0]}
             blocky={blocky}
             dealer={0}
             holeCards={[-1, -1]}
@@ -161,12 +161,29 @@ const CardExamples = () => (
           />
         </div>
 
-        <H3>Reveal</H3>
+        <H3>Bottom</H3>
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
           <SeatComponent
             activePlayer
-            amountCoords={[1, 1]}
+            amountCoords={[12, 40]}
+            blocky={blocky}
+            dealer={0}
+            holeCards={[4, 8]}
+            lastAmount={1000}
+            myPos={0}
+            pos={0}
+            stackSize={stackSize}
+            signerAddr={signerAddr}
+          />
+        </div>
+
+        <H3>Rigth</H3>
+        <div style={{ position: 'relative' }}>
+          <div style={colWidth} />
+          <SeatComponent
+            activePlayer
+            amountCoords={[-70, 0]}
             blocky={blocky}
             dealer={0}
             holeCards={[4, 8]}
