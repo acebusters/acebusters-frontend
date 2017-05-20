@@ -27,7 +27,7 @@ const CardExamples = () => (
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
           <SeatComponent
-            holeCards={['d2', 's2']}
+            holeCards={[]}
             stackSize={stackSize}
             signerAddr={signerAddr}
           />

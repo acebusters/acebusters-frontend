@@ -121,12 +121,13 @@ const SeatExamples = () => (
       </div>
       <div style={colStyle}>
         <H2>Recent Action</H2>
+
         <h3>Call, Check</h3>
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
           <SeatComponent
             activePlayer
-            cards={['d2', 's2']}
+            holeCards={['d2', 's2']}
             pending={false}
             stackSize={10000}
             signerAddr="123456789012"
@@ -134,6 +135,7 @@ const SeatExamples = () => (
             showStatus
           />
         </div>
+
         <h3>Raise, Bet</h3>
         <div style={{ position: 'relative' }}>
           <div style={colWidth} />
