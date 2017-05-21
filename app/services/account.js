@@ -1,7 +1,13 @@
 import fetch from 'isomorphic-fetch';
-import uuid from 'node-uuid';
 
 const accountUrl = 'https://hsqkzjp3m8.execute-api.eu-west-1.amazonaws.com/v0';
+
+/* eslint-disable */
+function uuid(a) {
+  return a ? (a^Math.random()*16>>a/4).toString(16) : ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,uuid); // eslint-disable-line import/extensions
+};
+/* eslint-enable */
+
 
 function request(path, body, method = 'post') {
   return new Promise((resolve, reject) => {
@@ -33,7 +39,7 @@ const account = {
   },
 
   register(email, recapResponse, origin) {
-    const accountId = uuid.v4();
+    const accountId = uuid();
     return request(`account/${accountId}`, {
       email,
       recapResponse,
