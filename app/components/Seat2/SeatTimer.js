@@ -10,7 +10,7 @@ import {
 } from './styles';
 
 const timerDisplayType = (timerType, timerProgress) => {
-  if (timerType === 'sitout') return 'info';
+  if (timerType === 'sitout') return 'sitout';
   if (timerProgress >= 0.6) return 'active';
   if (timerProgress >= 0.3) return 'warning';
   if (timerProgress >= 0) return 'danger';

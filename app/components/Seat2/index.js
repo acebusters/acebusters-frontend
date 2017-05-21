@@ -16,7 +16,6 @@ const coords = [0, 0];
 
 const SeatComponent = (props) => {
   const {
-    folded,
     isTaken,
     myPos,
     open,
@@ -34,8 +33,6 @@ const SeatComponent = (props) => {
     // TODO add 'Standing-up' logic
   } else if (typeof sitout === 'number') {
     seatStatus = 'sit-out';
-  } else if (folded) {
-    seatStatus = 'folded';
   } else {
     seatStatus = 'EMPTY'; // successfully resolves to EMPTY
   }

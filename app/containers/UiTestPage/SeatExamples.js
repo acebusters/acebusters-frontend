@@ -207,12 +207,12 @@ const SeatExamples = () => (
             blocky={blocky}
             dealer={1}
             holeCards={[-1, -1]}
+            lastAction="all-in"
             myPos={0}
             pos={0}
             pending={false}
             stackSize={999}
             signerAddr="Edith"
-            lastAction="all-in"
             showStatus
           />
         </div>
@@ -227,8 +227,10 @@ const SeatExamples = () => (
             dealer={1}
             folded
             holeCards={[4, 8]}
+            lastAction="fold"
             myPos={0}
             pos={0}
+            showStatus
             stackSize={stackSize}
             signerAddr={signerAddr}
           />
@@ -284,12 +286,12 @@ const SeatExamples = () => (
             blocky={blocky}
             dealer={1}
             holeCards={[-1, -1]}
+            lastAction="all-in"
             myPos={0}
             pos={0}
             pending={false}
             stackSize={999}
             signerAddr="Edith"
-            lastAction="all-in"
           />
         </div>
 
@@ -302,6 +304,7 @@ const SeatExamples = () => (
             dealer={1}
             folded
             holeCards={[4, 8]}
+            lastAction="fold"
             myPos={0}
             pos={0}
             stackSize={stackSize}

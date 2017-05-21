@@ -6,6 +6,7 @@ import React from 'react';
 import { StatusWrapper, StatusActionStyle } from './styles';
 
 const statusType = (lastAction) => {
+  if (lastAction === 'fold') return 'info';
   if (lastAction === 'call') return 'success';
   if (lastAction === 'check') return 'success';
   if (lastAction === 'all-in') return 'warning';

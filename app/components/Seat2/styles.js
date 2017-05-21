@@ -11,7 +11,7 @@ const warningBg = 'linear-gradient(0deg, #F7F8CB 0%, #F7F51C 100%)';
 const dangerBg = 'linear-gradient(0deg, #FBDA61 0%, #F76B1C 100%)';
 const activeColor = '#35C5E3'; // tealish
 const successColor = '#305209'; // greenish
-const infoColor = '#FFFFFF'; // white
+const infoColor = 'white'; // white
 const warningColor = '#5E5F3B'; // yellowish
 const dangerColor = '#63430F';  // orangish
 // shadows
@@ -20,6 +20,9 @@ const medShadow = '0 2px 4px 0 rgba(0,0,0,0.50)';
 // size
 const seatScale = 128;
 const joinButtonScale = 64;
+// font
+const fontWeightInfo = 500;
+const fontWeigthBold = 600;
 
 
 const calcSize = (baseSize, scaleSize, dimToScale) => {
@@ -193,19 +196,21 @@ export const StatusActionStyle = styled(SharedLower)`
   padding-left: ${scaleSeat(10)};
   padding-bottom: ${scaleSeat(1)};
   padding-right: ${scaleSeat(10)};
-  font-weight: 600;
+  font-weight: ${
+    (props) => (props.type === 'info') ? fontWeightInfo : fontWeigthBold
+  };
   font-size: ${scaleSeat(11)};
 
   color: ${(props) => {
     if (props.type === 'success') return successColor;
-    if (props.type === 'info') return infoColor;
+    if (props.type === 'info') return 'black';
     if (props.type === 'warning') return warningColor;
     if (props.type === 'danger') return dangerColor;
     return infoColor;
   }};
   background: ${(props) => {
     if (props.type === 'success') return successBg;
-    if (props.type === 'info') return infoBg;
+    if (props.type === 'info') return 'white';
     if (props.type === 'warning') return warningBg;
     if (props.type === 'danger') return dangerBg;
     return infoBg;
@@ -227,7 +232,7 @@ export const StatusSeat = styled.div`
   padding-bottom: ${scaleSeat(1)};
   padding-right: ${scaleSeat(14)};
 
-  font-weight: 600;
+  font-weight: ${fontWeightInfo};
   font-size: ${scaleSeat(11)};
   color: ${infoColor};
 
@@ -261,7 +266,7 @@ export const TimerBar = styled.div`
   width: ${(props) => props.width};
   border-radius: 0 0 ${scaleSeat(2)} ${scaleSeat(2)};
   background: ${(props) => {
-    if (props.type === 'info') return infoColor;
+    if (props.type === 'sitout') return 'white';
     if (props.type === 'active') return activeColor;
     if (props.type === 'warning') return warningBg;
     if (props.type === 'danger') return dangerBg;
