@@ -11,6 +11,7 @@ import {
   makeMyPosSelector,
   tableStateSelector,
   makeWhosTurnSelector,
+  makeSbSelector,
 } from '../Table/selectors';
 
 import { createBlocky } from '../../services/blockies';
@@ -145,6 +146,53 @@ const makeStackSelector = () => createSelector(
   selectStack
 );
 
+const makeShowStatusSelector = () => createSelector(
+  [makeHandSelector(), makeLastActionSelector(), makeLastRoundMaxBetSelector(), makeLastReceiptSelector(), makeSbSelector(), posSelector],
+  (hand, lastAction, lastRoundMaxBet, lastReceipt, sb, pos) => {
+    if (lastAction && lastReceipt && hand && hand.get) {
+      const amount = lastReceipt.values[1];
+      const state = hand.get('state');
+      if (hand.get('state') === 'preflop') {
+        const lineup = hand.get('lineup').toJS();
+        const dealer = hand.get('dealer');
+        let sbPos;
+        let bbPos;
+        try {
+          sbPos = pokerHelper.getSbPos(lineup, dealer, state);
+        } catch (e) {
+          sbPos = undefined;
+        }
+        try {
+          bbPos = pokerHelper.getBbPos(lineup, dealer, state);
+        } catch (e) {
+          bbPos = undefined;
+        }
+        if (pos === sbPos && amount === sb) {
+          return 'posted SB';
+        }
+
+        if (pos === bbPos && amount === sb * 2) {
+          return 'posted BB';
+        }
+      }
+
+      if (lastAction === 'sitOut') { return 'sitting out'; }
+      if (lastAction === 'fold') {
+        return 'folded';
+      }
+      if (state !== 'waiting' && state !== 'dealing') {
+        if (lastAction.indexOf('bet') > -1 && amount > lastRoundMaxBet) {
+          return 'bet';
+        }
+        if (lastAction.toLowerCase().indexOf(state) > -1) {
+          return 'check';
+        }
+      }
+    }
+    return '';
+  }
+);
+
 const makeMyStackSelector = () => createSelector(
   [tableStateSelector, makeMyPosSelector()],
   selectStack
@@ -212,6 +260,7 @@ export {
   makeBlockySelector,
   makeCardsSelector,
   makeLastRoundMaxBetSelector,
+  makeShowStatusSelector,
   makeMyCardsSelector,
   makeFoldedSelector,
   makeWhosTurnSelector,
