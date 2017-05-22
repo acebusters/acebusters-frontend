@@ -1,6 +1,6 @@
 # Acebusters Web App
 
-Forked from [react-boilerplate](https://github.com/react-boilerplate/react-boilerplate).
+Web app to play a fair and secure game of poker.
 
 ## Quick Start
 
