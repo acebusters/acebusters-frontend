@@ -47,7 +47,6 @@ import makeSelectAccountData, {
 
 import {
   makeLastReceiptSelector,
-  makeMyStackSelector,
 } from '../Seat/selectors';
 
 import { blockNotify } from '../AccountProvider/actions';
@@ -74,7 +73,6 @@ import web3Connect from '../AccountProvider/web3Connect';
 import TableService, { getHand } from '../../services/tableService';
 import JoinDialog from '../JoinDialog';
 import JoinSlides from '../JoinDialog/slides';
-import RebuyDialog from '../RebuyDialog';
 import InviteDialog from '../InviteDialog';
 
 const getTableData = (table, props) => {
@@ -178,23 +176,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           });
         }
       }
-    }
-
-    // display Rebuy modal if state === 'waiting' and user stack is no greater than 0
-    if (nextProps.state === 'waiting' && nextProps.myStack !== null && nextProps.myStack <= 0
-        && (nextProps.state !== this.props.state || nextProps.myStack !== this.props.myStack)) {
-      const balance = parseInt(this.balance.toString(), 10);
-
-      this.props.modalDismiss();
-      this.props.modalAdd((
-        <RebuyDialog
-          handleRebuy={this.handleRebuy}
-          handleLeave={this.handleLeave}
-          modalDismiss={this.props.modalDismiss}
-          params={this.props.params}
-          balance={balance}
-        />
-      ));
     }
   }
 
@@ -535,7 +516,6 @@ const mapStateToProps = createStructuredSelector({
   hand: makeHandSelector(),
   board: makeBoardSelector(),
   myHand: makeMyHandValueSelector(),
-  myStack: makeMyStackSelector(),
   data: makeTableDataSelector(),
   sitoutAmount: makeSitoutAmountSelector(),
   lineup: makeLineupSelector(),
@@ -557,7 +537,6 @@ Table.propTypes = {
   board: React.PropTypes.array,
   hand: React.PropTypes.object,
   myHand: React.PropTypes.object,
-  myStack: React.PropTypes.number,
   lineup: React.PropTypes.object,
   sitout: React.PropTypes.any,
   params: React.PropTypes.object,

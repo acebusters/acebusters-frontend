@@ -130,8 +130,15 @@ const hasNettingInAction = createSelector(
     if (!myAddr || !action || !action.hand || !action.hand.netting) {
       return false;
     }
-    // check already signed
-    if (action.hand.netting[myAddr]) {
+    // check if myAddr in lineup
+    let isInLineup = false;
+    for (let i = 0; i < action.hand.lineup.length; i += 1) {
+      if (myAddr === action.hand.lineup[i].address) {
+        isInLineup = true;
+      }
+    }
+    // check in lineup an not already signed
+    if (!isInLineup || action.hand.netting[myAddr]) {
       return false;
     }
     return true;

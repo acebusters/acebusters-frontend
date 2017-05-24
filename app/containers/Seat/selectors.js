@@ -87,7 +87,8 @@ const makeCardsSelector = () => createSelector(
 
     // Note: no players should have cards shown on table if it's still waiting
     // and show his cards only if he is an active player
-    if (state === 'waiting' || !pokerHelper.isActivePlayer(lineup, pos, hand.get('state'))) {
+    // except in showdown, when cards should always be shown
+    if (state === 'waiting' || (state !== 'showdown' && !pokerHelper.isActivePlayer(lineup, pos, hand.get('state')))) {
       return [null, null];
     }
 
