@@ -31,6 +31,10 @@ import {
   makeWhosTurnSelector,
 } from '../Table/selectors';
 
+import {
+  timeoutSeconds,
+} from '../../app.config';
+
 import SeatComponent from '../../components/Seat';
 
 class Seat extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -38,13 +42,13 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
   componentWillReceiveProps(nextProps) {
     // Show Action;
     this.opacity = (nextProps.lastAmount !== this.props.lastAmount) ? '1' : 0;
-    let timeLeft = 100;
+    let timeLeft = timeoutSeconds;
     // manage timer
     if (nextProps.whosTurn === nextProps.pos) {
       if (!this.interval) {
         this.interval = setInterval(() => {
           if (this.props.changed) {
-            const deadline = this.props.changed + 180;
+            const deadline = this.props.changed + timeoutSeconds;
             timeLeft = deadline - Math.floor(Date.now() / 1000);
             if (timeLeft <= 0) {
               clearInterval(this.interval);
@@ -70,7 +74,7 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
   }
 
   render() {
-    const timeLeft = (this.state && this.props.whosTurn === this.props.pos) ? this.state.timeLeft * (100 / 60) : 100;
+    const timeLeft = (this.state && this.props.whosTurn === this.props.pos) ? ((this.state.timeLeft * 100) / timeoutSeconds) : timeoutSeconds;
     return (
       <SeatComponent
         {...this.props}
