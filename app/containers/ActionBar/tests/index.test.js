@@ -19,12 +19,12 @@ describe('ActionBar', () => {
     let actionBar = shallow(
       <ActionBar {...props} />
     );
-    expect(actionBar.children().length).toBe(0);
+    expect(actionBar.find('ActionBarComponent').length).toBe(0);
     props.state = 'dealing';
     actionBar = shallow(
       <ActionBar {...props} />
     );
-    expect(actionBar.children().length).toBe(0);
+    expect(actionBar.find('ActionBarComponent').length).toBe(0);
   });
 
   it('should render in flop', () => {
@@ -38,7 +38,7 @@ describe('ActionBar', () => {
     const actionBar = shallow(
       <ActionBar {...props} />
     );
-    expect(actionBar.children().length).toBeGreaterThan(0);
+    expect(actionBar.find('ActionBarComponent').length).toBeGreaterThan(0);
   });
 
   it('should not render in flop when its not my turn', () => {
@@ -52,7 +52,7 @@ describe('ActionBar', () => {
     const actionBar = shallow(
       <ActionBar {...props} />
     );
-    expect(actionBar.children().length).toBe(0);
+    expect(actionBar.find('ActionBarComponent').length).toBe(0);
   });
 
   it('should render fold button when amountToCall is greater than 0', () => {
@@ -202,7 +202,7 @@ describe('ActionBar', () => {
       <ActionBar {...props} />
     );
     actionBar.instance().setActive(false);
-    expect(actionBar.children().length).toBe(0);
+    expect(actionBar.find('ActionBarComponent').length).toBe(0);
   });
 });
 
