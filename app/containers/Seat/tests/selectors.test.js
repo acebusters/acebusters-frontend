@@ -7,9 +7,10 @@ import {
   makeLastAmountSelector,
   makeCardsSelector,
   makeStackSelector,
+  makeShowStatusSelector,
 } from '../selectors';
 
-import { ABI_BET, ABI_DIST, ABI_FOLD } from '../../../app.config';
+import { ABI_BET, ABI_DIST, ABI_FOLD, checkABIs } from '../../../app.config';
 
 // secretSeed: 'rural tent tests net drip fatigue uncle action repeat couple lawn rival'
 const P1_ADDR = '0x6d2f2c0fa568243d2def3e999a791a6df45d816e';
@@ -331,5 +332,207 @@ describe('stackSelector', () => {
       },
     };
     expect(stackSelector(mockedState, props)).toEqual(4300);
+  });
+});
+
+describe('makeShowStatusSelector', () => {
+  it('should return posted SB', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          data: {
+            smallBlind: 50,
+          },
+          0: {
+            state: 'preflop',
+            dealer: 0,
+            lineup: [{
+              address: P1_ADDR,
+              last: new EWT(ABI_BET).bet(1, 50).sign(P1_KEY),
+            }, {
+              address: P2_ADDR,
+              last: new EWT(ABI_BET).bet(1, 100).sign(P2_KEY),
+            }],
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 0,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 0,
+      },
+    };
+    const statusSelector = makeShowStatusSelector();
+    expect(statusSelector(mockedState, props)).toEqual('posted SB');
+  });
+
+  it('should return posted BB', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          data: {
+            smallBlind: 50,
+          },
+          0: {
+            state: 'preflop',
+            dealer: 0,
+            lineup: [{
+              address: P1_ADDR,
+              last: new EWT(ABI_BET).bet(1, 50).sign(P1_KEY),
+            }, {
+              address: P2_ADDR,
+              last: new EWT(ABI_BET).bet(1, 100).sign(P2_KEY),
+            }],
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 1,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 0,
+      },
+    };
+    const statusSelector = makeShowStatusSelector();
+    expect(statusSelector(mockedState, props)).toEqual('posted BB');
+  });
+
+  it('should return check', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          data: {
+            smallBlind: 50,
+          },
+          3: {
+            state: 'flop',
+            dealer: 0,
+            lineup: [{
+              address: P1_ADDR,
+              last: new EWT(ABI_BET).bet(3, 200).sign(P1_KEY),
+            }, {
+              address: P2_ADDR,
+              last: new EWT(checkABIs.flop).checkFlop(3, 200).sign(P2_KEY),
+            }],
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 1,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 3,
+      },
+    };
+    const statusSelector = makeShowStatusSelector();
+    expect(statusSelector(mockedState, props)).toEqual('check');
+  });
+
+  it('should return call', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          data: {
+            smallBlind: 50,
+          },
+          3: {
+            state: 'flop',
+            dealer: 0,
+            lineup: [{
+              address: P1_ADDR,
+              last: new EWT(ABI_BET).bet(3, 200).sign(P1_KEY),
+            }, {
+              address: P2_ADDR,
+              last: new EWT(ABI_BET).bet(3, 200).sign(P2_KEY),
+            }],
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 0,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 3,
+      },
+    };
+    const statusSelector = makeShowStatusSelector();
+    expect(statusSelector(mockedState, props)).toEqual('call');
+  });
+
+  it('should return bet', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          data: {
+            smallBlind: 50,
+          },
+          3: {
+            state: 'flop',
+            lastRoundMaxBet: 100,
+            dealer: 0,
+            lineup: [{
+              address: P1_ADDR,
+              last: new EWT(ABI_BET).bet(3, 200).sign(P1_KEY),
+            }, {
+              address: P2_ADDR,
+              last: new EWT(ABI_BET).bet(3, 100).sign(P2_KEY),
+            }],
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 0,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 3,
+      },
+    };
+    const statusSelector = makeShowStatusSelector();
+    expect(statusSelector(mockedState, props)).toEqual('bet');
+  });
+
+  it('should return raise', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          data: {
+            smallBlind: 50,
+          },
+          3: {
+            state: 'flop',
+            lastRoundMaxBet: 100,
+            dealer: 0,
+            lineup: [{
+              address: P1_ADDR,
+              last: new EWT(ABI_BET).bet(3, 400).sign(P1_KEY),
+            }, {
+              address: P2_ADDR,
+              last: new EWT(ABI_BET).bet(3, 200).sign(P2_KEY),
+            }],
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 0,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 3,
+      },
+    };
+    const statusSelector = makeShowStatusSelector();
+    expect(statusSelector(mockedState, props)).toEqual('raise');
   });
 });
