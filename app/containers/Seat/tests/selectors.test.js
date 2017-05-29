@@ -10,7 +10,13 @@ import {
   makeShowStatusSelector,
 } from '../selectors';
 
-import { ABI_BET, ABI_DIST, ABI_FOLD, checkABIs } from '../../../app.config';
+import {
+  ABI_BET,
+  ABI_DIST,
+  ABI_FOLD,
+  STATUS_MSG,
+  checkABIs,
+} from '../../../app.config';
 
 // secretSeed: 'rural tent tests net drip fatigue uncle action repeat couple lawn rival'
 const P1_ADDR = '0x6d2f2c0fa568243d2def3e999a791a6df45d816e';
@@ -366,7 +372,8 @@ describe('makeShowStatusSelector', () => {
       },
     };
     const statusSelector = makeShowStatusSelector();
-    expect(statusSelector(mockedState, props)).toEqual('posted SB');
+    expect(statusSelector(mockedState, props))
+      .toEqual(STATUS_MSG.blindSmall);
   });
 
   it('should return posted BB', () => {
@@ -399,7 +406,7 @@ describe('makeShowStatusSelector', () => {
       },
     };
     const statusSelector = makeShowStatusSelector();
-    expect(statusSelector(mockedState, props)).toEqual('posted BB');
+    expect(statusSelector(mockedState, props)).toEqual(STATUS_MSG.blindBig);
   });
 
   it('should return check', () => {
@@ -432,7 +439,7 @@ describe('makeShowStatusSelector', () => {
       },
     };
     const statusSelector = makeShowStatusSelector();
-    expect(statusSelector(mockedState, props)).toEqual('check');
+    expect(statusSelector(mockedState, props)).toEqual(STATUS_MSG.check);
   });
 
   it('should return call', () => {
@@ -465,7 +472,7 @@ describe('makeShowStatusSelector', () => {
       },
     };
     const statusSelector = makeShowStatusSelector();
-    expect(statusSelector(mockedState, props)).toEqual('call');
+    expect(statusSelector(mockedState, props)).toEqual(STATUS_MSG.call);
   });
 
   it('should return bet', () => {
@@ -499,7 +506,7 @@ describe('makeShowStatusSelector', () => {
       },
     };
     const statusSelector = makeShowStatusSelector();
-    expect(statusSelector(mockedState, props)).toEqual('bet');
+    expect(statusSelector(mockedState, props)).toEqual(STATUS_MSG.bet);
   });
 
   it('should return raise', () => {
@@ -533,6 +540,6 @@ describe('makeShowStatusSelector', () => {
       },
     };
     const statusSelector = makeShowStatusSelector();
-    expect(statusSelector(mockedState, props)).toEqual('raise');
+    expect(statusSelector(mockedState, props)).toEqual(STATUS_MSG.raise);
   });
 });

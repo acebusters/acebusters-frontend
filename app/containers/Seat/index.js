@@ -40,13 +40,20 @@ import {
 import SeatComponent from '../../components/Seat';
 
 class Seat extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
+  constructor(props) {
+    super(props);
+    this.state = { wasMostRecentAction: false };
+  }
   componentWillReceiveProps(nextProps) {
-    // Show Action;
-    this.opacity = (nextProps.lastAmount !== this.props.lastAmount) ? '1' : 0;
-    let timeLeft = timeoutSeconds;
+    // Show Action if most recent action
+    this.setState({
+      wasMostRecentAction: nextProps.lastAmount === this.props.lastAmount,
+    });
+
     // manage timer
+    let timeLeft = timeoutSeconds;
     if (nextProps.whosTurn === nextProps.pos) {
+      // TODO: Make timeLeft count down from 100 - 0, right now is 360 - 0?
       if (!this.interval) {
         this.interval = setInterval(() => {
           if (this.props.changed) {
@@ -81,6 +88,7 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
       <SeatComponent
         {...this.props}
         timeLeft={timeLeft}
+        wasMostRecentAction={this.state.wasMostRecentAction}
       >
       </SeatComponent>
     );

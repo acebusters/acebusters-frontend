@@ -19,6 +19,7 @@ import { createBlocky } from '../../services/blockies';
 import {
   SEAT_COORDS,
   AMOUNT_COORDS,
+  STATUS_MSG,
 } from '../../app.config';
 
 const rc = new ReceiptCache();
@@ -169,19 +170,19 @@ const makeShowStatusSelector = () => createSelector(
           bbPos = undefined;
         }
         if (pos === sbPos && amount === sb) {
-          return 'posted SB';
+          return STATUS_MSG.blindSmall;
         }
 
         if (pos === bbPos && amount === sb * 2) {
-          return 'posted BB';
+          return STATUS_MSG.blindBig;
         }
       }
 
       if (lastAction === 'sitOut') {
-        return 'sitting out';
+        return STATUS_MSG.sitOut;
       }
       if (lastAction === 'fold') {
-        return 'folded';
+        return STATUS_MSG.fold;
       }
       if (state !== 'waiting' && state !== 'dealing') {
         if (lastAction.indexOf('bet') > -1) {
@@ -199,26 +200,27 @@ const makeShowStatusSelector = () => createSelector(
             // then we try to find that guy to compare values
             prevPos = pokerHelper.nextPlayer(reverseLineup, reversePos, 'involved', state);
           }
-          const prevAmount = rc.get(lineup[prevPos].last).values[1];
+
+          const prevAmount = (lineup[prevPos].last) ? rc.get(lineup[prevPos].last).values[1] : 0;
           // bet: amount higher than previous player && previous player amount <= lastRoundMaxBet
           if (amount > prevAmount && prevAmount <= lastRoundMaxBet) {
-            return 'bet';
+            return STATUS_MSG.bet;
           }
           // call: amount same as previous player
           if (amount === prevAmount) {
-            return 'call';
+            return STATUS_MSG.call;
           }
           // raise: amount higher than previous player
           if (amount > prevAmount) {
-            return 'raise';
+            return STATUS_MSG.raise;
           }
         }
         if (lastAction.toLowerCase().indexOf(state) > -1) {
-          return 'check';
+          return STATUS_MSG.check;
         }
       }
     }
-    return '';
+    return {};
   }
 );
 

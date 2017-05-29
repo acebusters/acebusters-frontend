@@ -1,114 +1,77 @@
 /**
- * Created by helge on 15.02.17.
- */
-
+* Created by jzobro 20170517
+*/
 import React from 'react';
-import {
-  baseColor,
-  green,
-  gray,
-} from 'variables';
-import { nickNameByAddress } from '../../services/nicknames';
-import Card from '../Card';
-import Radial from '../RadialProgress';
-import Pot from '../Pot';
-import { SeatWrapper, CardContainer, DealerButton } from './SeatWrapper';
-import { StackBox, NameBox, AmountBox } from './Info';
 
+import Seat from './Seat';
+import ButtonJoinSeat from './ButtonJoinSeat';
+import ButtonInvite from './ButtonInvite';
+/* TODO Remove radial component?
+imoprt Radial from '../RadialProgress'
+*/
 
-function SeatComponent(props) {
-  const cardSize = 40;
-  let seat = null;
-  let status = '';
-  if (props.pending) {
-    status = 'PENDING';
-  } else if (props.myPos === undefined) {
-    status = 'JOIN';
-  } else {
-    status = 'EMPTY';
+const isActivePlayer = (seatStatus) => {
+  if (seatStatus === 'sitting-in') return false;
+  if (seatStatus === 'standing-up') return false;
+  if (seatStatus === 'sit-out') return false;
+  return true;
+};
+
+const seatStatus = (pending, myPos, sitout) => {
+  if (pending) {
+    if (myPos === undefined) return 'sitting-in';
+    if (myPos !== undefined) return 'standing-up';
+  } else if (typeof sitout === 'number') {
+    return 'sit-out';
   }
-  if (props.open || props.pending) {
-    seat = (
-      <SeatWrapper
-        onClick={() => props.isTaken(props.open, props.myPos, props.pending, props.pos)}
-        coords={props.coords}
-      >
-        <Radial
-          color={'#fff'}
-          cursor={'pointer'}
-          label={status}
-        >
-        </Radial>
-      </SeatWrapper>
-      );
-  } else {
-    let color;
-    if (['showdown'].indexOf(props.state) === -1
-          && props.pos === props.whosTurn) {
-      color = green;
-    } else if (typeof props.sitout === 'number') {
-      color = gray;
-    } else {
-      color = baseColor;
-    }
-    seat = (
-      <SeatWrapper
-        coords={props.coords}
-      >
-        <Radial
-          percent={props.timeLeft}
-          strokeWidth="10"
-          strokeColor={color}
-          bgImg={props.blocky}
+  return 'EMPTY'; // successfully resolves to EMPTY
+};
+
+const SeatComponent = (props) => {
+  const {
+    coords,
+    isTaken,
+    myPos,
+    open,
+    pos,
+    pending,
+    sitout,
+  } = props;
+  const seatStatusResult = seatStatus(pending, myPos, sitout);
+  if (open) {
+    if (myPos === undefined) {
+      return (
+        <ButtonJoinSeat
+          coords={coords}
+          onClickHandler={() => isTaken(open, myPos, pending, pos)}
         />
-        <DealerButton
-          dealer={props.dealer}
-          pos={props.pos}
-        >
-        </DealerButton>
-        <CardContainer>
-          <Card
-            cardNumber={props.holeCards[0]}
-            folded={props.folded}
-            size={cardSize}
-            offset={[0, 0]}
-          >
-          </Card>
-          <Card
-            cardNumber={props.holeCards[1]}
-            folded={props.folded}
-            size={cardSize}
-            offset={[-100, -133]}
-          >
-          </Card>
-        </CardContainer>
-        <AmountBox
-          amountCoords={props.amountCoords}
-        >
-          { (props.lastAmount > 0) &&
-          <div>
-            <Pot potSize={props.lastAmount} left="0%" top="0%" />
-          </div>
-          }
-        </AmountBox>
-        <div>
-          <NameBox> { nickNameByAddress(props.signerAddr) }
-            <hr />
-          </NameBox>
-          <StackBox> { props.stackSize }</StackBox>
-        </div>
-      </SeatWrapper>
-    );
+      );
+    }
+    if (typeof myPos === 'number') {
+      return (
+        <ButtonInvite
+          coords={coords}
+          onClickHandler={() => isTaken(open, myPos, pending, pos)}
+        />
+      );
+    }
   }
-  return seat;
-}
-
+  return (
+    <Seat
+      activePlayer={isActivePlayer(seatStatusResult)}
+      seatStatus={seatStatusResult}
+      {...props}
+    />
+  );
+};
 SeatComponent.propTypes = {
+  coords: React.PropTypes.array,
+  isTaken: React.PropTypes.func,
+  myPos: React.PropTypes.number, // action bar position
+  open: React.PropTypes.bool,
   pos: React.PropTypes.number,
-  cards: React.PropTypes.array,
-  lastAction: React.PropTypes.string,
-  lastAmount: React.PropTypes.number,
-  folded: React.PropTypes.bool,
+  pending: React.PropTypes.bool,
+  sitout: React.PropTypes.number, // amount of time left in sitou
 };
 
 export default SeatComponent;
