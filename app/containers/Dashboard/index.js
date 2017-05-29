@@ -106,12 +106,12 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
 
     return (
       <Container>
+        <h1><FormattedMessage {...messages.header} /></h1>
         <Tabs
           panes={['Nutz Wallet', 'Power Wallet', 'Transactions']}
         >
           <TabContent>
             <Container>
-              <h1><FormattedMessage {...messages.header} /></h1>
               <Blocky blocky={createBlocky(this.props.signerAddr)} />
               <h3> Your address:</h3>
 
