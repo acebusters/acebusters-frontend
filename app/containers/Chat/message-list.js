@@ -34,7 +34,7 @@ class MessageList extends React.PureComponent { // eslint-disable-line react/pre
 }
 
 MessageList.propTypes = {
-  messages: React.PropTypes.object,
+  messages: React.PropTypes.array,
 };
 
 export default MessageList;

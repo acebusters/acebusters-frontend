@@ -27,6 +27,7 @@ import {
   makeIsMyTurnSelector,
   makeMyPosSelector,
   makeMessagesSelector,
+  makePlayersCountSelector,
 } from '../Table/selectors';
 
 import {
@@ -155,11 +156,24 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
   }
 
   render() {
-    if (this.state.active
-        && this.props.isMyTurn
-        && this.props.state !== 'waiting'
-        && this.props.state !== 'dealing'
-        && this.props.state !== 'showdown') {
+    const isMyTurn = this.props.isMyTurn;
+    const isTakePartOfAGame = this.props.myPos != null;
+    const isAppropriateState = (
+      this.props.state !== 'waiting'
+      && this.props.state !== 'dealing'
+      && this.props.state !== 'showdown'
+    );
+    const canSeeChat = (
+      isTakePartOfAGame
+      && !isMyTurn
+      && isAppropriateState
+    ) || !isTakePartOfAGame;
+    const canSeeActionBar = (
+      this.state.active
+      && isMyTurn
+      && isAppropriateState
+    );
+    if (canSeeActionBar) {
       const raiseButton = (this.props.myStack > this.props.amountToCall) ? (<ActionButton size="medium" onClick={this.handleBet} text={`RAISE ${this.state.amount}`} />) : null;
       return (
         <ActionBarComponent>
@@ -197,13 +211,12 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
           </Grid>
         </ActionBarComponent>
       );
-    } else if (!this.props.isMyTurn
-               && this.props.state !== 'waiting'
-               && this.props.state !== 'dealing'
-               && this.props.state !== 'showdown') {
+    } else if (canSeeChat) {
+      const ta = this.props.params.tableAddr.substring(2, 8);
+      const chatPlaceholder = `table <${ta}> in state ${this.props.state} has ${this.props.playerCount || 'no'} player${this.props.playerCount === 1 ? '' : 's'}.`;
       return (
         <ChatWrapper>
-          <Chat onAddMessage={this.sendMessage} messages={this.props.messages} />
+          <Chat onAddMessage={this.sendMessage} messages={this.props.messages} readonly={!isTakePartOfAGame} placeholder={chatPlaceholder} />
         </ChatWrapper>
       );
     }
@@ -233,12 +246,13 @@ const mapStateToProps = createStructuredSelector({
   cards: makeMyCardsSelector(),
   state: makeHandStateSelector(),
   messages: makeMessagesSelector(),
+  playerCount: makePlayersCountSelector(),
 });
 
 ActionBar.propTypes = {
   params: React.PropTypes.object,
   privKey: React.PropTypes.string,
-  lastReceipt: React.PropTypes.string,
+  lastReceipt: React.PropTypes.object,
   myPos: React.PropTypes.number,
   myMaxBet: React.PropTypes.number,
   isMyTurn: React.PropTypes.bool,
@@ -250,7 +264,8 @@ ActionBar.propTypes = {
   dispatch: React.PropTypes.func,
   setCards: React.PropTypes.func,
   sendMessage: React.PropTypes.func,
-  messages: React.PropTypes.object,
+  messages: React.PropTypes.array,
+  playerCount: React.PropTypes.number,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ActionBar);

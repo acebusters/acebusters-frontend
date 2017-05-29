@@ -153,7 +153,21 @@ const makeTableDataSelector = () => createSelector(
 // other selectors
 const makeMessagesSelector = () => createSelector(
   tableStateSelector,
-  (table) => (table) ? table.get('messages') : null
+  (table) => {
+    const messages = (table) ? table.get('messages') : null;
+    return messages ? messages.toJS() : messages;
+  }
+);
+
+const makePlayersCountSelector = () => createSelector(
+  [makeTableDataSelector()],
+  (data) => {
+    const ADDR_EMPTY = '0x0000000000000000000000000000000000000000';
+    if (!data || !data.get('seats')) {
+      return 0;
+    }
+    return data.get('seats').reduce((prev, current) => prev + (current.get('address') === ADDR_EMPTY ? 0 : 1), 0);
+  }
 );
 
 const makeHandSelector = () => createSelector(
@@ -470,4 +484,5 @@ export {
     makeMyMaxBetSelector,
     makeMissingHandSelector,
     makeMessagesSelector,
+    makePlayersCountSelector,
 };
