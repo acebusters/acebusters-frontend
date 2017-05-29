@@ -38,12 +38,13 @@ const account = {
     return request('query', { email });
   },
 
-  register(email, recapResponse, origin) {
+  register(email, recapResponse, origin, refCode) {
     const accountId = uuid();
     return request(`account/${accountId}`, {
       email,
       recapResponse,
       origin,
+      refCode,
     });
   },
 

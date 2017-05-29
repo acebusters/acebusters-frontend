@@ -66,7 +66,7 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
     // Note: auto increase progress for 3 seconds;
     this.props.setProgress(-3000);
 
-    return account.register(values.get('email'), values.get('captchaResponse'), window.location.origin).catch((err) => {
+    return account.register(values.get('email'), values.get('captchaResponse'), window.location.origin, values.get('referral')).catch((err) => {
       // If store account failed, ...
       const errMsg = 'Registration failed!';
       if (err === 409) {
