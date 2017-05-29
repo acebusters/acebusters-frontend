@@ -196,7 +196,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   handleUpdate(hand) {
     if (typeof hand === 'string') {
       const msg = Receipt.parse(hand);
-      this.props.addMessage(msg.message, msg.tableAddr, msg.signer);
+      this.props.addMessage(msg.message, msg.tableAddr, msg.signer, msg.created);
     } else {
       this.props.updateReceived(this.tableAddr, hand);
     }
@@ -505,7 +505,7 @@ export function mapDispatchToProps() {
     modalDismiss: () => (modalDismiss()),
     pendingToggle: (tableAddr, handId, pos) => (pendingToggle(tableAddr, handId, pos)),
     updateReceived: (tableAddr, hand) => (updateReceived(tableAddr, hand)),
-    addMessage: (message, tableAddr, privKey) => (addMessage(message, tableAddr, privKey)),
+    addMessage: (message, tableAddr, privKey, created) => (addMessage(message, tableAddr, privKey, created)),
     blockNotify: () => (blockNotify()),
   };
 }

@@ -85,8 +85,8 @@ export function receiptSet(tableAddr, handId, pos, receipt) {
   return { type: RECEIPT_SET, tableAddr, handId, pos, receipt };
 }
 
-export function addMessage(message, tableAddr, privKey) {
-  return { type: ADD_MESSAGE, message, tableAddr, privKey };
+export function addMessage(message, tableAddr, privKey, created) {
+  return { type: ADD_MESSAGE, message, tableAddr, privKey, created };
 }
 
 export function sendMessage(message, tableAddr, privKey) {

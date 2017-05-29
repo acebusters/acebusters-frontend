@@ -40,11 +40,11 @@ export default function tableReducer(state = initialState, action) {
       const message = {
         message: action.message,
         signer: action.privKey,
+        created: action.created,
       };
-      if (!state.getIn([action.tableAddr, 'messages'])) {
-        return state.setIn([action.tableAddr, 'messages'], List([message]));
-      }
-      return state.updateIn([action.tableAddr, 'messages'], (list) => list.push(message));
+      const newState = state.updateIn([action.tableAddr, 'messages'], (list) => list.push(message));
+      storageService.setItem(`messages${action.tableAddr}`, newState.getIn([action.tableAddr, 'messages']).toJS());
+      return newState;
     }
 
     case TableActions.TABLE_RECEIVED: {
@@ -154,7 +154,11 @@ export default function tableReducer(state = initialState, action) {
             hand = hand.set('lineup', fromJS(action.hand.lineup));
           }
         }
-        return state.setIn([action.tableAddr, action.hand.handId.toString()], hand);
+        let messages = storageService.getItem(`messages${action.tableAddr}`) || [];
+        const min15ago = Date.now() - (60 * 15 * 1000);
+        messages = messages.filter((message) => message.created > min15ago);
+        return state.setIn([action.tableAddr, action.hand.handId.toString()], hand)
+          .setIn([action.tableAddr, 'messages'], List(messages));
       }
 
       let hand = table.get(action.hand.handId.toString());
