@@ -215,6 +215,11 @@ export default function tableReducer(state = initialState, action) {
           hand = hand.set('holeCards', List(holeCards));
         }
       }
+      for (let j = 0; j < action.hand.lineup.length; j += 1) {
+        if (hand.getIn(['lineup', j, 'address']) !== action.hand.lineup[j].address) {
+          hand = hand.setIn(['lineup', j], Map(action.hand.lineup[j]));
+        }
+      }
       if (table.get(action.hand.handId.toString()) === hand) {
         return state;
       }
