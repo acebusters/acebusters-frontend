@@ -117,6 +117,7 @@ export const CardContainer = styled.div`
   display: flex;
   justify-content: flex-end;
   margin-right: ${scaleSeat(4)};
+  margin-top: ${(props) => props.empty ? scaleSeat(40) : 0};
 
   background-color: none;
 `;
@@ -129,6 +130,7 @@ export const CardShared = styled.div`
 `;
 
 export const CardBack = styled(CardShared)`
+  margin-top: ${scaleSeat(28)};
   height: ${scaleSeat(12)};
 `;
 
@@ -224,6 +226,7 @@ export const StatusSeatWrapper = styled.div`
   display: flex;
   justify-content: flex-end;
   margin-right: ${scaleSeat(6)};
+  margin-top: ${scaleSeat(22)};
 
   background-color: none;
 `;
@@ -233,6 +236,7 @@ export const StatusSeat = styled.div`
   padding-left: ${scaleSeat(14)};
   padding-bottom: ${scaleSeat(1)};
   padding-right: ${scaleSeat(14)};
+  height: ${scaleSeat(18)};
 
   font-weight: ${fontWeightInfo};
   font-size: ${scaleSeat(11)};
@@ -284,6 +288,7 @@ export const ButtonStyle = styled(SharedMiddle)`
 
 export const ButtonWrapper = styled.button`
   position: absolute;
+  margin-top: ${scaleButtonJoin(42)};
   top: ${scaleButtonJoin(-20)};
   left: ${scaleButtonJoin(-64)};
   display: flex;

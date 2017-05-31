@@ -11,8 +11,8 @@ import {
 } from './styles';
 
 const ButtonInvite = ({ coords, onClickHandler }) => (
-  <SeatWrapper coords={coords}>
-    <ButtonWrapper onClick={onClickHandler}>
+  <SeatWrapper className="seat-wrapper" coords={coords}>
+    <ButtonWrapper className="button-wrapper" onClick={onClickHandler}>
       <ButtonStyle>
         <ButtonIcon className="fa fa-envelope" aria-hidden="true" />
         <ButtonText>Invite</ButtonText>
