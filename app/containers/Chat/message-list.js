@@ -23,11 +23,12 @@ class MessageList extends React.PureComponent { // eslint-disable-line react/pre
     };
     return (
       <ul style={style} ref={(el) => { this.list = el; }}>
-        {(this.props.messages || []).map((message, i) =>
-          <li style={{ padding: '5px 5px 0 5px' }} key={i}>
-            <u>{ nickNameByAddress(message.signer) }</u> &gt; { message.message }
-          </li>
-        )}
+        {(this.props.messages || []).map((message, i) => {
+          const string = message.signer
+            ? <span><u>{ nickNameByAddress(message.signer) }</u> &gt; {message.message}</span>
+            : <i style={{ color: 'lightslategray' }}>ORACLE: {message.message}</i>;
+          return (<li style={{ padding: '5px 5px 0 5px' }} key={i}>{string}</li>);
+        })}
       </ul>
     );
   }

@@ -8,6 +8,7 @@ import { PokerHelper, ReceiptCache } from 'poker-helper';
 
 import {
   setCards,
+  addMessage,
   updateReceived,
   bet,
   show,
@@ -45,9 +46,14 @@ import {
   makeLatestHandSelector,
   makeLineupSelector,
   makeHandSelector,
+  makeSelectWinners,
 } from './selectors';
 
 import TableService, { getHand } from '../../services/tableService';
+
+import { nickNameByAddress } from '../../services/nicknames';
+
+import * as storageService from '../../services/sessionStorage';
 
 const rc = new ReceiptCache();
 const pokerHelper = new PokerHelper(rc);
@@ -231,6 +237,7 @@ export function* updateScanner() {
   const myAddrSelector = makeSignerAddrSelector();
   const sbSelector = makeSbSelector();
   const myCardsSelector = makeMyCardsSelector();
+  const winnnersSelector = makeSelectWinners();
   // toggle variables to avoid duplicate requests
   const payedBlind = {};
   const showed = {};
@@ -296,6 +303,18 @@ export function* updateScanner() {
       const balances = action.hand.netting.newBalances;
       yield put(net(action.tableAddr, action.hand.handId, balances, privKey));
       continue; // eslint-disable-line no-continue
+    }
+    if (!storageService.getItem(`won[${toggleKey}]`)) {
+      const winners = winnnersSelector(state, { params: { tableAddr: action.tableAddr, handId: action.hand.handId } });
+      if (winners && winners.length) {
+        storageService.setItem(`won[${toggleKey}]`, true);
+        const winnerMessages = winners.map((winner) => {
+          const handString = (winner.hand) ? `with ${winner.hand}` : '';
+          return `player ${nickNameByAddress(winner.addr)} won NTZ${winner.amount} ${handString}`;
+        });
+        yield put(addMessage(winnerMessages.join(', '), action.tableAddr, null, Date.now()));
+        continue; // eslint-disable-line no-continue
+      }
     }
   }
 }
