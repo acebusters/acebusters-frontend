@@ -44,6 +44,7 @@ const SeatComponent = (props) => {
         <ButtonJoinSeat
           coords={coords}
           onClickHandler={() => isTaken(open, myPos, pending, pos)}
+          pending={pending}
         />
       );
     }
