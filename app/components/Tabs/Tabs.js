@@ -6,7 +6,29 @@ const ContentWrapper = styled.div`
     width: 100%;
 `;
 
+const TabsHeader = function (props) {
+  const headers = props.panes.map((message, index) => {
+    const active = props.activeKey === index;
+    return (<TabPane
+      index={index}
+      active={active}
+      setActive={props.setActive}
+      key={message.id}
+      message={message}
+    />
+    );
+  });
+
+  return (
+    <TabPaneWrapper>
+      { headers }
+    </TabPaneWrapper>
+  );
+};
+
+
 export default class Tabs extends React.Component {
+
   constructor(props) {
     super(props);
     this.setActive = this.setActive.bind(this);
@@ -21,19 +43,6 @@ export default class Tabs extends React.Component {
     });
   }
 
-  renderTabHeader() {
-    return this.props.panes.map((title, index) => {
-      const active = this.state.activeKey === index;
-      return (<TabPane
-        title={title}
-        index={index}
-        active={active}
-        setActive={this.setActive}
-        key={index}
-      />
-      );
-    });
-  }
 
   renderTabContent() {
     return React.Children.map(this.props.children, (child, index) => {
@@ -50,9 +59,11 @@ export default class Tabs extends React.Component {
   render() {
     return (
       <div>
-        <TabPaneWrapper>
-          { this.renderTabHeader() }
-        </TabPaneWrapper>
+        <TabsHeader
+          panes={this.props.panes}
+          activeKey={this.state.activeKey}
+          setActive={this.setActive}
+        />
         <ContentWrapper>
           { this.renderTabContent() }
         </ContentWrapper>
@@ -63,11 +74,21 @@ export default class Tabs extends React.Component {
 
 Tabs.propTypes = {
   activeKey: React.PropTypes.number,
-  panes: React.PropTypes.array,
   children: React.PropTypes.array,
+  panes: React.PropTypes.array,
 };
 
 Tabs.defaultProps = {
+  activeKey: 0,
+};
+
+
+TabsHeader.propTypes = {
+  setActive: React.PropTypes.func,
+  panes: React.PropTypes.array,
+};
+
+TabsHeader.defaultProps = {
   activeKey: 0,
 };
 

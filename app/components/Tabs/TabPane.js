@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { FormattedMessage } from 'react-intl';
 
 import {
   baseColor,
@@ -49,7 +50,6 @@ export const TabPaneWrapper = styled.ul`
     display: block;
     margin: 0;
     padding: 0;
-    
 `;
 
 const TabPane = function (props) {
@@ -58,16 +58,16 @@ const TabPane = function (props) {
       active={props.active}
       onClick={() => props.setActive(props.index)}
     >
-      { props.title }
+      <FormattedMessage {...props.message} />
     </TabPaneItem>
   );
 };
 
 TabPane.propTypes = {
-  title: React.PropTypes.string,
   index: React.PropTypes.number,
   active: React.PropTypes.bool,
   setActive: React.PropTypes.func,
+  message: React.PropTypes.object,
 };
 
 export default TabPane;

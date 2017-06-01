@@ -18,4 +18,18 @@ export default defineMessages({
     id: 'app.containers.Dashboard.included',
     defaultMessage: 'Transaction History:',
   },
+  panes: {
+    nutz: {
+      id: 'app.containers.Dashboard.panes.nutz',
+      defaultMessage: 'Nutz Wallet',
+    },
+    power: {
+      id: 'app.containers.Dashboard.panes.power',
+      defaultMessage: 'Power Wallet',
+    },
+    transactions: {
+      id: 'app.containers.Dashboard.panes.transactions',
+      defaultMessage: 'Transactions',
+    },
+  },
 });
