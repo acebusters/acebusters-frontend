@@ -21,7 +21,6 @@ import {
 import List from '../../components/List';
 import TransferDialog from '../TransferDialog';
 import Container from '../../components/Container';
-import Tabs, { TabContent } from '../../components/Tabs';
 import Button from '../../components/Button';
 import Blocky from '../../components/Blocky';
 import FormGroup from '../../components/Form/FormGroup';
@@ -103,57 +102,52 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
       listPending = pendingToList(this.props.account[tokenContractAddress].pending);
       listTxns = txnsToList(this.props.account[tokenContractAddress].transactions, this.props.account.proxy);
     }
+
     return (
       <Container>
         <h1><FormattedMessage {...messages.header} /></h1>
-        <Tabs
-          panes={[messages.panes.nutz, messages.panes.power, messages.panes.transactions]}
-        >
-          <TabContent>
-            <Blocky blocky={createBlocky(this.props.signerAddr)} />
-            <h3> Your address:</h3>
+        <Blocky blocky={createBlocky(this.props.signerAddr)} />
+        <h3> Your address:</h3>
 
-            <WithLoading
-              isLoading={!this.props.account.proxy || this.props.account.proxy === '0x'}
-              loadingSize="40px"
-              styles={{ layout: { transform: 'translateY(-50%)', left: 0 } }}
-            >
-              <p> { this.props.account.proxy } </p>
-              <QRCode value={qrUrl} size={120} />
-            </WithLoading>
-            <p>
-              <span>Balance: </span>
-              <WithLoading
-                isLoading={balance === undefined || balance === null}
-                loadingSize="14px"
-                type="inline"
-                styles={{ layout: { marginLeft: '15px' } }}
-              >
-                <span>{balance}</span>
-              </WithLoading>
-            </p>
-            <FormGroup>
-              <Button
-                onClick={() => {
-                  this.props.modalAdd((
-                    <TransferDialog handleTransfer={this.handleTransfer} />
-                      ));
-                }}
-                size="medium"
-                icon="fa fa-money"
-              >TRANSFER</Button>
-            </FormGroup>
-          </TabContent>
-          <TabContent>
-              Power Wallet
-          </TabContent>
-          <TabContent>
-            <h2><FormattedMessage {...messages.pending} /></h2>
-            <List items={listPending} headers={['#', 'txHash']} noDataMsg="No Pending Transactions" />
-            <h2><FormattedMessage {...messages.included} /></h2>
-            <List items={listTxns} headers={['txHash', 'from', 'to', 'amount']} noDataMsg="No Transactions Yet" />
-          </TabContent>
-        </Tabs>
+        <WithLoading
+          isLoading={!this.props.account.proxy || this.props.account.proxy === '0x'}
+          loadingSize="40px"
+          styles={{ layout: { transform: 'translateY(-50%)', left: 0 } }}
+        >
+          <p> { this.props.account.proxy } </p>
+          <QRCode value={qrUrl} size={120} />
+        </WithLoading>
+
+        <p>
+          <span>Balance: </span>
+          <WithLoading
+            isLoading={balance === undefined || balance === null}
+            loadingSize="14px"
+            type="inline"
+            styles={{ layout: { marginLeft: '15px' } }}
+          >
+            <span>{balance}</span>
+          </WithLoading>
+
+        </p>
+
+        <FormGroup>
+          <Button
+            onClick={() => {
+              this.props.modalAdd((
+                <TransferDialog handleTransfer={this.handleTransfer} />
+              ));
+            }}
+            size="medium"
+            icon="fa fa-money"
+          >TRANSFER</Button>
+        </FormGroup>
+        <hr />
+        <h2><FormattedMessage {...messages.pending} /></h2>
+        <List items={listPending} headers={['#', 'txHash']} noDataMsg="No Pending Transactions" />
+        <h2><FormattedMessage {...messages.included} /></h2>
+        <List items={listTxns} headers={['txHash', 'from', 'to', 'amount']} noDataMsg="No Transactions Yet" />
+
       </Container>
     );
   }
