@@ -13,18 +13,11 @@ import {
   NameBox,
   StackBox,
 } from './styles';
+import { STATUS_MSG } from '../../app.config';
 
 const stackToString = (stackSize) => {
   if (!stackSize) return '0';
   return stackSize.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-};
-
-const showChipsButton = (pending, seatStatus) => {
-  if (pending) return false;
-  if (seatStatus === 'sit-out' ||
-    seatStatus === 'sitting-in' ||
-    seatStatus === 'standing-up') return false;
-  return true;
 };
 
 const SeatInfo = ({
@@ -32,14 +25,13 @@ const SeatInfo = ({
   blocky,
   dealer,
   lastAmount,
-  pending,
   pos,
   signerAddr,
   seatStatus,
   stackSize,
 }) => (
   <InfoWrapper>
-    {showChipsButton(pending, seatStatus) ?
+    {seatStatus && seatStatus === STATUS_MSG.active ?
       <ChipButtonContainer className="chip-button-container">
         <DealerButton dealer={dealer} pos={pos}>D</DealerButton>
 
@@ -65,10 +57,9 @@ SeatInfo.propTypes = {
   blocky: React.PropTypes.string,
   dealer: React.PropTypes.number, // which seat is dealer
   lastAmount: React.PropTypes.number,
-  pending: React.PropTypes.bool,
   pos: React.PropTypes.number, // which position is THIS seat
   signerAddr: React.PropTypes.string,
-  seatStatus: React.PropTypes.string,
+  seatStatus: React.PropTypes.object,
   stackSize: React.PropTypes.number,
 };
 

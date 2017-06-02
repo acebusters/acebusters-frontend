@@ -15,7 +15,7 @@ const CardsComponent = ({
 }) => (
   <CardContainer
     className="card-container"
-    empty={holeCards[0] === null}
+    empty={holeCards[0] === null || folded}
   >
     <Card
       cardNumber={holeCards[0]}

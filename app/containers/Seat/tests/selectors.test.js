@@ -8,12 +8,14 @@ import {
   makeCardsSelector,
   makeStackSelector,
   makeShowStatusSelector,
+  makeSeatStatusSelector,
 } from '../selectors';
 
 import {
   ABI_BET,
   ABI_DIST,
   ABI_FOLD,
+  ABI_SIT_OUT,
   STATUS_MSG,
   checkABIs,
 } from '../../../app.config';
@@ -341,6 +343,220 @@ describe('stackSelector', () => {
   });
 });
 
+describe('makeSeatStatusSelector', () => {
+  describe('if user sits at table and seat is pending', () => {
+    it('should return sittingIn', () => {
+      const mockedState = fromJS({
+        table: {
+          [TBL_ADDR]: {
+            data: {
+              smallBlind: 50,
+            },
+            0: {
+              state: 'preflop',
+              dealer: 0,
+              lineup: [{
+                address: P1_ADDR,
+                last: new EWT(ABI_BET).bet(1, 50).sign(P1_KEY),
+                pending: true,
+              }, {
+                address: P2_ADDR,
+                last: new EWT(ABI_BET).bet(1, 100).sign(P2_KEY),
+              }],
+            },
+          },
+        },
+      });
+
+      const props = {
+        pos: 0,
+        params: {
+          tableAddr: TBL_ADDR,
+          handId: 0,
+        },
+      };
+      const statusSelector = makeSeatStatusSelector();
+      expect(statusSelector(mockedState, props))
+        .toEqual(STATUS_MSG.sittingIn);
+    });
+  });
+  describe('if player is leaving the table', () => {
+    it('should return standingUp', () => {
+      const mockedState = fromJS({
+        table: {
+          [TBL_ADDR]: {
+            data: {
+              smallBlind: 50,
+            },
+            2: {
+              state: 'preflop',
+              dealer: 0,
+              lineup: [{
+                address: P1_ADDR,
+                last: new EWT(ABI_BET).bet(1, 50).sign(P1_KEY),
+                exitHand: 0,
+              }, {
+                address: P2_ADDR,
+                last: new EWT(ABI_BET).bet(1, 100).sign(P2_KEY),
+              }],
+            },
+          },
+        },
+      });
+
+      const props = {
+        pos: 0,
+        params: {
+          tableAddr: TBL_ADDR,
+          handId: 2,
+        },
+      };
+      const statusSelector = makeSeatStatusSelector();
+      expect(statusSelector(mockedState, props))
+        .toEqual(STATUS_MSG.standingUp);
+    });
+  });
+  describe('if player is in sitout', () => {
+    it('should return sitOut', () => {
+      const mockedState = fromJS({
+        table: {
+          [TBL_ADDR]: {
+            data: {
+              smallBlind: 50,
+            },
+            0: {
+              state: 'preflop',
+              dealer: 0,
+              lineup: [{
+                address: P1_ADDR,
+                last: new EWT(ABI_BET).bet(1, 50).sign(P1_KEY),
+                sitout: 312431432,
+              }, {
+                address: P2_ADDR,
+                last: new EWT(ABI_BET).bet(1, 100).sign(P2_KEY),
+              }],
+            },
+          },
+        },
+      });
+
+      const props = {
+        pos: 0,
+        params: {
+          tableAddr: TBL_ADDR,
+          handId: 0,
+        },
+      };
+      const statusSelector = makeSeatStatusSelector();
+      expect(statusSelector(mockedState, props))
+        .toEqual(STATUS_MSG.sitOut);
+    });
+  });
+  describe('if player returns from sitout', () => {
+    it('should return sittingIn', () => {
+      const mockedState = fromJS({
+        table: {
+          [TBL_ADDR]: {
+            data: {
+              smallBlind: 50,
+            },
+            1: {
+              state: 'preflop',
+              dealer: 0,
+              lineup: [{
+                address: P1_ADDR,
+                last: new EWT(ABI_SIT_OUT).sitOut(1, 0).sign(P1_KEY),
+              }, {
+                address: P2_ADDR,
+                last: new EWT(ABI_BET).bet(1, 100).sign(P2_KEY),
+              }],
+            },
+          },
+        },
+      });
+
+      const props = {
+        pos: 0,
+        params: {
+          tableAddr: TBL_ADDR,
+          handId: 1,
+        },
+      };
+      const statusSelector = makeSeatStatusSelector();
+      expect(statusSelector(mockedState, props))
+        .toEqual(STATUS_MSG.sittingIn);
+    });
+  });
+  describe('if player is sitting at table playing', () => {
+    it('should return sittingIn', () => {
+      const mockedState = fromJS({
+        table: {
+          [TBL_ADDR]: {
+            data: {
+              smallBlind: 50,
+            },
+            1: {
+              state: 'preflop',
+              dealer: 0,
+              lineup: [{
+                address: P1_ADDR,
+                last: new EWT(ABI_BET).bet(1, 50).sign(P1_KEY),
+              }, {
+                address: P2_ADDR,
+                last: new EWT(ABI_BET).bet(1, 100).sign(P2_KEY),
+              }],
+            },
+          },
+        },
+      });
+
+      const props = {
+        pos: 0,
+        params: {
+          tableAddr: TBL_ADDR,
+          handId: 1,
+        },
+      };
+      const statusSelector = makeSeatStatusSelector();
+      expect(statusSelector(mockedState, props))
+        .toEqual(STATUS_MSG.active);
+    });
+  });
+  describe('if player waiting for another player', () => {
+    it('should return waiting', () => {
+      const mockedState = fromJS({
+        table: {
+          [TBL_ADDR]: {
+            data: {
+              smallBlind: 50,
+            },
+            1: {
+              state: 'preflop',
+              dealer: 0,
+              lineup: [{
+                address: P1_ADDR,
+              }, {
+                address: P2_ADDR,
+              }],
+            },
+          },
+        },
+      });
+
+      const props = {
+        pos: 0,
+        params: {
+          tableAddr: TBL_ADDR,
+          handId: 1,
+        },
+      };
+      const statusSelector = makeSeatStatusSelector();
+      expect(statusSelector(mockedState, props))
+        .toEqual(STATUS_MSG.waiting);
+    });
+  });
+});
+
 describe('makeShowStatusSelector', () => {
   it('should return posted SB', () => {
     const mockedState = fromJS({
@@ -354,10 +570,10 @@ describe('makeShowStatusSelector', () => {
             dealer: 0,
             lineup: [{
               address: P1_ADDR,
-              last: new EWT(ABI_BET).bet(1, 50).sign(P1_KEY),
+              last: new EWT(ABI_BET).bet(0, 50).sign(P1_KEY),
             }, {
               address: P2_ADDR,
-              last: new EWT(ABI_BET).bet(1, 100).sign(P2_KEY),
+              last: new EWT(ABI_BET).bet(0, 100).sign(P2_KEY),
             }],
           },
         },
@@ -388,10 +604,10 @@ describe('makeShowStatusSelector', () => {
             dealer: 0,
             lineup: [{
               address: P1_ADDR,
-              last: new EWT(ABI_BET).bet(1, 50).sign(P1_KEY),
+              last: new EWT(ABI_BET).bet(0, 50).sign(P1_KEY),
             }, {
               address: P2_ADDR,
-              last: new EWT(ABI_BET).bet(1, 100).sign(P2_KEY),
+              last: new EWT(ABI_BET).bet(0, 100).sign(P2_KEY),
             }],
           },
         },

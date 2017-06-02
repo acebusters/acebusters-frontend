@@ -12,7 +12,6 @@ import {
 } from '../Table/actions';
 
 import {
-  makeSeatSelector,
   makeCardsSelector,
   makeLastAmountSelector,
   makeFoldedSelector,
@@ -26,6 +25,7 @@ import {
   makeDealerSelector,
   makeBlockySelector,
   makeStackSelector,
+  makeSeatStatusSelector,
 } from './selectors';
 
 import {
@@ -85,11 +85,9 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
 
   render() {
     const timeLeft = (this.state && this.props.whosTurn === this.props.pos) ? ((this.state.timeLeft * 100) / timeoutSeconds) : timeoutSeconds;
-    const exitHand = (this.props.seat) ? this.props.seat.get('exitHand') : null;
     return (
       <SeatComponent
         {...this.props}
-        exitHand={exitHand}
         timeLeft={timeLeft}
         wasMostRecentAction={this.state.wasMostRecentAction}
       >
@@ -111,7 +109,7 @@ const mapStateToProps = createStructuredSelector({
   state: makeHandStateSelector(),
   dealer: makeDealerSelector(),
   open: makeOpenSelector(),
-  seat: makeSeatSelector(),
+  seatStatus: makeSeatStatusSelector(),
   pending: makePendingSelector(),
   sitout: makeSitoutSelector(),
   showStatus: makeShowStatusSelector(),
@@ -128,7 +126,6 @@ const mapStateToProps = createStructuredSelector({
 });
 
 Seat.propTypes = {
-  seat: React.PropTypes.any,
   lastAmount: React.PropTypes.number,
   changed: React.PropTypes.number,
   whosTurn: React.PropTypes.number,

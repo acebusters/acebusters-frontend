@@ -6,6 +6,7 @@ import React from 'react';
 import CardsComponent from './CardsComponent';
 import SeatInfo from './SeatInfo';
 import StatusAction from './StatusAction';
+import { STATUS_MSG } from '../../app.config';
 
 import {
   SeatContainer,
@@ -16,16 +17,17 @@ import {
 
 const Seat = (props) => {
   const {
-    activePlayer,
     coords,
     seatStatus,
   } = props;
   return (
     <SeatWrapper coords={coords}>
-      <SeatContainer activePlayer={activePlayer}>
-        {seatStatus !== 'EMPTY' ?
+      <SeatContainer
+        activePlayer={seatStatus && seatStatus === STATUS_MSG.active}
+      >
+        {seatStatus && seatStatus !== STATUS_MSG.active ?
           <StatusSeatWrapper>
-            <StatusSeat>{seatStatus}</StatusSeat>
+            <StatusSeat>{seatStatus.msg}</StatusSeat>
           </StatusSeatWrapper>
           :
           <CardsComponent {...props} />
@@ -40,9 +42,8 @@ const Seat = (props) => {
   );
 };
 Seat.propTypes = {
-  activePlayer: React.PropTypes.bool,
   coords: React.PropTypes.array,
-  seatStatus: React.PropTypes.string,
+  seatStatus: React.PropTypes.object,
 };
 
 export default Seat;

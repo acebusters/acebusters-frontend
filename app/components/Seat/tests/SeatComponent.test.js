@@ -57,41 +57,4 @@ describe('components.seat.seatComponent', () => {
       });
     });
   });
-
-  // seat status func
-  describe('if not at table yet and still pending', () => {
-    const props = {
-      pending: true,
-      myPos: undefined,
-    };
-    const el = shallow(<SeatComponent {...props} />);
-    it('should display "sitting-in"', () => {
-      expect(el.props().seatStatus).toEqual('sitting-in');
-    });
-  });
-
-  describe('if at table and not pending', () => {
-    const props = {
-      pending: false,
-      myPos: 0, // any number 0-whatever, maybe 10
-    };
-    const el = shallow(<SeatComponent {...props} />);
-    it('should return seatStatus as EMPTY', () => {
-      expect(el.props().seatStatus).toEqual('EMPTY');
-    });
-  });
-
-  describe('if standing-up', () => {
-    const props = {
-      pending: true,
-      myPos: 0, // any number 0-whatever, maybe 10
-    };
-    const el = shallow(<SeatComponent {...props} />);
-    it('should return seatStatus as "standing-up"', () => {
-      expect(el.props().seatStatus).toEqual('standing-up');
-    });
-  });
-
-
-  // TODO add test for sitout condition of the seatStatus method
 });
