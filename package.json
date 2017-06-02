@@ -195,9 +195,9 @@
     "coverageThreshold": {
       "global": {
         "statements": 41,
-        "branches": 45,
-        "functions": 46,
-        "lines": 62
+        "branches": 44,
+        "functions": 44,
+        "lines": 61
       }
     },
     "moduleDirectories": [

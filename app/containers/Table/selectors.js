@@ -267,7 +267,7 @@ const makeMyHandValueSelector = () => createSelector(
 const makeSelectWinners = () => createSelector(
   [makeHandSelector(), makeBoardSelector()],
   (hand, board) => {
-    if (!hand || !hand.get) {
+    if (!hand || !hand.get || !hand.get('lineup')) {
       return null;
     }
 
