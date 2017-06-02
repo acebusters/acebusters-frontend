@@ -35,6 +35,7 @@ import {
   updateReceived,
   addMessage,
   pendingToggle,
+  setExitHand,
   sitOutToggle,
   bet,
 } from './actions';
@@ -308,7 +309,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     const state = this.props.state;
     const exitHand = (state !== 'waiting') ? handId : handId - 1;
     const table = new TableService(this.props.params.tableAddr, this.props.privKey);
-    this.props.pendingToggle(this.tableAddr, this.props.params.handId, pos);
+    this.props.setExitHand(this.tableAddr, this.props.params.handId, pos, exitHand);
     const statusElement = (<div>
       <p>
         Please wait until your leave request is processed!
@@ -504,6 +505,7 @@ export function mapDispatchToProps() {
     modalAdd: (node) => (modalAdd(node)),
     modalDismiss: () => (modalDismiss()),
     pendingToggle: (tableAddr, handId, pos) => (pendingToggle(tableAddr, handId, pos)),
+    setExitHand: (tableAddr, handId, pos, exitHand) => (setExitHand(tableAddr, handId, pos, exitHand)),
     updateReceived: (tableAddr, hand) => (updateReceived(tableAddr, hand)),
     addMessage: (message, tableAddr, privKey, created) => (addMessage(message, tableAddr, privKey, created)),
     blockNotify: () => (blockNotify()),
@@ -552,6 +554,7 @@ Table.propTypes = {
   blockNotify: React.PropTypes.func,
   handRequest: React.PropTypes.func,
   pendingToggle: React.PropTypes.func,
+  setExitHand: React.PropTypes.func,
   modalDismiss: React.PropTypes.func,
   winners: React.PropTypes.array,
   dispatch: React.PropTypes.func,

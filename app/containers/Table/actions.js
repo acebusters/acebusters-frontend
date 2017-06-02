@@ -16,6 +16,7 @@ export const CHECK = 'acebusters/Table/CHECK';
 export const SHOW = 'acebusters/Table/SHOW';
 export const NET = 'acebusters/Table/NET';
 export const PENDING_TOGGLE = 'acebusters/Table/PENDING_TOGGLE';
+export const EXIT_HAND_SET = 'acebusters/Table/EXIT_HAND_SET';
 export const RECEIPT_SET = 'acebusters/Table/RECEIPT_SET';
 export const ADD_MESSAGE = 'acebusters/Chat/ADD_MESSAGE';
 export const SEND_MESSAGE = 'acebusters/Chat/SEND_MESSAGE';
@@ -63,6 +64,10 @@ export function tableReceived(tableAddr) {
 
 export function pendingToggle(tableAddr, handId, pos) {
   return { type: PENDING_TOGGLE, tableAddr, handId, pos };
+}
+
+export function setExitHand(tableAddr, handId, pos, exitHand) {
+  return { type: EXIT_HAND_SET, tableAddr, handId, pos, exitHand };
 }
 
 export function updateReceived(tableAddr, hand) {

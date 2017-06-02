@@ -40,6 +40,11 @@ const makeLastReceiptSelector = () => createSelector(
     (hand, pos) => (hand && pos > -1 && hand.getIn && hand.getIn(['lineup', pos])) ? rc.get(hand.getIn(['lineup', pos, 'last'])) : undefined
 );
 
+const makeSeatSelector = () => createSelector(
+    [makeHandSelector(), posSelector],
+    (hand, pos) => (hand && pos > -1 && hand.getIn && hand.getIn(['lineup', pos])) ? hand.getIn(['lineup', pos]) : undefined
+);
+
 const makeLastRoundMaxBetSelector = () => createSelector(
   [makeHandSelector()],
   (hand) => (hand && hand.get && hand.get('lastRoundMaxBet')) ? hand.get('lastRoundMaxBet') : 0
@@ -280,6 +285,7 @@ const selectStack = (table, pos) => {
 
 export {
   posSelector,
+  makeSeatSelector,
   makeLastReceiptSelector,
   makeSitoutSelector,
   makeLastAmountSelector,

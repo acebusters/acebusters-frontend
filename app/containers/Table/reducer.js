@@ -92,6 +92,11 @@ export default function tableReducer(state = initialState, action) {
         .setIn([action.tableAddr, 'data', 'smallBlind'], sb);
     }
 
+    case TableActions.EXIT_HAND_SET: {
+      const handIdStr = action.handId.toString();
+      return state.setIn([action.tableAddr, handIdStr, 'lineup', action.pos, 'exitHand'], action.exitHand);
+    }
+
     case TableActions.PENDING_TOGGLE: {
       const handIdStr = action.handId.toString();
       const pending = state.getIn([action.tableAddr, handIdStr, 'lineup', action.pos, 'pending']);
