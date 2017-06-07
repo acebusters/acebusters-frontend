@@ -8,6 +8,9 @@ describe('account reducer tests', () => {
     expect(accountProviderReducer(undefined, {}).toJS()).toEqual({
       privKey: undefined,
       email: undefined,
+      blocky: null,
+      nickName: null,
+      signerAddr: null,
       loggedIn: false,
       web3ReadyState: 0,
       web3ErrMsg: null,

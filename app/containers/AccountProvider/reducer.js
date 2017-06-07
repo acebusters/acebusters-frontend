@@ -28,6 +28,9 @@ const initialState = fromJS({
   privKey: storageService.getItem('privKey'),
   email: storageService.getItem('email'),
   loggedIn: isLoggedIn(),
+  blocky: null,
+  nickName: null,
+  signerAddr: null,
   web3ReadyState: READY_STATE.CONNECTING,
   web3ErrMsg: null,
 });
@@ -42,7 +45,12 @@ function accountProviderReducer(state = initialState, action) {
     case WEB3_ERROR:
       return state.set('web3ErrMsg', action.err ? (action.err.message || 'Connection Error') : null);
     case ACCOUNT_LOADED:
-      return state.set('proxy', action.data.proxy).set('controller', action.data.controller).set('lastNonce', action.data.lastNonce);
+      return state.set('proxy', action.data.proxy)
+        .set('controller', action.data.controller)
+        .set('lastNonce', action.data.lastNonce)
+        .set('blocky', action.data.blocky)
+        .set('nickName', action.data.nickName)
+        .set('signerAddr', action.data.signer);
     case WEB3_METHOD_SUCCESS:
       return state.setIn(['web3', 'methods', action.key], fromJS(action.payload));
     case WEB3_METHOD_ERROR:
@@ -85,7 +93,10 @@ function accountProviderReducer(state = initialState, action) {
       if (!action.newAuthState.loggedIn) {
         newState = state
           .delete('privKey')
-          .delete('email');
+          .delete('email')
+          .set('blocky', null)
+          .set('nickName', null)
+          .set('signerAddr', null);
         storageService.removeItem('privKey');
         storageService.removeItem('email');
       } else {

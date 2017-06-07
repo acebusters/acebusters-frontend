@@ -6,6 +6,8 @@ import fetch from 'isomorphic-fetch';
 import Raven from 'raven-js';
 
 import WebsocketProvider from '../../services/wsProvider';
+import { createBlocky } from '../../services/blockies';
+import { nickNameByAddress } from '../../services/nicknames';
 import {
   ethNodeUrl,
   ABI_TOKEN_CONTRACT,
@@ -204,9 +206,11 @@ function* accountLoginSaga() {
       const proxy = res[0];
       const controller = res[1];
       const lastNonce = res[2].toNumber();
+      const blocky = createBlocky(signer);
+      const nickName = nickNameByAddress(signer);
 
       // write data into the state
-      yield put(accountLoaded({ proxy, controller, lastNonce }));
+      yield put(accountLoaded({ proxy, controller, lastNonce, blocky, nickName, signer }));
 
       // start listen on the account controller for events
       // mostly auth errors

@@ -12,6 +12,17 @@ const selectAccount = (state) => state.get('account');
 /**
  * Other specific selectors
  */
+
+const makeBlockySelector = () => createSelector(
+  selectAccount,
+  (account) => account.get('blocky'),
+);
+
+const makeNickNameSelector = () => createSelector(
+  selectAccount,
+  (account) => account.get('nickName'),
+);
+
 const makeSelectAccountData = () => createSelector(
   selectAccount,
   (account) => account.toJS()
@@ -19,6 +30,7 @@ const makeSelectAccountData = () => createSelector(
 
 const makeSignerAddrSelector = () => createSelector(
   selectAccount,
+  // (account) => account.get('signerAddr'),
   (account) => {
     if (account && account.get('privKey')) {
       const privKeyBuffer = new Buffer(account.get('privKey').replace('0x', ''), 'hex');
@@ -71,6 +83,8 @@ const makeSelectProxyAddr = () => createSelector(
 export default makeSelectAccountData;
 export {
   selectAccount,
+  makeBlockySelector,
+  makeNickNameSelector,
   makeSignerAddrSelector,
   makeSelectAccountData,
   makeSelectContract,
