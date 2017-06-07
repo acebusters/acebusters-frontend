@@ -9,12 +9,10 @@ import WebsocketProvider from '../../services/wsProvider';
 import { createBlocky } from '../../services/blockies';
 import { nickNameByAddress } from '../../services/nicknames';
 import {
-  ethNodeUrl,
+  conf,
   ABI_TOKEN_CONTRACT,
   ABI_CONTROLLER,
-  tokenContractAddress,
   ABI_ACCOUNT_FACTORY,
-  accountFactoryAddress,
 } from '../../app.config';
 
 import {
@@ -39,10 +37,11 @@ import {
 } from './actions';
 
 let web3Instance;
+const confParams = conf();
 
 export function getWeb3() {
   if (typeof web3Instance === 'undefined') {
-    web3Instance = new Web3(new WebsocketProvider(ethNodeUrl));
+    web3Instance = new Web3(new WebsocketProvider(confParams.gethUrl));
   }
   return web3Instance;
 }
@@ -61,7 +60,7 @@ const getPeerCount = (web3) => (
 
 const getAccount = (web3, signer) => (
   new Promise((resolve, reject) => {
-    const factoryContract = web3.eth.contract(ABI_ACCOUNT_FACTORY).at(accountFactoryAddress);
+    const factoryContract = web3.eth.contract(ABI_ACCOUNT_FACTORY).at(confParams.accountFactory);
     factoryContract.getAccount.call(signer, (e, a) => {
       if (e) {
         reject('login error');
@@ -122,7 +121,7 @@ function* web3ConnectSaga() {
   try {
     yield getPeerCount(getWeb3());
     yield put(web3Connected({ isConnected: true }));
-    const tokenContract = web3Instance.eth.contract(ABI_TOKEN_CONTRACT).at(tokenContractAddress);
+    const tokenContract = web3Instance.eth.contract(ABI_TOKEN_CONTRACT).at(confParams.ntzAddr);
     yield call(delay, 500);
     yield fork(ethEventListenerSaga, tokenContract);
   } catch (err) {
@@ -220,12 +219,11 @@ function* accountLoginSaga() {
   }
 }
 
-const workerUrl = 'https://khengvfg6c.execute-api.eu-west-1.amazonaws.com/v0';
 
 function sendTx(signer, nonceAndDest, data, r, s, v) {
   return new Promise((resolve, reject) => {
     const bodyStr = JSON.stringify({ signer, nonceAndDest, data, r, s, v });
-    fetch(`${workerUrl}/forward`, {
+    fetch(`${confParams.txUrl}/forward`, {
       method: 'post',
       headers: {
         Accept: 'application/json',
@@ -251,7 +249,7 @@ function sendTx(signer, nonceAndDest, data, r, s, v) {
 
 function notifyBlock() {
   return new Promise((resolve, reject) => {
-    fetch(`${workerUrl}/notify`, {
+    fetch(`${confParams.txUrl}/notify`, {
       method: 'post',
       headers: {
         Accept: 'application/json',

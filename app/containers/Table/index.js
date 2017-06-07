@@ -24,7 +24,7 @@ import {
   ABI_TABLE,
   ABI_TOKEN_CONTRACT,
   TIMEOUT_PERIOD,
-  tokenContractAddress,
+  conf,
 } from '../../app.config';
 
 import { modalAdd, modalDismiss } from '../App/actions';
@@ -101,7 +101,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.tableAddr = props.params.tableAddr;
     this.web3 = props.web3Redux.web3;
     this.table = this.web3.eth.contract(ABI_TABLE).at(this.tableAddr);
-    this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(tokenContractAddress);
+    this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(conf().ntzAddr);
     // register event listener for table
     this.tableEvents = this.table.allEvents({ fromBlock: 'latest' });
     this.tableEvents.watch(this.watchTable);

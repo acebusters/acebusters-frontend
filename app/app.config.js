@@ -4,12 +4,49 @@
  * license that can be found in the LICENSE file.
 */
 
-export const apiBasePath = 'https://evm4rumeob.execute-api.eu-west-1.amazonaws.com/v0';
-export const landingPageUrl = 'http://www.acebusters.com';
-export const ethNodeUrl = 'ws://geth.ocolin.com:8546';
-export const tokenContractAddress = '0xd56fb602475a6bf067e5998bd02764df5219bcb5';
-export const accountFactoryAddress = '0xecc669f51460e729eb8a386dc779398a5482b9f1';
-export const tableFactoryAddress = '0xfcc4dbbe90bca01dc157f84ea8ed8722551cd588';
+export function conf() {
+  let sub = '';
+  if (window && window.location && window.location.host) {
+    sub = window.location.host.split('.')[0];
+  }
+  // ### PRODUCTION ENVIRONMENT CONFIG
+  if (sub === 'app') {
+    return {
+      gethUrl: '',
+      oracleUrl: '',
+      txUrl: '',
+      accountUrl: '',
+      ntzAddr: '',
+      accountFactory: '',
+      tableFactory: '',
+    };
+  }
+
+  // ### STAGING ENVIRONMENT CONFIG
+  if (sub === 'beta') {
+    return {
+      gethUrl: 'ws://rinkeby.acebusters.com:8545',
+      oracleUrl: 'https://v83iq1161a.execute-api.eu-west-1.amazonaws.com/v0',
+      txUrl: 'https://h5fb9klhzc.execute-api.eu-west-1.amazonaws.com/v0',
+      accountUrl: 'https://vps13t4f7e.execute-api.eu-west-1.amazonaws.com/v0',
+      ntzAddr: 'tbd',
+      accountFactory: 'tbd',
+      tableFactory: 'tbd',
+    };
+  }
+
+  // ### SANDBOX ENVIRONMENT CONFIG
+  return {
+    gethUrl: 'ws://geth.ocolin.com:8546',
+    oracleUrl: 'https://evm4rumeob.execute-api.eu-west-1.amazonaws.com/v0',
+    txUrl: 'https://khengvfg6c.execute-api.eu-west-1.amazonaws.com/v0',
+    accountUrl: 'https://hsqkzjp3m8.execute-api.eu-west-1.amazonaws.com/v0',
+    ntzAddr: '0xd56fb602475a6bf067e5998bd02764df5219bcb5',
+    accountFactory: '0xecc669f51460e729eb8a386dc779398a5482b9f1',
+    tableFactory: '0xfcc4dbbe90bca01dc157f84ea8ed8722551cd588',
+  };
+}
+
 export const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'jack', 'queen', 'king', 'ace'];
 export const valuesShort = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'];
 export const suits = ['c', 'd', 'h', 's'];

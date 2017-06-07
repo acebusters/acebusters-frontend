@@ -9,7 +9,6 @@ import Footer from 'components/Footer';
 import Content from 'components/Content';
 import withProgressBar from 'components/ProgressBar';
 
-import { landingPageUrl } from '../../app.config';
 import makeSelectAccountData, { makeSignerAddrSelector } from '../AccountProvider/selectors';
 import {
   makeSelectProgress,
@@ -72,7 +71,6 @@ export function App(props) {
           location={props.location}
           loggedIn={props.account.loggedIn}
           onClickLogout={props.handleClickLogout}
-          logoHref={props.logoHref}
           signerAddr={props.signerAddr}
           params={props.params}
         />
@@ -105,7 +103,6 @@ export function App(props) {
 App.defaultProps = {
   fixed: false,
   initialCollapse: true,
-  logoHref: landingPageUrl,
 };
 
 
@@ -114,7 +111,6 @@ App.propTypes = {
   account: React.PropTypes.object,
   handleClickLogout: React.PropTypes.func,
   modalDismiss: React.PropTypes.func,
-  logoHref: React.PropTypes.string,
   fixed: React.PropTypes.bool,
   params: React.PropTypes.object,
   location: React.PropTypes.object,

@@ -11,12 +11,7 @@ import { modalAdd, modalDismiss } from '../App/actions';
 import web3Connect from '../AccountProvider/web3Connect';
 import { contractEvent, accountLoaded } from '../AccountProvider/actions';
 import { createBlocky } from '../../services/blockies';
-import {
-  ABI_TOKEN_CONTRACT,
-  ABI_ACCOUNT_FACTORY,
-  tokenContractAddress,
-  accountFactoryAddress,
-} from '../../app.config';
+import { ABI_TOKEN_CONTRACT, ABI_ACCOUNT_FACTORY, conf } from '../../app.config';
 
 import List from '../../components/List';
 import TransferDialog from '../TransferDialog';
@@ -26,13 +21,15 @@ import Blocky from '../../components/Blocky';
 import FormGroup from '../../components/Form/FormGroup';
 import WithLoading from '../../components/WithLoading';
 
+const confParams = conf();
+
 export class Dashboard extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   constructor(props) {
     super(props);
     this.handleTransfer = this.handleTransfer.bind(this);
     this.web3 = props.web3Redux.web3;
-    this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(tokenContractAddress);
+    this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(confParams.ntzAddr);
     this.web3.eth.getBlockNumber((err, blockNumber) => {
       const events = this.token.allEvents({ fromBlock: blockNumber - (4 * 60 * 24), toBlock: 'latest' });
       events.get((error, eventList) => {
@@ -73,8 +70,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     const privKey = this.props.privKey;
     const privKeyBuffer = new Buffer(privKey.replace('0x', ''), 'hex');
     const signer = `0x${ethUtil.privateToAddress(privKeyBuffer).toString('hex')}`;
-    const accountFactory = web3.eth.contract(ABI_ACCOUNT_FACTORY)
-                                    .at(accountFactoryAddress);
+    const accountFactory = web3.eth.contract(ABI_ACCOUNT_FACTORY).at(confParams.accountFactory);
     const events = accountFactory.AccountCreated({ signer }, { fromBlock: 'latest' });
 
     events.watch((err, ev) => {  // eslint-disable-line no-unused-vars
@@ -98,9 +94,9 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     }
     let listPending = null;
     let listTxns = null;
-    if (this.props.account[tokenContractAddress]) {
-      listPending = pendingToList(this.props.account[tokenContractAddress].pending);
-      listTxns = txnsToList(this.props.account[tokenContractAddress].transactions, this.props.account.proxy);
+    if (this.props.account[confParams.ntzAddr]) {
+      listPending = pendingToList(this.props.account[confParams.ntzAddr].pending);
+      listTxns = txnsToList(this.props.account[confParams.ntzAddr].transactions, this.props.account.proxy);
     }
 
     return (

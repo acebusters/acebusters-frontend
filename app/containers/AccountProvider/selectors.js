@@ -1,7 +1,5 @@
 import EthUtil from 'ethereumjs-util';
 import { createSelector } from 'reselect';
-
-import { ABI_TOKEN_CONTRACT, tokenContractAddress } from '../../app.config';
 import { READY_STATE } from './actions';
 
 /**
@@ -55,17 +53,6 @@ const makeSelectEmail = () => createSelector(
   (account) => account.get('email')
 );
 
-const makeSelectContract = () => createSelector(
-  selectAccount,
-  () => {
-    if (typeof window.web3 !== 'undefined') {
-      const contract = window.web3.eth.contract(ABI_TOKEN_CONTRACT).at(tokenContractAddress);
-      return contract;
-    }
-    return null;
-  }
-);
-
 const makeSelectPrivKey = () => createSelector(
   selectAccount,
   (account) => account.get('privKey')
@@ -87,7 +74,6 @@ export {
   makeNickNameSelector,
   makeSignerAddrSelector,
   makeSelectAccountData,
-  makeSelectContract,
   makeSelectPrivKey,
   makeSelectProxyAddr,
   makeSelectEmail,

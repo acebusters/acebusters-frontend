@@ -12,13 +12,12 @@ import {
   ABI_SIT_OUT,
   ABI_TABLE_FACTORY,
   checkABIs,
-  apiBasePath,
-  tableFactoryAddress,
+  conf,
 } from '../app.config';
 
+const confParams = conf();
 
 function TableService(tableAddr, privKey) {
-  this.apiBasePath = apiBasePath;
   this.tableAddr = tableAddr;
   this.privKey = privKey;
 }
@@ -91,7 +90,7 @@ TableService.prototype.message = function message(receipt) {
     const header = new Headers({ 'Content-Type': 'application/json' });
     const data = JSON.stringify({ msgReceipt: receipt });
     const requestInit = { headers: header, body: data, method: 'POST' };
-    const request = new Request(`${this.apiBasePath}/table/${this.tableAddr}/message`, requestInit);
+    const request = new Request(`${confParams.oracleUrl}/table/${this.tableAddr}/message`, requestInit);
     fetch(request).then((res) => res.json(), (err) => {
       reject(err);
     }).then((response) => {
@@ -104,7 +103,7 @@ TableService.prototype.message = function message(receipt) {
 
 TableService.prototype.pay = function pay(receipt) {
   return new Promise((resolve, reject) => {
-    fetch(`${this.apiBasePath}/table/${this.tableAddr}/pay`, {
+    fetch(`${confParams.oracleUrl}/table/${this.tableAddr}/pay`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -135,7 +134,7 @@ TableService.prototype.leave = function leave(handId) {
     const receipt = new EWT(ABI_LEAVE).leave(handId, 0).sign(this.privKey);
     const header = new Headers({ Authorization: receipt });
     const myInit = { headers: header, method: 'POST' };
-    const request = new Request(`${this.apiBasePath}/table/${this.tableAddr}/leave`, myInit);
+    const request = new Request(`${confParams.oracleUrl}/table/${this.tableAddr}/leave`, myInit);
     fetch(request).then((res) => res.json(), (err) => {
       reject(err);
     }).then((cards) => {
@@ -152,7 +151,7 @@ TableService.prototype.show = function show(handId, amount, holeCards) {
     const header = new Headers({ Authorization: receipt, 'Content-Type': 'application/json' });
     const data = JSON.stringify({ cards: holeCards });
     const myInit = { headers: header, body: data, method: 'POST' };
-    const request = new Request(`${this.apiBasePath}/table/${this.tableAddr}/show`, myInit);
+    const request = new Request(`${confParams.oracleUrl}/table/${this.tableAddr}/show`, myInit);
     fetch(request).then((res) => res.json(), (err) => {
       reject(err);
     }).then((distribution) => {
@@ -170,7 +169,7 @@ TableService.prototype.sitOut = function sitOut(handId, amount) {
 
 TableService.prototype.timeOut = function timeOut() {
   return new Promise((resolve, reject) => {
-    fetch(`${apiBasePath}/table/${this.tableAddr}/timeout`, {
+    fetch(`${confParams.oracleUrl}/table/${this.tableAddr}/timeout`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -201,7 +200,7 @@ TableService.prototype.net = function net(handId, payload) {
     const header = new Headers({ 'Content-Type': 'application/json' });
     const data = JSON.stringify({ nettingSig: payload });
     const myInit = { headers: header, body: data, method: 'POST' };
-    const request = new Request(`${this.apiBasePath}/table/${this.tableAddr}/hand/${handId}/netting`, myInit);
+    const request = new Request(`${confParams.oracleUrl}/table/${this.tableAddr}/hand/${handId}/netting`, myInit);
     fetch(request).then((res) => res.json(), (err) => {
       reject(err);
     }).then((distribution) => {
@@ -214,7 +213,7 @@ TableService.prototype.net = function net(handId, payload) {
 
 export function fetchTableState(tableAddr) {
   return new Promise((resolve, reject) => {
-    const request = new Request(`${apiBasePath}/table/${tableAddr}/info`);
+    const request = new Request(`${confParams.oracleUrl}/table/${tableAddr}/info`);
     fetch(request).then(
       (res) => res.json(),
       (error) => reject(error)
@@ -227,7 +226,7 @@ export function fetchTableState(tableAddr) {
 
 export function getHand(tableAddr, handId) {
   return new Promise((resolve, reject) => {
-    fetch(`${apiBasePath}/table/${tableAddr}/hand/${handId}`, {
+    fetch(`${confParams.oracleUrl}/table/${tableAddr}/hand/${handId}`, {
       method: 'GET',
       headers: {
         Accept: 'application/json',
@@ -253,7 +252,8 @@ export function getHand(tableAddr, handId) {
 }
 
 export function fetchTables() {
-  const tableFactoryContract = getWeb3().eth.contract(ABI_TABLE_FACTORY).at(tableFactoryAddress);
+  const tableFactoryContract = getWeb3()
+    .eth.contract(ABI_TABLE_FACTORY).at(confParams.tableFactory);
 
   return new Promise((resolve, reject) => {
     tableFactoryContract.getTables.call((e, a) => {

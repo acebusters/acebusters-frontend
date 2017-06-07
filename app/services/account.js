@@ -1,6 +1,5 @@
 import fetch from 'isomorphic-fetch';
-
-const accountUrl = 'https://hsqkzjp3m8.execute-api.eu-west-1.amazonaws.com/v0';
+import { conf } from '../app.config';
 
 /* eslint-disable */
 function uuid(a) {
@@ -11,7 +10,7 @@ function uuid(a) {
 
 function request(path, body, method = 'post') {
   return new Promise((resolve, reject) => {
-    fetch(`${accountUrl}/${path}`, {
+    fetch(`${conf().accountUrl}/${path}`, {
       method,
       headers: {
         Accept: 'application/json',
