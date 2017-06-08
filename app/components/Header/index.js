@@ -6,8 +6,6 @@ import Navbar from './Navbar';
 import UserMenu from './UserMenu';
 import NavItem from './NavItem';
 
-import { nickNameByAddress } from '../../services/nicknames';
-
 import {
   screenXsMax,
 } from '../../variables';
@@ -52,7 +50,6 @@ const NavToggle = styled.button`
   }
 `;
 
-
 class Header extends React.Component { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
@@ -88,13 +85,11 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
         location={this.props.location}
       />,
       <UserMenu
-        name={nickNameByAddress(this.props.signerAddr)}
-        image={this.props.imageUrl}
         profileAction={() => browserHistory.push('/dashboard')}
         signOutAction={this.props.onClickLogout}
         collapsed={collapsed}
-        signerAddr={this.props.signerAddr}
         key="4"
+        {...this.props}
       />,
     ]) : ([
       <NavItem
@@ -126,8 +121,6 @@ Header.propTypes = {
   fixed: React.PropTypes.bool,
   location: React.PropTypes.object,
   loggedIn: React.PropTypes.bool,
-  imageUrl: React.PropTypes.string,
-  signerAddr: React.PropTypes.string,
   onClickLogout: React.PropTypes.func,
 };
 

@@ -11,7 +11,7 @@ describe('components.TableMenu.TableMenu', () => {
     const props = {
       loggedIn: false,
       active: false,
-      nickName: null,
+      nickName: 'Guest',
       blocky: null,
     };
     describe('if menu closed', () => {

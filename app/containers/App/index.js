@@ -4,12 +4,11 @@ import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import { ModalContainer, ModalDialog } from 'kd-react-modal-dialog';
 import { browserHistory } from 'react-router';
-import Header from 'components/Header';
 import Footer from 'components/Footer';
 import Content from 'components/Content';
 import withProgressBar from 'components/ProgressBar';
+import Header from '../Header';
 
-import makeSelectAccountData, { makeSignerAddrSelector } from '../AccountProvider/selectors';
 import {
   makeSelectProgress,
   makeSelectTransferShow,
@@ -60,11 +59,8 @@ export function App(props) {
       <StyledDashboard params={props.params} name="styled-dashboard">
         { props.location.pathname.indexOf('table') === -1 &&
           <Header
-            location={props.location}
-            loggedIn={props.account.loggedIn}
             onClickLogout={props.handleClickLogout}
-            signerAddr={props.signerAddr}
-            params={props.params}
+            {...props}
           />
         }
         <Content
@@ -102,13 +98,11 @@ App.defaultProps = {
 
 App.propTypes = {
   children: React.PropTypes.node,
-  account: React.PropTypes.object,
   handleClickLogout: React.PropTypes.func,
   modalDismiss: React.PropTypes.func,
   fixed: React.PropTypes.bool,
   params: React.PropTypes.object,
   location: React.PropTypes.object,
-  signerAddr: React.PropTypes.string,
   modalStack: React.PropTypes.array,
 };
 
@@ -122,10 +116,7 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-
 const mapStateToProps = createStructuredSelector({
-  account: makeSelectAccountData(),
-  signerAddr: makeSignerAddrSelector(),
   workerProgress: selectWorkerProgress,
   isModalOpen: makeSelectTransferShow(),
   modalStack: makeModalStackSelector(),

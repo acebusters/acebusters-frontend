@@ -26,7 +26,7 @@ const MenuHeader = ({
       onMouseLeave={handleOnLeave}
     >
       <Identicon name="identicon" bgImg={blocky} />
-      <ItemTitle name="item-title">{nickName !== null ? nickName : 'Guest'}</ItemTitle>
+      <ItemTitle name="item-title">{nickName}</ItemTitle>
       <Hamburger>
         <Patty active={active} />
         <Patty active={active} />

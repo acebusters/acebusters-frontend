@@ -1,11 +1,11 @@
 import EthUtil from 'ethereumjs-util';
 import { createSelector } from 'reselect';
 import { READY_STATE } from './actions';
-
 /**
  * Direct selector to the accountProvider state domain
  */
 const selectAccount = (state) => state.get('account');
+
 
 /**
  * Other specific selectors
@@ -18,7 +18,12 @@ const makeBlockySelector = () => createSelector(
 
 const makeNickNameSelector = () => createSelector(
   selectAccount,
-  (account) => account.get('nickName'),
+  (account) => {
+    if (account.get('nickName') === null) {
+      return 'Guest';
+    }
+    return account.get('nickName');
+  },
 );
 
 const makeSelectAccountData = () => createSelector(
