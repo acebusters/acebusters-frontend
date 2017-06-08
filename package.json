@@ -232,7 +232,7 @@
     "localStorage": "1.0.3",
     "lodash": "4.17.2",
     "minimist": "1.2.0",
-    "poker-helper": "/Users/jz/Projects/projects_current/AceBusters/ab-poker-helper",
+    "poker-helper": "0.3.18",
     "pusher-js": "^4.0.0",
     "qrcode.react": "^0.6.1",
     "raven-js": "^3.13.1",

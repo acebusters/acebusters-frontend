@@ -10,6 +10,7 @@ import { reducer as formReducer } from 'redux-form/immutable';
 
 import globalReducer from 'containers/App/reducer';
 import tableReducer from 'containers/Table/reducer';
+import tableMenuReducer from 'containers/TableMenu/reducer';
 import languageProviderReducer from 'containers/LanguageProvider/reducer';
 import accountProviderReducer from 'containers/AccountProvider/reducer';
 
@@ -51,6 +52,7 @@ export default function createReducer(asyncReducers) {
     language: languageProviderReducer,
     account: accountProviderReducer,
     table: tableReducer,
+    tableMenu: tableMenuReducer,
     form: formReducer,
     ...asyncReducers,
   });

@@ -4,9 +4,8 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 import SeatInfo from '../SeatInfo';
-import { STATUS_MSG } from '../../../app.config';
+import { STATUS_MSG, signerAddr } from '../../../app.config';
 
-const signerAddr = '0xdb2fdaf5b80c6a4c408e51b36ce7bbdd0c0852c4';
 
 describe('components.seat.SeatInfo', () => {
   // describe('stackToString func', () => {});

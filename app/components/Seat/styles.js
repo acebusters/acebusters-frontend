@@ -152,7 +152,6 @@ export const InfoWrapper = styled(SharedMiddle)`
 
   color: #D5D5D5;
   font-weight: 400;
-  z-index: 100;
 `;
 
 export const AvatarImage = styled.div`

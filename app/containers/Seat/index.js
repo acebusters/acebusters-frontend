@@ -104,7 +104,6 @@ export function mapDispatchToProps() {
   };
 }
 
-
 const mapStateToProps = createStructuredSelector({
   state: makeHandStateSelector(),
   dealer: makeDealerSelector(),

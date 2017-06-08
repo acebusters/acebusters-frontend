@@ -5,7 +5,9 @@ import tinycolor from 'tinycolor2';
 // --------------------------------------------------------
 export const baseColor = '#FD5E60';
 export const black = '#080B0F';
-export const background = '#ECECEC';
+export const background = '#ECECEC'; // lightgray
+export const backgroundBoxed = '#ECECEC'; // lightgray
+export const backgroundTable = 'radial-gradient(50% 50%, #B4B3B3 50%, #353535 100%)'; // lightgray radial-gradient
 export const disabled = '#FFC7BD';
 export const gray = '#999999';
 export const green = '#A0FFB1';
