@@ -288,6 +288,9 @@ export const ButtonStyle = styled(SharedMiddle)`
 export const ButtonWrapper = styled.button`
   position: absolute;
   margin-top: ${scaleButtonJoin(42)};
+  margin-left: ${scaleButtonJoin(42)};
+  height: ${scaleButtonJoin(40)};
+  width: ${scaleButtonJoin(42)}
   top: ${scaleButtonJoin(-20)};
   left: ${scaleButtonJoin(-64)};
   display: flex;
@@ -295,11 +298,12 @@ export const ButtonWrapper = styled.button`
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  width: ${scaleButtonJoin(128)};
-  height: ${scaleButtonJoin(40)};
 
   color: #D5D5D5;
   font-weight: 400;
+  &:focus {
+    outline: none;
+  }
   &:hover {
     color: white;
     transform: scale(1.1, 1.1);
