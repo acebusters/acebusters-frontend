@@ -2,16 +2,11 @@
  * Created by helge on 24.08.16.
  */
 import React from 'react';
+import Raven from 'raven-js';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
-import Grid from 'grid-styled';
-import Slider from 'react-rangeslider';
-import 'react-rangeslider/lib/index.css';
-import Raven from 'raven-js';
 
-import SliderWrapper from '../../components/Slider';
-import ChatWrapper from '../../components/Chat';
-import Chat from '../../containers/Chat';
+import TableService from '../../services/tableService';
 
 import {
   makeMinSelector,
@@ -36,12 +31,11 @@ import {
   makeLastReceiptSelector,
 } from '../Seat/selectors';
 
-import { bet, pay, fold, check, setCards, sendMessage } from '../Table/actions';
-import { ActionBarComponent, ActionButton } from '../../components/ActionBar';
-import TableService from '../../services/tableService';
+import { setCards, sendMessage, bet, pay, fold, check } from '../Table/actions';
 
-export class ActionBar extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+import ActionBar from '../../components/ActionBar';
 
+class ActionBarContainer extends React.Component {
   constructor(props) {
     super(props);
     this.handleBet = this.handleBet.bind(this);
@@ -53,6 +47,7 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
     this.table = new TableService(props.params.tableAddr, this.props.privKey);
     this.state = {
       active: true,
+      amount: null,
     };
   }
 
@@ -92,8 +87,8 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
     const amount = this.state.amount + this.props.myMaxBet;
     const handId = parseInt(this.props.params.handId, 10);
 
-    const betAction = bet(this.props.params.tableAddr, handId, amount, this.props.privKey, this.props.myPos, this.props.lastReceipt);
-    return pay(betAction, this.props.dispatch)
+    const betAction = this.props.bet(this.props.params.tableAddr, handId, amount, this.props.privKey, this.props.myPos, this.props.lastReceipt);
+    return this.props.pay(betAction, this.props.dispatch)
     .then((cards) => {
       this.props.setCards(this.props.params.tableAddr, handId, cards);
     })
@@ -114,7 +109,7 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
     const checkStates = ['preflop', 'turn', 'river', 'flop'];
     const state = this.props.state;
     const checkType = checkStates.indexOf(state) !== -1 ? state : 'flop';
-    const action = check(
+    const action = this.props.check(
       this.props.params.tableAddr,
       handId,
       amount,
@@ -124,7 +119,7 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
       checkType,
     );
 
-    return pay(action, this.props.dispatch)
+    return this.props.pay(action, this.props.dispatch)
       .then((cards) => {
         this.props.setCards(this.props.params.tableAddr, handId, cards);
       })
@@ -135,7 +130,7 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
     this.setActive(false);
     const amount = this.props.myMaxBet;
     const handId = parseInt(this.props.params.handId, 10);
-    const action = fold(
+    const action = this.props.fold(
       this.props.params.tableAddr,
       handId,
       amount,
@@ -144,7 +139,7 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
       this.props.lastReceipt
     );
 
-    return pay(action, this.props.dispatch)
+    return this.props.pay(action, this.props.dispatch)
       .then((cards) => {
         this.props.setCards(this.props.params.tableAddr, handId, cards);
       })
@@ -156,82 +151,59 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
   }
 
   render() {
-    const isMyTurn = this.props.isMyTurn;
-    const isTakePartOfAGame = this.props.myPos != null;
-    const isAppropriateState = (
-      this.props.state !== 'waiting'
-      && this.props.state !== 'dealing'
-      && this.props.state !== 'showdown'
+    return (
+      <ActionBar
+        active={this.state.active}
+        amount={this.state.amount}
+        handleBet={this.handleBet}
+        handleCheck={this.handleCheck}
+        handleCall={this.handleCall}
+        handleFold={this.handleFold}
+        updateAmount={this.updateAmount}
+        sendMessage={this.sendMessage}
+        {...this.props}
+      />
     );
-    const canSeeChat = (
-      isTakePartOfAGame
-      && !isMyTurn
-      && isAppropriateState
-    ) || !isTakePartOfAGame;
-    const canSeeActionBar = (
-      this.state.active
-      && isMyTurn
-      && isAppropriateState
-    );
-    if (canSeeActionBar) {
-      const raiseButton = (this.props.myStack > this.props.amountToCall) ? (<ActionButton size="medium" onClick={this.handleBet} text={`RAISE ${this.state.amount}`} />) : null;
-      return (
-        <ActionBarComponent>
-          <SliderWrapper>
-            { this.props.myStack > this.props.amountToCall &&
-              <Slider
-                key="betting-slider"
-                data-orientation="vertical"
-                value={this.state.amount}
-                min={this.props.minRaise}
-                max={this.props.myStack}
-                step={1}
-                onChange={this.updateAmount}
-              >
-              </Slider>
-            }
-          </SliderWrapper>
-          <Grid xs={1 / 3}>
-            { this.props.amountToCall > 0 &&
-              <div>
-                { raiseButton }
-                <ActionButton size="medium" onClick={this.handleCall} text={`CALL ${this.props.callAmount}`}>
-                </ActionButton>
-                <ActionButton size="medium" onClick={this.handleFold} text="FOLD"></ActionButton>
-              </div>
-            }
-            { this.props.amountToCall === 0 &&
-              <div>
-                <ActionButton size="medium" onClick={this.handleBet} text={`BET ${this.state.amount}`}>
-                </ActionButton>
-                <ActionButton size="medium" onClick={this.handleCheck} text="CHECK">
-                </ActionButton>
-              </div>
-            }
-          </Grid>
-        </ActionBarComponent>
-      );
-    } else if (canSeeChat) {
-      const ta = this.props.params.tableAddr.substring(2, 8);
-      const chatPlaceholder = `table <${ta}> in state ${this.props.state} has ${this.props.playerCount || 'no'} player${this.props.playerCount === 1 ? '' : 's'}.`;
-      return (
-        <ChatWrapper>
-          <Chat onAddMessage={this.sendMessage} messages={this.props.messages} readonly={!isTakePartOfAGame} placeholder={chatPlaceholder} />
-        </ChatWrapper>
-      );
-    }
-    return null;
   }
 }
+
+ActionBarContainer.propTypes = {
+  bet: React.PropTypes.func,
+  callAmount: React.PropTypes.number,
+  check: React.PropTypes.func,
+  dispatch: React.PropTypes.func,
+  fold: React.PropTypes.func,
+  lastReceipt: React.PropTypes.object,
+  myMaxBet: React.PropTypes.number,
+  myPos: React.PropTypes.number,
+  myStack: React.PropTypes.number,
+  pay: React.PropTypes.func,
+  params: React.PropTypes.object,
+  privKey: React.PropTypes.string,
+  setCards: React.PropTypes.func,
+  sendMessage: React.PropTypes.func,
+  state: React.PropTypes.string,
+};
 
 export function mapDispatchToProps(dispatch) {
   return {
     dispatch,
     setCards: (tableAddr, handId, cards) => setCards(tableAddr, handId, cards),
-    sendMessage: (message, tableAddr, privKey) => dispatch(sendMessage(message, tableAddr, privKey)),
+    sendMessage: (message, tableAddr, privKey) => dispatch(
+      sendMessage(message, tableAddr, privKey)
+    ),
+    bet: (tableAddr, handId, amount, privKey, myPos, lastReceipt) => bet(
+      tableAddr, handId, amount, privKey, myPos, lastReceipt,
+    ),
+    pay: (betAction) => pay(betAction, dispatch),
+    fold: (tableAddr, handId, amount, privKey, myPos, lastReceipt) => fold(
+      tableAddr, handId, amount, privKey, myPos, lastReceipt),
+    check: (tableAddr, handId, amount, privKey, myPos, lastReceipt, checkType
+      ) => check(
+        tableAddr, handId, amount, privKey, myPos, lastReceipt, checkType
+    ),
   };
 }
-
 
 const mapStateToProps = createStructuredSelector({
   privKey: makeSelectPrivKey(),
@@ -249,23 +221,4 @@ const mapStateToProps = createStructuredSelector({
   playerCount: makePlayersCountSelector(),
 });
 
-ActionBar.propTypes = {
-  params: React.PropTypes.object,
-  privKey: React.PropTypes.string,
-  lastReceipt: React.PropTypes.object,
-  myPos: React.PropTypes.number,
-  myMaxBet: React.PropTypes.number,
-  isMyTurn: React.PropTypes.bool,
-  minRaise: React.PropTypes.number,
-  amountToCall: React.PropTypes.number,
-  myStack: React.PropTypes.number,
-  callAmount: React.PropTypes.number,
-  state: React.PropTypes.string,
-  dispatch: React.PropTypes.func,
-  setCards: React.PropTypes.func,
-  sendMessage: React.PropTypes.func,
-  messages: React.PropTypes.array,
-  playerCount: React.PropTypes.number,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(ActionBar);
+export default connect(mapStateToProps, mapDispatchToProps)(ActionBarContainer);

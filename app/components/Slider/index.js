@@ -1,15 +1,36 @@
-/**
- * Created by helge on 09.03.17.
- */
+import React from 'react';
 
-import styled from 'styled-components';
+import Slider from 'react-rangeslider';
+import 'react-rangeslider/lib/index.css';
 
-const SliderWrapper = styled.div`
-  width: 100%;
-  position: fixed;
-  bottom: 0;
-  padding-left: 15%;
-  padding-right: 15%;
-`;
+import {
+  SliderWrapper,
+} from './styles';
 
-export default SliderWrapper;
+const SliderContainer = ({
+  value,
+  min,
+  max,
+  onChange,
+}) => (
+  <SliderWrapper name="slider-wrapper">
+    <Slider
+      data-orientation="vertical"
+      value={value}
+      min={min}
+      max={max}
+      step={1}
+      onChange={onChange}
+    >
+    </Slider>
+  </SliderWrapper>
+);
+
+SliderContainer.propTypes = {
+  value: React.PropTypes.number,
+  min: React.PropTypes.number,
+  max: React.PropTypes.number,
+  onChange: React.PropTypes.func,
+};
+
+export default SliderContainer;
