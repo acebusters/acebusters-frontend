@@ -15,6 +15,8 @@ export const Button = styled.button`
   padding: 0;
   margin: 0;
   color: ${menuColor};
+  border: none;
+  background: none;
   &:focus {
     outline: none;
   }
