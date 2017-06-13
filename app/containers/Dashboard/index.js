@@ -27,6 +27,9 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
 
   constructor(props) {
     super(props);
+    this.state = {
+      ethBalance: undefined,
+    };
     this.handleTransfer = this.handleTransfer.bind(this);
     this.web3 = props.web3Redux.web3;
     this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(confParams.ntzAddr);
@@ -50,6 +53,15 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     const balance = this.token.balanceOf(this.props.account.proxy);
     if (!balance && nextProps.account.proxy) {
       this.token.balanceOf.call(nextProps.account.proxy);
+    }
+
+    if (this.props.account.proxy === undefined && nextProps.account.proxy) {
+      const web3 = getWeb3();
+      web3.eth.getBalance(nextProps.account.proxy, (err, ethBalance) => {
+        this.setState({
+          ethBalance,
+        });
+      });
     }
 
     // Note: listen to AccountFactory's AccountCreated Event if proxy address is not ready
@@ -88,10 +100,9 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
 
   render() {
     const qrUrl = `ether:${this.props.account.proxy}`;
-    let balance = this.token.balanceOf(this.props.account.proxy);
-    if (balance) {
-      balance = balance.toString();
-    }
+    const { ethBalance } = this.state;
+    const balance = this.token.balanceOf(this.props.account.proxy);
+
     let listPending = null;
     let listTxns = null;
     if (this.props.account[confParams.ntzAddr]) {
@@ -124,25 +135,32 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
             type="inline"
             styles={{ layout: { marginLeft: '15px' } }}
           >
-            <span>{balance}</span>
+            <span>{balance && balance.toString()} NTZ</span>
           </WithLoading>
-
-          <Button
-            align="left"
-            onClick={() => {
-              this.props.modalAdd((
-                <TransferDialog handleTransfer={this.handleTransfer} />
-              ));
-            }}
-            size="medium"
-            icon="fa fa-money"
-          >TRANSFER</Button>
         </p>
+        <Button
+          align="left"
+          onClick={() => {
+            this.props.modalAdd((
+              <TransferDialog handleTransfer={this.handleTransfer} />
+            ));
+          }}
+          size="medium"
+          icon="fa fa-money"
+        >TRANSFER</Button>
 
         <hr />
         <h2>ETH</h2>
         <p>
           <span>Balance: </span>
+          <WithLoading
+            isLoading={ethBalance === undefined}
+            loadingSize="14px"
+            type="inline"
+            styles={{ layout: { marginLeft: '15px' } }}
+          >
+            <span>{ethBalance && ethBalance.toString()} ETH</span>
+          </WithLoading>
         </p>
 
         <hr />
