@@ -21,8 +21,6 @@ import {
   makeMyMaxBetSelector,
   makeIsMyTurnSelector,
   makeMyPosSelector,
-  makeMessagesSelector,
-  makePlayersCountSelector,
 } from '../Table/selectors';
 
 import {
@@ -31,7 +29,7 @@ import {
   makeLastReceiptSelector,
 } from '../Seat/selectors';
 
-import { setCards, sendMessage, bet, pay, fold, check } from '../Table/actions';
+import { setCards, bet, pay, fold, check } from '../Table/actions';
 
 import ActionBar from '../../components/ActionBar';
 
@@ -43,7 +41,6 @@ class ActionBarContainer extends React.Component {
     this.handleCall = this.handleCall.bind(this);
     this.handleFold = this.handleFold.bind(this);
     this.updateAmount = this.updateAmount.bind(this);
-    this.sendMessage = this.sendMessage.bind(this);
     this.table = new TableService(props.params.tableAddr, this.props.privKey);
     this.state = {
       active: true,
@@ -146,10 +143,6 @@ class ActionBarContainer extends React.Component {
       .catch(this.captureError(handId));
   }
 
-  sendMessage(message) {
-    this.props.sendMessage(message, this.props.params.tableAddr, this.props.privKey);
-  }
-
   render() {
     return (
       <ActionBar
@@ -160,7 +153,6 @@ class ActionBarContainer extends React.Component {
         handleCall={this.handleCall}
         handleFold={this.handleFold}
         updateAmount={this.updateAmount}
-        sendMessage={this.sendMessage}
         {...this.props}
       />
     );
@@ -181,7 +173,6 @@ ActionBarContainer.propTypes = {
   params: React.PropTypes.object,
   privKey: React.PropTypes.string,
   setCards: React.PropTypes.func,
-  sendMessage: React.PropTypes.func,
   state: React.PropTypes.string,
 };
 
@@ -189,9 +180,6 @@ export function mapDispatchToProps(dispatch) {
   return {
     dispatch,
     setCards: (tableAddr, handId, cards) => setCards(tableAddr, handId, cards),
-    sendMessage: (message, tableAddr, privKey) => dispatch(
-      sendMessage(message, tableAddr, privKey)
-    ),
     bet: (tableAddr, handId, amount, privKey, myPos, lastReceipt) => bet(
       tableAddr, handId, amount, privKey, myPos, lastReceipt,
     ),
@@ -217,8 +205,6 @@ const mapStateToProps = createStructuredSelector({
   lastReceipt: makeLastReceiptSelector(),
   cards: makeMyCardsSelector(),
   state: makeHandStateSelector(),
-  messages: makeMessagesSelector(),
-  playerCount: makePlayersCountSelector(),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ActionBarContainer);

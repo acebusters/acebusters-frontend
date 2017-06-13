@@ -1,6 +1,11 @@
 import React, { PropTypes } from 'react';
 
-import ChatPlaceholder from '../../components/Chat/placeholder';
+import {
+  ChatPlaceholder,
+  ChatContainer,
+  ChatArea,
+  ChatBox,
+} from '../../components/Chat';
 import MessageList from './message-list';
 import MessageBox from './message-box';
 
@@ -18,10 +23,10 @@ export class Chat extends React.PureComponent { // eslint-disable-line react/pre
       ? <MessageList messages={this.props.messages} />
       : <ChatPlaceholder>{this.props.placeholder}</ChatPlaceholder>;
     return (
-      <div>
-        {area}
-        {box}
-      </div>
+      <ChatContainer>
+        <ChatArea>{area}</ChatArea>
+        <ChatBox>{box}</ChatBox>
+      </ChatContainer>
     );
   }
 }

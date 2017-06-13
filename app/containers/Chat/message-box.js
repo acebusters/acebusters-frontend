@@ -19,7 +19,18 @@ class MessageBox extends React.PureComponent { // eslint-disable-line react/pref
   render() {
     return (
       <div>
-        <input placeholder="enter message..." onKeyDown={this.handleSend} ref={(input) => { this.input = input; }} style={{ width: '100%' }} />
+        <input
+          placeholder="enter message..."
+          onKeyDown={this.handleSend}
+          ref={(input) => { this.input = input; }}
+          style={{
+            width: '100%',
+            background: 'whitesmoke',
+            boxShadow: 'inset black 0 0 3px 0px',
+            padding: '10px',
+            fontSize: 'large',
+          }}
+        />
       </div>
     );
   }

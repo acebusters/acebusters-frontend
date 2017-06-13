@@ -7,12 +7,18 @@ import styled from 'styled-components';
 import {
   black,
   white,
+  curtainStickyWidth,
+  curtainWidth,
 } from 'variables';
 
 export const TableContainer = styled.div`
   margin-top: 18px;
   margin-right: auto;
   margin-left: auto;
+  
+  @media (min-width: ${curtainStickyWidth}) {
+    margin-left: ${curtainWidth};
+  }
 `;
 
 export const TableHeader = styled.div`
@@ -20,6 +26,10 @@ export const TableHeader = styled.div`
    text-align: left;
    color: ${white};
    padding-left: 10em;
+
+  @media (min-width: ${curtainStickyWidth}) {
+    margin-left: ${curtainWidth};
+  }
 `;
 
 export const Wrapper = styled.div`
@@ -29,6 +39,10 @@ export const Wrapper = styled.div`
   height: 10%
   width: 20%;
   bottom: 2em;
+
+  @media (min-width: ${curtainStickyWidth}) {
+    left: calc(${curtainWidth} + 2em);
+  }
 `;
 
 export const Winner = styled.div`

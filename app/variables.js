@@ -60,3 +60,7 @@ export const linkHoverColor = tinycolor(linkColor).lighten(15).toString();
 // Transition global options
 export const transitionSpeed = '.3s';
 export const transitionFn = 'ease-in-out';
+
+export const curtainWidth = '400px';
+// Max width sticking curtain
+export const curtainStickyWidth = '1168px';

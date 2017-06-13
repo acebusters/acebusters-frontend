@@ -1,11 +1,24 @@
 import styled from 'styled-components';
+import {
+  baseColor,
+} from 'variables';
 
-const ChatWrapper = styled.div`
-  width: 400px;
-  position: fixed;
-  bottom: 0;
-  border: 10px solid green;
-  background: whitesmoke;
+export const ChatPlaceholder = styled.div`
+  padding: 10px;
+  font-style: italic;
+  color: ${baseColor};
 `;
 
-export default ChatWrapper;
+export const ChatContainer = styled.div`
+  height: calc(100% - 80px);
+`;
+
+export const ChatArea = styled.div`
+  width: 100%;
+  height: calc(100% - 40px);
+`;
+
+export const ChatBox = styled.div`
+  width: 100%;
+  height: 40px;
+`;

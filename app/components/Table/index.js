@@ -8,6 +8,7 @@ import TableMenu from '../../containers/TableMenu';
 import ActionBar from '../../containers/ActionBar';
 import tableImage from './tableBG.svg';
 import Pot from '../Pot';
+import Curtain from '../../containers/Curtain';
 
 import {
   TableHeader,
@@ -20,6 +21,7 @@ import {
 
 const TableComponent = (props) => (
   <div name="table-component">
+    <Curtain {...props} />
 
     <TableHeader className="table-header">
       { `state: ${props.state}` } <br />

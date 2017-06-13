@@ -3,9 +3,6 @@
  */
 import React from 'react';
 
-import ChatWrapper from '../Chat';
-import Chat from '../../containers/Chat';
-
 import ActionButton from './ActionButton';
 import Slider from '../Slider';
 
@@ -17,8 +14,8 @@ import {
 const ActionBar = (props) => {
   const {
     active, amount, amountToCall, callAmount, isMyTurn, handleBet, handleCall,
-    handleCheck, handleFold, messages, minRaise, myPos, myStack, params,
-    playerCount, state, sendMessage, updateAmount,
+    handleCheck, handleFold, minRaise, myStack,
+    state, updateAmount,
   } = props;
   const buttonState1 = [
     {
@@ -112,11 +109,9 @@ const ActionBar = (props) => {
     }
     return buttonStateNull;
   };
-  const isTakePartOfAGame = myPos != null;
   const isAppropriateState = (
     state !== 'waiting' && state !== 'dealing' && state !== 'showdown'
   );
-  const canSeeChat = (isTakePartOfAGame && !isMyTurn && isAppropriateState) || !isTakePartOfAGame;
   if (active && isMyTurn && isAppropriateState) {
     return (
       <ActionBarWrapper name="action-bar-wrapper">
@@ -143,14 +138,6 @@ const ActionBar = (props) => {
         </ControlPanel>
       </ActionBarWrapper>
     );
-  } else if (canSeeChat) {
-    const ta = params.tableAddr.substring(2, 8);
-    const chatPlaceholder = `table <${ta}> in state ${state} has ${playerCount || 'no'} player${playerCount === 1 ? '' : 's'}.`;
-    return (
-      <ChatWrapper>
-        <Chat onAddMessage={sendMessage} messages={messages} readonly={!isTakePartOfAGame} placeholder={chatPlaceholder} />
-      </ChatWrapper>
-    );
   }
   return null;
 };
@@ -165,15 +152,10 @@ ActionBar.propTypes = {
   handleCall: React.PropTypes.func,
   handleFold: React.PropTypes.func,
   updateAmount: React.PropTypes.func,
-  sendMessage: React.PropTypes.func,
   isMyTurn: React.PropTypes.bool,
-  messages: React.PropTypes.array,
   minRaise: React.PropTypes.number,
   myStack: React.PropTypes.number,
-  myPos: React.PropTypes.number,
   state: React.PropTypes.string,
-  params: React.PropTypes.object,
-  playerCount: React.PropTypes.number,
 };
 
 export default ActionBar;
