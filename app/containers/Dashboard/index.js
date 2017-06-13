@@ -18,7 +18,7 @@ import TransferDialog from '../TransferDialog';
 import Container from '../../components/Container';
 import Button from '../../components/Button';
 import Blocky from '../../components/Blocky';
-import FormGroup from '../../components/Form/FormGroup';
+// import FormGroup from '../../components/Form/FormGroup';
 import WithLoading from '../../components/WithLoading';
 
 const confParams = conf();
@@ -114,6 +114,8 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
           <QRCode value={qrUrl} size={120} />
         </WithLoading>
 
+        <hr />
+        <h2>Nutz</h2>
         <p>
           <span>Balance: </span>
           <WithLoading
@@ -125,10 +127,8 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
             <span>{balance}</span>
           </WithLoading>
 
-        </p>
-
-        <FormGroup>
           <Button
+            align="left"
             onClick={() => {
               this.props.modalAdd((
                 <TransferDialog handleTransfer={this.handleTransfer} />
@@ -137,7 +137,14 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
             size="medium"
             icon="fa fa-money"
           >TRANSFER</Button>
-        </FormGroup>
+        </p>
+
+        <hr />
+        <h2>ETH</h2>
+        <p>
+          <span>Balance: </span>
+        </p>
+
         <hr />
         <h2><FormattedMessage {...messages.pending} /></h2>
         <List items={listPending} headers={['#', 'txHash']} noDataMsg="No Pending Transactions" />

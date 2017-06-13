@@ -19,7 +19,7 @@ import {
 } from '../../variables';
 
 const SharedButton = styled.button`
-  display: block;
+  display: inline-block;
   box-sizing: border-box;
   text-decoration: none;
   margin: 0 auto;
@@ -81,53 +81,32 @@ const Icon = styled.i`
 `;
 
 const Wrapper = styled.div`
-  text-align: center;
+  text-align: ${(props) => props.align};
   width: 100%;
 `;
 
-function Button(props) {
+const sizes = {
+  medium: Medium,
+  large: Large,
+};
+
+function Button({
+  size = 'medium',
+  icon = '',
+  align = 'center',
+  ...props
+}) {
   // Render an anchor tag
-  const icon = props.icon ? props.icon : '';
-  let button;
-  switch (props.size) {
-    case 'medium': {
-      button = (
-        <Medium onClick={props.onClick} type={props.type} disabled={props.disabled}>
-          {Children.toArray(props.children)}
-          { props.icon &&
-          <Icon className={icon} content={Children.toArray(props.children)}></Icon>
-          }
-        </Medium>
-      );
-      break;
-    }
+  const ButtonComponent = sizes[size] || Medium;
 
-    case 'large': {
-      button = (
-        <Large onClick={props.onClick} type={props.type} disabled={props.disabled}>
-          {Children.toArray(props.children)}
-          { props.icon &&
-          <Icon className={icon} content={Children.toArray(props.children)}></Icon>
-          }
-        </Large>
-      );
-      break;
-    }
-
-    default: {
-      button = (
-        <Medium onClick={props.onClick} type={props.type} disabled={props.disabled}>
-          {Children.toArray(props.children)}
-          { props.icon &&
-          <Icon className={icon} content={Children.toArray(props.children)}></Icon>
-          }
-        </Medium>
-      );
-    }
-  }
   return (
-    <Wrapper>
-      {button}
+    <Wrapper align={align}>
+      <ButtonComponent onClick={props.onClick} type={props.type} disabled={props.disabled}>
+        {Children.toArray(props.children)}
+        {icon &&
+          <Icon className={icon} content={Children.toArray(props.children)}></Icon>
+        }
+      </ButtonComponent>
     </Wrapper>
   );
 }
@@ -135,7 +114,8 @@ function Button(props) {
 Button.propTypes = {
   onClick: PropTypes.func,
   type: PropTypes.string,
-  size: PropTypes.string,
+  size: PropTypes.oneOf(['large', 'medium']),
+  align: PropTypes.oneOf(['center', 'left']),
   icon: PropTypes.string,
   disabled: PropTypes.bool,
   children: PropTypes.node,
