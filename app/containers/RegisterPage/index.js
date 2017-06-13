@@ -1,8 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import ReCAPTCHA from 'react-google-recaptcha';
-import { Form, Field, reduxForm, SubmissionError, propTypes } from 'redux-form/immutable';
+import { Form, Field, reduxForm, SubmissionError, propTypes, stopAsyncValidation, startAsyncValidation, change } from 'redux-form/immutable';
 import { browserHistory } from 'react-router';
+
 // components
 import Container from '../../components/Container';
 import FormGroup from '../../components/Form/FormGroup';
@@ -14,8 +15,10 @@ import { ErrorMessage, WarningMessage } from '../../components/FormMessages';
 
 import { setProgress } from '../App/actions';
 import account from '../../services/account';
+import { conf } from '../../app.config';
 
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
+const refRegex = /^[0-9a-f]{8}$/i;
 
 const validate = (values) => {
   const errors = {};
@@ -27,6 +30,16 @@ const validate = (values) => {
   if (!values.get('captchaResponse')) {
     errors.captchaResponse = 'Required';
   }
+
+  const referral = values.get('referral') || '';
+  if (!refRegex.test(referral)) {
+    if (!values.has('defaultRef') && referral.length === 0) {
+      errors.referral = 'Referral code is required';
+    } else if (referral.length > 0) {
+      errors.referral = 'Referral code must have 8 letters';
+    }
+  }
+
   return errors;
 };
 
@@ -60,13 +73,26 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
   constructor(props) {
     super(props);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleReferralChange = this.handleReferralChange.bind(this);
+
+    const defaultRefCode = conf().defaultRefCode;
+    account.checkReferral(defaultRefCode).then((response) => {
+      if (response.defaultRef) {
+        this.props.dispatch(change('register', 'defaultRef', defaultRefCode));
+      }
+    });
   }
 
   handleSubmit(values) {
     // Note: auto increase progress for 3 seconds;
     this.props.setProgress(-3000);
 
-    return account.register(values.get('email'), values.get('captchaResponse'), window.location.origin, values.get('referral')).catch((err) => {
+    return account.register(
+      values.get('email'),
+      values.get('captchaResponse'),
+      window.location.origin,
+      values.get('referral') || values.get('defaultRef')
+    ).catch((err) => {
       // If store account failed, ...
       const errMsg = 'Registration failed!';
       if (err === 409) {
@@ -81,21 +107,63 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
     });
   }
 
+  handleReferralChange(e, value/* , prevValue*/) {
+    if (value.length === 8) {
+      this.defaultRef = undefined;
+      this.props.dispatch(startAsyncValidation('register'));
+      account
+        .checkReferral(value)
+        .then((response) => {
+          if (response.defaultRef) {
+            this.defaultRef = response.defaultRef;
+          }
+          return null;
+        })
+        .catch((err) => {
+          switch (err) {
+            case 400:
+            case 404:
+              return 'Invalid referral code';
+            case 418:
+              return 'Referral code is no longer available';
+            case 420:
+              return 'Sorry, signup limit reached, try to signup later';
+            default:
+              return null;
+          }
+        })
+        .then((error) => {
+          this.props.dispatch(
+            stopAsyncValidation(
+              'register',
+              error ? { referral: error } : {},
+            )
+          );
+        });
+    }
+  }
+
   render() {
-    const { error, handleSubmit, invalid, submitting } = this.props;
+    const { error, handleSubmit, invalid, submitting, asyncValidating } = this.props;
 
     return (
       <Container>
         <div>
-          <H1> Register a new account!</H1>
+          <H1>Register a new account!</H1>
           <Form
             onSubmit={handleSubmit(this.handleSubmit)}
           >
             <Field name="email" type="text" component={renderField} label="e-mail" />
-            <Field name="referral" type="text" component={renderField} label="referral code" />
+            <Field
+              name="referral"
+              type="text"
+              component={renderField}
+              label="referral code"
+              onChange={this.handleReferralChange}
+            />
             <Field name="captchaResponse" component={Captcha} />
             {error && <ErrorMessage error={error} />}
-            <Button type="submit" disabled={submitting || invalid} size="large">
+            <Button type="submit" disabled={submitting || invalid || asyncValidating} size="large">
               { (!submitting) ? 'Register' : 'Please wait ...' }
             </Button>
           </Form>
@@ -121,4 +189,12 @@ function mapDispatchToProps(dispatch) {
 const mapStateToProps = () => ({});
 
 // Wrap the component to inject dispatch and state into it
-export default connect(mapStateToProps, mapDispatchToProps)(reduxForm({ form: 'register', validate, warn })(RegisterPage));
+export default connect(mapStateToProps, mapDispatchToProps)(
+  reduxForm({
+    form: 'register',
+    validate,
+    // asyncValidate,
+    // asyncBlurFields: [],
+    warn,
+  })(RegisterPage)
+);

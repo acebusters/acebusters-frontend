@@ -4,6 +4,8 @@
  * license that can be found in the LICENSE file.
 */
 
+const DEFAULT_REF_CODE = '00000000';
+
 export function conf() {
   let sub = '';
   if (window && window.location && window.location.host) {
@@ -12,6 +14,7 @@ export function conf() {
   // ### PRODUCTION ENVIRONMENT CONFIG
   if (sub === 'app') {
     return {
+      defaultRefCode: DEFAULT_REF_CODE,
       gethUrl: '',
       oracleUrl: '',
       txUrl: '',
@@ -25,6 +28,7 @@ export function conf() {
   // ### STAGING ENVIRONMENT CONFIG
   if (sub === 'beta') {
     return {
+      defaultRefCode: DEFAULT_REF_CODE,
       gethUrl: 'ws://rinkeby.acebusters.com:8545',
       oracleUrl: 'https://v83iq1161a.execute-api.eu-west-1.amazonaws.com/v0',
       txUrl: 'https://h5fb9klhzc.execute-api.eu-west-1.amazonaws.com/v0',
@@ -37,6 +41,7 @@ export function conf() {
 
   // ### SANDBOX ENVIRONMENT CONFIG
   return {
+    defaultRefCode: DEFAULT_REF_CODE,
     gethUrl: 'ws://geth.ocolin.com:8546',
     oracleUrl: 'https://evm4rumeob.execute-api.eu-west-1.amazonaws.com/v0',
     txUrl: 'https://khengvfg6c.execute-api.eu-west-1.amazonaws.com/v0',

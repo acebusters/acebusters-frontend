@@ -16,7 +16,7 @@ function request(path, body, method = 'post') {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(body),
+      body: body && JSON.stringify(body),
     }).then((rsp) => {
       if (rsp.status >= 200 && rsp.status < 300) {
         rsp.json().then((response) => {
@@ -35,6 +35,14 @@ const account = {
 
   login(email) {
     return request('query', { email });
+  },
+
+  checkReferral(code) {
+    return request(
+      code ? `referral/${code}` : 'referral/',
+      undefined,
+      'get'
+    );
   },
 
   register(email, recapResponse, origin, refCode) {
