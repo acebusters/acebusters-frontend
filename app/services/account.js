@@ -9,26 +9,24 @@ function uuid(a) {
 
 
 function request(path, body, method = 'post') {
-  return new Promise((resolve, reject) => {
-    fetch(`${conf().accountUrl}/${path}`, {
-      method,
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: body && JSON.stringify(body),
-    }).then((rsp) => {
+  const options = {
+    method,
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: body && JSON.stringify(body),
+  };
+
+  return fetch(`${conf().accountUrl}/${path}`, options)
+    .then((rsp) => {
       if (rsp.status >= 200 && rsp.status < 300) {
-        rsp.json().then((response) => {
-          resolve(response);
-        });
-      } else {
-        reject(rsp.status);
+        return rsp.json();
       }
-    }).catch((error) => {
-      reject(error);
-    });
-  });
+
+      return Promise.reject(rsp.status);
+    })
+    .catch((error) => Promise.reject(error));
 }
 
 const account = {

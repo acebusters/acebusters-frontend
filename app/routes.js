@@ -124,11 +124,13 @@ export default function createRoutes(store) {
       name: 'register',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
+          import('containers/RegisterPage/sagas'),
           import('containers/RegisterPage'),
         ]);
         const renderRoute = loadModule(cb);
 
-        importModules.then(([component]) => {
+        importModules.then(([sagas, component]) => {
+          injectSagas(sagas.default);
           renderRoute(component);
         });
 
