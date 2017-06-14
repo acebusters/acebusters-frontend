@@ -21,15 +21,14 @@ import Blocky from '../../components/Blocky';
 // import FormGroup from '../../components/Form/FormGroup';
 import WithLoading from '../../components/WithLoading';
 
+import { updateETHBalance } from './actions';
+
 const confParams = conf();
 
 export class Dashboard extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   constructor(props) {
     super(props);
-    this.state = {
-      ethBalance: undefined,
-    };
     this.handleTransfer = this.handleTransfer.bind(this);
     this.web3 = props.web3Redux.web3;
     this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(confParams.ntzAddr);
@@ -56,12 +55,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     }
 
     if (this.props.account.proxy === undefined && nextProps.account.proxy) {
-      const web3 = getWeb3();
-      web3.eth.getBalance(nextProps.account.proxy, (err, ethBalance) => {
-        this.setState({
-          ethBalance,
-        });
-      });
+      this.updateETHBalance(nextProps.account.proxy);
     }
 
     // Note: listen to AccountFactory's AccountCreated Event if proxy address is not ready
@@ -70,6 +64,13 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
         && nextProps.account.proxy === '0x') {
       this.watchAccountCreated();
     }
+  }
+
+  updateETHBalance(proxy) {
+    const web3 = getWeb3();
+    web3.eth.getBalance(proxy, (err, ethBalance) => {
+      this.props.updateETHBalance(ethBalance);
+    });
   }
 
   handleTransfer(to, amount) {
@@ -100,7 +101,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
 
   render() {
     const qrUrl = `ether:${this.props.account.proxy}`;
-    const { ethBalance } = this.state;
+    const { ethBalance } = this.props;
     const balance = this.token.balanceOf(this.props.account.proxy);
 
     let listPending = null;
@@ -141,13 +142,15 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
         <Button
           align="left"
           onClick={() => {
-            this.props.modalAdd((
+            this.props.modalAdd(
               <TransferDialog handleTransfer={this.handleTransfer} />
-            ));
+            );
           }}
           size="medium"
           icon="fa fa-money"
-        >TRANSFER</Button>
+        >
+          TRANSFER
+        </Button>
 
         <hr />
         <h2>ETH</h2>
@@ -209,6 +212,8 @@ const txnsToList = (txns, proxyAddr) => {
 Dashboard.propTypes = {
   modalAdd: PropTypes.func,
   modalDismiss: PropTypes.func,
+  updateETHBalance: PropTypes.func,
+  ethBalance: PropTypes.object,
   contractEvent: PropTypes.func,
   accountLoaded: PropTypes.func,
   web3Redux: PropTypes.any,
@@ -221,15 +226,17 @@ const mapStateToProps = createStructuredSelector({
   account: makeSelectAccountData(),
   signerAddr: makeSignerAddrSelector(),
   privKey: makeSelectPrivKey(),
+  ethBalance: (state) => state.getIn(['dashboard', 'ethBalance']),
 });
 
 
 function mapDispatchToProps() {
   return {
-    modalAdd: (node) => (modalAdd(node)),
-    modalDismiss: () => (modalDismiss()),
-    contractEvent: (event) => (contractEvent({ event })),
-    accountLoaded: (data) => accountLoaded(data),
+    updateETHBalance,
+    modalAdd,
+    modalDismiss,
+    contractEvent: (event) => contractEvent({ event }),
+    accountLoaded,
   };
 }
 
