@@ -41,6 +41,10 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
         });
       });
     });
+
+    if (this.props.account.proxy) {
+      this.updateETHBalance(this.props.account.proxy);
+    }
   }
 
   componentDidMount() {
