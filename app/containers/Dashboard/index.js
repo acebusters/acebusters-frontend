@@ -22,6 +22,7 @@ import Blocky from '../../components/Blocky';
 import WithLoading from '../../components/WithLoading';
 
 import { updateETHBalance } from './actions';
+import { Section } from './styles';
 
 const confParams = conf();
 
@@ -114,63 +115,69 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     return (
       <Container>
         <h1><FormattedMessage {...messages.header} /></h1>
-        <Blocky blocky={createBlocky(this.props.signerAddr)} />
-        <h3> Your address:</h3>
 
-        <WithLoading
-          isLoading={!this.props.account.proxy || this.props.account.proxy === '0x'}
-          loadingSize="40px"
-          styles={{ layout: { transform: 'translateY(-50%)', left: 0 } }}
-        >
-          <p> { this.props.account.proxy } </p>
-          <QRCode value={qrUrl} size={120} />
-        </WithLoading>
+        <Section>
+          <Blocky blocky={createBlocky(this.props.signerAddr)} />
+          <h3> Your address:</h3>
 
-        <hr />
-        <h2>Nutz</h2>
-        <p>
-          <span>Balance: </span>
           <WithLoading
-            isLoading={balance === undefined || balance === null}
-            loadingSize="14px"
-            type="inline"
-            styles={{ layout: { marginLeft: '15px' } }}
+            isLoading={!this.props.account.proxy || this.props.account.proxy === '0x'}
+            loadingSize="40px"
+            styles={{ layout: { transform: 'translateY(-50%)', left: 0 } }}
           >
-            <span>{balance && balance.toString()} NTZ</span>
+            <p> { this.props.account.proxy } </p>
+            <QRCode value={qrUrl} size={120} />
           </WithLoading>
-        </p>
-        <Button
-          align="left"
-          onClick={() => {
-            this.props.modalAdd(
-              <TransferDialog handleTransfer={this.handleTransfer} />
-            );
-          }}
-          size="medium"
-          icon="fa fa-money"
-        >
-          TRANSFER
-        </Button>
+        </Section>
 
-        <hr />
-        <h2>ETH</h2>
-        <p>
-          <span>Balance: </span>
-          <WithLoading
-            isLoading={ethBalance === undefined}
-            loadingSize="14px"
-            type="inline"
-            styles={{ layout: { marginLeft: '15px' } }}
+        <Section>
+          <h2>Nutz</h2>
+          <p>
+            <span>Balance: </span>
+            <WithLoading
+              isLoading={balance === undefined || balance === null}
+              loadingSize="14px"
+              type="inline"
+              styles={{ layout: { marginLeft: '15px' } }}
+            >
+              <span>{balance && balance.toString()} NTZ</span>
+            </WithLoading>
+          </p>
+          <Button
+            align="left"
+            onClick={() => {
+              this.props.modalAdd(
+                <TransferDialog handleTransfer={this.handleTransfer} />
+              );
+            }}
+            size="medium"
+            icon="fa fa-money"
           >
-            <span>{ethBalance && ethBalance.toString()} ETH</span>
-          </WithLoading>
-        </p>
+            TRANSFER
+          </Button>
+        </Section>
 
-        <hr />
-        <h2><FormattedMessage {...messages.pending} /></h2>
-        <List items={listPending} headers={['#', 'txHash']} noDataMsg="No Pending Transactions" />
-        <h2><FormattedMessage {...messages.included} /></h2>
-        <List items={listTxns} headers={['txHash', 'from', 'to', 'amount']} noDataMsg="No Transactions Yet" />
+        <Section>
+          <h2>Ether</h2>
+          <p>
+            <span>Balance: </span>
+            <WithLoading
+              isLoading={ethBalance === undefined}
+              loadingSize="14px"
+              type="inline"
+              styles={{ layout: { marginLeft: '15px' } }}
+            >
+              <span>{ethBalance && ethBalance.toString()} ETH</span>
+            </WithLoading>
+          </p>
+        </Section>
+
+        <Section>
+          <h2><FormattedMessage {...messages.pending} /></h2>
+          <List items={listPending} headers={['#', 'txHash']} noDataMsg="No Pending Transactions" />
+          <h2><FormattedMessage {...messages.included} /></h2>
+          <List items={listTxns} headers={['txHash', 'from', 'to', 'amount']} noDataMsg="No Transactions Yet" />
+        </Section>
 
       </Container>
     );
