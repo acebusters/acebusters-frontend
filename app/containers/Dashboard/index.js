@@ -5,7 +5,7 @@ import { createStructuredSelector } from 'reselect';
 import ethUtil from 'ethereumjs-util';
 
 import { getWeb3 } from '../AccountProvider/sagas';
-import makeSelectAccountData, { makeSignerAddrSelector, makeSelectPrivKey } from '../AccountProvider/selectors';
+import makeSelectAccountData, { makeSignerAddrSelector, makeSelectPrivKey, makeSelectETHBalance } from '../AccountProvider/selectors';
 import messages from './messages';
 import { modalAdd, modalDismiss } from '../App/actions';
 import web3Connect from '../AccountProvider/web3Connect';
@@ -21,7 +21,6 @@ import Blocky from '../../components/Blocky';
 // import FormGroup from '../../components/Form/FormGroup';
 import WithLoading from '../../components/WithLoading';
 
-import { updateETHBalance } from './actions';
 import { Section } from './styles';
 
 const confParams = conf();
@@ -43,7 +42,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     });
 
     if (this.props.account.proxy) {
-      this.updateETHBalance(this.props.account.proxy);
+      this.web3.eth.getBalance(this.props.account.proxy);
     }
   }
 
@@ -60,7 +59,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     }
 
     if (this.props.account.proxy === undefined && nextProps.account.proxy) {
-      this.updateETHBalance(nextProps.account.proxy);
+      this.web3.eth.getBalance(nextProps.account.proxy);
     }
 
     // Note: listen to AccountFactory's AccountCreated Event if proxy address is not ready
@@ -69,13 +68,6 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
         && nextProps.account.proxy === '0x') {
       this.watchAccountCreated();
     }
-  }
-
-  updateETHBalance(proxy) {
-    const web3 = getWeb3();
-    web3.eth.getBalance(proxy, (err, ethBalance) => {
-      this.props.updateETHBalance(ethBalance);
-    });
   }
 
   handleTransfer(to, amount) {
@@ -223,7 +215,6 @@ const txnsToList = (txns, proxyAddr) => {
 Dashboard.propTypes = {
   modalAdd: PropTypes.func,
   modalDismiss: PropTypes.func,
-  updateETHBalance: PropTypes.func,
   ethBalance: PropTypes.object,
   contractEvent: PropTypes.func,
   accountLoaded: PropTypes.func,
@@ -237,13 +228,12 @@ const mapStateToProps = createStructuredSelector({
   account: makeSelectAccountData(),
   signerAddr: makeSignerAddrSelector(),
   privKey: makeSelectPrivKey(),
-  ethBalance: (state) => state.getIn(['dashboard', 'ethBalance']),
+  ethBalance: makeSelectETHBalance(),
 });
 
 
 function mapDispatchToProps() {
   return {
-    updateETHBalance,
     modalAdd,
     modalDismiss,
     contractEvent: (event) => contractEvent({ event }),
