@@ -17,7 +17,7 @@ export const CurtainWrapper = styled.div`
   top: 0px;
   bottom: 0;
   left: ${(props) => props.isOpen ? '0' : `-${curtainWidth}`};
-  z-index: 11;
+  z-index: 6;
   padding: 20px;
   transition: .15s ease left;
   
