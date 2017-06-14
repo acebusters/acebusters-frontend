@@ -47,7 +47,7 @@ export function conf() {
     txUrl: 'https://khengvfg6c.execute-api.eu-west-1.amazonaws.com/v0',
     accountUrl: 'https://hsqkzjp3m8.execute-api.eu-west-1.amazonaws.com/v0',
     ntzAddr: '0xd56fb602475a6bf067e5998bd02764df5219bcb5',
-    accountFactory: '0xecc669f51460e729eb8a386dc779398a5482b9f1',
+    accountFactory: '0xf8fc7db81608d5c641f7d3c4e8b47eecb8a3dfb8',
     tableFactory: '0xfcc4dbbe90bca01dc157f84ea8ed8722551cd588',
   };
 }
