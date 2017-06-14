@@ -7,11 +7,13 @@ import styled from 'styled-components';
 import {
   black,
   white,
+  backgroundTable,
   curtainStickyWidth,
   curtainWidth,
 } from 'variables';
 
 export const TableContainer = styled.div`
+  background-image: ${backgroundTable};
   margin-top: 18px;
   margin-right: auto;
   margin-left: auto;
@@ -26,10 +28,6 @@ export const TableHeader = styled.div`
    text-align: left;
    color: ${white};
    padding-left: 10em;
-
-  @media (min-width: ${curtainStickyWidth}) {
-    margin-left: ${curtainWidth};
-  }
 `;
 
 export const Wrapper = styled.div`

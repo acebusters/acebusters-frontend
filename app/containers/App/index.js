@@ -21,7 +21,7 @@ import { modalDismiss } from './actions';
 import {
   boxedLayoutMaxWidth,
   backgroundBoxed,
-  backgroundTable,
+  backgroundTableColor,
 } from '../../variables';
 
 const StyledDashboard = styled.div`
@@ -36,7 +36,7 @@ const StyledDashboard = styled.div`
   }
   /* theme */
   background: #444;
-  background-image: ${(props) => props.params.tableAddr ? backgroundTable : backgroundBoxed};
+  background-color: ${(props) => props.params.tableAddr ? backgroundTableColor : backgroundBoxed}
   min-height: 100vh;
   position: relative;
   overflow: hidden;

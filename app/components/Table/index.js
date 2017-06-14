@@ -23,11 +23,11 @@ const TableComponent = (props) => (
   <div name="table-component">
     <Curtain {...props} />
 
-    <TableHeader className="table-header">
-      { `state: ${props.state}` } <br />
-    </TableHeader>
-
     <TableContainer name="table-container">
+
+      <TableHeader className="table-header">
+        { `state: ${props.state}` } <br />
+      </TableHeader>
 
       <TableAndChairs id="table-and-chairs" >
 
