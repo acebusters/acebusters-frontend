@@ -1,6 +1,6 @@
 import Web3 from 'web3';
 import ethUtil from 'ethereumjs-util';
-import { takeLatest, select, actionChannel, put, fork, take, call, cancelled } from 'redux-saga/effects';
+import { takeLatest, select, actionChannel, put, fork, take, takeEvery, call, cancelled } from 'redux-saga/effects';
 import { delay, eventChannel, END } from 'redux-saga';
 import fetch from 'isomorphic-fetch';
 import Raven from 'raven-js';
@@ -146,31 +146,21 @@ function callMethod({ method, args }) {
   });
 }
 
-function* web3MethodCallSaga() {
-  while (true) { // eslint-disable-line no-constant-condition
-    const req = yield take(WEB3_METHOD_CALL);
-    const { method, args, key } = req.payload;
-
-    try {
-      const value = yield callMethod({ method, args });
-      yield put(web3MethodSuccess({ key, payload: { value, updated: new Date() } }));
-    } catch (err) {
-      yield put(web3MethodError({ key, err }));
-    }
+function* web3MethodCallSaga({ payload: { method, args, key } }) {
+  try {
+    const value = yield callMethod({ method, args });
+    yield put(web3MethodSuccess({ key, payload: { value, updated: new Date() } }));
+  } catch (err) {
+    yield put(web3MethodError({ key, err }));
   }
 }
 
-function* contractMethodCallSaga() {
-  while (true) { // eslint-disable-line no-constant-condition
-    const req = yield take(CONTRACT_METHOD_CALL);
-    const { method, args, key, address } = req.payload;
-
-    try {
-      const value = yield callMethod({ method, args });
-      yield put(contractMethodSuccess({ address, key, payload: { value, updated: new Date() } }));
-    } catch (err) {
-      yield put(contractMethodError({ address, key, err }));
-    }
+function* contractMethodCallSaga({ payload: { method, args, key, address } }) {
+  try {
+    const value = yield callMethod({ method, args });
+    yield put(contractMethodSuccess({ address, key, payload: { value, updated: new Date() } }));
+  } catch (err) {
+    yield put(contractMethodError({ address, key, err }));
   }
 }
 
@@ -325,10 +315,10 @@ export function* ethEventListenerSaga(contract) {
 export function* accountSaga() {
   yield takeLatest(WEB3_CONNECT, web3ConnectSaga);
   yield takeLatest(BLOCK_NOTIFY, notifyBlock);
+  yield takeEvery(WEB3_METHOD_CALL, web3MethodCallSaga);
+  yield takeEvery(CONTRACT_METHOD_CALL, contractMethodCallSaga);
   yield fork(websocketSaga);
-  yield fork(web3MethodCallSaga);
   yield fork(accountLoginSaga);
-  yield fork(contractMethodCallSaga);
   yield fork(contractTransactionSendSaga);
 }
 

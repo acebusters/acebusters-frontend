@@ -1,11 +1,13 @@
 import EthUtil from 'ethereumjs-util';
 import { createSelector } from 'reselect';
 import { READY_STATE } from './actions';
+import { getMethodKey } from './web3Connect';
+
 /**
  * Direct selector to the accountProvider state domain
  */
 const selectAccount = (state) => state.get('account');
-
+const selectWeb3Methods = (state) => state.getIn(['account', 'web3', 'methods']);
 
 /**
  * Other specific selectors
@@ -74,6 +76,23 @@ const makeSelectProxyAddr = () => createSelector(
   (account) => account.get('proxy')
 );
 
+const makeSelectETHBalance = () => createSelector(
+  selectAccount,
+  selectWeb3Methods,
+  (account, methods) => {
+    if (account.get('proxy')) {
+      const methodKey = getMethodKey({
+        groupName: 'eth',
+        methodName: 'getBalance',
+        args: [account.get('proxy')],
+      });
+
+      return methods && methods.getIn([methodKey, 'value']);
+    }
+
+    return undefined;
+  }
+);
 
 /**
  * Default selector used by AccountProvider
@@ -91,4 +110,5 @@ export {
   makeSelectLoggedIn,
   makeSelectIsWeb3Connected,
   makeSelectWeb3ErrMsg,
+  makeSelectETHBalance,
 };

@@ -5,7 +5,7 @@ import { createStructuredSelector } from 'reselect';
 import ethUtil from 'ethereumjs-util';
 
 import { getWeb3 } from '../AccountProvider/sagas';
-import makeSelectAccountData, { makeSignerAddrSelector, makeSelectPrivKey } from '../AccountProvider/selectors';
+import makeSelectAccountData, { makeSignerAddrSelector, makeSelectPrivKey, makeSelectETHBalance } from '../AccountProvider/selectors';
 import messages from './messages';
 import { modalAdd, modalDismiss } from '../App/actions';
 import web3Connect from '../AccountProvider/web3Connect';
@@ -18,8 +18,10 @@ import TransferDialog from '../TransferDialog';
 import Container from '../../components/Container';
 import Button from '../../components/Button';
 import Blocky from '../../components/Blocky';
-import FormGroup from '../../components/Form/FormGroup';
+// import FormGroup from '../../components/Form/FormGroup';
 import WithLoading from '../../components/WithLoading';
+
+import { Section } from './styles';
 
 const confParams = conf();
 
@@ -38,6 +40,10 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
         });
       });
     });
+
+    if (this.props.account.proxy) {
+      this.web3.eth.getBalance(this.props.account.proxy);
+    }
   }
 
   componentDidMount() {
@@ -50,6 +56,10 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     const balance = this.token.balanceOf(this.props.account.proxy);
     if (!balance && nextProps.account.proxy) {
       this.token.balanceOf.call(nextProps.account.proxy);
+    }
+
+    if (this.props.account.proxy === undefined && nextProps.account.proxy) {
+      this.web3.eth.getBalance(nextProps.account.proxy);
     }
 
     // Note: listen to AccountFactory's AccountCreated Event if proxy address is not ready
@@ -88,10 +98,9 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
 
   render() {
     const qrUrl = `ether:${this.props.account.proxy}`;
-    let balance = this.token.balanceOf(this.props.account.proxy);
-    if (balance) {
-      balance = balance.toString();
-    }
+    const { ethBalance } = this.props;
+    const balance = this.token.balanceOf(this.props.account.proxy);
+
     let listPending = null;
     let listTxns = null;
     if (this.props.account[confParams.ntzAddr]) {
@@ -102,47 +111,69 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     return (
       <Container>
         <h1><FormattedMessage {...messages.header} /></h1>
-        <Blocky blocky={createBlocky(this.props.signerAddr)} />
-        <h3> Your address:</h3>
 
-        <WithLoading
-          isLoading={!this.props.account.proxy || this.props.account.proxy === '0x'}
-          loadingSize="40px"
-          styles={{ layout: { transform: 'translateY(-50%)', left: 0 } }}
-        >
-          <p> { this.props.account.proxy } </p>
-          <QRCode value={qrUrl} size={120} />
-        </WithLoading>
+        <Section>
+          <Blocky blocky={createBlocky(this.props.signerAddr)} />
+          <h3> Your address:</h3>
 
-        <p>
-          <span>Balance: </span>
           <WithLoading
-            isLoading={balance === undefined || balance === null}
-            loadingSize="14px"
-            type="inline"
-            styles={{ layout: { marginLeft: '15px' } }}
+            isLoading={!this.props.account.proxy || this.props.account.proxy === '0x'}
+            loadingSize="40px"
+            styles={{ layout: { transform: 'translateY(-50%)', left: 0 } }}
           >
-            <span>{balance}</span>
+            <p> { this.props.account.proxy } </p>
+            <QRCode value={qrUrl} size={120} />
           </WithLoading>
+        </Section>
 
-        </p>
-
-        <FormGroup>
+        <Section>
+          <h2>Nutz</h2>
+          <p>
+            <span>Balance: </span>
+            <WithLoading
+              isLoading={balance === undefined || balance === null}
+              loadingSize="14px"
+              type="inline"
+              styles={{ layout: { marginLeft: '15px' } }}
+            >
+              <span>{balance && balance.toString()} NTZ</span>
+            </WithLoading>
+          </p>
           <Button
+            align="left"
             onClick={() => {
-              this.props.modalAdd((
+              this.props.modalAdd(
                 <TransferDialog handleTransfer={this.handleTransfer} />
-              ));
+              );
             }}
             size="medium"
             icon="fa fa-money"
-          >TRANSFER</Button>
-        </FormGroup>
-        <hr />
-        <h2><FormattedMessage {...messages.pending} /></h2>
-        <List items={listPending} headers={['#', 'txHash']} noDataMsg="No Pending Transactions" />
-        <h2><FormattedMessage {...messages.included} /></h2>
-        <List items={listTxns} headers={['txHash', 'from', 'to', 'amount']} noDataMsg="No Transactions Yet" />
+          >
+            TRANSFER
+          </Button>
+        </Section>
+
+        <Section>
+          <h2>Ether</h2>
+          <p>
+            <span>Balance: </span>
+            <WithLoading
+              isLoading={ethBalance === undefined}
+              loadingSize="14px"
+              type="inline"
+              styles={{ layout: { marginLeft: '15px' } }}
+            >
+              <span>{ethBalance && ethBalance.toString()} ETH</span>
+            </WithLoading>
+          </p>
+        </Section>
+
+        <Section>
+          <h2><FormattedMessage {...messages.pending} /></h2>
+          <List items={listPending} headers={['#', 'txHash']} noDataMsg="No Pending Transactions" />
+          <h2><FormattedMessage {...messages.included} /></h2>
+          <List items={listTxns} headers={['txHash', 'from', 'to', 'amount']} noDataMsg="No Transactions Yet" />
+        </Section>
 
       </Container>
     );
@@ -184,6 +215,7 @@ const txnsToList = (txns, proxyAddr) => {
 Dashboard.propTypes = {
   modalAdd: PropTypes.func,
   modalDismiss: PropTypes.func,
+  ethBalance: PropTypes.object,
   contractEvent: PropTypes.func,
   accountLoaded: PropTypes.func,
   web3Redux: PropTypes.any,
@@ -196,15 +228,16 @@ const mapStateToProps = createStructuredSelector({
   account: makeSelectAccountData(),
   signerAddr: makeSignerAddrSelector(),
   privKey: makeSelectPrivKey(),
+  ethBalance: makeSelectETHBalance(),
 });
 
 
 function mapDispatchToProps() {
   return {
-    modalAdd: (node) => (modalAdd(node)),
-    modalDismiss: () => (modalDismiss()),
-    contractEvent: (event) => (contractEvent({ event })),
-    accountLoaded: (data) => accountLoaded(data),
+    modalAdd,
+    modalDismiss,
+    contractEvent: (event) => contractEvent({ event }),
+    accountLoaded,
   };
 }
 
