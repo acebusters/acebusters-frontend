@@ -29,13 +29,13 @@ export function conf() {
   if (sub === 'beta') {
     return {
       defaultRefCode: DEFAULT_REF_CODE,
-      gethUrl: 'ws://rinkeby.acebusters.com:8545',
+      gethUrl: 'ws://rinkeby.acebusters.com:8546',
       oracleUrl: 'https://v83iq1161a.execute-api.eu-west-1.amazonaws.com/v0',
       txUrl: 'https://h5fb9klhzc.execute-api.eu-west-1.amazonaws.com/v0',
       accountUrl: 'https://vps13t4f7e.execute-api.eu-west-1.amazonaws.com/v0',
-      ntzAddr: 'tbd',
-      accountFactory: 'tbd',
-      tableFactory: 'tbd',
+      ntzAddr: '0xb0fb6369deb053eeaf3daee3a53e89bcbf1543ce',
+      accountFactory: '0x2e7b835760765e6bef9e05a954ac4e901448d105',
+      tableFactory: '0xd56fb602475a6bf067e5998bd02764df5219bcb5',
     };
   }
 
