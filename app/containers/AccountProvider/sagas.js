@@ -4,6 +4,7 @@ import { takeLatest, select, actionChannel, put, fork, take, call, cancelled } f
 import { delay, eventChannel, END } from 'redux-saga';
 import fetch from 'isomorphic-fetch';
 import Raven from 'raven-js';
+import { Receipt } from 'poker-helper';
 
 import WebsocketProvider from '../../services/wsProvider';
 import { createBlocky } from '../../services/blockies';
@@ -220,16 +221,15 @@ function* accountLoginSaga() {
 }
 
 
-function sendTx(signer, nonceAndDest, data, r, s, v) {
+function sendTx(forwardReceipt) {
   return new Promise((resolve, reject) => {
-    const bodyStr = JSON.stringify({ signer, nonceAndDest, data, r, s, v });
     fetch(`${confParams.txUrl}/forward`, {
       method: 'post',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-      body: bodyStr,
+      body: `{ "forwardReceipt" : "${forwardReceipt}" }`,
     }).then((rsp) => {
       rsp.json().then((response) => {
         if (rsp.status >= 200 && rsp.status < 300) {
@@ -278,31 +278,13 @@ function* contractTransactionSendSaga() {
   while (true) { // eslint-disable-line no-constant-condition
     const req = yield take(txChan);
     const { dest, key, data, privKey } = req.payload;
-    const dataHex = data.replace('0x', '');
-    const destHex = dest.replace('0x', '');
-    const privHex = privKey.replace('0x', '');
-
     const state = yield select();
     const nonce = state.get('account').get('lastNonce') + 1;
-    // sign the receipt.
-    const payload = new Buffer(32 + (dataHex.length / 2));
-    payload.fill(0);
-    payload.writeUInt32BE(nonce, 8);
-    payload.write(destHex, 12, 20, 'hex');
-    payload.write(dataHex, 32, 'hex');
-    const priv = new Buffer(privHex, 'hex');
-    const signer = `0x${ethUtil.privateToAddress(priv).toString('hex')}`;
-    const hash = ethUtil.sha3(payload);
-    const sig = ethUtil.ecsign(hash, priv);
+    const controller = state.get('account').get('controller');
+    const forwardReceipt = new Receipt(controller).forward(nonce, dest, 0, data).sign(privKey);
     // send it.
     try {
-      const value = yield sendTx(
-        signer,
-        `0x${payload.toString('hex', 0, 32)}`,
-        data,
-        `0x${sig.r.toString('hex')}`,
-        `0x${sig.s.toString('hex')}`,
-        sig.v);
+      const value = yield sendTx(forwardReceipt);
       yield put(contractTxSuccess({ address: dest, nonce, txHash: value.txHash, key }));
     } catch (err) {
       const error = (err.message) ? err.message : err;
