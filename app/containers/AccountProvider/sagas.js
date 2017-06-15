@@ -24,6 +24,7 @@ import {
   SET_AUTH,
   WEB3_CONNECTED,
   BLOCK_NOTIFY,
+  ETH_TRANSFER,
   web3Error,
   web3Connected,
   web3Disconnected,
@@ -35,6 +36,8 @@ import {
   contractTxSuccess,
   contractTxError,
   contractEvent,
+  transferETHSuccess,
+  transferETHError,
 } from './actions';
 
 let web3Instance;
@@ -210,7 +213,6 @@ function* accountLoginSaga() {
   }
 }
 
-
 function sendTx(forwardReceipt) {
   return new Promise((resolve, reject) => {
     fetch(`${confParams.txUrl}/forward`, {
@@ -283,6 +285,26 @@ function* contractTransactionSendSaga() {
   }
 }
 
+function* transferETHSaga() {
+  const transferChan = yield actionChannel(ETH_TRANSFER);
+  while (true) { // eslint-disable-line no-constant-condition
+    const { payload: { dest, amount } } = yield take(transferChan);
+    const state = yield select();
+    const nonce = state.get('account').get('lastNonce') + 1;
+    const controller = state.get('account').get('controller');
+    const privKey = state.get('account').get('privKey');
+    const receipt = new Receipt(controller).forward(nonce, dest, amount, '').sign(privKey);
+
+    try {
+      const value = yield sendTx(receipt);
+      yield put(transferETHSuccess({ address: dest, nonce, amount, txHash: value.txHash }));
+    } catch (err) {
+      const error = (err.message) ? err.message : err;
+      yield put(transferETHError({ address: dest, amount, nonce, error }));
+    }
+  }
+}
+
 
 const ethEvent = (contract) => eventChannel((emitter) => {
   const contractEvents = contract.allEvents({ fromBlock: 'latest' });
@@ -318,6 +340,7 @@ export function* accountSaga() {
   yield takeEvery(WEB3_METHOD_CALL, web3MethodCallSaga);
   yield takeEvery(CONTRACT_METHOD_CALL, contractMethodCallSaga);
   yield fork(websocketSaga);
+  yield fork(transferETHSaga);
   yield fork(accountLoginSaga);
   yield fork(contractTransactionSendSaga);
 }

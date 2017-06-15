@@ -10,7 +10,7 @@ import makeSelectAccountData, { makeSignerAddrSelector, makeSelectPrivKey } from
 import messages from './messages';
 import { modalAdd, modalDismiss } from '../App/actions';
 import web3Connect from '../AccountProvider/web3Connect';
-import { contractEvent, accountLoaded } from '../AccountProvider/actions';
+import { contractEvent, accountLoaded, transferETH } from '../AccountProvider/actions';
 import { createBlocky } from '../../services/blockies';
 import { ABI_TOKEN_CONTRACT, ABI_ACCOUNT_FACTORY, conf } from '../../app.config';
 
@@ -39,7 +39,8 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
 
   constructor(props) {
     super(props);
-    this.handleTransfer = this.handleTransfer.bind(this);
+    this.handleNTZTransfer = this.handleNTZTransfer.bind(this);
+    this.handleETHTransfer = this.handleETHTransfer.bind(this);
     this.web3 = props.web3Redux.web3;
     this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(confParams.ntzAddr);
     this.web3.eth.getBlockNumber((err, blockNumber) => {
@@ -80,8 +81,19 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     }
   }
 
-  handleTransfer(to, amount) {
-    this.token.transfer.sendTransaction(to, amount);
+  handleNTZTransfer(to, amount) {
+    this.token.transfer.sendTransaction(
+      to,
+      `0x${new BigNumber(amount).mul(ntzDecimals).toString(16)}`
+    );
+    this.props.modalDismiss();
+  }
+
+  handleETHTransfer(dest, amount) {
+    this.props.transferETH({
+      dest,
+      amount: `0x${new BigNumber(amount).mul(ethDecimals).toString(16)}`,
+    });
     this.props.modalDismiss();
   }
 
@@ -113,10 +125,10 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     const babBalance = this.token.balanceOf(this.props.account.proxy);
     const ntzBalance = (babBalance) ? babBalance.div(ntzDecimals) : babBalance;
 
-    let listPending = null;
+    const listPending = pendingToList(this.props.account.pending);
+
     let listTxns = null;
     if (this.props.account[confParams.ntzAddr]) {
-      listPending = pendingToList(this.props.account[confParams.ntzAddr].pending);
       listTxns = txnsToList(this.props.account[confParams.ntzAddr].transactions, this.props.account.proxy);
     }
 
@@ -155,7 +167,10 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
             align="left"
             onClick={() => {
               this.props.modalAdd(
-                <TransferDialog handleTransfer={this.handleTransfer} />
+                <TransferDialog
+                  handleTransfer={this.handleNTZTransfer}
+                  amountUnit="NTZ"
+                />
               );
             }}
             size="medium"
@@ -178,6 +193,21 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
               <span>{ethBalance && ethBalance.toString()} ETH</span>
             </WithLoading>
           </p>
+          <Button
+            align="left"
+            onClick={() => {
+              this.props.modalAdd(
+                <TransferDialog
+                  handleTransfer={this.handleETHTransfer}
+                  amountUnit="ETH"
+                />
+              );
+            }}
+            size="medium"
+            icon="fa fa-money"
+          >
+            TRANSFER
+          </Button>
         </Section>
 
         <Section>
@@ -201,31 +231,28 @@ const pendingToList = (pending) => {
 };
 
 const txnsToList = (txns, proxyAddr) => {
-  let list = null;
-
   if (txns) {
-    const onlyMine = [];
-
-    Object.keys(txns).forEach((key) => {
-      if (key && txns[key] && txns[key].from && txns[key].to) {
-        if (txns[key].from === proxyAddr || txns[key].to === proxyAddr) {
-          onlyMine.push({
-            txHash: key,
-            blockNumber: txns[key].blockNumber,
-            from: txns[key].from,
-            to: txns[key].to,
-            value: (txns[key].to === proxyAddr) ? txns[key].value : txns[key].value * -1,
-          });
-        }
-      }
-    });
-    list = onlyMine.map((entry) => [entry.txHash.substring(2, 8), entry.from.substring(2, 8), entry.to.substring(2, 8), entry.value]);
+    return Object.keys(txns)
+      .filter((key) => (
+        (key && txns[key] && txns[key].from && txns[key].to) &&
+        (txns[key].from === proxyAddr || txns[key].to === proxyAddr)
+      ))
+      .map((key) => ({
+        txHash: key,
+        blockNumber: txns[key].blockNumber,
+        from: txns[key].from,
+        to: txns[key].to,
+        value: (txns[key].to === proxyAddr) ? txns[key].value : txns[key].value * -1,
+      }))
+      .map((entry) => [entry.txHash.substring(2, 8), entry.from.substring(2, 8), entry.to.substring(2, 8), entry.value]);
   }
-  return list;
+
+  return null;
 };
 
 Dashboard.propTypes = {
   modalAdd: PropTypes.func,
+  transferETH: PropTypes.func,
   modalDismiss: PropTypes.func,
   contractEvent: PropTypes.func,
   accountLoaded: PropTypes.func,
@@ -246,6 +273,7 @@ function mapDispatchToProps() {
   return {
     modalAdd,
     modalDismiss,
+    transferETH,
     contractEvent: (event) => contractEvent({ event }),
     accountLoaded,
   };

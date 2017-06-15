@@ -15,6 +15,7 @@ import {
   CONTRACT_EVENT,
   ACCOUNT_LOADED,
   READY_STATE,
+  ETH_TRANSFER_SUCCESS,
 } from './actions';
 import * as storageService from '../../services/localStorage';
 
@@ -33,6 +34,7 @@ const initialState = fromJS({
   signerAddr: null,
   web3ReadyState: READY_STATE.CONNECTING,
   web3ErrMsg: null,
+  pending: {},
 });
 
 function accountProviderReducer(state = initialState, action) {
@@ -67,18 +69,19 @@ function accountProviderReducer(state = initialState, action) {
       return state;
 
     case CONTRACT_TX_SUCCESS:
+    case ETH_TRANSFER_SUCCESS:
       // the nonce is only increased after the call was successfull.
       // in the account saga we use a channel, so no 2 requests are submitted
       // at the same time and no nonce can be reused by accident.
-      return state.set('lastNonce', action.nonce)
-        .setIn([action.address, 'pending', action.nonce, 'txHash'], action.txHash);
+      return state.set('lastNonce', action.payload.nonce)
+        .setIn(['pending', action.payload.nonce, 'txHash'], action.payload.txHash);
     case CONTRACT_TX_ERROR:
-      return state.setIn([action.address, 'pending', action.nonce, 'error'], action.error);
+      return state.setIn(['pending', action.payload.nonce, 'error'], action.payload.error);
     case CONTRACT_EVENT:
-      if (newState.getIn([action.event.address, 'pending'])) {
-        newState.getIn([action.event.address, 'pending']).forEach((value, key) => {
+      if (newState.getIn(['pending'])) {
+        newState.getIn(['pending']).forEach((value, key) => {
           if (value.get('txHash') === action.event.transactionHash) {
-            newState = newState.deleteIn([action.event.address, 'pending', key]);
+            newState = newState.deleteIn(['pending', key]);
           }
         });
       }
