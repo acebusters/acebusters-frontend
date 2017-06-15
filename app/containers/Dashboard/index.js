@@ -3,9 +3,10 @@ import QRCode from 'qrcode.react';
 import { FormattedMessage } from 'react-intl';
 import { createStructuredSelector } from 'reselect';
 import ethUtil from 'ethereumjs-util';
+import BigNumber from 'bignumber.js';
 
 import { getWeb3 } from '../AccountProvider/sagas';
-import makeSelectAccountData, { makeSignerAddrSelector, makeSelectPrivKey, makeSelectETHBalance } from '../AccountProvider/selectors';
+import makeSelectAccountData, { makeSignerAddrSelector, makeSelectPrivKey } from '../AccountProvider/selectors';
 import messages from './messages';
 import { modalAdd, modalDismiss } from '../App/actions';
 import web3Connect from '../AccountProvider/web3Connect';
@@ -24,6 +25,15 @@ import WithLoading from '../../components/WithLoading';
 import { Section } from './styles';
 
 const confParams = conf();
+// ether units: https://github.com/ethereum/web3.js/blob/0.15.0/lib/utils/utils.js#L40
+const ethDecimals = new BigNumber(10).pow(18);
+// acebuster units:
+// 1 x 10^12 - Nutz   (NTZ)
+// 1 x 10^9 - Jonyz
+// 1 x 10^6 - Helcz
+// 1 x 10^3 - Pascalz
+// 1 x 10^0 - Babz
+const ntzDecimals = new BigNumber(10).pow(12);
 
 export class Dashboard extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
@@ -98,8 +108,10 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
 
   render() {
     const qrUrl = `ether:${this.props.account.proxy}`;
-    const { ethBalance } = this.props;
-    const balance = this.token.balanceOf(this.props.account.proxy);
+    const weiBalance = this.web3.eth.balance(this.props.account.proxy);
+    const ethBalance = (weiBalance) ? weiBalance.div(ethDecimals) : weiBalance;
+    const babBalance = this.token.balanceOf(this.props.account.proxy);
+    const ntzBalance = (babBalance) ? babBalance.div(ntzDecimals) : babBalance;
 
     let listPending = null;
     let listTxns = null;
@@ -131,12 +143,12 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
           <p>
             <span>Balance: </span>
             <WithLoading
-              isLoading={balance === undefined || balance === null}
+              isLoading={ntzBalance === undefined || ntzBalance === null}
               loadingSize="14px"
               type="inline"
               styles={{ layout: { marginLeft: '15px' } }}
             >
-              <span>{balance && balance.toString()} NTZ</span>
+              <span>{ntzBalance && ntzBalance.toString()} NTZ</span>
             </WithLoading>
           </p>
           <Button
@@ -215,7 +227,6 @@ const txnsToList = (txns, proxyAddr) => {
 Dashboard.propTypes = {
   modalAdd: PropTypes.func,
   modalDismiss: PropTypes.func,
-  ethBalance: PropTypes.object,
   contractEvent: PropTypes.func,
   accountLoaded: PropTypes.func,
   web3Redux: PropTypes.any,
@@ -228,7 +239,6 @@ const mapStateToProps = createStructuredSelector({
   account: makeSelectAccountData(),
   signerAddr: makeSignerAddrSelector(),
   privKey: makeSelectPrivKey(),
-  ethBalance: makeSelectETHBalance(),
 });
 
 
