@@ -71,7 +71,7 @@ export function App(props) {
         <Footer />
       }
       { modalContent &&
-        <ModalContainer zIndex="7">
+        <ModalContainer zIndex={7}>
           <ModalDialog
             onClose={props.modalDismiss}
             dismissOnBackgroundClick={false}
