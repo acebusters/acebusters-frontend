@@ -22,6 +22,7 @@ export function conf() {
       ntzAddr: '',
       accountFactory: '',
       tableFactory: '',
+      sentryDSN: 'https://8c3e021848b247ddaf627c8040f94e07@sentry.io/153017',
     };
   }
 
@@ -36,6 +37,7 @@ export function conf() {
       ntzAddr: '0xb0fb6369deb053eeaf3daee3a53e89bcbf1543ce',
       accountFactory: '0x2e7b835760765e6bef9e05a954ac4e901448d105',
       tableFactory: '0xd56fb602475a6bf067e5998bd02764df5219bcb5',
+      sentryDSN: 'https://8c3e021848b247ddaf627c8040f94e07@sentry.io/153017',
     };
   }
 
@@ -49,6 +51,7 @@ export function conf() {
     ntzAddr: '0xd56fb602475a6bf067e5998bd02764df5219bcb5',
     accountFactory: '0xf8fc7db81608d5c641f7d3c4e8b47eecb8a3dfb8',
     tableFactory: '0xfcc4dbbe90bca01dc157f84ea8ed8722551cd588',
+    sentryDSN: 'https://8c3e021848b247ddaf627c8040f94e07@sentry.io/153017',
   };
 }
 export const signerAddr = '0xdb2fdaf5b80c6a4c408e51b36ce7bbdd0c0852c4';

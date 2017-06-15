@@ -19,6 +19,9 @@ import { useScroll } from 'react-router-scroll';
 import 'sanitize.css/sanitize.css';
 import Raven from 'raven-js';
 
+// Import configs
+import { conf } from 'app.config';
+
 // Import root app
 import App from 'containers/App';
 
@@ -80,7 +83,7 @@ const rootRoute = {
   childRoutes: createRoutes(store),
 };
 
-Raven.config('https://8c3e021848b247ddaf627c8040f94e07@sentry.io/153017').install();
+Raven.config(conf().sentryDSN).install();
 
 // set app div height
 document.getElementById('app').style['min-height'] = '100vh';
