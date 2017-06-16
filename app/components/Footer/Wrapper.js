@@ -1,12 +1,15 @@
 import styled from 'styled-components';
-import { black } from '../../variables';
+import {
+  black,
+  white,
+} from '../../variables';
 
 const Wrapper = styled.footer`
-  display: flex;
-  justify-content: space-between;
   padding: 3em 10em;
   border-top: 1px solid #666;
+  color: ${white};
   background: ${black};
+  color
   width: 100%;
 `;
 
