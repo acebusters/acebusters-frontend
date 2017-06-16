@@ -5,7 +5,6 @@
 import React from 'react';
 import { mount, shallow } from 'enzyme';
 import ActionBar from '../index';
-import ActionButton from '../ActionButton';
 
 import tests from './tests';
 
@@ -50,7 +49,9 @@ describe(tests[4].describe, () => {
     const actionBar = shallow(
       <ActionBar {...tests[4].props} />
     );
-    expect(actionBar.find(ActionButton).last().props().text).toBe('FOLD');
+    expect(actionBar.find('ButtonFold').html()).toContain('FOLD');
+    expect(actionBar.find('ButtonCheckCall').length).toBe(1);
+    expect(actionBar.find('ButtonBetRaise').length).toBe(1);
   });
 });
 
@@ -59,39 +60,42 @@ describe(tests[5].describe, () => {
     const actionBar = shallow(
       <ActionBar {...tests[5].props} />
     );
-    expect(actionBar.find({ name: 'bet' }).length).toBe(1);
-    expect(actionBar.find({ name: 'check' }).length).toBe(1);
-    expect(actionBar.find({ name: 'fold' }).length).toBe(0);
+    expect(actionBar.find('ButtonFold').html()).toContain('blank');
+    expect(actionBar.find('ButtonCheckCall').length).toBe(1);
+    expect(actionBar.find('ButtonBetRaise').length).toBe(1);
   });
 });
 
 describe(tests[6].describe, () => {
   it(tests[6].it, () => {
-    const actionBar = shallow(
+    const actionBar = mount(
       <ActionBar {...tests[6].props} />
     );
-    // actionBar.instance().componentWillReceiveProps(props);
-    expect(actionBar.find(ActionButton).first().props().text).toEqual('BET 2000');
+    expect(actionBar.find('ButtonFold').html()).toContain('blank');
+    expect(actionBar.find('ButtonCheckCall').length).toBe(1);
+    expect(actionBar.find('ButtonBetRaise').html()).toContain('BET 2000');
   });
 });
 
 describe(tests[7].describe, () => {
   it(tests[7].it, () => {
-    const actionBar = shallow(
+    const actionBar = mount(
       <ActionBar {...tests[7].props} />
     );
-    // actionBar.instance().componentWillReceiveProps(props);
-    expect(actionBar.find(ActionButton).first().props().text).toEqual('RAISE 5000');
+    expect(actionBar.find('ButtonFold').html()).toContain('FOLD');
+    expect(actionBar.find('ButtonCheckCall').length).toBe(1);
+    expect(actionBar.find('ButtonBetRaise').html()).toContain('RAISE 5000');
   });
 });
 
 describe(tests[8].describe, () => {
   it(tests[8].it, () => {
-    const actionBar = shallow(
+    const actionBar = mount(
       <ActionBar {...tests[8].props} />
     );
-    // actionBar.instance().updateamount(2000);
-    expect(actionBar.find(ActionButton).first().props().text).toEqual('BET 1750');
+    expect(actionBar.find('ButtonFold').html()).toContain('blank');
+    expect(actionBar.find('ButtonCheckCall').length).toBe(1);
+    expect(actionBar.find('ButtonBetRaise').html()).toContain('BET 1750');
   });
 });
 
@@ -100,7 +104,9 @@ describe(tests[9].describe, () => {
     const actionBar = shallow(
       <ActionBar {...tests[9].props} />
     );
-    expect(actionBar.find(ActionButton).nodes[1].props.text).toEqual('CHECK');
+    expect(actionBar.find('ButtonFold').html()).toContain('blank');
+    expect(actionBar.find('ButtonCheckCall').html()).toContain('CHECK');
+    expect(actionBar.find('ButtonBetRaise').length).toBe(1);
   });
 });
 
@@ -109,7 +115,7 @@ describe(tests[10].describe, () => {
     const actionBar = shallow(
       <ActionBar {...tests[10].props} />
     );
-    expect(actionBar.find(ActionButton).nodes[1].props.text).toEqual('CALL 1000');
+    expect(actionBar.find('ButtonCheckCall').html()).toContain('CALL 1000');
   });
 });
 
@@ -118,10 +124,11 @@ describe(tests[11].describe, () => {
     const actionBar = mount(
       <ActionBar {...tests[11].props} />
     );
-    expect(actionBar.find({ name: 'call' }).text()).toEqual('CALL 800');
-    expect(actionBar.find({ name: 'fold' }).length).toEqual(1);
-    expect(actionBar.find({ name: 'null' }).length).toEqual(1);
-    expect(actionBar.find({ name: 'raise' }).length).toEqual(0);
+
+    expect(actionBar.find('ButtonFold').length).toBe(1);
+    expect(actionBar.find('ButtonCheckCall').html()).toContain('CALL 800');
+    expect(actionBar.find('ButtonBetRaise').html()).toContain('blank');
+    expect(actionBar.find('ButtonBetRaise').html()).not.toContain('RAISEj');
   });
 });
 

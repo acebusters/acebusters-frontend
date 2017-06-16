@@ -2,36 +2,40 @@ import React from 'react';
 
 import {
   ActionButtonWrapper,
-  Icon,
+  ActionIndicator,
+  ActionText,
 } from './styles';
 
 const ActionButton = (props) => {
-  const onClick = (e) => {
-    if (props.disabled) return;
-    props.onClick(e);
+  // disable button if actioBar is not active or if mode matches
+  const disabled = !props.active || (props.mode === props.newMode);
+  const handleThisClick = () => {
+    if (disabled) return;
+    props.setActionBarBetSlider(false);
+    props.setActionBarMode(props.newMode);
+    props.handleClick();
   };
   return (
     <ActionButtonWrapper
       name={props.name}
-      onClick={onClick}
-      size={props.size}
-      disabled={props.disabled}
+      onClick={handleThisClick}
+      disabled={disabled}
     >
-      { !props.text &&
-        <Icon className={props.icon} disabled={props.disabled} />
-      }
-      { props.text }
+      <ActionIndicator />
+      <ActionText>{props.text}</ActionText>
     </ActionButtonWrapper>
   );
 };
 
 ActionButton.propTypes = {
-  text: React.PropTypes.string,
-  size: React.PropTypes.string,
-  icon: React.PropTypes.string,
+  active: React.PropTypes.bool,
+  mode: React.PropTypes.string,
   name: React.PropTypes.string,
-  onClick: React.PropTypes.func,
-  disabled: React.PropTypes.bool,
+  newMode: React.PropTypes.string,
+  handleClick: React.PropTypes.func,
+  setActionBarMode: React.PropTypes.func,
+  setActionBarBetSlider: React.PropTypes.func,
+  text: React.PropTypes.string,
 };
 
 export default ActionButton;

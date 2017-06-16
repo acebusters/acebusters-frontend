@@ -8,6 +8,8 @@ import EWT from 'ethereum-web-token';
 import {
   makeMinSelector,
   makeAmountToCallSelector,
+  makeSelectActionBarActive,
+  makeSelectActionBarVisible,
 } from '../selectors';
 
 import { checkABIs } from '../../../app.config';
@@ -283,3 +285,112 @@ describe('amountToCall Selector', () => {
   });
 });
 
+// action specific tests
+describe('makeSelectActionBarActive', () => {
+  it('should select the tableMenu active state', () => {
+    const mockedState = fromJS({
+      actionBar: {
+        active: false,
+      },
+    });
+    const statusSelector = makeSelectActionBarActive();
+    expect(statusSelector(mockedState)).toEqual(false);
+  });
+});
+
+describe('makeSelectActionBarVisible', () => {
+  const mockedState = fromJS({
+    actionBar: {
+      active: true,
+    },
+    account: {
+      privKey: P1_KEY,
+    },
+    table: {
+      [TBL_ADDR]: {
+        4: {
+          state: 'waiting',
+          lastRoundMaxBet: 1000,
+          lineup: [{
+            address: P1_ADDR,
+            last: new EWT(ABI_BET).bet(1, 1000).sign(P1_KEY),
+          }, {
+            address: P2_ADDR,
+            last: new EWT(ABI_BET).bet(1, 2000).sign(P2_KEY),
+          }, {
+            address: P3_ADDR,
+            last: new EWT(ABI_BET).bet(1, 1000).sign(P3_KEY),
+          }],
+        },
+        data: {
+          amounts: [1421, 50000, 20000],
+          smallBlind: 500,
+          lastHandNetted: 3,
+        },
+      },
+    },
+  });
+  const selector = makeSelectActionBarVisible();
+  const props = fromJS({
+    isMyTurn: true,
+    pos: 2,
+    params: {
+      handId: 4,
+      tableAddr: TBL_ADDR,
+    },
+  });
+  describe('if table state is not ready', () => {
+    it('should not show ActionBar', () => {
+      // flop
+      const flopState = mockedState.setIn(
+        ['table', TBL_ADDR, '4', 'state'],
+        'flop',
+      );
+      expect(selector(flopState, props.toJS())).toBe(true);
+      // waiting
+      const waitingState = mockedState.setIn(
+        ['table', TBL_ADDR, '4', 'state'],
+        'waiting',
+      );
+      expect(selector(waitingState, props.toJS())).toBe(false);
+      // dealing
+      const dealingState = mockedState.setIn(
+        ['table', TBL_ADDR, '4', 'state'],
+        'dealing',
+      );
+      expect(selector(dealingState, props.toJS())).toBe(false);
+      // dealing
+      const showdownState = mockedState.setIn(
+        ['table', TBL_ADDR, '4', 'state'],
+        'showdown',
+      );
+      expect(selector(showdownState, props.toJS())).toBe(false);
+    });
+  });
+
+  describe('if !isMyTurn', () => {
+    it('should not show ActionBar', () => {
+      // flop
+      const flopState = mockedState.setIn(
+        ['table', TBL_ADDR, '4', 'state'],
+        'flop',
+      );
+      expect(selector(flopState, props.toJS())).toBe(true);
+      const newProps = props.set('isMyTurn', false);
+      expect(selector(flopState, newProps.toJS())).toBe(false);
+    });
+  });
+
+  describe('if Actionbar is !active', () => {
+    it('shuold not show ActionBar', () => {
+      // flop
+      const flopState = mockedState.setIn(
+        ['table', TBL_ADDR, '4', 'state'],
+        'flop',
+      );
+      expect(selector(flopState, props.toJS())).toBe(true);
+      const newProps = props.set('isMyTurn', false);
+      expect(selector(flopState, newProps.toJS())).toBe(false);
+    });
+  });
+});

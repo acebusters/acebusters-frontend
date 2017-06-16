@@ -1,8 +1,9 @@
 export const combine = (describe, it) => `${describe}, ${it}`;
 
 export default [{
-  describe: 'tests[0] during table "waiting"',
+  describe: '[0] during table "waiting"',
   props: {
+    visible: false,
     state: 'waiting',
     params: {
       tableAddr: '0x123',
@@ -11,8 +12,9 @@ export default [{
   },
   it: 'actionBar should not render',
 }, {
-  describe: 'tests[1] during table "dealing"',
+  describe: '[1] during table "dealing"',
   props: {
+    visible: false,
     state: 'dealing',
     params: {
       tableAddr: '0x123',
@@ -21,9 +23,10 @@ export default [{
   },
   it: 'actionBar should not render',
 }, {
-  describe: 'tests[2] during table "flop"',
+  describe: '[2] during table "flop"',
   props: {
-    active: true,
+    amount: 100,
+    visible: true,
     state: 'flop',
     params: {
       tableAddr: '0x123',
@@ -32,9 +35,9 @@ export default [{
   },
   it: 'actionBar should render',
 }, {
-  describe: 'tests[3] during table "flop" if isMyTurn is false',
+  describe: '[3] during table "flop" if isMyTurn is false',
   props: {
-    active: false,
+    visible: false,
     state: 'flop',
     params: {
       tableAddr: '0x123',
@@ -43,33 +46,38 @@ export default [{
   },
   it: 'actionBar should not render',
 }, {
-  describe: 'tests[4] when amountToCall > 0',
+  describe: '[4] when amountToCall > 0',
   props: {
-    active: true,
+    visible: true,
     state: 'flop',
     params: {
       tableAddr: '0x123',
     },
     isMyTurn: true,
     amountToCall: 1000,
+    callAmount: 1000,
+    amount: 200,
+    myStack: 2000,
   },
   it: 'should render fold button',
 }, {
-  describe: 'tests[5] amountToCall is 0',
+  describe: '[5] amountToCall is 0',
   props: {
-    active: true,
+    visible: true,
     state: 'flop',
     params: {
       tableAddr: '0x123',
     },
+    amount: 200,
+    myStack: 2000,
     isMyTurn: true,
     amountToCall: 0,
   },
   it: 'should not render fold button',
 }, {
-  describe: 'tests[6] the correct betting amount',
+  describe: '[6] the correct betting amount',
   props: {
-    active: true,
+    visible: true,
     amount: 2000,
     state: 'flop',
     params: {
@@ -82,9 +90,9 @@ export default [{
   },
   it: 'should render BET button',
 }, {
-  describe: 'tests[7] RAISE button min amount',
+  describe: '[7] RAISE button min amount',
   props: {
-    active: true,
+    visible: true,
     amount: 5000,
     state: 'flop',
     params: {
@@ -93,13 +101,14 @@ export default [{
     isMyTurn: true,
     minRaise: 5000,
     amountToCall: 1000,
+    callAmount: 1000,
     myStack: 10000,
   },
   it: 'should render with correct min amount',
 }, {
-  describe: 'tests[8] if all-in amount',
+  describe: '[8] if all-in amount',
   props: {
-    active: true,
+    visible: true,
     amount: 1750,
     state: 'flop',
     params: {
@@ -111,9 +120,10 @@ export default [{
   },
   it: 'should set BET to all-in amount',
 }, {
-  describe: 'tests[9] when amount to call === 0',
+  describe: '[9] when amount to call === 0',
   props: {
-    active: true,
+    amount: 100,
+    visible: true,
     state: 'flop',
     params: {
       tableAddr: '0x123',
@@ -123,9 +133,9 @@ export default [{
   },
   it: 'should render the CHECK button',
 }, {
-  describe: 'ttests[10] when amount to call > 0',
+  describe: '[10] when amount to call > 0',
   props: {
-    active: true,
+    visible: true,
     amount: 1000,
     state: 'preflop',
     params: {
@@ -138,9 +148,9 @@ export default [{
   },
   it: 'should render the CALL button',
 }, {
-  describe: 'tests[11] if amount to call > myStack',
+  describe: '[11] if amount to call > myStack',
   props: {
-    active: true,
+    visible: true,
     amount: 800,
     state: 'preflop',
     params: {
@@ -153,9 +163,9 @@ export default [{
   },
   it: 'should not render the RAISE button',
 }, {
-  describe: 'tests[12] after action was taken',
+  describe: '[12] after action was taken',
   props: {
-    active: false,
+    visible: false,
     state: 'flop',
     params: {
       tableAddr: '0x123',

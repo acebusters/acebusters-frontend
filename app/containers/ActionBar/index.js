@@ -9,6 +9,16 @@ import { connect } from 'react-redux';
 import TableService from '../../services/tableService';
 
 import {
+  setActionBarActive,
+  setActionBarMode,
+  setActionBarBetSlider,
+} from './actions';
+
+import {
+  getActionBarSliderOpen,
+  getActionBarMode,
+  makeSelectActionBarActive,
+  makeSelectActionBarVisible,
   makeMinSelector,
   makeCallAmountSelector,
   makeAmountToCallSelector,
@@ -17,16 +27,15 @@ import {
 import { makeSelectPrivKey } from '../AccountProvider/selectors';
 
 import {
-  makeHandStateSelector,
-  makeMyMaxBetSelector,
   makeIsMyTurnSelector,
-  makeMyPosSelector,
+  makeMyMaxBetSelector,
+  makeMessagesSelector,
+  makePlayersCountSelector,
 } from '../Table/selectors';
 
 import {
   makeMyCardsSelector,
   makeMyStackSelector,
-  makeLastReceiptSelector,
 } from '../Seat/selectors';
 
 import { setCards, bet, pay, fold, check } from '../Table/actions';
@@ -36,29 +45,21 @@ import ActionBar from '../../components/ActionBar';
 class ActionBarContainer extends React.Component {
   constructor(props) {
     super(props);
+    this.handleAllIn = this.handleAllIn.bind(this);
     this.handleBet = this.handleBet.bind(this);
     this.handleCheck = this.handleCheck.bind(this);
     this.handleCall = this.handleCall.bind(this);
     this.handleFold = this.handleFold.bind(this);
     this.updateAmount = this.updateAmount.bind(this);
     this.table = new TableService(props.params.tableAddr, this.props.privKey);
-    this.state = {
-      active: true,
-      amount: null,
-    };
+    this.state = { amount: 0 };
   }
 
   componentWillReceiveProps(nextProps) {
-    const min = nextProps.minRaise;
-    const amount = (min && nextProps.myStack < min) ? nextProps.myStack : min;
-    this.setState({ amount });
     if (nextProps.isMyTurn === true) {
-      this.setActive(true);
+      this.props.setActionBarActive(true);
+      this.props.setActionBarMode(null);
     }
-  }
-
-  setActive(active) {
-    this.setState({ active });
   }
 
   updateAmount(value) {
@@ -75,12 +76,20 @@ class ActionBarContainer extends React.Component {
         tableAddr: self.props.params.tableAddr,
         handId,
       } });
-      self.setActive(true);
+      this.props.setActionBarActive(true);
+      this.props.setActionBarMode(null);
     };
   }
 
+  handleAllIn() {
+    // if player wants to raise and their stack is smaller than the minRaise amount, then bet their stack
+    const { minRaise, myStack } = this.props;
+    const amount = (myStack < minRaise) ? myStack : minRaise;
+    this.setState({ amount }, () => this.handleBet());
+  }
+
   handleBet() {
-    this.setActive(false);
+    this.props.setActionBarActive(false);
     const amount = this.state.amount + this.props.myMaxBet;
     const handId = parseInt(this.props.params.handId, 10);
 
@@ -100,7 +109,7 @@ class ActionBarContainer extends React.Component {
   }
 
   handleCheck() {
-    this.setActive(false);
+    this.props.setActionBarActive(false);
     const amount = this.props.myMaxBet;
     const handId = parseInt(this.props.params.handId, 10);
     const checkStates = ['preflop', 'turn', 'river', 'flop'];
@@ -124,7 +133,7 @@ class ActionBarContainer extends React.Component {
   }
 
   handleFold() {
-    this.setActive(false);
+    this.props.setActionBarActive(false);
     const amount = this.props.myMaxBet;
     const handId = parseInt(this.props.params.handId, 10);
     const action = this.props.fold(
@@ -146,8 +155,8 @@ class ActionBarContainer extends React.Component {
   render() {
     return (
       <ActionBar
-        active={this.state.active}
         amount={this.state.amount}
+        handleAllIn={this.handleAllIn}
         handleBet={this.handleBet}
         handleCheck={this.handleCheck}
         handleCall={this.handleCall}
@@ -166,6 +175,7 @@ ActionBarContainer.propTypes = {
   dispatch: React.PropTypes.func,
   fold: React.PropTypes.func,
   lastReceipt: React.PropTypes.object,
+  minRaise: React.PropTypes.number,
   myMaxBet: React.PropTypes.number,
   myPos: React.PropTypes.number,
   myStack: React.PropTypes.number,
@@ -174,6 +184,8 @@ ActionBarContainer.propTypes = {
   privKey: React.PropTypes.string,
   setCards: React.PropTypes.func,
   state: React.PropTypes.string,
+  setActionBarActive: React.PropTypes.func,
+  setActionBarMode: React.PropTypes.func,
 };
 
 export function mapDispatchToProps(dispatch) {
@@ -190,21 +202,27 @@ export function mapDispatchToProps(dispatch) {
       ) => check(
         tableAddr, handId, amount, privKey, myPos, lastReceipt, checkType
     ),
+    setActionBarActive: (active) => dispatch(setActionBarActive(active)),
+    setActionBarBetSlider: (open) => dispatch(setActionBarBetSlider(open)),
+    setActionBarMode: (mode) => dispatch(setActionBarMode(mode)),
   };
 }
 
 const mapStateToProps = createStructuredSelector({
-  privKey: makeSelectPrivKey(),
-  myMaxBet: makeMyMaxBetSelector(),
-  isMyTurn: makeIsMyTurnSelector(),
+  active: makeSelectActionBarActive(),
   amountToCall: makeAmountToCallSelector(),
   callAmount: makeCallAmountSelector(),
-  minRaise: makeMinSelector(),
-  myStack: makeMyStackSelector(),
-  myPos: makeMyPosSelector(),
-  lastReceipt: makeLastReceiptSelector(),
   cards: makeMyCardsSelector(),
-  state: makeHandStateSelector(),
+  isMyTurn: makeIsMyTurnSelector(),
+  playerCount: makePlayersCountSelector(),
+  privKey: makeSelectPrivKey(),
+  messages: makeMessagesSelector(),
+  mode: getActionBarMode(),
+  minRaise: makeMinSelector(),
+  myMaxBet: makeMyMaxBetSelector(),
+  myStack: makeMyStackSelector(),
+  sliderOpen: getActionBarSliderOpen(),
+  visible: makeSelectActionBarVisible(),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ActionBarContainer);
