@@ -42,4 +42,12 @@ const InputStyled = styled.input`
   border-radius: 4px;
 `;
 
+export const CheckBox = styled.input`
+  display: inline-block;
+  margin-top: 0.7em;
+  margin-right: 1em;
+  padding-right: 5px;
+  float: left;
+`;
+
 export default InputStyled;

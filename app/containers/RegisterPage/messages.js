@@ -10,4 +10,12 @@ export default defineMessages({
     id: 'app.containers.RegisterPage.header',
     defaultMessage: 'This is RegisterPage Container !',
   },
+  terms: {
+    id: 'app.containers.RegisterPage.terms',
+    defaultMessage: 'Acebusters Terms',
+    agree: {
+      id: 'app.containers.RegisterPage.terms',
+      defaultMessage: 'I agree to ',
+    },
+  },
 });

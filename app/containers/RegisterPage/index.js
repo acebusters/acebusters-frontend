@@ -2,15 +2,17 @@ import React from 'react';
 import { connect } from 'react-redux';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { Form, Field, reduxForm, propTypes } from 'redux-form/immutable';
+import { FormattedMessage } from 'react-intl';
 
 // components
 import Container from '../../components/Container';
 import FormGroup from '../../components/Form/FormGroup';
 import Label from '../../components/Label';
-import Input from '../../components/Input';
+import Input, { CheckBox } from '../../components/Input';
 import Button from '../../components/Button';
 import H1 from '../../components/H1';
 import { ErrorMessage, WarningMessage } from '../../components/FormMessages';
+import messages from './messages';
 
 import { register } from './actions';
 
@@ -37,6 +39,10 @@ const validate = (values) => {
     }
   }
 
+  if (!values.get('terms')) {
+    errors.captchaResponse = 'Required';
+  }
+
   return errors;
 };
 
@@ -54,6 +60,14 @@ const Captcha = (props) => (
       onChange={props.input.onChange}
     />
   </div>
+);
+
+const renderCheckBox = ({ input, label, type, meta: { touched, error, warning } }) => (
+  <FormGroup>
+    <CheckBox {...input} placeholder={label} type={type} />
+    <Label htmlFor={input.name}><FormattedMessage {...messages.terms.agree} /> {label}</Label>
+    {touched && ((error && <ErrorMessage error={error} />) || (warning && <WarningMessage warning={warning} />))}
+  </FormGroup>
 );
 
 const renderField = ({ input, label, type, meta: { touched, error, warning } }) => (
@@ -83,7 +97,7 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
 
   render() {
     const { error, invalid, submitting, handleSubmit, asyncValidating } = this.props;
-
+    const termsLink = (<a href="http://www.acebusters.com/terms_of_use.html" target="_blank"><FormattedMessage {...messages.terms} /></a>);
     return (
       <Container>
         <div>
@@ -100,6 +114,12 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
             />
             <Field name="captchaResponse" component={Captcha} />
             {error && <ErrorMessage error={error} />}
+            <Field
+              name="terms"
+              type="checkbox"
+              component={renderCheckBox}
+              label={termsLink}
+            />
             <Button type="submit" disabled={submitting || invalid || asyncValidating} size="large">
               { (!submitting) ? 'Register' : 'Please wait ...' }
             </Button>
