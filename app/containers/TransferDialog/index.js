@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import EthUtil from 'ethereumjs-util';
 import { Form, Field, reduxForm } from 'redux-form/immutable';
 import { FormattedMessage } from 'react-intl';
+import BigNumber from 'bignumber.js';
 
 import messages from './messages';
 import Button from '../../components/Button';
@@ -54,10 +55,12 @@ const isChecksumAddress = (addr) => {
 };
 
 const validate = (values) => {
+  // console.log(props);
   const errors = {};
   if (!values.get('amount')) {
     errors.amount = 'Required';
   }
+
   if (!values.get('address')) {
     errors.address = 'Required';
   } else if (!isAddress(values.get('address'))) {
@@ -88,12 +91,21 @@ class TransferDialog extends React.Component { // eslint-disable-line react/pref
   }
 
   handleSubmit(values) {
-    const amount = Number(values.get('amount', '').replace(',', '.'));
-    this.props.handleTransfer(values.get('address'), amount);
+    this.props.handleTransfer(
+      values.get('address'),
+      values.get('amount')
+    );
   }
 
   render() {
-    const { error, handleSubmit, submitting, amountUnit } = this.props;
+    const { error, handleSubmit, submitting, amountUnit, maxAmount } = this.props;
+
+    const limitAmount = (value) => {
+      const numValue = Math.max(0, Number(value));
+
+      return maxAmount.gte(new BigNumber(numValue)) ? numValue : maxAmount.toNumber();
+    };
+
     return (
       <div>
         <H2><FormattedMessage {...messages.header} /></H2>
@@ -103,6 +115,7 @@ class TransferDialog extends React.Component { // eslint-disable-line react/pref
             component={renderField}
             type="number"
             label={`Amount (${amountUnit})`}
+            normalize={maxAmount && limitAmount}
           />
           <Field
             name="address"
@@ -122,6 +135,7 @@ class TransferDialog extends React.Component { // eslint-disable-line react/pref
 
 TransferDialog.propTypes = {
   submitting: PropTypes.bool,
+  maxAmount: PropTypes.object, // BigNumber
   amountUnit: PropTypes.string,
   handleSubmit: PropTypes.func,
   handleTransfer: PropTypes.func,
@@ -138,4 +152,10 @@ function mapDispatchToProps(dispatch) {
 const mapStateToProps = () => ({
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(reduxForm({ form: 'transfer', validate, warn })(TransferDialog));
+export default connect(mapStateToProps, mapDispatchToProps)(
+  reduxForm({
+    form: 'transfer',
+    validate,
+    warn,
+  })(TransferDialog)
+);

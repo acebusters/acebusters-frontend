@@ -121,9 +121,9 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
   render() {
     const qrUrl = `ether:${this.props.account.proxy}`;
     const weiBalance = this.web3.eth.balance(this.props.account.proxy);
-    const ethBalance = (weiBalance) ? weiBalance.div(ethDecimals) : weiBalance;
+    const ethBalance = weiBalance && weiBalance.div(ethDecimals);
     const babBalance = this.token.balanceOf(this.props.account.proxy);
-    const ntzBalance = (babBalance) ? babBalance.div(ntzDecimals) : babBalance;
+    const ntzBalance = babBalance && babBalance.div(ntzDecimals);
 
     const listPending = pendingToList(this.props.account.pending);
 
@@ -155,7 +155,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
           <p>
             <span>Balance: </span>
             <WithLoading
-              isLoading={ntzBalance === undefined || ntzBalance === null}
+              isLoading={!ntzBalance}
               loadingSize="14px"
               type="inline"
               styles={{ layout: { marginLeft: '15px' } }}
@@ -163,21 +163,24 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
               <span>{ntzBalance && ntzBalance.toString()} NTZ</span>
             </WithLoading>
           </p>
-          <Button
-            align="left"
-            onClick={() => {
-              this.props.modalAdd(
-                <TransferDialog
-                  handleTransfer={this.handleNTZTransfer}
-                  amountUnit="NTZ"
-                />
-              );
-            }}
-            size="medium"
-            icon="fa fa-money"
-          >
-            TRANSFER
-          </Button>
+          {ntzBalance &&
+            <Button
+              align="left"
+              onClick={() => {
+                this.props.modalAdd(
+                  <TransferDialog
+                    handleTransfer={this.handleNTZTransfer}
+                    maxAmount={ntzBalance}
+                    amountUnit="NTZ"
+                  />
+                );
+              }}
+              size="medium"
+              icon="fa fa-money"
+            >
+              TRANSFER
+            </Button>
+          }
         </Section>
 
         <Section>
@@ -185,7 +188,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
           <p>
             <span>Balance: </span>
             <WithLoading
-              isLoading={ethBalance === undefined}
+              isLoading={!ethBalance}
               loadingSize="14px"
               type="inline"
               styles={{ layout: { marginLeft: '15px' } }}
@@ -193,21 +196,24 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
               <span>{ethBalance && ethBalance.toString()} ETH</span>
             </WithLoading>
           </p>
-          <Button
-            align="left"
-            onClick={() => {
-              this.props.modalAdd(
-                <TransferDialog
-                  handleTransfer={this.handleETHTransfer}
-                  amountUnit="ETH"
-                />
-              );
-            }}
-            size="medium"
-            icon="fa fa-money"
-          >
-            TRANSFER
-          </Button>
+          {ethBalance &&
+            <Button
+              align="left"
+              onClick={() => {
+                this.props.modalAdd(
+                  <TransferDialog
+                    handleTransfer={this.handleETHTransfer}
+                    maxAmount={ethBalance}
+                    amountUnit="ETH"
+                  />
+                );
+              }}
+              size="medium"
+              icon="fa fa-money"
+            >
+              TRANSFER
+            </Button>
+          }
         </Section>
 
         <Section>
