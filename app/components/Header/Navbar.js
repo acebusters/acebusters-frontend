@@ -49,11 +49,11 @@ const StyledNavbar = styled.nav`
   color: ${(props) => props.theme.navbarFontColor || '#333'};
   display: block;
   font-weight: 400;
-  position: relative;
+  position: fixed;
+  width: 100%;
   min-height: ${navbarHeight};
   z-index: 1000;
   margin-bottom: 0;
-  border: none;
   border-radius: 0;
   background-color: ${black};
 `;

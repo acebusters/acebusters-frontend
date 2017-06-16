@@ -119,9 +119,8 @@ const StyledItem = styled.li`
   display: block;
   background-color: ${(props) => props.currentPath ? navbarColorCurrent : 'transparent'};
   background-image: none;
-  border: none;
-  outline: none;
   position: relative;
+  border-bottom: 2px solid ${(props) => props.currentPath ? navbarColorCurrent : 'transparent'};
   text-decoration: none;
   cursor: ${(props) => props.currentPath ? 'default' : 'pointer'};
   &:focus, &:active {
@@ -135,14 +134,11 @@ const StyledItem = styled.li`
   &:hover {
     color: ${(props) => props.theme.navbarHoverColor || '#fff'};
     background-color: ${(props) => props.currentPath ? navbarColorCurrent : (props.theme.logoBgColor || 'transparent')};
-    border-bottom: ${(props) => props.currentPath ? 'none' : `1px solid ${baseColor}`};
+    border-bottom: ${(props) => props.currentPath ? `2px solid ${navbarColorCurrent}` : `2px solid ${baseColor}`};
   }
 
   @media (max-width: ${screenXsMax}) {
     width: 100%;
-    &:hover {
-      border-bottom: none;
-    }
     display: ${(props) => {
       if (props.collapsed) {
         return 'none';
