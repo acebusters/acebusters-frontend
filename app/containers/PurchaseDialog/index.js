@@ -1,16 +1,14 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 
-import { Form, Field, reduxForm } from 'redux-form/immutable';
+import { Form, reduxForm } from 'redux-form/immutable';
 import { FormattedMessage } from 'react-intl';
-import BigNumber from 'bignumber.js';
 
-import { ErrorMessage } from '../../components/FormMessages';
 import Button from '../../components/Button';
 import FormField from '../../components/Form/FormField';
+import AmountField from '../../components/AmountField';
 import H2 from '../../components/H2';
 
-import { isEthereumAddress } from './isEthereumAddress';
 import messages from './messages';
 
 const validate = (values) => {
@@ -19,11 +17,6 @@ const validate = (values) => {
     errors.amount = 'Required';
   }
 
-  if (!values.get('address')) {
-    errors.address = 'Required';
-  } else if (!isEthereumAddress(values.get('address'))) {
-    errors.address = 'Invalid Ethereum Address.';
-  }
   return errors;
 };
 
@@ -32,49 +25,30 @@ const warn = () => {
   return warnings;
 };
 
-class TransferDialog extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class PurchaseDialog extends React.Component { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   handleSubmit(values) {
-    this.props.handleTransfer(
-      values.get('address'),
-      values.get('amount')
-    );
+    this.props.handlePurchase(values.get('amount'));
   }
 
   render() {
-    const { error, handleSubmit, submitting, amountUnit, maxAmount } = this.props;
-
-    const limitAmount = (value) => {
-      const numValue = Math.max(0, Number(value));
-
-      return maxAmount.gte(new BigNumber(numValue)) ? numValue : maxAmount.toNumber();
-    };
+    const { error, handleSubmit, submitting, maxAmount } = this.props;
 
     return (
       <div>
         <H2><FormattedMessage {...messages.header} /></H2>
         <Form onSubmit={handleSubmit(this.handleSubmit)}>
-          <Field
+          <AmountField
             name="amount"
             component={FormField}
-            type="number"
-            label={`Amount (${amountUnit})`}
-            normalize={maxAmount && limitAmount}
+            label="Amount (ETH)"
+            maxAmount={maxAmount}
           />
-
-          <Field
-            name="address"
-            component={FormField}
-            type="text"
-            label="Ethereum address"
-          />
-
-          {error && <ErrorMessage>{error}</ErrorMessage>}
-
+          {error && <strong>{error}</strong>}
           <div>
             <Button type="submit" disabled={submitting}>Submit</Button>
           </div>
@@ -84,12 +58,11 @@ class TransferDialog extends React.Component { // eslint-disable-line react/pref
   }
 }
 
-TransferDialog.propTypes = {
+PurchaseDialog.propTypes = {
   submitting: PropTypes.bool,
   maxAmount: PropTypes.object, // BigNumber
-  amountUnit: PropTypes.string,
   handleSubmit: PropTypes.func,
-  handleTransfer: PropTypes.func,
+  handlePurchase: PropTypes.func,
   error: PropTypes.any,
 };
 
@@ -105,8 +78,8 @@ const mapStateToProps = () => ({
 
 export default connect(mapStateToProps, mapDispatchToProps)(
   reduxForm({
-    form: 'transfer',
+    form: 'purchase',
     validate,
     warn,
-  })(TransferDialog)
+  })(PurchaseDialog)
 );

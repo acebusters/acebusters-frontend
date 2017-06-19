@@ -305,7 +305,6 @@ function* transferETHSaga() {
   }
 }
 
-
 const ethEvent = (contract) => eventChannel((emitter) => {
   const contractEvents = contract.allEvents({ fromBlock: 'latest' });
   contractEvents.watch((error, results) => {

@@ -16,6 +16,7 @@ import { ABI_TOKEN_CONTRACT, ABI_ACCOUNT_FACTORY, conf } from '../../app.config'
 
 import List from '../../components/List';
 import TransferDialog from '../TransferDialog';
+import PurchaseDialog from '../PurchaseDialog';
 import Container from '../../components/Container';
 import Button from '../../components/Button';
 import Blocky from '../../components/Blocky';
@@ -40,6 +41,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
   constructor(props) {
     super(props);
     this.handleNTZTransfer = this.handleNTZTransfer.bind(this);
+    this.handleNTZPurchase = this.handleNTZPurchase.bind(this);
     this.handleETHTransfer = this.handleETHTransfer.bind(this);
     this.web3 = props.web3Redux.web3;
     this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(confParams.ntzAddr);
@@ -87,6 +89,14 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
       to,
       `0x${new BigNumber(amount).mul(ntzDecimals).toString(16)}`
     );
+    this.props.modalDismiss();
+  }
+
+  handleNTZPurchase(amount) {
+    this.props.transferETH({
+      dest: confParams.ntzAddr,
+      amount: `0x${new BigNumber(amount).mul(ethDecimals).toString(16)}`,
+    });
     this.props.modalDismiss();
   }
 
@@ -213,6 +223,22 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
               icon="fa fa-money"
             >
               TRANSFER
+            </Button>
+          }
+          {ethBalance &&
+            <Button
+              align="left"
+              onClick={() => {
+                this.props.modalAdd(
+                  <PurchaseDialog
+                    handlePurchase={this.handleNTZPurchase}
+                  />
+                );
+              }}
+              size="medium"
+              icon="fa fa-money"
+            >
+              PURCHASE
             </Button>
           }
         </Section>
