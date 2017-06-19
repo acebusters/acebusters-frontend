@@ -364,12 +364,12 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           this.props.blockNotify();
           // show modal
 
-          const statusElement = (<div>
-            <h2>Join Successful!</h2>
-            <Button onClick={this.handleJoinComplete}>OK!</Button>
-          </div>);
-          this.props.modalDismiss();
-          this.props.modalAdd(statusElement);
+          // const statusElement = (<div>
+          //   <h2>Join Successful!</h2>
+          //   <Button onClick={this.handleJoinComplete}>OK!</Button>
+          // </div>);
+          // this.props.modalDismiss();
+          // this.props.modalAdd(statusElement);
         }
 
         // update lineup when join successful
