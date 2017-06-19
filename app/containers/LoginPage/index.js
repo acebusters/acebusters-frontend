@@ -2,12 +2,10 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
 import { Form, Field, reduxForm, SubmissionError, propTypes, change, formValueSelector } from 'redux-form/immutable';
-import Input from '../../components/Input';
-import Label from '../../components/Label';
-import FormGroup from '../../components/Form/FormGroup';
+import FormField from '../../components/Form/FormField';
 import Button from '../../components/Button';
 import Container from '../../components/Container';
-import { ErrorMessage, WarningMessage } from '../../components/FormMessages';
+import { ErrorMessage } from '../../components/FormMessages';
 import account from '../../services/account';
 import { workerError, walletImported, login } from './actions';
 import { modalAdd, modalDismiss, setProgress } from '../App/actions';
@@ -36,16 +34,6 @@ const warn = () => {
   const warnings = {};
   return warnings;
 };
-
-/* eslint-disable react/prop-types */
-const renderField = ({ input, label, type, meta: { touched, error, warning } }) => (
-  <FormGroup>
-    <Label htmlFor={input.name}>{label}</Label>
-    <Input {...input} placeholder={label} type={type} />
-    {touched && ((error && <ErrorMessage error={error} />) || (warning && <WarningMessage warning={warning}></WarningMessage>))}
-  </FormGroup>
-);
-/* eslint-enable react/prop-types */
 
 export class LoginPage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -147,8 +135,8 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
       <div>
         <H1>Log into your account!</H1>
         <Form onSubmit={handleSubmit(this.handleSubmit)}>
-          <Field name="email" type="text" component={renderField} label="Email" />
-          <Field name="password" type="password" component={renderField} label="Password" />
+          <Field name="email" type="text" component={FormField} label="Email" />
+          <Field name="password" type="password" component={FormField} label="Password" />
           {error && <ErrorMessage error={error} />}
           <Button type="submit" size="large" disabled={submitting || invalid}>
             { (!submitting) ? 'Login' : 'Please wait ...' }

@@ -5,13 +5,11 @@ import { Form, Field, reduxForm } from 'redux-form/immutable';
 import { FormattedMessage } from 'react-intl';
 import BigNumber from 'bignumber.js';
 
+import { ErrorMessage } from '../../components/FormMessages';
 import messages from './messages';
 import Button from '../../components/Button';
-import Input from '../../components/Input';
-import Label from '../../components/Label';
+import FormField from '../../components/Form/FormField';
 import H2 from '../../components/H2';
-import FormGroup from '../../components/Form/FormGroup';
-import { ErrorMessage } from '../../components/FormMessages';
 
 /**
  * Checks if the given string is an address
@@ -74,16 +72,6 @@ const warn = () => {
   return warnings;
 };
 
-/* eslint-disable react/prop-types */
-const renderField = ({ input, label, type, meta: { touched, error, warning } }) => (
-  <FormGroup>
-    <Label htmlFor={input.name}>{label}</Label>
-    <Input {...input} type={type} />
-    {touched && ((error && <ErrorMessage error={error}></ErrorMessage>) || (warning && <ErrorMessage error={warning}></ErrorMessage>))}
-  </FormGroup>
-);
-/* eslint-enable react/prop-types */
-
 class TransferDialog extends React.Component { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
@@ -112,18 +100,21 @@ class TransferDialog extends React.Component { // eslint-disable-line react/pref
         <Form onSubmit={handleSubmit(this.handleSubmit)}>
           <Field
             name="amount"
-            component={renderField}
+            component={FormField}
             type="number"
             label={`Amount (${amountUnit})`}
             normalize={maxAmount && limitAmount}
           />
+
           <Field
             name="address"
-            component={renderField}
+            component={FormField}
             type="text"
             label="Ethereum address"
           />
-          {error && <strong>{error}</strong>}
+
+          {error && <ErrorMessage>{error}</ErrorMessage>}
+
           <div>
             <Button type="submit" disabled={submitting}>Submit</Button>
           </div>

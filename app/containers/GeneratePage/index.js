@@ -7,13 +7,12 @@ import { browserHistory } from 'react-router';
 import { Receipt, Type } from 'poker-helper';
 // components
 import Container from '../../components/Container';
-import FormGroup from '../../components/Form/FormGroup';
 import Label from '../../components/Label';
-import Input from '../../components/Input';
+import FormField from '../../components/Form/FormField';
 import Button from '../../components/Button';
 import H1 from '../../components/H1';
 import MouseEntropy from '../../components/MouseEntropy';
-import { ErrorMessage, WarningMessage } from '../../components/FormMessages';
+import { ErrorMessage } from '../../components/FormMessages';
 
 import account from '../../services/account';
 import * as storageService from '../../services/localStorage';
@@ -43,16 +42,6 @@ const warn = (values) => {
   }
   return warnings;
 };
-
-/* eslint-disable react/prop-types */
-const renderField = ({ input, label, type, meta: { touched, error, warning } }) => (
-  <FormGroup>
-    <Label htmlFor={input.name}>{label}</Label>
-    <Input {...input} placeholder={label} type={type} value={input.value || ''} />
-    {touched && ((error && <ErrorMessage error={error} />) || (warning && <WarningMessage warning={warning} />))}
-  </FormGroup>
-);
-/* eslint-enable react/prop-types */
 
 export class GeneratePage extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
@@ -166,9 +155,9 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
           >
             <Label style={{ float: 'none' }}>Random Secret</Label>
             <MouseEntropy totalBits={768} width="100%" height="200px" onFinish={updateEntropy} sampleRate={0} />
-            <Field name="entropy" type="hidden" component={renderField} label="" value={entropy} />
-            <Field name="password" type="password" component={renderField} label="password" />
-            <Field name="confirmedPassword" type="password" component={renderField} label="confirm password" />
+            <Field name="entropy" type="hidden" component={FormField} label="" value={entropy} />
+            <Field name="password" type="password" component={FormField} label="password" />
+            <Field name="confirmedPassword" type="password" component={FormField} label="confirm password" />
             {error && <ErrorMessage error={error} />}
             <Button type="submit" disabled={submitting} size="large">
               { (!submitting) ? 'Encrypt and Store' : 'Please wait ...' }

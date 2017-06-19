@@ -5,12 +5,10 @@ import { Form, Field, reduxForm, SubmissionError, propTypes } from 'redux-form/i
 import { browserHistory } from 'react-router';
 // components
 import Container from '../../components/Container';
-import FormGroup from '../../components/Form/FormGroup';
-import Label from '../../components/Label';
-import Input from '../../components/Input';
+import FormField from '../../components/Form/FormField';
 import Button from '../../components/Button';
 import H1 from '../../components/H1';
-import { ErrorMessage, WarningMessage } from '../../components/FormMessages';
+import { ErrorMessage } from '../../components/FormMessages';
 
 import { setProgress } from '../App/actions';
 import account from '../../services/account';
@@ -44,14 +42,6 @@ const Captcha = (props) => (
       onChange={props.input.onChange}
     />
   </div>
-);
-
-const renderField = ({ input, label, type, meta: { touched, error, warning } }) => (
-  <FormGroup>
-    <Label htmlFor={input.name}>{label}</Label>
-    <Input {...input} placeholder={label} type={type} />
-    {touched && ((error && <ErrorMessage error={error} />) || (warning && <WarningMessage warning={warning} />))}
-  </FormGroup>
 );
 /* eslint-enable react/prop-types */
 
@@ -91,7 +81,7 @@ export class ResetPage extends React.Component { // eslint-disable-line react/pr
           <Form
             onSubmit={handleSubmit(this.handleSubmit)}
           >
-            <Field name="email" type="text" component={renderField} label="e-mail" />
+            <Field name="email" type="text" component={FormField} label="e-mail" />
             <Field name="captchaResponse" component={Captcha} />
             {error && <ErrorMessage error={error} />}
             <Button type="submit" disabled={submitting || invalid} size="large">

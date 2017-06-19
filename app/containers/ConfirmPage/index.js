@@ -9,11 +9,8 @@ import account from '../../services/account';
 import * as storageService from '../../services/localStorage';
 
 // components
-import FormGroup from '../../components/Form/FormGroup';
+import FormField from '../../components/Form/FormField';
 import Container from '../../components/Container';
-import { ErrorMessage, WarningMessage } from '../../components/FormMessages';
-import Input from '../../components/Input';
-import Label from '../../components/Label';
 import Button from '../../components/Button';
 import H1 from '../../components/H1';
 import FieldIntl from '../../components/FieldIntl';
@@ -44,16 +41,6 @@ const warn = () => {
   const warnings = {};
   return warnings;
 };
-
-/* eslint-disable react/prop-types */
-const renderField = ({ placeholder, input, label, type, meta: { touched, error, warning } }) => (
-  <FormGroup>
-    <Label htmlFor={input.name}>{label}</Label>
-    <Input {...input} placeholder={placeholder} type={type} />
-    {touched && ((error && <ErrorMessage error={error} />) || (warning && <WarningMessage warning={warning}></WarningMessage>))}
-  </FormGroup>
-);
-/* eslint-enable react/prop-types */
 
 export class ConfirmPage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
@@ -167,7 +154,7 @@ export class ConfirmPage extends React.PureComponent { // eslint-disable-line re
           <FieldIntl
             name="confCode"
             type="text"
-            component={renderField}
+            component={FormField}
             label={msg.label}
             placeholder={msg.placeholder}
             onChange={this.onChangeCode}

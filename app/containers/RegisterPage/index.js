@@ -7,8 +7,9 @@ import { FormattedMessage } from 'react-intl';
 // components
 import Container from '../../components/Container';
 import FormGroup from '../../components/Form/FormGroup';
+import FormField from '../../components/Form/FormField';
 import Label from '../../components/Label';
-import Input, { CheckBox } from '../../components/Input';
+import { CheckBox } from '../../components/Input';
 import Button from '../../components/Button';
 import H1 from '../../components/H1';
 import { ErrorMessage, WarningMessage } from '../../components/FormMessages';
@@ -69,14 +70,6 @@ const renderCheckBox = ({ input, label, type, meta: { touched, error, warning } 
     {touched && ((error && <ErrorMessage error={error} />) || (warning && <WarningMessage warning={warning} />))}
   </FormGroup>
 );
-
-const renderField = ({ input, label, type, meta: { touched, error, warning } }) => (
-  <FormGroup>
-    <Label htmlFor={input.name}>{label}</Label>
-    <Input {...input} placeholder={label} type={type} />
-    {touched && ((error && <ErrorMessage error={error} />) || (warning && <WarningMessage warning={warning} />))}
-  </FormGroup>
-);
 /* eslint-enable react/prop-types */
 
 export class RegisterPage extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -105,11 +98,11 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
           <Form
             onSubmit={handleSubmit(this.handleSubmit)}
           >
-            <Field name="email" type="text" component={renderField} label="e-mail" />
+            <Field name="email" type="text" component={FormField} label="e-mail" />
             <Field
               name="referral"
               type="text"
-              component={renderField}
+              component={FormField}
               label="referral code"
             />
             <Field name="captchaResponse" component={Captcha} />
