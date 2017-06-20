@@ -54,6 +54,13 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
           .filter(({ args = {} }) => args.from === proxy || args.to === proxy)
           .forEach(props.contractEvent);
       });
+
+      events.watch((error) => {
+        if (!error && this.props.account.proxy) {
+          this.token.balanceOf.call(this.props.account.proxy);
+          this.web3.eth.getBalance(this.props.account.proxy);
+        }
+      });
     });
 
     if (this.props.account.proxy) {
@@ -131,6 +138,10 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
   }
 
   render() {
+    // if (this.props.account.proxy) {
+    //   this.token.balanceOf.call(this.props.account.proxy);
+    // }
+
     const qrUrl = `ether:${this.props.account.proxy}`;
     const weiBalance = this.web3.eth.balance(this.props.account.proxy);
     const ethBalance = weiBalance && weiBalance.div(ethDecimals);
@@ -282,13 +293,15 @@ const pendingToList = (pending = {}) => (
 
 const txnsToList = (txns, proxyAddr) => {
   if (txns) {
-    return Object.keys(txns).map((key) => [
-      key.substring(2, 8), // txHash
-      txns[key].blockNumber, // blockNumber
-      txns[key].from.substring(2, 8), // from
-      txns[key].to.substring(2, 8), // to
-      new BigNumber((txns[key].to === proxyAddr) ? txns[key].value : txns[key].value * -1).div(ntzDecimals).toNumber(), // value
-    ]);
+    return Object.keys(txns)
+      .filter((key) => txns[key] && txns[key].to && txns[key].from)
+      .map((key) => [
+        key.substring(2, 8), // txHash
+        txns[key].blockNumber, // blockNumber
+        txns[key].from.substring(2, 8), // from
+        txns[key].to.substring(2, 8), // to
+        new BigNumber((txns[key].to === proxyAddr) ? txns[key].value : txns[key].value * -1).div(ntzDecimals).toNumber(), // value
+      ]);
   }
 
   return null;
