@@ -12,7 +12,7 @@ import {
   white,
 } from '../../variables';
 
-const StyledIcon = styled.i`
+export const StyledIcon = styled.i`
   font-size: 5em !important;
   color: ${baseColor}
   padding: 0.1em;
