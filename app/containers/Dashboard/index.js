@@ -15,6 +15,7 @@ import { createBlocky } from '../../services/blockies';
 import { ABI_TOKEN_CONTRACT, ABI_ACCOUNT_FACTORY, conf } from '../../app.config';
 
 import List from '../../components/List';
+import Alert from '../../components/Alert';
 import TransferDialog from '../TransferDialog';
 import PurchaseDialog from '../PurchaseDialog';
 import Container from '../../components/Container';
@@ -158,7 +159,12 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
           >
             <p> { this.props.account.proxy } </p>
             <QRCode value={qrUrl} size={120} />
+
+            <Alert theme="danger">
+              <FormattedMessage {...messages.ethAlert} />
+            </Alert>
           </WithLoading>
+
         </Section>
 
         <Section>

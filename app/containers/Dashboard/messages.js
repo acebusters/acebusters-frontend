@@ -18,4 +18,8 @@ export default defineMessages({
     id: 'app.containers.Dashboard.included',
     defaultMessage: 'Transaction History:',
   },
+  ethAlert: {
+    id: 'app.containers.Dashboard.ethAlert',
+    defaultMessage: 'Never send real ether to this address. It is a Rinkeby Testnet Address. Only send Rinkaby TestEther to this Address. Otherwise your Ether will be lost',
+  },
 });
