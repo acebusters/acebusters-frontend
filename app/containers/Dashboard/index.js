@@ -245,9 +245,25 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
 
         <Section>
           <h2><FormattedMessage {...messages.pending} /></h2>
-          <List items={listPending} headers={['#', 'txHash']} noDataMsg="No Pending Transactions" />
+          <List
+            items={listPending}
+            headers={['#', 'txHash']}
+            noDataMsg="No Pending Transactions"
+          />
+
           <h2><FormattedMessage {...messages.included} /></h2>
-          <List items={listTxns} headers={['txHash', 'from', 'to', 'amount']} noDataMsg="No Transactions Yet" />
+          <List
+            items={listTxns}
+            sortableColumns={[1]}
+            headers={[
+              'TX hash',
+              'Block number',
+              'From',
+              'To',
+              'Amount',
+            ]}
+            noDataMsg="No Transactions Yet"
+          />
         </Section>
       </Container>
     );
@@ -262,9 +278,10 @@ const txnsToList = (txns, proxyAddr) => {
   if (txns) {
     return Object.keys(txns).map((key) => [
       key.substring(2, 8), // txHash
+      txns[key].blockNumber, // blockNumber
       txns[key].from.substring(2, 8), // from
       txns[key].to.substring(2, 8), // to
-      (txns[key].to === proxyAddr) ? txns[key].value : txns[key].value * -1, // value
+      new BigNumber((txns[key].to === proxyAddr) ? txns[key].value : txns[key].value * -1).div(ntzDecimals).toNumber(), // value
     ]);
   }
 

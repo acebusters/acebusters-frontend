@@ -21,19 +21,21 @@ const Td = styled.td`
   border-top: 1px solid #eceeef;
 `;
 
-function ListItem(props) {
-  let data = (<td></td>);
-  if (props.values) {
-    data = props.values.map((val, i) => {
-      if (i === 0) {
-        return (<Th key={i}>{val}</Th>);
-      }
-      return (<Td key={i}>{val}</Td>);
-    });
-  }
+function ListItem({ values }) {
   return (
     <Tr>
-      {data}
+      {!values && <td />}
+      {values && values.map((val, i) => {
+        const Comp = i === 0 ? Th : Td;
+        return (
+          <Comp key={i}>
+            {typeof val === 'number'
+              ? String(val).replace(/^-/, '−')
+              : val
+            }
+          </Comp>
+        );
+      })}
     </Tr>
   );
 }
