@@ -271,10 +271,8 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
           <h2><FormattedMessage {...messages.included} /></h2>
           <List
             items={listTxns}
-            sortableColumns={[1]}
             headers={[
               'TX hash',
-              'Block number',
               'From',
               'To',
               'Amount',
@@ -294,10 +292,10 @@ const pendingToList = (pending = {}) => (
 const txnsToList = (txns, proxyAddr) => {
   if (txns) {
     return Object.keys(txns)
-      .filter((key) => txns[key] && txns[key].to && txns[key].from)
+      .filter((key) => txns[key] && txns[key].from && txns[key].to)
+      .sort((a, b) => txns[b].blockNumber - txns[a].blockNumber)
       .map((key) => [
         key.substring(2, 8), // txHash
-        txns[key].blockNumber, // blockNumber
         txns[key].from.substring(2, 8), // from
         txns[key].to.substring(2, 8), // to
         new BigNumber((txns[key].to === proxyAddr) ? txns[key].value : txns[key].value * -1).div(ntzDecimals).toNumber(), // value
