@@ -12,7 +12,7 @@ import { modalAdd, modalDismiss } from '../App/actions';
 import web3Connect from '../AccountProvider/web3Connect';
 import { contractEvent, accountLoaded, transferETH } from '../AccountProvider/actions';
 import { createBlocky } from '../../services/blockies';
-import { ABI_TOKEN_CONTRACT, ABI_ACCOUNT_FACTORY, conf } from '../../app.config';
+import { ABI_TOKEN_CONTRACT, ABI_ACCOUNT_FACTORY, ABI_PROXY, conf } from '../../app.config';
 
 import List from '../../components/List';
 import Alert from '../../components/Alert';
@@ -37,6 +37,8 @@ const ethDecimals = new BigNumber(10).pow(18);
 // 1 x 10^0 - Babz
 const ntzDecimals = new BigNumber(10).pow(12);
 
+const LOOK_BEHIND_PERIOD = 4 * 60 * 24;
+
 export class Dashboard extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   constructor(props) {
@@ -45,26 +47,13 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     this.handleNTZPurchase = this.handleNTZPurchase.bind(this);
     this.handleETHTransfer = this.handleETHTransfer.bind(this);
     this.web3 = props.web3Redux.web3;
-    this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(confParams.ntzAddr);
-    this.web3.eth.getBlockNumber((err, blockNumber) => {
-      const events = this.token.allEvents({ fromBlock: blockNumber - (4 * 60 * 24), toBlock: 'latest' });
-      events.get((error, eventList) => {
-        const { proxy } = this.props.account;
-        eventList
-          .filter(({ args = {} }) => args.from === proxy || args.to === proxy)
-          .forEach(props.contractEvent);
-      });
 
-      events.watch((error) => {
-        if (!error && this.props.account.proxy) {
-          this.token.balanceOf.call(this.props.account.proxy);
-          this.web3.eth.getBalance(this.props.account.proxy);
-        }
-      });
-    });
+    this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(confParams.ntzAddr);
 
     if (this.props.account.proxy) {
       this.web3.eth.getBalance(this.props.account.proxy);
+      this.watchProxyEvents(this.props.account.proxy);
+      this.watchTokenEvents(this.props.account.proxy);
     }
   }
 
@@ -82,6 +71,8 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
 
     if (this.props.account.proxy === undefined && nextProps.account.proxy) {
       this.web3.eth.getBalance(nextProps.account.proxy);
+      this.watchProxyEvents(nextProps.account.proxy);
+      this.watchTokenEvents(nextProps.account.proxy);
     }
 
     // Note: listen to AccountFactory's AccountCreated Event if proxy address is not ready
@@ -90,6 +81,34 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
         && nextProps.account.proxy === '0x') {
       this.watchAccountCreated();
     }
+  }
+
+  watchProxyEvents(proxyAddr) {
+    const web3 = getWeb3();
+    this.proxy = web3.eth.contract(ABI_PROXY).at(proxyAddr);
+    this.web3.eth.getBlockNumber((err, blockNumber) => {
+      this.proxy.Received({ fromBlock: blockNumber - LOOK_BEHIND_PERIOD, toBlock: 'latest' }).watch(() => {
+        this.web3.eth.getBalance(proxyAddr);
+      });
+    });
+  }
+
+  watchTokenEvents(proxyAddr) {
+    this.web3.eth.getBlockNumber((err, blockNumber) => {
+      const events = this.token.allEvents({ fromBlock: blockNumber - LOOK_BEHIND_PERIOD, toBlock: 'latest' });
+      events.get((error, eventList) => {
+        eventList
+          .filter(({ args = {} }) => args.from === proxyAddr || args.to === proxyAddr)
+          .forEach(this.props.contractEvent);
+
+        events.watch((watchError) => {
+          if (!watchError && this.props.account.proxy) {
+            this.token.balanceOf.call(this.props.account.proxy);
+            this.web3.eth.getBalance(this.props.account.proxy);
+          }
+        });
+      });
+    });
   }
 
   handleNTZTransfer(to, amount) {
@@ -138,10 +157,6 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
   }
 
   render() {
-    // if (this.props.account.proxy) {
-    //   this.token.balanceOf.call(this.props.account.proxy);
-    // }
-
     const qrUrl = `ether:${this.props.account.proxy}`;
     const weiBalance = this.web3.eth.balance(this.props.account.proxy);
     const ethBalance = weiBalance && weiBalance.div(ethDecimals);
