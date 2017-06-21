@@ -5,24 +5,23 @@ import { fromJS } from 'immutable';
 import * as types from './actions';
 
 export const initialState = fromJS({
-  active: true,
-  visible: false,
-  sliderOpen: false,
-  mode: null,
+  buttonActive: '', // used for activeIndicator
+  sliderOpen: false, // toggles slider open/closed
+  turnComplete: false,
+  mode: '', // tracks active button's life-cycle
 });
 
 export default function actionBarReducer(state = initialState, action) {
   switch (action.type) {
 
-    case types.ACTIONBAR_SET_ACTIVE: {
-      return state.set('active', action.active);
+    case types.ACTIONBAR_SET_TURN_COMPLETE: {
+      return state.set('turnComplete', action.complete);
     }
 
     case types.ACTIONBAR_SET_MODE: {
-      // on CONFIRM button press
-      // if (action.mode === null) {
-      //   return state;
-      // }
+      if (action.mode === null) {
+        return state;
+      }
       return state.set('mode', action.mode);
     }
 
@@ -30,8 +29,8 @@ export default function actionBarReducer(state = initialState, action) {
       return state.set('sliderOpen', action.sliderOpen);
     }
 
-    case types.ACTIONBAR_TOGGLE_VISIBLE: {
-      return state.set('visible', !state.get('visible'));
+    case types.ACTIONBAR_SET_BUTTON_ACTIVE: {
+      return state.set('buttonActive', action.whichBtn);
     }
 
     default: {

@@ -8,19 +8,7 @@ import {
 } from '@storybook/addon-knobs';
 
 import tests, { combine } from '../tests';
-import {
-  atTable0,
-  atTable1,
-  atTable2,
-  amountToCall1,
-  amountToCall2,
-  amountToCall3,
-  minRaise0,
-  buttonBet0,
-  buttonBet1,
-  buttonRaise0,
-  buttonRaise1,
-} from '../tests2';
+import * as tests2 from '../tests2';
 
 import ActionBar from '../../index';
 
@@ -57,17 +45,23 @@ stories.add('Kitchen Sink', () => (
   />
 ));
 
-createStory(atTable0);
-createStory(atTable1);
-createStory(atTable2);
-createStory(amountToCall1);
-createStory(amountToCall2);
-createStory(amountToCall3);
-createStory(minRaise0);
-createStory(buttonBet0);
-createStory(buttonBet1);
-createStory(buttonRaise0);
-createStory(buttonRaise1);
+createStory(tests2.atTable0);
+createStory(tests2.atTable1);
+createStory(tests2.atTable2);
+createStory(tests2.amountToCheck);
+createStory(tests2.actionDispatchCheck);
+createStory(tests2.amountToCall0);
+createStory(tests2.actionDispatchCall);
+createStory(tests2.amountToCall1);
+createStory(tests2.minRaise0);
+createStory(tests2.actionDispatchAllIn);
+createStory(tests2.actionDispatchFold);
+createStory(tests2.buttonBet0);
+createStory(tests2.buttonBet1);
+createStory(tests2.actionDispatchBet);
+createStory(tests2.buttonRaise0);
+createStory(tests2.buttonRaise1);
+createStory(tests2.actionDispatchRaise);
 
 // iterate over tests and add a story for each
 tests.forEach((test) => {

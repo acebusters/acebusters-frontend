@@ -1,13 +1,20 @@
 /**
 * Created by jzobro 20170531
 */
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
+import {
+  curtainStickyWidth,
+  curtainHalfWidth,
+} from '../../variables';
+
+const active = '#35c5e3'; // electric blue
+const largeBoxShadow = '0 2px 4px 1px rgba(0,0,0,0.50)';
+const medBoxShadow = '0 2px 4px 0px rgba(0,0,0,0.50)';
 const Button = styled.button`
   padding: 0;
   margin: 0;
   border: none;
-  background: none;
   &:focus {
     outline: none;
   }
@@ -20,55 +27,90 @@ const Button = styled.button`
 `;
 
 export const ActionBarWrapper = styled.div`
-  position: fixed;
+  position: absolute;
+  min-height: 50px;
   bottom: 0;
   left: 50%;
   transform: translate(-50%, 0);
   display: flex;
   flex-direction: column;
-  opacity: ${(props) => props.active ? 1 : 0.3};
+  opacity: ${(props) => props.active && !props.disabled ? 1 : 0.3};
+
+  transition: opacity 0.3s ease-out;
+
+  @media (min-width: ${curtainStickyWidth}) {
+    left: calc(50% + ${curtainHalfWidth});
+  }
 `;
 
 export const ControlPanel = styled.div`
+  z-index: 3;
+  align-self: center;
   display: flex;
-  padding-top: 4px;
-  padding-left: 4px;
-  padding-right: 4px;
-  border-top-left-radius: 12px;
-  border-top-right-radius: 12px;
-  background-color: #999;
+  padding: 6px 7px 0 7px;
+  border-radius: 16px 16px 0 0;
+  background-color: #7A7A7A;
+  background-image: linear-gradient(0deg, #383838 0%, #7A7A7A 100%);
+  box-shadow: ${largeBoxShadow};
+`;
+
+const easeSliderIn = keyframes`
+  from { width: 290px; }
+  to { width: 544px; }
+`;
+
+const easeSliderOut = keyframes`
+  from { width: 544px; }
+  to { width: 290px; }
 `;
 
 export const ControlWrapper = styled.div`
   display: flex;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-  padding-top: 4px;
-  padding-left: 4px;
-  padding-right: 4px;
-  background-color: #666;
+  border-radius: 11px 11px 0 0;
+  padding: 3px 3px 0 3px;
+  background-color: none;
+  box-shadow: inset 0 1px 3px 1px rgba(0,0,0,0.50);
+  ${(props) => props.sliderOpen ?
+    `animation: ${easeSliderIn} 0.5s ease-in-out;`
+    :
+    `animation: ${easeSliderOut} 0.5s ease-in-out;`
+  }
 `;
 
 export const ActionButtonWrapper = styled(Button)`
   display: flex;
-  height: 50px;
-  min-width: 100px;
-  margin-left: 6px;
-  background-color: #999;
-  color: white;
+  height: 40px;
+  margin-left: 4px;
+  min-width: 88px;
+  border-radius: 2px 2px 0 0;
+  background-color: #7C7C7C;
+  background-image: linear-gradient(0deg, #383838 0%, #7C7C7C 100%);
+  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.50);
   font-weight: 400;
-  border-top-left-radius: 2px;
-  border-top-right-radius: 2px;
+  ${(props) =>
+    props.type === 'BET-SET' ||
+    props.type === 'RAISE-SET' ||
+    props.type === 'BLANK' ?
+    'min-width: 88px;'
+  :
+    'min-width: 94px;'
+  };
+  color: #CACACA;
   &:first-child {
     margin-left: 0;
-    border-top-left-radius: 8px;
+    border-top-left-radius: 9px;
   }
   &:nth-child(3) {
-    border-top-right-radius: 8px;
+    border-top-right-radius: 9px;
+  }
+  &:hover {
+    background-color: #383838;
+    background-image: linear-gradient(0deg, #666 0%, #585858 72%, #7C7C7C 100%);
   }
   &:active {
-    background-color: #666;
-    color: #DDD;
+    background-color: #7C7C7C;
+    background-image: linear-gradient(0deg, #7C7C7C 0%, #585858 72%, #666 100%);
+    color: ${active};
   }
   &:disabled {
     background-color: #777;
@@ -77,18 +119,39 @@ export const ActionButtonWrapper = styled(Button)`
 `;
 
 export const ActionIndicator = styled.div`
-  margin-left: 10px;
-  margin-top: 10px;
-  height: 40px;
-  width: 8px;
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-  background-color: #444;
+  ${(props) =>
+    props.type === 'BLANK' ||
+    props.type === 'BET-SET' ||
+    props.type === 'RAISE-SET' ?
+    'display: none;'
+    :
+    'display: block;'
+  };
+  margin-left: 8px;
+  margin-top: 6px;
+  height: 34px;
+  width: 10px;
+  border-radius: 4px 4px 0 0;
+  background-color: ${(props) => props.active ? active : 'none'};
+  box-shadow: inset 0 1px 3px 0px rgba(0,0,0,0.50);
 `;
 
 export const ActionText = styled.div`
+  ${(props) =>
+    props.type === 'BET-SET' ||
+    props.type === 'RAISE-SET' ||
+    props.type === 'BLANK' ?
+    `width: 100%;
+     margin-left: 0;
+     text-align: center;`
+  :
+    `margin-left: 12px;
+     text-align: left;`
+  }
+  margin-bottom: 2px;
   align-self: center;
-  margin-left: 8px;
+  font-weight: 600;
+  font-size: 15px;
 `;
 
 export const SliderWrapper = styled.div`
@@ -99,6 +162,39 @@ export const SliderWrapper = styled.div`
   margin-right: 24px;
 `;
 
+export const SliderHandle = styled.div`
+  display: flex;
+  position: absolute;
+  justify-content: center;
+  align-items: center;
+  width: 34px;
+  height: 40px;
+  margin-left: -12px;
+  margin-top: -12px;
+  cursor: pointer;
+  border-radius: 8px 8px 0 0;
+  border: none;
+  background-color: #7C7C7C;
+  background-image: linear-gradient(0deg, #383838 0%, #7C7C7C 100%);
+  boxShadow: 0 1px 2px 0 rgba(0,0,0,0.50);
+  &:hover {
+    background-color: #383838;
+    background-image: linear-gradient(0deg, #666 0%, #585858 72%, #7C7C7C 100%);
+  }
+  &:active {
+    background-color: #7C7C7C;
+    background-image: linear-gradient(0deg, #7C7C7C 0%, #585858 72%, #666 100%);
+  }
+`;
+
+export const SliderDot = styled.div`
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+  background-color: ${(props) => props.active ? active : 'none'};
+  box-shadow: inset 0 1px 3px 1px rgba(0,0,0,0.50);
+`;
+
 export const FlagContainer = styled.div`
   display: flex;
   justify-content: flex-end;
@@ -107,46 +203,57 @@ export const FlagContainer = styled.div`
 `;
 
 export const FlagButtonWrapper = styled(Button)`
+  height: 30px;
+  transform: translateY(${(props) => !props.sliderOpen ? '32px' : '0'});
+
+  opacity: 0.5;
   margin-left: 4px;
-  padding: 5px;
-  padding-left: 18px;
-  padding-right: 18px;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-  border-bottom: solid 2px #666;
-  background-color: #999;
+  padding: 5px 18px ;
+  border-radius: 4px 4px 0 0;
+  border-bottom: solid 2px #515151;
+  background-color: #7B7B7B;
+  color: #C1BFBF;
+  font-weight: 600;
+  font-size: 12px;
+  &:hover {
+    cursor: default;
+  }
+  transition: 0.5s ease;
 `;
 
-export const FlagBet = styled.div`
-  margin-right: 10px;
-  padding: 5px;
-  padding-left: 10px;
-  padding-right: 20px;
-  width: 142px;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-  background-color: #DDD;
-  color: #333;
-`;
-
-export const FlagCall = styled.div`
-  ${(props) => {
-    if (props.sliderOpen) {
-      return `
-        margin-right: 18px;
-      `;
-    }
-    return `
-      margin: 0 auto;
-    `;
-  }};
-  padding-left: 6px;
-  padding-right: 6px;
-  text-align: center;
+const FlagShared = styled.div`
+  align-self: center;
+  min-height: 20px;
   min-width: 80px;
-  padding: 5px;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-  background-color: #DDD;
-  color: #333;
+  padding: 6px 10px 4px 10px;
+  border-radius: 4px 4px 0 0;
+  background-color: #BCBCBC;
+  box-shadow: ${medBoxShadow};
+  color: #555;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  transition: 0.5s ease;
+`;
+
+export const FlagBet = styled(FlagShared)`
+  z-index: 1;
+  ${(props) => props.sliderOpen ?
+    `transform: translate(-26px, 30px);
+    transition-delay: 0.3s;
+    ` : `
+    transform: translate(0px, 60px);`
+  }
+`;
+
+export const FlagCall = styled(FlagShared)`
+  z-index: 2;
+  ${(props) => props.sliderOpen ?
+    `margin-right: 18px;
+    display: ${props.hide ? 'none' : 'block'};
+    transform: translate(-116px, 60px);
+    ` : `
+    transform: translateY(${props.hide ? '90px' : '60px'});
+    `
+  };
 `;

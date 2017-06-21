@@ -12,15 +12,11 @@ const FlagButton = ({
     if (type === 'pot') return 'POT';
     return null;
   };
-  // only display if slider is Open
-  if (sliderOpen) {
-    return (
-      <FlagButtonWrapper name="flag-button">
-        {textType()}
-      </FlagButtonWrapper>
-    );
-  }
-  return null;
+  return (
+    <FlagButtonWrapper sliderOpen={sliderOpen} name="flag-button">
+      {textType()}
+    </FlagButtonWrapper>
+  );
 };
 FlagButton.propTypes = {
   type: React.PropTypes.string,

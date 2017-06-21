@@ -1,12 +1,7 @@
 import React from 'react';
 
-import {
-  ActionButtonWrapper,
-  ActionIndicator,
-} from './styles';
+import { ActionButtonWrapper } from './styles';
 
 export default () => (
-  <ActionButtonWrapper name="button-blank" disabled>
-    <ActionIndicator />
-  </ActionButtonWrapper>
+  <ActionButtonWrapper type="BLANK" name="button-blank" disabled />
 );

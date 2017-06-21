@@ -63,5 +63,6 @@ export const transitionSpeed = '.3s';
 export const transitionFn = 'ease-in-out';
 
 export const curtainWidth = '400px';
+export const curtainHalfWidth = '200px';
 // Max width sticking curtain
 export const curtainStickyWidth = '1168px';

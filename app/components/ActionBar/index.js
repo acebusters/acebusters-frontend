@@ -21,29 +21,28 @@ import {
 const ActionBar = (props) => {
   const {
     active,
+    disabled,
     sliderOpen,
     visible,
   } = props;
   if (visible) {
     return (
-      <ActionBarWrapper active={active} name="action-bar-wrapper">
+      <ActionBarWrapper
+        active={active}
+        disabled={disabled}
+        name="action-bar-wrapper"
+      >
 
-        {sliderOpen ?
-          <FlagContainer active={active} name="flag-container">
-            <FlagAmountCall {...props} />
-            <FlagAmountBet {...props} />
-            <FlagButton type="quarter" {...props} />
-            <FlagButton type="half" {...props} />
-            <FlagButton type="pot" {...props} />
-          </FlagContainer>
-          :
-          <FlagContainer active={active} name="flag-container">
-            <FlagAmountCall {...props} />
-          </FlagContainer>
-        }
+        <FlagAmountCall {...props} />
+        <FlagAmountBet {...props} />
+        <FlagContainer active={active} name="flag-container">
+          <FlagButton type="quarter" {...props} />
+          <FlagButton type="half" {...props} />
+          <FlagButton type="pot" {...props} />
+        </FlagContainer>
 
         <ControlPanel name="control-panel-visible">
-          <ControlWrapper>
+          <ControlWrapper sliderOpen={sliderOpen} >
             <ControlFold {...props} />
             <ControlCheckCall {...props} />
             <ControlBetRaise {...props} />
@@ -60,6 +59,7 @@ const ActionBar = (props) => {
 ActionBar.propTypes = {
   visible: React.PropTypes.bool.isRequired,
   active: React.PropTypes.bool.isRequired,
+  disabled: React.PropTypes.bool.isRequired,
   sliderOpen: React.PropTypes.bool.isRequired,
 };
 
