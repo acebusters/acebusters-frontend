@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { browserHistory } from 'react-router';
 
 import Navbar from './Navbar';
 import UserMenu from './UserMenu';
@@ -71,35 +70,34 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
         <i className="fa fa-bars fa-2"></i>
       </NavToggle>,
       <NavItem
-        onClick={() => browserHistory.push('/dashboard')}
+        to="dashboard"
         collapsed={collapsed}
         key="2"
         title="Dashboard"
         location={this.props.location}
       />,
       <NavItem
-        onClick={() => browserHistory.push('/lobby')}
+        to="lobby"
         key="3"
         collapsed={collapsed}
         title="Lobby"
         location={this.props.location}
       />,
       <UserMenu
-        profileAction={() => browserHistory.push('/dashboard')}
-        signOutAction={this.props.onClickLogout}
+        onLogout={this.props.onClickLogout}
         collapsed={collapsed}
         key="4"
         {...this.props}
       />,
     ]) : ([
       <NavItem
-        onClick={() => browserHistory.push('/register')}
+        to="/register"
         key="1"
         title="Register"
         location={this.props.location}
       />,
       <NavItem
-        onClick={() => browserHistory.push('/login')}
+        to="/login"
         key="2"
         title="Login"
         location={this.props.location}

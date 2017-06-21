@@ -36,7 +36,7 @@ const StyledDashboard = styled.div`
   }
   /* theme */
   background: #444;
-  background-color: ${(props) => props.params.tableAddr ? backgroundTableColor : backgroundBoxed}
+  background-color: ${(props) => props.params.tableAddr ? backgroundTableColor : backgroundBoxed};
   min-height: 100vh;
   position: relative;
   overflow: hidden;

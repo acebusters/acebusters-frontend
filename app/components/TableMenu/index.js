@@ -1,5 +1,4 @@
 import React from 'react';
-import { browserHistory } from 'react-router';
 
 import MenuHeader from './MenuHeader';
 import MenuItem from './MenuItem';
@@ -47,14 +46,14 @@ const TableMenu = (props) => {
       name: 'lobby',
       icon: 'fa fa-search',
       title: 'Lobby',
-      onClick: () => browserHistory.push('/lobby'),
+      to: '/lobby',
       disabled: false,
     },
     {
       name: 'dashboard',
       icon: 'fa fa-tachometer',
       title: 'Dashboard',
-      onClick: () => browserHistory.push('/dashboard'),
+      to: '/dashboard',
       disabled: false,
     },
     {
@@ -77,21 +76,21 @@ const TableMenu = (props) => {
       name: 'lobby',
       icon: 'fa fa-search',
       title: 'Lobby',
-      onClick: () => browserHistory.push('/lobby'),
+      to: '/lobby',
       disabled: false,
     },
     {
       name: 'register',
       icon: 'fa fa-user-plus',
       title: 'Register',
-      onClick: () => browserHistory.push('/register'),
+      to: '/register',
       disabled: false,
     },
     {
       name: 'signin',
       icon: 'fa fa-sign-in',
       title: 'Log-In',
-      onClick: () => browserHistory.push('/login'),
+      to: '/login',
       disabled: false,
     },
   ];

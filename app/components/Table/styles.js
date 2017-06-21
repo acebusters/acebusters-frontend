@@ -56,7 +56,7 @@ export const Winner = styled.div`
 
 export const TableAndChairs = styled.div`
   position: relative;
-  width: 100%
+  width: 100%;
   padding-bottom: 50%;
 `;
 

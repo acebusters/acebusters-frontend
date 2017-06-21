@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import { createStructuredSelector } from 'reselect';
-import { browserHistory } from 'react-router';
 import Button from 'components/Button';
+import Link from 'components/Link';
 
 import web3Connect from '../AccountProvider/web3Connect';
 import { lineupReceived, updateReceived } from '../Table/actions';
@@ -36,19 +36,14 @@ const getTableData = (table, props) => {
 
 const getTableHand = (props) => fetchTableState(props.tableAddr).then((rsp) => props.updateReceived(props.tableAddr, rsp));
 
-class LobbyItem extends React.PureComponent {  // eslint-disable-line
+class LobbyItem extends React.PureComponent { // eslint-disable-line
 
   constructor(props) {
     super(props);
-    this.handleView = this.handleView.bind(this);
     this.web3 = props.web3Redux.web3;
     this.table = this.web3.eth.contract(ABI_TABLE).at(props.tableAddr);
     getTableData(this.table, props);
     getTableHand(props);
-  }
-
-  handleView() {
-    browserHistory.push(`/table/${this.props.tableAddr}/hand/${this.props.lastHandId}`);
   }
 
   render() {
@@ -69,7 +64,14 @@ class LobbyItem extends React.PureComponent {  // eslint-disable-line
         <Td key="sb">{this.props.data.smallBlind}</Td>
         <Td key="np">{`${players}/${this.props.data.seats.length}`}</Td>
         <Td key="lh">{this.props.lastHandId}</Td>
-        <Td key="ac"><Button onClick={this.handleView} size="medium" icon="fa fa-eye"></Button></Td>
+        <Td key="ac">
+          <Link
+            to={`/table/${this.props.tableAddr}/hand/${this.props.lastHandId}`}
+            size="medium"
+            icon="fa fa-eye"
+            component={Button}
+          />
+        </Td>
       </Tr>
     );
   }

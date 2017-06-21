@@ -290,7 +290,7 @@ export const ButtonWrapper = styled.button`
   margin-top: ${scaleButtonJoin(42)};
   margin-left: ${scaleButtonJoin(42)};
   height: ${scaleButtonJoin(40)};
-  width: ${scaleButtonJoin(42)}
+  width: ${scaleButtonJoin(42)};
   top: ${scaleButtonJoin(-20)};
   left: ${scaleButtonJoin(-64)};
   display: flex;

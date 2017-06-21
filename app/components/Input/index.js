@@ -15,8 +15,8 @@ const InputStyled = styled.input`
       return `border: 2px solid ${green}`;
     }
     return 'border: 1px solid #ccc';
-  }}
-  -webkit-box-shadow: 0 0 0px 1000px white inset !important
+  }};
+  -webkit-box-shadow: 0 0 0px 1000px white inset !important;
   padding: 10px;
   border: solid 1px gainsboro;
   -webkit-transition: box-shadow 0.3s, border 0.3s;

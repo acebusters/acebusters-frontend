@@ -4,6 +4,7 @@ import { browserHistory } from 'react-router';
 import { Form, Field, reduxForm, SubmissionError, propTypes, change, formValueSelector } from 'redux-form/immutable';
 import FormField from '../../components/Form/FormField';
 import Button from '../../components/Button';
+import Link from '../../components/Link';
 import Container from '../../components/Container';
 import { ErrorMessage } from '../../components/FormMessages';
 import account from '../../services/account';
@@ -143,7 +144,7 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
           </Button>
         </Form>
         <iframe src={workerPath} style={{ display: 'none' }} onLoad={(event) => { this.frame = event.target; }} />
-        <a href={'reset'}>forgot password</a>
+        <Link to="reset">forgot password</Link>
       </div>
     </Container>);
   }

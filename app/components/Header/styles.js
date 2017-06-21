@@ -89,6 +89,7 @@ export const UserMenuHeaderName = styled.p`
 
 export const UserFooterButton = styled.button`
   color: #666666;
+  text-decoration: none;
   box-shadow: none;
   border: 1px solid transparent;
   border-width: 1px;

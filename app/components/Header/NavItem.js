@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-filename-extension */
 import React from 'react';
 import styled from 'styled-components';
+import Link from '../Link';
 
 import {
   fontFamilyBase,
@@ -85,7 +86,6 @@ const StyledImage = styled.img`
 
 const StyledLink = styled.a`
   text-decoration: none;
-  cursor: inherit;
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Chrome/Safari/Opera */
   -khtml-user-select: none; /* Konqueror */
@@ -95,13 +95,27 @@ const StyledLink = styled.a`
 
   color: inherit;
   display: block;
+  cursor: pointer;
   padding: ${navbarPaddingVertical} ${navbarPaddingHorizontal};
   position: relative;
   background-color: transparent;
 
+  border-bottom: 2px solid transparent;
+
   &:hover {
-    color: inherit;
+    color: ${(props) => props.theme.navbarHoverColor || '#fff'};
     text-decoration: none !important;
+    border-bottom-color: ${baseColor};
+  }
+`;
+
+const ActiveLink = styled(StyledLink)`
+  cursor: default;
+  border-bottom: 2px solid ${navbarColorCurrent};
+  background-color: ${navbarColorCurrent};
+
+  &:hover {
+    border-bottom-color: ${navbarColorCurrent};
   }
 `;
 
@@ -117,12 +131,9 @@ const StyledItem = styled.li`
 
   float: left;
   display: block;
-  background-color: ${(props) => props.currentPath ? navbarColorCurrent : 'transparent'};
   background-image: none;
   position: relative;
-  border-bottom: 2px solid ${(props) => props.currentPath ? navbarColorCurrent : 'transparent'};
   text-decoration: none;
-  cursor: ${(props) => props.currentPath ? 'default' : 'pointer'};
   &:focus, &:active {
     background: transparent;
     outline: none;
@@ -131,11 +142,6 @@ const StyledItem = styled.li`
   /* theme */
   color: ${(props) => props.theme.navbarFontColor || '#fff'};
   border-left: ${(props) => props.theme.navbarItemBorder || 'none'};
-  &:hover {
-    color: ${(props) => props.theme.navbarHoverColor || '#fff'};
-    background-color: ${(props) => props.currentPath ? navbarColorCurrent : (props.theme.logoBgColor || 'transparent')};
-    border-bottom: ${(props) => props.currentPath ? `2px solid ${navbarColorCurrent}` : `2px solid ${baseColor}`};
-  }
 
   @media (max-width: ${screenXsMax}) {
     width: 100%;
@@ -157,46 +163,25 @@ const displayImage = (src, icon) => {
   return null;
 };
 
-// Compare the redux state of location.pathname with the title of the NavItem
-const isCurrentPath = (location, title) => {
-  if (!location || !title) return false;
-
-  const currentPathname = location.pathname.slice(1);
-  const currentTitle = title.toLowerCase();
-
-  if (currentPathname === currentTitle) {
-    return true;
-  }
-
-  return false;
-};
-
-const NavItem = ({ title, onClick, href, image, iconClass, collapsed, location }) => (
+const NavItem = ({ title, to, image, iconClass, collapsed }) => (
   <StyledItem
     collapsed={collapsed}
-    currentPath={isCurrentPath(location, title)}
   >
-    {onClick &&
-      <StyledLink onClick={onClick} href={null}>
-        {displayImage(image, iconClass)}
-        <StyledSpan>{title}</StyledSpan>
-      </StyledLink>
-    }
-    {(!onClick && href) &&
-      <StyledLink href={href}>
-        {displayImage(image, iconClass)}
-        <StyledSpan>{title}</StyledSpan>
-      </StyledLink>
-    }
+    <Link
+      component={StyledLink}
+      activeComponent={ActiveLink}
+      to={to}
+    >
+      {displayImage(image, iconClass)}
+      <StyledSpan>{title}</StyledSpan>
+    </Link>
   </StyledItem>
 );
 
 NavItem.propTypes = {
-  location: React.PropTypes.object,
   title: React.PropTypes.string,
   collapsed: React.PropTypes.bool,
-  onClick: React.PropTypes.func,
-  href: React.PropTypes.string,
+  to: React.PropTypes.any,
   image: React.PropTypes.string,
   iconClass: React.PropTypes.string,
 };

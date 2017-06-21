@@ -17,6 +17,7 @@ export const Button = styled.button`
   color: ${menuColor};
   border: none;
   background: none;
+  text-decoration: none;
   &:focus {
     outline: none;
   }
@@ -128,6 +129,7 @@ export const MenuItemsWrapper = styled.div`
 
 export const ItemWrapper = styled(Button)`
   display: flex;
+  align-items: center;
   height: 40px;
   margin-left: 8px;
   padding-left: 12px;
@@ -138,6 +140,8 @@ export const ItemWrapper = styled(Button)`
     margin-bottom: 10px;
   }
 `;
+
+export const LinkWrapper = ItemWrapper.withComponent(Button.withComponent('a'));
 
 export const ItemIcon = styled.i`
   &:before {

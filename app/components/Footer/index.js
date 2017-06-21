@@ -14,7 +14,7 @@ import {
 
 export const StyledIcon = styled.i`
   font-size: 5em !important;
-  color: ${baseColor}
+  color: ${baseColor};
   padding: 0.1em;
   &:hover {
     color: ${white};

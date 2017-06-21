@@ -91,20 +91,20 @@ const sizes = {
 };
 
 function Button({
-  size = 'medium',
   icon = '',
   align = 'center',
+  children,
   ...props
 }) {
   // Render an anchor tag
-  const ButtonComponent = sizes[size] || Medium;
+  const ButtonComponent = getButtonComponent(props);
 
   return (
     <Wrapper align={align}>
-      <ButtonComponent onClick={props.onClick} type={props.type} disabled={props.disabled}>
-        {Children.toArray(props.children)}
+      <ButtonComponent {...props}>
+        {Children.toArray(children)}
         {icon &&
-          <Icon className={icon} content={Children.toArray(props.children)}></Icon>
+          <Icon className={icon} content={Children.toArray(children)}></Icon>
         }
       </ButtonComponent>
     </Wrapper>
@@ -120,5 +120,15 @@ Button.propTypes = {
   disabled: PropTypes.bool,
   children: PropTypes.node,
 };
+
+function getButtonComponent({ size, href }) {
+  const component = sizes[size] || Medium;
+
+  if (href) {
+    return component.withComponent(SharedButton.withComponent('a'));
+  }
+
+  return component;
+}
 
 export default Button;

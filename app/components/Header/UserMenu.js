@@ -1,6 +1,8 @@
 /* eslint-disable react/jsx-filename-extension */
 import React from 'react';
 
+import Link from '../Link';
+
 import {
   StyledUserImage,
   StyledUserName,
@@ -47,13 +49,14 @@ class UserMenu extends React.Component {
             <UserMenuHeaderName>{this.props.signerAddr}</UserMenuHeaderName>
           </UserMenuHeader>
           <UserFooter>
-            {this.props.profileAction &&
-              <div style={{ float: 'left' }}>
-                <UserFooterButton onClick={this.props.profileAction}>Profile</UserFooterButton>
-              </div>}
-            {this.props.signOutAction &&
+            <div style={{ float: 'left' }}>
+              <Link to="/dashboard" component={UserFooterButton.withComponent('a')}>
+                Profile
+              </Link>
+            </div>
+            {this.props.onLogout &&
               <div style={{ float: 'right' }}>
-                <UserFooterButton onClick={this.props.signOutAction}>Sign Out</UserFooterButton>
+                <UserFooterButton onClick={this.props.onLogout}>Sign Out</UserFooterButton>
               </div>}
           </UserFooter>
         </UserDropDown>
@@ -67,8 +70,7 @@ UserMenu.propTypes = {
   blocky: React.PropTypes.string,
   signerAddr: React.PropTypes.string,
   collapsed: React.PropTypes.bool,
-  profileAction: React.PropTypes.func,
-  signOutAction: React.PropTypes.func,
+  onLogout: React.PropTypes.func,
 };
 
 export default UserMenu;
