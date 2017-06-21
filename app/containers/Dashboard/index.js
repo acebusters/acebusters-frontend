@@ -114,7 +114,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
   handleNTZTransfer(to, amount) {
     this.token.transfer.sendTransaction(
       to,
-      `0x${new BigNumber(amount).mul(ntzDecimals).toString(16)}`
+      new BigNumber(amount).mul(ntzDecimals)
     );
     this.props.modalDismiss();
   }
@@ -122,7 +122,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
   handleNTZPurchase(amount) {
     this.props.transferETH({
       dest: confParams.ntzAddr,
-      amount: `0x${new BigNumber(amount).mul(ethDecimals).toString(16)}`,
+      amount: new BigNumber(amount).mul(ethDecimals),
     });
     this.props.modalDismiss();
   }
@@ -130,7 +130,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
   handleETHTransfer(dest, amount) {
     this.props.transferETH({
       dest,
-      amount: `0x${new BigNumber(amount).mul(ethDecimals).toString(16)}`,
+      amount: new BigNumber(amount).mul(ethDecimals),
     });
     this.props.modalDismiss();
   }
