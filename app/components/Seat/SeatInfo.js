@@ -13,7 +13,10 @@ import {
   NameBox,
   StackBox,
 } from './styles';
-import { STATUS_MSG } from '../../app.config';
+import {
+  STATUS_MSG,
+  NTZ_DECIMALS,
+} from '../../app.config';
 
 const stackToString = (stackSize) => {
   if (!stackSize) return '0';
@@ -48,7 +51,7 @@ const SeatInfo = ({
 
     <DetailWrapper>
       <NameBox className="name-box">{nickNameByAddress(signerAddr)}</NameBox>
-      <StackBox className="stack-box">{stackToString(stackSize)}</StackBox>
+      <StackBox className="stack-box">{stackToString(stackSize / NTZ_DECIMALS)}</StackBox>
     </DetailWrapper>
   </InfoWrapper>
 );
