@@ -4,7 +4,6 @@ import MenuHeader from './MenuHeader';
 import MenuItem from './MenuItem';
 
 import {
- Container,
  Logo,
  LogoWrapper,
  MenuContainer,
@@ -104,17 +103,17 @@ const TableMenu = (props) => {
     return menuClose;
   };
   return (
-    <Container name="container">
+    <div>
       <LogoWrapper name="logo-wrapper">
         <Logo>AceBusters Logo</Logo>
       </LogoWrapper>
-      <MenuContainer open={open} name="menu-container-guest">
+      <MenuContainer open={open} name="menu-container">
         <MenuHeader {...props} />
         {renderMenu().map((item, index) => (
           <MenuItem key={index} item={item} {...props} />
         ))}
       </MenuContainer>
-    </Container>
+    </div>
   );
 };
 
