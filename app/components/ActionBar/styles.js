@@ -27,7 +27,7 @@ const Button = styled.button`
 `;
 
 export const ActionBarWrapper = styled.div`
-  position: absolute;
+  position: fixed;
   min-height: 50px;
   bottom: 0;
   left: 50%;

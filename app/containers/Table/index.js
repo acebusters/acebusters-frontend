@@ -489,6 +489,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           sitout={this.props.sitout}
           board={board}
           seats={seats}
+          hand={this.props.hand}
           onLeave={() => this.handleLeave(this.props.myPos)}
           onSitout={this.handleSitout}
         >

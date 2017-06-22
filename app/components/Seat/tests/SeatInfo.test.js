@@ -14,6 +14,7 @@ describe('components.seat.SeatInfo', () => {
     describe('if user seat is NOT active or NOT ready', () => {
       const props = {
         signerAddr,
+        amountCoords: [2, 2],
         seatStatus: STATUS_MSG.waiting,
       };
       it('should return null', () => {
@@ -26,6 +27,7 @@ describe('components.seat.SeatInfo', () => {
       describe('and lastAmount was > 0', () => {
         const props = {
           lastAmount: 0,
+          amountCoords: [2, 2],
           seatStatus: STATUS_MSG.active,
           signerAddr,
         };
@@ -38,6 +40,7 @@ describe('components.seat.SeatInfo', () => {
       describe('and lastAmount was > 0', () => {
         const props = {
           lastAmount: 50,
+          amountCoords: [2, 2],
           seatStatus: STATUS_MSG.active,
           signerAddr,
         };

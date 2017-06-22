@@ -18,10 +18,13 @@ import {
 const Seat = (props) => {
   const {
     coords,
+    pos,
+    myPos,
     seatStatus,
   } = props;
+
   return (
-    <SeatWrapper coords={coords}>
+    <SeatWrapper coords={coords} pos={pos} myPos={myPos}>
       <SeatContainer
         activePlayer={seatStatus && seatStatus === STATUS_MSG.active}
       >
@@ -42,6 +45,8 @@ const Seat = (props) => {
   );
 };
 Seat.propTypes = {
+  myPos: React.PropTypes.number,
+  pos: React.PropTypes.number,
   coords: React.PropTypes.array,
   seatStatus: React.PropTypes.object,
 };
