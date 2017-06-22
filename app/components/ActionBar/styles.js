@@ -205,8 +205,6 @@ export const FlagContainer = styled.div`
 export const FlagButtonWrapper = styled(Button)`
   height: 30px;
   transform: translateY(${(props) => !props.sliderOpen ? '32px' : '0'});
-
-  opacity: 0.5;
   margin-left: 4px;
   padding: 5px 18px ;
   border-radius: 4px 4px 0 0;
@@ -216,7 +214,17 @@ export const FlagButtonWrapper = styled(Button)`
   font-weight: 600;
   font-size: 12px;
   &:hover {
+    cursor: pointer;
+    background-color: #666;
+  }
+  &:active {
+    background-color: #7B7B7B;
+    color: ${active};
+  }
+  &:disabled {
     cursor: default;
+    opacity: 0.3;
+    background-color: #7B7B7B;
   }
   transition: 0.5s ease;
 `;

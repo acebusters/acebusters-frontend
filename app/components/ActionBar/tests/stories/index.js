@@ -25,7 +25,7 @@ stories.addDecorator(withKnobs);
 stories.add('Kitchen Sink', () => (
   <ActionBar
     active={boolean('active', true)}
-    amount={number('amount', 100)}
+    amount={number('amount', 200)}
     amountToCall={number('amountToCall', 100)}
     callAmount={number('callAmount', 0)}
     handleFold={() => {}}
@@ -33,10 +33,11 @@ stories.add('Kitchen Sink', () => (
     handleCheck={() => {}}
     handleBet={() => {}}
     isMyTurn={boolean('isMyTurn', true)}
-    minRaise={number('minRaise', 0)}
+    minRaise={number('minRaise', 200)}
     mode={text('mode', null)}
     myStack={number('myStack', 10000)}
     params={{ tableAddr: '0x33' }}
+    potSize={number('potSize', 400)}
     setActionBarBetSlider={() => {}}
     sliderOpen={boolean('sliderOpen', false)}
     state={text('state', 'flop')}

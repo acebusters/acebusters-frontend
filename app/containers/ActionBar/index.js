@@ -61,10 +61,19 @@ class ActionBarContainer extends React.Component {
     };
   }
 
+  componentWillMount() {
+    if (this.props.minRaise) {
+      this.updateAmount(this.props.minRaise);
+    }
+  }
+
   componentWillReceiveProps(nextProps) {
     if (nextProps.turnComplete === true) {
       this.props.setActionBarTurnComplete(false);
       this.props.setActionBarMode('');
+    }
+    if (nextProps.minRaise && nextProps.minRaise !== this.props.minRaise) {
+      this.updateAmount(nextProps.minRaise);
     }
   }
 

@@ -9,7 +9,7 @@ import FlagButton from './FlagButton';
 import ControlBetRaise from './ControlBetRaise';
 import ControlCheckCall from './ControlCheckCall';
 import ControlFold from './ControlFold';
-import Slider from './Slider';
+import Slider from '../Slider';
 
 import {
   ActionBarWrapper,
@@ -36,9 +36,9 @@ const ActionBar = (props) => {
         <FlagAmountCall {...props} />
         <FlagAmountBet {...props} />
         <FlagContainer active={active} name="flag-container">
-          <FlagButton type="quarter" {...props} />
-          <FlagButton type="half" {...props} />
-          <FlagButton type="pot" {...props} />
+          <FlagButton type={0.25} {...props} />
+          <FlagButton type={0.50} {...props} />
+          <FlagButton type={1.00} {...props} />
         </FlagContainer>
 
         <ControlPanel name="control-panel-visible">

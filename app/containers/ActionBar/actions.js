@@ -7,7 +7,7 @@ export const ACTIONBAR_SET_MODE = 'acebusters/ActionBar/SET_MODE';
 export const ACTIONBAR_SET_BET_SLIDER = 'acebusters/ActionBar/SET_BET_SLIDER';
 export const ACTIONBAR_SET_BUTTON_ACTIVE = 'acebusters/ActionBar/SET_BUTTON_ACTIVE';
 
-// actions
+// actionBar
 export function setActionBarTurnComplete(complete) {
   return {
     type: ACTIONBAR_SET_TURN_COMPLETE,
@@ -22,16 +22,17 @@ export function setActionBarMode(mode) {
   };
 }
 
-export function setActionBarBetSlider(sliderOpen) {
-  return {
-    type: ACTIONBAR_SET_BET_SLIDER,
-    sliderOpen,
-  };
-}
-
 export function setActionBarButtonActive(whichBtn) {
   return {
     type: ACTIONBAR_SET_BUTTON_ACTIVE,
     whichBtn,
+  };
+}
+
+// slider
+export function setActionBarBetSlider(sliderOpen) {
+  return {
+    type: ACTIONBAR_SET_BET_SLIDER,
+    sliderOpen,
   };
 }
