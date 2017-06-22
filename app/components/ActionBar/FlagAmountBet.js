@@ -1,13 +1,14 @@
 import React from 'react';
 
 import { FlagBet } from './styles';
+import { formatNtz } from '../../utils/amountFormater';
 
 const FlagAmountBet = ({
   amount,
   sliderOpen,
 }) => (
   <FlagBet sliderOpen={sliderOpen}>
-    {amount}
+    {formatNtz(amount)}
   </FlagBet>
 );
 FlagAmountBet.propTypes = {

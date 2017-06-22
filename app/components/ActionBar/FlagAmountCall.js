@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { FlagCall } from './styles';
+import { formatNtz } from '../../utils/amountFormater';
 
 const FlagAmountCall = ({
   active,
@@ -12,7 +13,7 @@ const FlagAmountCall = ({
   const hide = amountToCall === 0 || amountToCall > myStack || !active;
   return (
     <FlagCall hide={hide} sliderOpen={sliderOpen}>
-      {amountToCall}
+      {formatNtz(amountToCall)}
     </FlagCall>
   );
 };

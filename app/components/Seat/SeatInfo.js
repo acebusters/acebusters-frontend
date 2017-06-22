@@ -2,7 +2,7 @@ import React from 'react';
 
 import Pot from '../Pot';
 import { nickNameByAddress } from '../../services/nicknames';
-
+import { formatNtz } from '../../utils/amountFormater';
 import {
   AvatarImage,
   ChipButtonContainer,
@@ -12,15 +12,7 @@ import {
   NameBox,
   StackBox,
 } from './styles';
-import {
-  STATUS_MSG,
-  NTZ_DECIMALS,
-} from '../../app.config';
-
-const stackToString = (stackSize) => {
-  if (!stackSize) return '0';
-  return stackSize.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-};
+import { STATUS_MSG } from '../../app.config';
 
 const SeatInfo = ({
   amountCoords,
@@ -46,7 +38,7 @@ const SeatInfo = ({
     <AvatarImage className="avatar-image" bgImg={blocky} />
     <DetailWrapper>
       <NameBox className="name-box">{nickNameByAddress(signerAddr)}</NameBox>
-      <StackBox className="stack-box">{stackToString(stackSize / NTZ_DECIMALS)}</StackBox>
+      <StackBox className="stack-box">{formatNtz(stackSize)}</StackBox>
     </DetailWrapper>
   </InfoWrapper>
 );

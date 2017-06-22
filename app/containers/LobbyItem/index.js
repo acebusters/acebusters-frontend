@@ -9,6 +9,7 @@ import { lineupReceived, updateReceived } from '../Table/actions';
 import { fetchTableState } from '../../services/tableService';
 import { makeSelectTableData, makeSelectTableLastHandId } from './selectors';
 import { ABI_TABLE } from '../../app.config';
+import { formatNtz } from '../../utils/amountFormater';
 
 const Tr = styled.tr`
   &:nth-of-type(odd) {
@@ -61,7 +62,7 @@ class LobbyItem extends React.PureComponent { // eslint-disable-line
     return (
       <Tr>
         <Td key="ta">{ta}</Td>
-        <Td key="sb">{this.props.data.smallBlind}</Td>
+        <Td key="sb">{formatNtz(this.props.data.smallBlind)} &#x20a6;</Td>
         <Td key="np">{`${players}/${this.props.data.seats.length}`}</Td>
         <Td key="lh">{this.props.lastHandId}</Td>
         <Td key="ac">

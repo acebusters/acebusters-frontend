@@ -50,9 +50,8 @@ import {
 } from './selectors';
 
 import TableService, { getHand } from '../../services/tableService';
-
 import { nickNameByAddress } from '../../services/nicknames';
-
+import { formatNtz } from '../../utils/amountFormater';
 import * as storageService from '../../services/sessionStorage';
 
 const rc = new ReceiptCache();
@@ -310,7 +309,7 @@ export function* updateScanner() {
         storageService.setItem(`won[${toggleKey}]`, true);
         const winnerMessages = winners.map((winner) => {
           const handString = (winner.hand) ? `with ${winner.hand}` : '';
-          return `player ${nickNameByAddress(winner.addr)} won NTZ${winner.amount} ${handString}`;
+          return `player ${nickNameByAddress(winner.addr)} won ${formatNtz(winner.amount)} \u20a6 ${handString}`;
         });
         yield put(addMessage(winnerMessages.join(', '), action.tableAddr, null, Date.now()));
         continue; // eslint-disable-line no-continue
