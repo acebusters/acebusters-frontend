@@ -15,6 +15,7 @@ describe('account reducer tests', () => {
       web3ReadyState: 0,
       web3ErrMsg: null,
       pending: {},
+      pendingSell: [],
     });
   });
 

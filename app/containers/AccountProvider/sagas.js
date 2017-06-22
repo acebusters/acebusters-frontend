@@ -1,6 +1,6 @@
 import Web3 from 'web3';
 import ethUtil from 'ethereumjs-util';
-import { takeLatest, select, actionChannel, put, fork, take, takeEvery, call, cancelled } from 'redux-saga/effects';
+import { takeLatest, select, actionChannel, put, fork, take, takeEvery, call } from 'redux-saga/effects';
 import { delay, eventChannel, END } from 'redux-saga';
 import fetch from 'isomorphic-fetch';
 import Raven from 'raven-js';
@@ -269,7 +269,7 @@ function* contractTransactionSendSaga() {
   const txChan = yield actionChannel(CONTRACT_TX_SEND);
   while (true) { // eslint-disable-line no-constant-condition
     const req = yield take(txChan);
-    const { dest, key, data, privKey } = req.payload;
+    const { dest, key, data, privKey, callback, args, methodName } = req.payload;
     const state = yield select();
     const nonce = state.get('account').get('lastNonce') + 1;
     const controller = state.get('account').get('controller');
@@ -277,10 +277,16 @@ function* contractTransactionSendSaga() {
     // send it.
     try {
       const value = yield sendTx(forwardReceipt);
-      yield put(contractTxSuccess({ address: dest, nonce, txHash: value.txHash, key }));
+      if (callback) {
+        yield call(callback, null, value.txHash);
+      }
+      yield put(contractTxSuccess({ address: dest, nonce, txHash: value.txHash, key, args, methodName }));
     } catch (err) {
-      const error = (err.message) ? err.message : err;
-      yield put(contractTxError({ address: dest, nonce, error }));
+      const error = err.message || err;
+      if (callback) {
+        yield call(callback, error);
+      }
+      yield put(contractTxError({ address: dest, nonce, error, args, methodName }));
     }
   }
 }
@@ -322,13 +328,11 @@ const ethEvent = (contract) => eventChannel((emitter) => {
 
 export function* ethEventListenerSaga(contract) {
   const chan = yield call(ethEvent, contract);
-  try {
-    const event = yield take(chan);
-    yield put(contractEvent({ event }));
-  } finally {
-    if (yield cancelled()) {
-      chan.close();
-    }
+  while (true) { // eslint-disable-line no-constant-condition
+    try {
+      const event = yield take(chan);
+      yield put(contractEvent({ event }));
+    } catch (e) {} // eslint-disable-line no-empty
   }
 }
 

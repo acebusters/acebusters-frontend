@@ -10,7 +10,7 @@ import makeSelectAccountData, { makeSignerAddrSelector, makeSelectPrivKey } from
 import messages from './messages';
 import { modalAdd, modalDismiss } from '../App/actions';
 import web3Connect from '../AccountProvider/web3Connect';
-import { contractEvent, accountLoaded, transferETH } from '../AccountProvider/actions';
+import { contractEvent, accountLoaded, transferETH, claimETH, proxyEvent } from '../AccountProvider/actions';
 import { createBlocky } from '../../services/blockies';
 import { ABI_TOKEN_CONTRACT, ABI_ACCOUNT_FACTORY, ABI_PROXY, conf } from '../../app.config';
 
@@ -18,6 +18,7 @@ import List from '../../components/List';
 import Alert from '../../components/Alert';
 import TransferDialog from '../TransferDialog';
 import PurchaseDialog from '../PurchaseDialog';
+import SellDialog from '../SellDialog';
 import Container from '../../components/Container';
 import Button from '../../components/Button';
 import Blocky from '../../components/Blocky';
@@ -45,6 +46,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     super(props);
     this.handleNTZTransfer = this.handleNTZTransfer.bind(this);
     this.handleNTZPurchase = this.handleNTZPurchase.bind(this);
+    this.handleNTZSell = this.handleNTZSell.bind(this);
     this.handleETHTransfer = this.handleETHTransfer.bind(this);
     this.web3 = props.web3Redux.web3;
 
@@ -64,9 +66,14 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
   }
 
   componentWillReceiveProps(nextProps) {
-    const balance = this.token.balanceOf(this.props.account.proxy);
+    const balance = this.token.balanceOf(nextProps.account.proxy);
     if (!balance && nextProps.account.proxy) {
       this.token.balanceOf.call(nextProps.account.proxy);
+    }
+
+    const floor = this.token.floor();
+    if (!floor) {
+      this.token.floor.call();
     }
 
     if (this.props.account.proxy === undefined && nextProps.account.proxy) {
@@ -87,8 +94,11 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     const web3 = getWeb3();
     this.proxy = web3.eth.contract(ABI_PROXY).at(proxyAddr);
     this.web3.eth.getBlockNumber((err, blockNumber) => {
-      this.proxy.Received({ fromBlock: blockNumber - LOOK_BEHIND_PERIOD, toBlock: 'latest' }).watch(() => {
-        this.web3.eth.getBalance(proxyAddr);
+      this.proxy.Received({ fromBlock: blockNumber - LOOK_BEHIND_PERIOD, toBlock: 'latest' }).watch((error, event) => {
+        if (!error && event) {
+          this.props.proxyEvent(event);
+          this.web3.eth.getBalance(proxyAddr);
+        }
       });
     });
   }
@@ -101,13 +111,38 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
           .filter(({ args = {} }) => args.from === proxyAddr || args.to === proxyAddr)
           .forEach(this.props.contractEvent);
 
-        events.watch((watchError) => {
+        events.watch((watchError, event) => {
+          const { pendingSell = [] } = this.props.account;
+          if (pendingSell.indexOf(event.transactionHash) > -1) {
+            this.token.transferFrom.sendTransaction(
+              confParams.ntzAddr,
+              this.props.account.proxy,
+              0,
+              { from: this.props.account.proxy }
+            );
+            this.props.claimETH(event.transactionHash);
+          }
           if (!watchError && this.props.account.proxy) {
             this.token.balanceOf.call(this.props.account.proxy);
             this.web3.eth.getBalance(this.props.account.proxy);
           }
         });
       });
+    });
+
+    // Check if we have unfinished sell
+    this.token.allowance.callPromise(
+      confParams.ntzAddr,
+      proxyAddr,
+    ).then((value) => {
+      if (!value.eq(0)) {
+        this.token.transferFrom.sendTransaction(
+          confParams.ntzAddr,
+          this.props.account.proxy,
+          0,
+          { from: this.props.account.proxy }
+        );
+      }
     });
   }
 
@@ -124,6 +159,15 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
       dest: confParams.ntzAddr,
       amount: new BigNumber(amount).mul(ethDecimals),
     });
+    this.props.modalDismiss();
+  }
+
+  handleNTZSell(amount) {
+    this.token.transfer.sendTransaction(
+      confParams.ntzAddr,
+      new BigNumber(amount).mul(ntzDecimals),
+      { from: this.props.account.proxy }
+    );
     this.props.modalDismiss();
   }
 
@@ -160,6 +204,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     const qrUrl = `ether:${this.props.account.proxy}`;
     const weiBalance = this.web3.eth.balance(this.props.account.proxy);
     const ethBalance = weiBalance && weiBalance.div(ethDecimals);
+    const floor = this.token.floor();
     const babBalance = this.token.balanceOf(this.props.account.proxy);
     const ntzBalance = babBalance && babBalance.div(ntzDecimals);
 
@@ -176,7 +221,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
 
         <Section>
           <Blocky blocky={createBlocky(this.props.signerAddr)} />
-          <h3> Your address:</h3>
+          <h3>Your address:</h3>
 
           <WithLoading
             isLoading={!this.props.account.proxy || this.props.account.proxy === '0x'}
@@ -222,6 +267,24 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
               icon="fa fa-money"
             >
               TRANSFER
+            </Button>
+          }
+          {ntzBalance && floor &&
+            <Button
+              align="left"
+              onClick={() => {
+                this.props.modalAdd(
+                  <SellDialog
+                    handleSell={this.handleNTZSell}
+                    maxAmount={ntzBalance}
+                    floorPrice={floor}
+                  />
+                );
+              }}
+              size="medium"
+              icon="fa fa-money"
+            >
+              SELL
             </Button>
           }
         </Section>
@@ -323,6 +386,8 @@ const txnsToList = (txns, proxyAddr) => {
 Dashboard.propTypes = {
   modalAdd: PropTypes.func,
   transferETH: PropTypes.func,
+  claimETH: PropTypes.func,
+  proxyEvent: PropTypes.func,
   modalDismiss: PropTypes.func,
   contractEvent: PropTypes.func,
   accountLoaded: PropTypes.func,
@@ -344,6 +409,8 @@ function mapDispatchToProps() {
     modalAdd,
     modalDismiss,
     transferETH,
+    proxyEvent,
+    claimETH,
     contractEvent: (event) => contractEvent({ event }),
     accountLoaded,
   };
