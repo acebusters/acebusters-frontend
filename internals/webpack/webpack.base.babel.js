@@ -88,6 +88,9 @@ module.exports = (options) => ({
       'jsnext:main',
       'main',
     ],
+    alias: {
+      'bignumber.js': path.resolve(__dirname, '../../node_modules/bignumber.js/'),
+    },
   },
   devtool: options.devtool,
   target: 'web', // Make web variables accessible to webpack, e.g. window
