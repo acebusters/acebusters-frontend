@@ -209,9 +209,6 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     const babBalance = this.token.balanceOf(this.props.account.proxy);
     const ntzBalance = babBalance && babBalance.div(ntzDecimals);
 
-    console.log(weiBalance, ethBalance);
-    // debugger;
-
     const listPending = pendingToList(this.props.account.pending);
 
     let listTxns = null;
@@ -407,7 +404,14 @@ const mapStateToProps = createStructuredSelector({
   privKey: makeSelectPrivKey(),
 });
 
-const makeIsUserEvent = (proxyAddr) => ({ args = {} }) => args.from === proxyAddr || args.to === proxyAddr;
+const makeIsUserEvent = (proxyAddr) => ({ args = {} }) => (
+  args.from === proxyAddr ||
+  args.purchaser === proxyAddr ||
+  args.seller === proxyAddr ||
+  args.owner === proxyAddr ||
+  args.spender === proxyAddr ||
+  args.to === proxyAddr
+);
 
 function mapDispatchToProps() {
   return {
