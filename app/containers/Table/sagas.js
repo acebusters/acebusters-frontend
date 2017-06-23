@@ -309,7 +309,7 @@ export function* updateScanner() {
         storageService.setItem(`won[${toggleKey}]`, true);
         const winnerMessages = winners.map((winner) => {
           const handString = (winner.hand) ? `with ${winner.hand}` : '';
-          return `player ${nickNameByAddress(winner.addr)} won ${formatNtz(winner.amount)} \u20a6 ${handString}`;
+          return `player ${nickNameByAddress(winner.addr)} won ${formatNtz(winner.amount)} NTZ ${handString}`;
         });
         yield put(addMessage(winnerMessages.join(', '), action.tableAddr, null, Date.now()));
         continue; // eslint-disable-line no-continue

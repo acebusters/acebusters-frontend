@@ -55,8 +55,8 @@ export class JoinDialog extends React.Component { // eslint-disable-line react/p
           onChange={this.updateAmount}
         >
         </Slider>
-        <div>Max: {formatNtz(max)} &#x20a6;</div>
-        <div>{ (this.state) ? formatNtz(this.state.amount) : formatNtz(min) } &#x20a6;</div>
+        <div>Max: {formatNtz(max)} NTZ</div>
+        <div>{ (this.state) ? formatNtz(this.state.amount) : formatNtz(min) } NTZ</div>
         <SubmitButton onClick={this.handleSubmit}>Join</SubmitButton>
       </div>
     );

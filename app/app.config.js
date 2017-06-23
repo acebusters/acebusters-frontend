@@ -174,8 +174,6 @@ export const chipValues = [
   [10000000000000, '#FFFFFF'],
 ];
 
-export const NTZ_DECIMALS = 1000000000000;
-
 export const SEAT_COORDS = [
   [10, 40, 0],
   [90, 40, 0],

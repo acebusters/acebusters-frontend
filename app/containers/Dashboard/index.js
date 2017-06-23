@@ -13,6 +13,7 @@ import web3Connect from '../AccountProvider/web3Connect';
 import { contractEvents, accountLoaded, transferETH, claimETH, proxyEvent } from '../AccountProvider/actions';
 import { createBlocky } from '../../services/blockies';
 import { ABI_TOKEN_CONTRACT, ABI_ACCOUNT_FACTORY, ABI_PROXY, conf } from '../../app.config';
+import { ETH_DECIMALS, NTZ_DECIMALS, formatEth, formatNtz } from '../../utils/amountFormater';
 
 import List from '../../components/List';
 import Alert from '../../components/Alert';
@@ -29,15 +30,6 @@ import WithLoading from '../../components/WithLoading';
 import { Section } from './styles';
 
 const confParams = conf();
-// ether units: https://github.com/ethereum/web3.js/blob/0.15.0/lib/utils/utils.js#L40
-const ethDecimals = new BigNumber(10).pow(18);
-// acebuster units:
-// 1 x 10^12 - Nutz   (NTZ)
-// 1 x 10^9 - Jonyz
-// 1 x 10^6 - Helcz
-// 1 x 10^3 - Pascalz
-// 1 x 10^0 - Babz
-const ntzDecimals = new BigNumber(10).pow(12);
 
 const LOOK_BEHIND_PERIOD = 4 * 60 * 24;
 
@@ -148,7 +140,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
   handleNTZTransfer(to, amount) {
     this.token.transfer.sendTransaction(
       to,
-      new BigNumber(amount).mul(ntzDecimals)
+      new BigNumber(amount).mul(NTZ_DECIMALS)
     );
     this.props.modalDismiss();
   }
@@ -156,7 +148,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
   handleNTZPurchase(amount) {
     this.props.transferETH({
       dest: confParams.ntzAddr,
-      amount: new BigNumber(amount).mul(ethDecimals),
+      amount: new BigNumber(amount).mul(ETH_DECIMALS),
     });
     this.props.modalDismiss();
   }
@@ -164,7 +156,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
   handleNTZSell(amount) {
     this.token.transfer.sendTransaction(
       confParams.ntzAddr,
-      new BigNumber(amount).mul(ntzDecimals),
+      new BigNumber(amount).mul(NTZ_DECIMALS),
       { from: this.props.account.proxy }
     );
     this.props.modalDismiss();
@@ -173,7 +165,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
   handleETHTransfer(dest, amount) {
     this.props.transferETH({
       dest,
-      amount: new BigNumber(amount).mul(ethDecimals),
+      amount: new BigNumber(amount).mul(ETH_DECIMALS),
     });
     this.props.modalDismiss();
   }
@@ -202,10 +194,8 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
   render() {
     const qrUrl = `ether:${this.props.account.proxy}`;
     const weiBalance = this.web3.eth.balance(this.props.account.proxy);
-    const ethBalance = weiBalance && weiBalance.div(ethDecimals);
     const floor = this.token.floor();
-    const babBalance = this.token.balanceOf(this.props.account.proxy);
-    const ntzBalance = babBalance && babBalance.div(ntzDecimals);
+    const babzBalance = this.token.balanceOf(this.props.account.proxy);
 
     const listPending = pendingToList(this.props.account.pending);
 
@@ -242,22 +232,22 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
           <p>
             <span>Balance: </span>
             <WithLoading
-              isLoading={!ntzBalance}
+              isLoading={!babzBalance}
               loadingSize="14px"
               type="inline"
               styles={{ layout: { marginLeft: '15px' } }}
             >
-              <span>{ntzBalance && ntzBalance.toString()} NTZ</span>
+              <span>{babzBalance && formatNtz(babzBalance)} NTZ</span>
             </WithLoading>
           </p>
-          {ntzBalance &&
+          {babzBalance &&
             <Button
               align="left"
               onClick={() => {
                 this.props.modalAdd(
                   <TransferDialog
                     handleTransfer={this.handleNTZTransfer}
-                    maxAmount={ntzBalance}
+                    maxAmount={babzBalance.div(NTZ_DECIMALS)}
                     amountUnit="NTZ"
                   />
                 );
@@ -268,14 +258,14 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
               TRANSFER
             </Button>
           }
-          {ntzBalance && floor &&
+          {babzBalance && floor &&
             <Button
               align="left"
               onClick={() => {
                 this.props.modalAdd(
                   <SellDialog
                     handleSell={this.handleNTZSell}
-                    maxAmount={ntzBalance}
+                    maxAmount={babzBalance.div(NTZ_DECIMALS)}
                     floorPrice={floor}
                   />
                 );
@@ -293,22 +283,22 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
           <p>
             <span>Balance: </span>
             <WithLoading
-              isLoading={!ethBalance}
+              isLoading={!weiBalance}
               loadingSize="14px"
               type="inline"
               styles={{ layout: { marginLeft: '15px' } }}
             >
-              <span>{ethBalance && ethBalance.toString()} ETH</span>
+              <span>{weiBalance && formatEth(weiBalance)} ETH</span>
             </WithLoading>
           </p>
-          {ethBalance &&
+          {weiBalance &&
             <Button
               align="left"
               onClick={() => {
                 this.props.modalAdd(
                   <TransferDialog
                     handleTransfer={this.handleETHTransfer}
-                    maxAmount={ethBalance}
+                    maxAmount={weiBalance.div(ETH_DECIMALS)}
                     amountUnit="ETH"
                   />
                 );
@@ -319,7 +309,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
               TRANSFER
             </Button>
           }
-          {ethBalance &&
+          {weiBalance &&
             <Button
               align="left"
               onClick={() => {
@@ -388,7 +378,7 @@ const txnsToList = (txns, proxyAddr) => {
         </A>, // txHash
         txns[key].from.substring(2, 8), // from
         txns[key].to.substring(2, 8), // to
-        new BigNumber((txns[key].to === proxyAddr) ? txns[key].value : txns[key].value * -1).div(ntzDecimals).toNumber(), // value
+        new BigNumber((txns[key].to === proxyAddr) ? txns[key].value : txns[key].value * -1).div(NTZ_DECIMALS).toNumber(), // value
       ]);
   }
 
