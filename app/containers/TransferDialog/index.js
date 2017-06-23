@@ -6,7 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import BigNumber from 'bignumber.js';
 
 import { ErrorMessage } from '../../components/FormMessages';
-import Button from '../../components/Button';
+import SubmitButton from '../../components/SubmitButton';
 import FormField from '../../components/Form/FormField';
 import H2 from '../../components/H2';
 
@@ -75,9 +75,7 @@ class TransferDialog extends React.Component { // eslint-disable-line react/pref
 
           {error && <ErrorMessage>{error}</ErrorMessage>}
 
-          <div>
-            <Button type="submit" disabled={submitting}>Submit</Button>
-          </div>
+          <SubmitButton type="submit" disabled={submitting}>Submit</SubmitButton>
         </Form>
       </div>
     );

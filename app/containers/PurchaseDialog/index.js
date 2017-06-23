@@ -4,7 +4,8 @@ import { connect } from 'react-redux';
 import { Form, reduxForm } from 'redux-form/immutable';
 import { FormattedMessage } from 'react-intl';
 
-import Button from '../../components/Button';
+import { ErrorMessage } from '../../components/FormMessages';
+import SubmitButton from '../../components/SubmitButton';
 import FormField from '../../components/Form/FormField';
 import AmountField from '../../components/AmountField';
 import H2 from '../../components/H2';
@@ -48,10 +49,9 @@ class PurchaseDialog extends React.Component { // eslint-disable-line react/pref
             label="Amount (ETH)"
             maxAmount={maxAmount}
           />
-          {error && <strong>{error}</strong>}
-          <div>
-            <Button type="submit" disabled={submitting}>Submit</Button>
-          </div>
+          {error && <ErrorMessage>{error}</ErrorMessage>}
+
+          <SubmitButton disabled={submitting}>Submit</SubmitButton>
         </Form>
       </div>
     );

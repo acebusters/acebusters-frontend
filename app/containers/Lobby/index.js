@@ -68,9 +68,7 @@ class LobbyComponent extends React.PureComponent {  // eslint-disable-line
         />
 
         <Grid xs={1 / 4} >
-          <div style={{ float: 'left' }}>
-            <Button onClick={this.handleGetTables} size="medium" icon="fa fa-refresh">REFRESH</Button>
-          </div>
+          <Button onClick={this.handleGetTables} size="medium" icon="fa fa-refresh">REFRESH</Button>
         </Grid>
         <Grid xs={3 / 4}>
         </Grid>

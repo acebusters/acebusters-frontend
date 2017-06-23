@@ -7,8 +7,9 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Form, Field, reduxForm } from 'redux-form/immutable';
 import { FormattedMessage } from 'react-intl';
-import Button from '../../components/Button';
+import SubmitButton from '../../components/SubmitButton';
 import FormField from '../../components/Form/FormField';
+import { ErrorMessage } from '../../components/FormMessages';
 
 import messages from './messages';
 
@@ -42,10 +43,9 @@ class InviteDialog extends React.Component { // eslint-disable-line react/prefer
         <FormattedMessage {...messages.header} />
         <Form onSubmit={handleSubmit(this.handleSubmit)}>
           <Field name="email" component={FormField} type="text" placeholder="e-mail" />
-          {error && <strong>{error}</strong>}
-          <div>
-            <Button type="submit" disabled={submitting}>Submit</Button>
-          </div>
+          {error && <ErrorMessage>{error}</ErrorMessage>}
+
+          <SubmitButton disabled={submitting}>Submit</SubmitButton>
         </Form>
       </div>
     );

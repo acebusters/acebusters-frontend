@@ -9,7 +9,7 @@ import {
 
 import { web3Connect, clearWeb3Error } from './actions';
 import { modalAdd, modalDismiss } from '../App/actions';
-import Button from '../../components/Button';
+import SubmitButton from '../../components/SubmitButton';
 
 export class AccountProvider extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   componentDidMount() {
@@ -24,9 +24,9 @@ export class AccountProvider extends React.PureComponent { // eslint-disable-lin
           <p>
             {nextProps.web3ErrMsg}
           </p>
-          <Button onClick={() => { this.props.clearWeb3Error(); this.props.modalDismiss(); }}>
+          <SubmitButton onClick={() => { this.props.clearWeb3Error(); this.props.modalDismiss(); }}>
             OK!
-          </Button>
+          </SubmitButton>
         </div>
       ));
     } else if (!nextProps.isWeb3Connected
@@ -36,7 +36,7 @@ export class AccountProvider extends React.PureComponent { // eslint-disable-lin
           <p>
             Connection Lost. Please try to refresh the page.
           </p>
-          <Button onClick={this.props.modalDismiss}>OK!</Button>
+          <SubmitButton onClick={this.props.modalDismiss}>OK!</SubmitButton>
         </div>
       ));
     }

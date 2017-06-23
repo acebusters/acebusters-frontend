@@ -6,7 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import Slider from 'react-rangeslider';
 import 'react-rangeslider/lib/index.css';
 import { createStructuredSelector } from 'reselect';
-import Button from '../../components/Button';
+import SubmitButton from '../../components/SubmitButton';
 import H2 from '../../components/H2';
 import { makeSbSelector } from '../Table/selectors';
 
@@ -60,9 +60,9 @@ export class RebuyDialog extends React.Component {
           <p>
             <FormattedMessage {...messages.balanceOut} />
           </p>
-          <Button onClick={this.props.modalDismiss}>
+          <SubmitButton onClick={this.props.modalDismiss}>
             <FormattedMessage {...messages.ok} />
-          </Button>
+          </SubmitButton>
         </div>
       );
     }
@@ -85,14 +85,14 @@ export class RebuyDialog extends React.Component {
         <div>{amount}</div>
         <ButtonContainer>
           <ButtonBox>
-            <Button onClick={this.handleLeave}>
+            <SubmitButton onClick={this.handleLeave}>
               <FormattedMessage {...messages.leave} />
-            </Button>
+            </SubmitButton>
           </ButtonBox>
           <ButtonBox>
-            <Button onClick={this.handleSubmit}>
+            <SubmitButton onClick={this.handleSubmit}>
               <FormattedMessage {...messages.rebuy} />
-            </Button>
+            </SubmitButton>
           </ButtonBox>
         </ButtonContainer>
       </div>

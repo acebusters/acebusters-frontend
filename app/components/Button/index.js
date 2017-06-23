@@ -30,6 +30,10 @@ const SharedButton = styled.button`
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: bold;
   color: ${white};
+
+  & + & {
+    margin-left: 10px;
+  }
 `;
 
 const Medium = styled(SharedButton)`{
@@ -80,11 +84,6 @@ const Icon = styled.i`
   }}
 `;
 
-const Wrapper = styled.div`
-  text-align: ${(props) => props.align};
-  width: 100%;
-`;
-
 const sizes = {
   medium: Medium,
   large: Large,
@@ -92,7 +91,6 @@ const sizes = {
 
 function Button({
   icon = '',
-  align = 'center',
   children,
   ...props
 }) {
@@ -100,14 +98,12 @@ function Button({
   const ButtonComponent = getButtonComponent(props);
 
   return (
-    <Wrapper align={align}>
-      <ButtonComponent {...props}>
-        {Children.toArray(children)}
-        {icon &&
-          <Icon className={icon} content={Children.toArray(children)}></Icon>
-        }
-      </ButtonComponent>
-    </Wrapper>
+    <ButtonComponent {...props}>
+      {Children.toArray(children)}
+      {icon &&
+        <Icon className={icon} content={Children.toArray(children)}></Icon>
+      }
+    </ButtonComponent>
   );
 }
 
@@ -115,7 +111,6 @@ Button.propTypes = {
   onClick: PropTypes.func,
   type: PropTypes.string,
   size: PropTypes.oneOf(['large', 'medium']),
-  align: PropTypes.oneOf(['center', 'left']),
   icon: PropTypes.string,
   disabled: PropTypes.bool,
   children: PropTypes.node,

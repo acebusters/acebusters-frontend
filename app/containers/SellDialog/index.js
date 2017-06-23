@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js';
 import { Form, reduxForm, formValueSelector } from 'redux-form/immutable';
 import { FormattedMessage } from 'react-intl';
 
-import Button from '../../components/Button';
+import SubmitButton from '../../components/SubmitButton';
 import FormField from '../../components/Form/FormField';
 import AmountField from '../../components/AmountField';
 import H2 from '../../components/H2';
@@ -62,9 +62,9 @@ class SellDialog extends React.Component { // eslint-disable-line react/prefer-s
           />
 
           <div>
-            <Button type="submit" disabled={submitting}>
+            <SubmitButton type="submit" disabled={submitting}>
               Submit
-            </Button>
+            </SubmitButton>
           </div>
         </Form>
       </div>
