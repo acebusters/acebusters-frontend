@@ -12,7 +12,7 @@ import {
   CONTRACT_TX_SEND,
   CONTRACT_TX_SUCCESS,
   CONTRACT_TX_ERROR,
-  CONTRACT_EVENT,
+  CONTRACT_EVENTS,
   ACCOUNT_LOADED,
   READY_STATE,
   PROXY_EVENT,
@@ -109,24 +109,8 @@ function accountProviderReducer(state = initialState, action) {
     case PROXY_EVENT:
       return completePending(action.payload.event.transactionHash)(state);
 
-    case CONTRACT_EVENT:
-      return state
-        .withMutations(completePending(action.event.transactionHash))
-        .withMutations((newState) => {
-          const tx = {
-            blockNumber: action.event.blockNumber,
-          };
-          if (action.event.event === 'Transfer') {
-            tx.from = action.event.args.from;
-            tx.to = action.event.args.to;
-            tx.value = action.event.args.value.toString();
-          }
-
-          return newState.setIn(
-            [action.event.address, 'transactions', action.event.transactionHash],
-            fromJS(tx)
-          );
-        });
+    case CONTRACT_EVENTS:
+      return action.events.reduce(handleEvent, state);
 
     case SET_AUTH:
       // ToDo: extract side effects to sagas (storageService and Raven calls)
@@ -177,6 +161,30 @@ function completePending(txHash) {
       return st;
     }, state)
   );
+}
+
+function addTx(event) {
+  return (state) => {
+    const tx = {
+      blockNumber: event.blockNumber,
+    };
+    if (event.event === 'Transfer') {
+      tx.from = event.args.from;
+      tx.to = event.args.to;
+      tx.value = event.args.value.toString();
+    }
+
+    return state.setIn(
+      [event.address, 'transactions', event.transactionHash],
+      fromJS(tx)
+    );
+  };
+}
+
+function handleEvent(state, event) {
+  return state
+    .withMutations(completePending(event.transactionHash))
+    .withMutations(addTx(event));
 }
 
 export default accountProviderReducer;

@@ -10,7 +10,7 @@ import makeSelectAccountData, { makeSignerAddrSelector, makeSelectPrivKey } from
 import messages from './messages';
 import { modalAdd, modalDismiss } from '../App/actions';
 import web3Connect from '../AccountProvider/web3Connect';
-import { contractEvent, accountLoaded, transferETH, claimETH, proxyEvent } from '../AccountProvider/actions';
+import { contractEvents, accountLoaded, transferETH, claimETH, proxyEvent } from '../AccountProvider/actions';
 import { createBlocky } from '../../services/blockies';
 import { ABI_TOKEN_CONTRACT, ABI_ACCOUNT_FACTORY, ABI_PROXY, conf } from '../../app.config';
 
@@ -53,6 +53,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(confParams.ntzAddr);
 
     if (this.props.account.proxy) {
+      this.token.balanceOf.call(this.props.account.proxy);
       this.web3.eth.getBalance(this.props.account.proxy);
       this.watchProxyEvents(this.props.account.proxy);
       this.watchTokenEvents(this.props.account.proxy);
@@ -66,20 +67,12 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
   }
 
   componentWillReceiveProps(nextProps) {
-    const balance = this.token.balanceOf(nextProps.account.proxy);
-    if (!balance && nextProps.account.proxy) {
-      this.token.balanceOf.call(nextProps.account.proxy);
-    }
-
-    const floor = this.token.floor();
-    if (!floor) {
-      this.token.floor.call();
-    }
-
     if (this.props.account.proxy === undefined && nextProps.account.proxy) {
-      this.web3.eth.getBalance(nextProps.account.proxy);
+      this.token.floor.call();
       this.watchProxyEvents(nextProps.account.proxy);
       this.watchTokenEvents(nextProps.account.proxy);
+      this.token.balanceOf.call(nextProps.account.proxy);
+      this.web3.eth.getBalance(nextProps.account.proxy);
     }
 
     // Note: listen to AccountFactory's AccountCreated Event if proxy address is not ready
@@ -93,27 +86,31 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
   watchProxyEvents(proxyAddr) {
     const web3 = getWeb3();
     this.proxy = web3.eth.contract(ABI_PROXY).at(proxyAddr);
-    this.web3.eth.getBlockNumber((err, blockNumber) => {
-      this.proxy.Received({ fromBlock: blockNumber - LOOK_BEHIND_PERIOD, toBlock: 'latest' }).watch((error, event) => {
-        if (!error && event) {
-          this.props.proxyEvent(event);
-          this.web3.eth.getBalance(proxyAddr);
-        }
-      });
+    this.proxy.Received({ toBlock: 'latest' }).watch((error, event) => {
+      if (!error && event) {
+        this.props.proxyEvent(event);
+        this.web3.eth.getBalance(proxyAddr);
+      }
     });
   }
 
   watchTokenEvents(proxyAddr) {
     const isUserEvent = makeIsUserEvent(proxyAddr);
     this.web3.eth.getBlockNumber((err, blockNumber) => {
-      const events = this.token.allEvents({ fromBlock: blockNumber - LOOK_BEHIND_PERIOD, toBlock: 'latest' });
-      events.get((error, eventList) => {
-        eventList
-          .filter(isUserEvent)
-          .forEach(this.props.contractEvent);
+      this.token.allEvents({
+        fromBlock: blockNumber - LOOK_BEHIND_PERIOD,
+        toBlock: 'latest',
+      }).get((error, eventList) => {
+        this.props.contractEvents(
+          eventList
+            .filter(({ event }) => event === 'Transfer')
+            .filter(isUserEvent)
+        );
       });
 
-      events.watch((watchError, event) => {
+      this.token.allEvents({
+        toBlock: 'latest',
+      }).watch((watchError, event) => {
         if (!watchError && isUserEvent(event)) {
           this.token.balanceOf.call(this.props.account.proxy);
           this.web3.eth.getBalance(this.props.account.proxy);
@@ -390,7 +387,7 @@ Dashboard.propTypes = {
   claimETH: PropTypes.func,
   proxyEvent: PropTypes.func,
   modalDismiss: PropTypes.func,
-  contractEvent: PropTypes.func,
+  contractEvents: PropTypes.func,
   accountLoaded: PropTypes.func,
   web3Redux: PropTypes.any,
   signerAddr: PropTypes.string,
@@ -420,7 +417,7 @@ function mapDispatchToProps() {
     transferETH,
     proxyEvent,
     claimETH,
-    contractEvent: (event) => contractEvent({ event }),
+    contractEvents,
     accountLoaded,
   };
 }

@@ -1,6 +1,6 @@
 import { fromJS } from 'immutable';
 import accountProviderReducer from '../reducer';
-import { CONTRACT_EVENT } from '../actions';
+import { CONTRACT_EVENTS } from '../actions';
 const BigNumber = require('bignumber.js');
 
 describe('account reducer tests', () => {
@@ -28,12 +28,12 @@ describe('account reducer tests', () => {
         },
       }),
       {
-        type: CONTRACT_EVENT,
-        event: {
+        type: CONTRACT_EVENTS,
+        events: [{
           address: '0x7c08ca8bef208ac8be8cd03ad15fbef643dd355c',
           blockNumber: 582975,
           transactionHash: '0x67ed561b9e1842016fda612d1940135465968cd3de0ea7008e7240347fe80bc1',
-        },
+        }],
       }
     )).toEqual(fromJS({
       pending: {
@@ -57,12 +57,12 @@ describe('account reducer tests', () => {
         },
       }),
       {
-        type: CONTRACT_EVENT,
-        event: {
+        type: CONTRACT_EVENTS,
+        events: [{
           address: '0x7c08ca8bef208ac8be8cd03ad15fbef643dd355c',
           blockNumber: 582975,
           transactionHash: '0x67ed561b9e1842016fda612d1940135465968cd3de0ea7008e7240347fe80bc1',
-        },
+        }],
       }
     )).toEqual(fromJS({
       pending: {
@@ -86,8 +86,8 @@ describe('account reducer tests', () => {
         },
       }),
       {
-        type: CONTRACT_EVENT,
-        event: {
+        type: CONTRACT_EVENTS,
+        events: [{
           address: '0x7c08ca8bef208ac8be8cd03ad15fbef643dd355c',
           args: {
             from: '0x6b569b17c684db05cdef8ab738b4be700138f70a',
@@ -97,7 +97,7 @@ describe('account reducer tests', () => {
           blockNumber: 582975,
           event: 'Transfer',
           transactionHash: '0x67ed561b9e1842016fda612d1940135465968cd3de0ea7008e7240347fe80bc1',
-        },
+        }],
       }
     )).toEqual(fromJS({
       pending: {},

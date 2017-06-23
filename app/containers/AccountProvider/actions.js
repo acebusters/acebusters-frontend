@@ -26,7 +26,7 @@ export const ETH_TRANSFER_ERROR = 'acebusters/AccountProvider/ETH_TRANSFER_ERROR
 
 export const PROXY_EVENT = 'acebusters/AccountProvider/PROXY_EVENT';
 
-export const CONTRACT_EVENT = 'acebusters/AccountProvider/CONTRACT_EVENT';
+export const CONTRACT_EVENTS = 'acebusters/AccountProvider/CONTRACT_EVENTS';
 export const BLOCK_NOTIFY = 'acebusters/AccountProvider/BLOCK_NOTIFY';
 
 // Note: refer to  https://developer.mozilla.org/en-US/docs/Web/API/WebSocket#Ready_state_constants
@@ -179,5 +179,9 @@ export function contractTxError({ address, nonce, error }) {
 }
 
 export function contractEvent({ event }) {
-  return { type: CONTRACT_EVENT, event };
+  return { type: CONTRACT_EVENTS, events: [event] };
+}
+
+export function contractEvents(events) {
+  return { type: CONTRACT_EVENTS, events };
 }
