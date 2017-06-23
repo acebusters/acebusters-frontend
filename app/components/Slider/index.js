@@ -1,5 +1,6 @@
 import React from 'react';
 import RCSlider from 'rc-slider';
+import 'rc-slider/assets/index.css';
 
 import { SliderWrapper, SliderHandle, SliderDot } from '../ActionBar/styles';
 
@@ -10,8 +11,8 @@ const styles = {
     marginTop: '4px',
   },
   track: {
-    backgroundColor: '#333',
-    height: '6px',
+    backgroundColor: 'none',
+    height: 0,
   },
 };
 

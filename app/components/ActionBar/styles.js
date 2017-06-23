@@ -160,6 +160,12 @@ export const SliderWrapper = styled.div`
   height: 20px;
   margin-left: 24px;
   margin-right: 24px;
+  .rc-slider-dot {
+    background-color: none;
+    height: 0;
+    width: 0;
+    border: none;
+  }
 `;
 
 export const SliderHandle = styled.div`
