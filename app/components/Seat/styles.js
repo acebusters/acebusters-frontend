@@ -56,17 +56,11 @@ export const SharedLower = styled.div`
 // seat
 export const SeatWrapper = styled.div`
   position: absolute;
-  ${(props) => {
-    if (props.coords[2] === 0) {
-      return `left:${ props.coords[0]}%;`;
-    }
-    return `right:${props.coords[0]}%;`;
-  }}
+  left: ${(props) => props.coords[0]}%;
   top: ${(props) => props.coords[1]}%;
   color: 'white';
   width: 10%;
-  height: 25%;  
-  z-index: 1000;
+  height: 25%;
 `;
 
 export const SeatContainer = styled.div`
@@ -107,17 +101,6 @@ export const DealerButton = styled.div`
   color: #353535;
 `;
 
-export const AmountBox = styled.div`
-  position: absolute;
-  left: ${(props) => `${props.amountCoords[0]}px`};
-  top: ${(props) => `${props.amountCoords[1]}px`};
-  border-radius: 25%;
-  color: white;
-  line-height: 3em;
-  text-align: center;
-  width: 100%;
-`;
-
 // cards
 export const CardContainer = styled.div`
   display: flex;
@@ -147,7 +130,6 @@ export const CardFront = styled(CardShared)`
 export const CardStyle = styled.img`
   max-width: 100%;
   height: auto;
-
   box-shadow: ${smallShadow};
 `;
 
@@ -295,6 +277,9 @@ export const ButtonStyle = styled(SharedMiddle)`
 export const ButtonWrapper = styled.button`
   position: absolute;
   margin-top: ${scaleButtonJoin(42)};
+  margin-left: ${scaleButtonJoin(42)};
+  height: ${scaleButtonJoin(40)};
+  width: ${scaleButtonJoin(42)}
   top: ${scaleButtonJoin(-20)};
   left: ${scaleButtonJoin(-64)};
   display: flex;
@@ -302,8 +287,6 @@ export const ButtonWrapper = styled.button`
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  width: ${scaleButtonJoin(128)};
-  height: ${scaleButtonJoin(40)};
 
   color: #D5D5D5;
   font-weight: 400;
@@ -311,6 +294,9 @@ export const ButtonWrapper = styled.button`
     color: white;
     transform: scale(1.1, 1.1);
     ${''/* box-shadow: inset 0 1px 3px 0 rgba(0,0,0,0.50); */}
+  }
+  &:focus {
+    outline: none;
   }
   &:active {
     color: ${activeColor};

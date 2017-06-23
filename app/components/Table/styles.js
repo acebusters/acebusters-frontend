@@ -13,11 +13,10 @@ import {
 } from 'variables';
 
 export const TableContainer = styled.div`
-  background-image: ${backgroundTable};
   margin-top: 5%;
   margin-right: auto;
   margin-left: auto;
-  
+  height: 100%;
   @media (min-width: ${curtainStickyWidth}) {
     margin-left: ${curtainWidth};
   }
@@ -58,7 +57,6 @@ export const Winner = styled.div`
 export const TableAndChairs = styled.div`
   position: relative;
   width: 100%;
-  padding: 25%;
 `;
 
 export const HandBox = styled.div`
@@ -75,9 +73,9 @@ export const HandBox = styled.div`
 export const PokerTable = styled.div`
   position: absolute;
   transform: translateX(-50%);
+  background-image: ${backgroundTable};
   top: -20%;
   left: 50%;
   width: 100%;
-  height: 150%;
   padding: 20%;
 `;

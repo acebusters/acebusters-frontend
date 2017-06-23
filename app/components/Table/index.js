@@ -43,7 +43,7 @@ const TableComponent = (props) => (
             <Pot className="pot" potSize={props.potSize} top="55%" left="50%" />
           }
 
-          <Seats seats={props.seats} />
+          { props.seats }
 
           <Board id="board" board={props.board}>
             { props.board }
