@@ -164,7 +164,10 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
             </Button>
           </Form>
           <iframe
-            src={workerPath} style={{ display: 'none' }} onLoad={(event) => {
+            src={workerPath}
+            title="iframe_generate"
+            style={{ display: 'none' }}
+            onLoad={(event) => {
               this.frame = event.target;
             }}
           />

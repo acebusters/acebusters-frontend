@@ -547,6 +547,8 @@ Table.propTypes = {
   params: React.PropTypes.object,
   privKey: React.PropTypes.string,
   lastReceipt: React.PropTypes.string,
+  latestHand: React.PropTypes.any,
+  missingHands: React.PropTypes.any,
   sitoutAmount: React.PropTypes.number,
   proxyAddr: React.PropTypes.string,
   signerAddr: React.PropTypes.string,

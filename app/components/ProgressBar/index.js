@@ -31,7 +31,7 @@ function withProgressBar(WrappedComponent) {
       // Complete progress when route changes. But prevent state update while re-rendering.
       if (loadedRoutes.indexOf(pathname) === -1 && progress !== 0 && newState.progress < 100) {
         this.updateProgress(100);
-        this.setState({
+        this.setState({  // eslint-disable-line react/no-will-update-set-state
           loadedRoutes: loadedRoutes.concat([pathname]),
         });
       } else if (newProps.progress !== this.props.progress) {

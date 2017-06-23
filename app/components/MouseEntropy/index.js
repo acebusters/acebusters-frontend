@@ -114,6 +114,7 @@ class MouseEntropy extends React.Component {
       <div style={{ width }}>
         <div
           role="button"
+          tabIndex="0"
           onMouseMove={this.onMouseMove}
           onTouchMove={this.onTouchMove}
           style={{
@@ -127,7 +128,7 @@ class MouseEntropy extends React.Component {
         >
           {isReady ? 'Done! ' : 'Move in this area'}
         </div>
-        <div style={{ width: `${percent}%`, height: '3px', background: '#20dd66' }}></div>
+        <div tabIndex="-1" style={{ width: `${percent}%`, height: '3px', background: '#20dd66' }}></div>
       </div>
     );
   }

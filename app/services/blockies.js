@@ -66,7 +66,8 @@
   function createCanvas(imageData, color, scale, bgcolor, spotcolor) {
     const c = document.createElement('canvas');
     const width = Math.sqrt(imageData.length);
-    c.width = c.height = width * scale;
+    c.width = width * scale;
+    c.height = width * scale;
 
     const cc = c.getContext('2d');
     cc.fillStyle = bgcolor;

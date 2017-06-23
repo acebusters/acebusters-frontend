@@ -143,7 +143,12 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
             { (!submitting) ? 'Login' : 'Please wait ...' }
           </Button>
         </Form>
-        <iframe src={workerPath} style={{ display: 'none' }} onLoad={(event) => { this.frame = event.target; }} />
+        <iframe
+          src={workerPath}
+          title="login_iframe"
+          style={{ display: 'none' }}
+          onLoad={(event) => { this.frame = event.target; }}
+        />
         <Link to="reset">forgot password</Link>
       </div>
     </Container>);
