@@ -15,6 +15,7 @@ export function conf() {
   if (sub === 'app') {
     return {
       defaultRefCode: DEFAULT_REF_CODE,
+      etherscanUrl: 'https://etherscan.io/',
       gethUrl: '',
       oracleUrl: '',
       txUrl: '',
@@ -30,6 +31,7 @@ export function conf() {
   if (sub === 'beta') {
     return {
       defaultRefCode: DEFAULT_REF_CODE,
+      etherscanUrl: 'https://rinkeby.etherscan.io/',
       gethUrl: 'ws://rinkeby.acebusters.com:8546',
       oracleUrl: 'https://v83iq1161a.execute-api.eu-west-1.amazonaws.com/v0',
       txUrl: 'https://h5fb9klhzc.execute-api.eu-west-1.amazonaws.com/v0',
@@ -44,6 +46,7 @@ export function conf() {
   // ### SANDBOX ENVIRONMENT CONFIG
   return {
     defaultRefCode: DEFAULT_REF_CODE,
+    etherscanUrl: 'https://rinkeby.etherscan.io/',
     gethUrl: 'ws://geth.ocolin.com:8546',
     oracleUrl: 'https://evm4rumeob.execute-api.eu-west-1.amazonaws.com/v0',
     txUrl: 'https://khengvfg6c.execute-api.eu-west-1.amazonaws.com/v0',
