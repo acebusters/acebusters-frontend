@@ -5,6 +5,7 @@ import { delay, eventChannel, END } from 'redux-saga';
 import fetch from 'isomorphic-fetch';
 import Raven from 'raven-js';
 import { Receipt } from 'poker-helper';
+import * as storageService from '../../services/localStorage';
 
 import WebsocketProvider from '../../services/wsProvider';
 import { createBlocky } from '../../services/blockies';
@@ -311,6 +312,19 @@ function* transferETHSaga() {
   }
 }
 
+function* updateLoggedInStatusSaga(action) { // SET_AUTH action
+  if (!action.newAuthState.loggedIn) {
+    storageService.removeItem('privKey');
+    storageService.removeItem('email');
+  } else {
+    Raven.setUserContext({
+      email: action.newAuthState.email,
+    });
+    storageService.setItem('privKey', action.newAuthState.privKey);
+    storageService.setItem('email', action.newAuthState.email);
+  }
+}
+
 const ethEvent = (contract) => eventChannel((emitter) => {
   const contractEvents = contract.allEvents({ fromBlock: 'latest' });
   contractEvents.watch((error, results) => {
@@ -342,6 +356,7 @@ export function* accountSaga() {
   yield takeLatest(BLOCK_NOTIFY, notifyBlock);
   yield takeEvery(WEB3_METHOD_CALL, web3MethodCallSaga);
   yield takeEvery(CONTRACT_METHOD_CALL, contractMethodCallSaga);
+  yield takeEvery(SET_AUTH, updateLoggedInStatusSaga);
   yield fork(websocketSaga);
   yield fork(transferETHSaga);
   yield fork(accountLoginSaga);

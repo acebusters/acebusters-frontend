@@ -1,5 +1,4 @@
 import { fromJS } from 'immutable';
-import Raven from 'raven-js';
 import {
   SET_AUTH,
   WEB3_ERROR,
@@ -20,20 +19,12 @@ import {
   ETH_CLAIM,
 } from './actions';
 import { conf } from '../../app.config';
-import * as storageService from '../../services/localStorage';
 
 const confParams = conf();
 
-const isLoggedIn = () => {
-  const privKey = storageService.getItem('privKey');
-  return (privKey !== undefined && privKey.length > 32);
-};
-
 // The initial application state
 const initialState = fromJS({
-  privKey: storageService.getItem('privKey'),
-  email: storageService.getItem('email'),
-  loggedIn: isLoggedIn(),
+  loggedIn: false,
   blocky: null,
   nickName: null,
   signerAddr: null,
@@ -113,12 +104,9 @@ function accountProviderReducer(state = initialState, action) {
       return action.events.reduce(handleEvent, state);
 
     case SET_AUTH:
-      // ToDo: extract side effects to sagas (storageService and Raven calls)
       return state
         .withMutations((newState) => {
           if (!action.newAuthState.loggedIn) {
-            storageService.removeItem('privKey');
-            storageService.removeItem('email');
             return newState
               .delete('privKey')
               .delete('email')
@@ -127,11 +115,6 @@ function accountProviderReducer(state = initialState, action) {
               .set('signerAddr', null);
           }
 
-          Raven.setUserContext({
-            email: action.newAuthState.email,
-          });
-          storageService.setItem('privKey', action.newAuthState.privKey);
-          storageService.setItem('email', action.newAuthState.email);
           return newState
             .set('privKey', action.newAuthState.privKey)
             .set('email', action.newAuthState.email);

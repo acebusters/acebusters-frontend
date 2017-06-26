@@ -73,7 +73,10 @@ export const SUPPORTED_WEB3_METHODS = {
 
 /**
  * Sets the authentication state of the application
- * @param  {boolean} newAuthState True means a user is logged in, false means no user is logged in
+ * @param {Object} newAuthState New auth state
+ * @param {boolean} loggedIn True means a user is logged in, false means no user is logged in
+ * @param {string} privKey
+ * @param {string} email
  */
 export function setAuthState(newAuthState) {
   return { type: SET_AUTH, newAuthState };
