@@ -26,8 +26,10 @@ const ActionButton = (props) => {
   // disable button if actioBar is not active or if mode matches
   const disabled = !active || props.disabled || selected;
   const handleThisClick = () => {
-    setActionBarButtonActive('');
     if (disabled) return;
+    // handle situation where player mouseDown drags button from another button
+    if (buttonActive !== type) return;
+    setActionBarButtonActive('');
     setActionBarBetSlider(false);
     setActionBarMode(type);
     handleClick();
