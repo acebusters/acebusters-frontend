@@ -36,7 +36,7 @@ export function conf() {
       oracleUrl: 'https://v83iq1161a.execute-api.eu-west-1.amazonaws.com/v0',
       txUrl: 'https://h5fb9klhzc.execute-api.eu-west-1.amazonaws.com/v0',
       accountUrl: 'https://vps13t4f7e.execute-api.eu-west-1.amazonaws.com/v0',
-      ntzAddr: '0xb0fb6369deb053eeaf3daee3a53e89bcbf1543ce',
+      ntzAddr: '0xfb728026a5d90b6852338c3bfde1e76947b9bc8e',
       accountFactory: '0x2e7b835760765e6bef9e05a954ac4e901448d105',
       tableFactory: '0xd56fb602475a6bf067e5998bd02764df5219bcb5',
       sentryDSN: 'https://8c3e021848b247ddaf627c8040f94e07@sentry.io/153017',
