@@ -1,12 +1,13 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
 
 import {
   CurtainWrapper,
-  CurtainToggler,
   CurtainHeader,
 } from '../../components/Curtain';
+import CurtainToggler from '../../components/Curtain/CurtainToggler';
 
 import Chat from '../../containers/Chat';
 
@@ -74,13 +75,13 @@ const mapStateToProps = createStructuredSelector({
 });
 
 Curtain.propTypes = {
-  state: React.PropTypes.string,
-  privKey: React.PropTypes.string,
-  myPos: React.PropTypes.number,
-  sendMessage: React.PropTypes.func,
-  messages: React.PropTypes.array,
-  playerCount: React.PropTypes.number,
-  params: React.PropTypes.object,
+  state: PropTypes.string,
+  privKey: PropTypes.string,
+  myPos: PropTypes.number,
+  sendMessage: PropTypes.func,
+  messages: PropTypes.array,
+  playerCount: PropTypes.number,
+  params: PropTypes.object,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Curtain);

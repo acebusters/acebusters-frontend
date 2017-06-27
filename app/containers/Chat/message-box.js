@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 class MessageBox extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -37,7 +38,7 @@ class MessageBox extends React.PureComponent { // eslint-disable-line react/pref
 }
 
 MessageBox.propTypes = {
-  onAddMessage: React.PropTypes.func,
+  onAddMessage: PropTypes.func,
 };
 
 export default MessageBox;

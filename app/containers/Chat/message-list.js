@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {
   baseColor,
   white,
@@ -39,7 +40,7 @@ class MessageList extends React.PureComponent { // eslint-disable-line react/pre
 }
 
 MessageList.propTypes = {
-  messages: React.PropTypes.array,
+  messages: PropTypes.array,
 };
 
 export default MessageList;
