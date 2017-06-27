@@ -247,6 +247,7 @@
     "rc-slider": "^8.1.2",
     "react": "15.6.1",
     "react-dom": "15.6.1",
+    "react-ga": "^2.2.0",
     "react-google-recaptcha": "^0.5.4",
     "react-helmet": "3.2.2",
     "react-intl": "2.1.5",

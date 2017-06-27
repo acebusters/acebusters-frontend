@@ -10395,6 +10395,12 @@
       "from": "react-dom@15.6.1",
       "resolved": "https://registry.npmjs.org/react-dom/-/react-dom-15.6.1.tgz"
     },
+    "react-ga": {
+      "version": "2.2.0",
+      "from": "react-ga@>=2.2.0 <4.0.0",
+      "resolved": "https://registry.npmjs.org/react-ga/-/react-ga-2.2.0.tgz",
+      "dev": true
+    },
     "react-dom-factories": {
       "version": "1.0.0",
       "from": "react-dom-factories@>=1.0.0 <2.0.0",

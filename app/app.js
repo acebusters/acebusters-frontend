@@ -18,6 +18,7 @@ import FontFaceObserver from 'fontfaceobserver';
 import { useScroll } from 'react-router-scroll';
 import 'sanitize.css/sanitize.css';
 import Raven from 'raven-js';
+import ReactGA from 'react-ga';
 
 // Import configs
 import { conf } from 'app.config';
@@ -77,6 +78,13 @@ const history = syncHistoryWithStore(browserHistory, store, {
   selectLocationState: makeSelectLocationState(),
 });
 
+ReactGA.initialize(conf().gaProperty);
+
+const logPageView = () => {
+  ReactGA.set({ page: window.location.pathname + window.location.search });
+  ReactGA.pageview(window.location.pathname + window.location.search);
+};
+
 // Set up the router, wrapping all Routes in the App component
 const rootRoute = {
   component: App,
@@ -96,6 +104,7 @@ const render = (messages) => {
           <Router
             history={history}
             routes={rootRoute}
+            onUpdate={logPageView}
             render={
               // Scroll to top when going to a new page, imitating default browser
               // behaviour
