@@ -103,9 +103,9 @@ class List extends React.Component {
           </thead>
           {items && items.length > 0 && (
             <tbody>
-              {items.map((item) => (
+              {items.map((item, i) => (
                 <ListItem
-                  key={item}
+                  key={i}
                   values={item}
                 />
               ))}

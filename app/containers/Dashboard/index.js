@@ -11,6 +11,7 @@ import messages from './messages';
 import { modalAdd, modalDismiss } from '../App/actions';
 import web3Connect from '../AccountProvider/web3Connect';
 import { contractEvents, accountLoaded, transferETH, claimETH, proxyEvent } from '../AccountProvider/actions';
+import { isUserEvent } from '../AccountProvider/utils';
 import { createBlocky } from '../../services/blockies';
 import { ABI_TOKEN_CONTRACT, ABI_ACCOUNT_FACTORY, ABI_PROXY, conf } from '../../app.config';
 import { ETH_DECIMALS, NTZ_DECIMALS, formatEth, formatNtz } from '../../utils/amountFormater';
@@ -88,7 +89,6 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
   }
 
   watchTokenEvents(proxyAddr) {
-    const isUserEvent = makeIsUserEvent(proxyAddr);
     this.web3.eth.getBlockNumber((err, blockNumber) => {
       this.token.allEvents({
         fromBlock: blockNumber - LOOK_BEHIND_PERIOD,
@@ -97,14 +97,14 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
         this.props.contractEvents(
           eventList
             .filter(({ event }) => event === 'Transfer')
-            .filter(isUserEvent)
+            .filter(isUserEvent(proxyAddr))
         );
       });
 
       this.token.allEvents({
         toBlock: 'latest',
       }).watch((watchError, event) => {
-        if (!watchError && isUserEvent(event)) {
+        if (!watchError && isUserEvent(proxyAddr)(event)) {
           this.token.balanceOf.call(this.props.account.proxy);
           this.web3.eth.getBalance(this.props.account.proxy);
           const { pendingSell = [] } = this.props.account;
@@ -404,15 +404,6 @@ const mapStateToProps = createStructuredSelector({
   signerAddr: makeSignerAddrSelector(),
   privKey: makeSelectPrivKey(),
 });
-
-const makeIsUserEvent = (proxyAddr) => ({ args = {} }) => (
-  args.from === proxyAddr ||
-  args.purchaser === proxyAddr ||
-  args.seller === proxyAddr ||
-  args.owner === proxyAddr ||
-  args.spender === proxyAddr ||
-  args.to === proxyAddr
-);
 
 function mapDispatchToProps() {
   return {

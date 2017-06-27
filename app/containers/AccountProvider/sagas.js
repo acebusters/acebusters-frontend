@@ -41,6 +41,8 @@ import {
   transferETHError,
 } from './actions';
 
+import { isUserEvent } from './utils';
+
 let web3Instance;
 const confParams = conf();
 
@@ -345,7 +347,10 @@ export function* ethEventListenerSaga(contract) {
   while (true) { // eslint-disable-line no-constant-condition
     try {
       const event = yield take(chan);
-      yield put(contractEvent({ event }));
+      const state = yield select();
+      if (isUserEvent(state.get('proxy'))(event)) {
+        yield put(contractEvent(event));
+      }
     } catch (e) {} // eslint-disable-line no-empty
   }
 }
