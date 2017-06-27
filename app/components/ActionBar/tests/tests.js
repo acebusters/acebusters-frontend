@@ -1,178 +1,248 @@
+import { fromJS } from 'immutable';
+import sinon from 'sinon';
 export const combine = (describe, it) => `${describe}, ${it}`;
 
-export default [{
-  describe: '[0] during table "waiting"',
-  props: {
-    visible: false,
-    state: 'waiting',
-    params: {
-      tableAddr: '0x123',
-    },
-    isMyTurn: true,
+export const baseProps = fromJS({
+  params: {
+    tableAddr: '0x123',
   },
+  active: false,
+  amount: 0,
+  amountToCall: 0,
+  buttonActive: '',
+  disabled: false,
+  callAmount: 0,
+  minRaise: 0,
+  mode: '',
+  myStack: 2000,
+  sliderOpen: false,
+  turnComplete: false,
+  visible: false,
+  setActionBarMode: sinon.spy(),
+  setActionBarBetSlider: sinon.spy(),
+  setActionBarButtonActive: sinon.spy(),
+  handleFold: sinon.spy(),
+  handleCheck: sinon.spy(),
+  handleCall: sinon.spy(),
+  handleBet: sinon.spy(),
+  updateAmount: sinon.spy(),
+  handleAllIn: sinon.spy(),
+});
+
+export const atTable0 = {
+  describe: 'when not at table',
   it: 'actionBar should not render',
-}, {
-  describe: '[1] during table "dealing"',
-  props: {
-    visible: false,
-    state: 'dealing',
-    params: {
-      tableAddr: '0x123',
-    },
-    isMyTurn: true,
-  },
-  it: 'actionBar should not render',
-}, {
-  describe: '[2] during table "flop"',
-  props: {
-    amount: 100,
+  props: baseProps.toJS(),
+};
+
+export const atTable1 = {
+  describe: 'when at table, and not Turn',
+  it: 'actionBar should render as disabled, buttons should not be clickable',
+  props: baseProps.merge({
+    active: false,
     visible: true,
-    state: 'flop',
-    params: {
-      tableAddr: '0x123',
-    },
-    isMyTurn: true,
-  },
-  it: 'actionBar should render',
-}, {
-  describe: '[3] during table "flop" if isMyTurn is false',
-  props: {
-    visible: false,
-    state: 'flop',
-    params: {
-      tableAddr: '0x123',
-    },
-    isMyTurn: false,
-  },
-  it: 'actionBar should not render',
-}, {
-  describe: '[4] when amountToCall > 0',
-  props: {
+  }).toJS(),
+};
+
+export const atTable2 = {
+  describe: 'when at table, and is Turn',
+  it: 'actionBar should render, and be clickable',
+  props: baseProps.merge({
+    active: true,
     visible: true,
-    state: 'flop',
-    params: {
-      tableAddr: '0x123',
-    },
-    isMyTurn: true,
+    buttonActive: 'CHECK',
+  }).toJS(),
+};
+
+export const amountToCheck = {
+  describe: 'when amountToCall === 0',
+  it: 'should render !fold, check, bet button',
+  props: baseProps.merge({
+    active: true,
+    amountToCall: 0,
+    visible: true,
+  }).toJS(),
+};
+
+export const amountToCall0 = {
+  describe: 'when amountToCall > 0',
+  it: 'should render fold, call, raise button',
+  props: baseProps.merge({
+    active: true,
     amountToCall: 1000,
     callAmount: 1000,
-    amount: 200,
     myStack: 2000,
-  },
-  it: 'should render fold button',
-}, {
-  describe: '[5] amountToCall is 0',
-  props: {
     visible: true,
-    state: 'flop',
-    params: {
-      tableAddr: '0x123',
-    },
-    amount: 200,
-    myStack: 2000,
-    isMyTurn: true,
-    amountToCall: 0,
-  },
-  it: 'should not render fold button',
-}, {
-  describe: '[6] the correct betting amount',
-  props: {
-    visible: true,
-    amount: 2000,
-    state: 'flop',
-    params: {
-      tableAddr: '0x123',
-    },
-    isMyTurn: true,
-    minRaise: 2000,
-    amountToCall: 0,
-    myStack: 10000,
-  },
-  it: 'should render BET button',
-}, {
-  describe: '[7] RAISE button min amount',
-  props: {
-    visible: true,
-    amount: 5000,
-    state: 'flop',
-    params: {
-      tableAddr: '0x123',
-    },
-    isMyTurn: true,
-    minRaise: 5000,
+  }).toJS(),
+};
+
+export const amountToCall1 = {
+  describe: 'when amountToCall > myStack',
+  it: 'should render fold, !call, all-in button',
+  props: baseProps.merge({
+    active: true,
     amountToCall: 1000,
-    callAmount: 1000,
-    myStack: 10000,
-  },
-  it: 'should render with correct min amount',
-}, {
-  describe: '[8] if all-in amount',
-  props: {
-    visible: true,
-    amount: 1750,
-    state: 'flop',
-    params: {
-      tableAddr: '0x123',
-    },
-    isMyTurn: true,
-    myStack: 1750,
-    amountToCall: 0,
-  },
-  it: 'should set BET to all-in amount',
-}, {
-  describe: '[9] when amount to call === 0',
-  props: {
-    amount: 100,
-    visible: true,
-    state: 'flop',
-    params: {
-      tableAddr: '0x123',
-    },
-    isMyTurn: true,
-    amountToCall: 0,
-  },
-  it: 'should render the CHECK button',
-}, {
-  describe: '[10] when amount to call > 0',
-  props: {
-    visible: true,
-    amount: 1000,
-    state: 'preflop',
-    params: {
-      tableAddr: '0x123',
-    },
-    isMyTurn: true,
-    callAmount: 1000,
-    amountToCall: 1000,
-    myStack: 2000,
-  },
-  it: 'should render the CALL button',
-}, {
-  describe: '[11] if amount to call > myStack',
-  props: {
-    visible: true,
-    amount: 800,
-    state: 'preflop',
-    params: {
-      tableAddr: '0x123',
-    },
-    isMyTurn: true,
     callAmount: 800,
-    amountToCall: 1000,
     myStack: 800,
-  },
-  it: 'should not render the RAISE button',
-}, {
-  describe: '[12] after action was taken',
-  props: {
-    visible: false,
-    state: 'flop',
-    params: {
-      tableAddr: '0x123',
-      handId: 1,
-    },
-    isMyTurn: true,
+    visible: true,
+  }).toJS(),
+};
+
+export const minRaise0 = {
+  describe: 'when amountToCall < myStack, but minRaise > myStack',
+  it: 'should render fold, call, all-in button',
+  props: baseProps.merge({
+    active: true,
     amountToCall: 1000,
-  },
-  it: 'actionBar should dissappear',
-}];
+    callAmount: 1000,
+    minRaise: 1500,
+    myStack: 1200,
+    visible: true,
+  }).toJS(),
+};
+
+export const buttonBet0 = {
+  describe: 'ButtonBet state is closed',
+  it: 'should not show slider',
+  props: baseProps.merge({
+    active: true,
+    amountToCall: 0,
+    callAmount: 0,
+    amount: 0,
+    myStack: 2000,
+    minRaise: 100,
+    sliderOpen: false,
+    visible: true,
+  }).toJS(),
+};
+
+export const buttonBet1 = {
+  describe: 'ButtonBet state is open',
+  it: 'should show slider',
+  props: baseProps.merge({
+    active: true,
+    amount: 100,
+    amountToCall: 0,
+    callAmount: 0,
+    myStack: 2000,
+    minRaise: 100,
+    mode: 'BET-SET',
+    sliderOpen: true,
+    visible: true,
+  }).toJS(),
+};
+
+export const buttonRaise0 = {
+  describe: 'ButtonRaise state is close',
+  it: 'should not show slider',
+  props: baseProps.merge({
+    active: true,
+    amount: 1000,
+    amountToCall: 1000,
+    callAmount: 1000,
+    visible: true,
+    sliderOpen: false,
+    minRaise: 1900,
+    myStack: 2000,
+  }).toJS(),
+};
+
+export const buttonRaise1 = {
+  describe: 'ButtonRaise state is open',
+  it: 'should show slider',
+  props: baseProps.merge({
+    active: true,
+    amount: 1900,
+    amountToCall: 1000,
+    callAmount: 1000,
+    visible: true,
+    sliderOpen: true,
+    mode: 'RAISE-SET',
+    minRaise: 1900,
+    myStack: 2000,
+  }).toJS(),
+};
+
+export const actionDispatchAllIn = {
+  describe: 'player selects ALL-IN action',
+  it: 'should dispatch All-In',
+  props: fromJS(amountToCall1.props).merge({
+    active: true,
+    mode: '',
+    buttonActive: 'ALL-IN',
+    visible: true,
+  }).toJS(),
+};
+
+export const actionDispatchCall = {
+  describe: 'player selects CALL action',
+  it: 'should highlight CALL button',
+  props: fromJS(amountToCall0.props).merge({
+    active: true,
+    mode: '',
+    buttonActive: 'CALL',
+    sliderOpen: false,
+    visible: true,
+  }).toJS(),
+};
+
+export const actionDispatchFold = {
+  describe: 'player selects FOLD action',
+  it: 'should highlight FOLD button',
+  props: fromJS(amountToCall1.props).merge({
+    active: true,
+    mode: '',
+    buttonActive: 'FOLD',
+    sliderOpen: false,
+    visible: true,
+  }).toJS(),
+};
+
+export const actionDispatchBet0 = {
+  describe: 'player selects BET action',
+  it: 'should open slider',
+  props: fromJS(buttonBet0.props).merge({
+    active: true,
+    mode: '',
+    buttonActive: 'BET-SET',
+    visible: true,
+    setActionBarBetSlider: sinon.spy(),
+  }).toJS(),
+};
+
+export const actionDispatchBet1 = {
+  describe: 'player confirms BET action',
+  it: 'should close slider, and dispatch BET action',
+  props: fromJS(buttonBet1.props).merge({
+    active: true,
+    mode: 'BET-SET',
+    buttonActive: 'BET-CONFIRM',
+    visible: true,
+    setActionBarBetSlider: sinon.spy(),
+  }).toJS(),
+};
+
+export const actionDispatchRaise0 = {
+  describe: 'player selects RAISE action',
+  it: 'should open slider',
+  props: fromJS(buttonRaise0.props).merge({
+    active: true,
+    buttonActive: 'RAISE-SET',
+    mode: '',
+    visible: true,
+    setActionBarBetSlider: sinon.spy(),
+  }).toJS(),
+};
+
+export const actionDispatchRaise1 = {
+  describe: 'player confirms RAISE action',
+  it: 'should close slider, and dispatch RAISE action',
+  props: fromJS(buttonRaise1.props).merge({
+    active: true,
+    buttonActive: 'RAISE-CONFIRM',
+    mode: 'RAISE-SET',
+    visible: true,
+    handleBet: sinon.spy(),
+    setActionBarBetSlider: sinon.spy(),
+  }).toJS(),
+};

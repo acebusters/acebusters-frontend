@@ -11,7 +11,6 @@ import {
   makeSbSelector,
   makeHandSelector,
   makeHandStateSelector,
-  makeMyPosSelector,
 } from '../Table/selectors';
 
 import {
@@ -42,7 +41,7 @@ export const makeSelectActionBarActive = () => createSelector(
 
 // show the ActionBar if the player is sitting at the table
 export const makeSelectActionBarVisible = () => createSelector(
-  [makeMyPosSelector()],
+  (_, props) => props.myPos,
   (myPos) => {
     if (myPos === undefined) return false;
     if (typeof myPos === 'number') return true;

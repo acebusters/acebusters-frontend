@@ -2,6 +2,7 @@
  * Created by helge on 24.08.16.
  */
 import React from 'react';
+import PropTypes from 'prop-types';
 import Raven from 'raven-js';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
@@ -196,24 +197,24 @@ class ActionBarContainer extends React.Component {
 }
 
 ActionBarContainer.propTypes = {
-  bet: React.PropTypes.func,
-  callAmount: React.PropTypes.number,
-  check: React.PropTypes.func,
-  dispatch: React.PropTypes.func,
-  fold: React.PropTypes.func,
-  lastReceipt: React.PropTypes.object,
-  minRaise: React.PropTypes.number,
-  myMaxBet: React.PropTypes.number,
-  myPos: React.PropTypes.number,
-  myStack: React.PropTypes.number,
-  pay: React.PropTypes.func,
-  params: React.PropTypes.object,
-  privKey: React.PropTypes.string,
-  setCards: React.PropTypes.func,
-  state: React.PropTypes.string,
-  setActionBarTurnComplete: React.PropTypes.func,
-  setActionBarMode: React.PropTypes.func,
-  turnComplete: React.PropTypes.func,
+  bet: PropTypes.func,
+  callAmount: PropTypes.number,
+  check: PropTypes.func,
+  dispatch: PropTypes.func,
+  fold: PropTypes.func,
+  lastReceipt: PropTypes.object,
+  minRaise: PropTypes.number,
+  myMaxBet: PropTypes.number,
+  myPos: PropTypes.number,
+  myStack: PropTypes.number,
+  pay: PropTypes.func,
+  params: PropTypes.object,
+  privKey: PropTypes.string,
+  setCards: PropTypes.func,
+  state: PropTypes.string,
+  setActionBarTurnComplete: PropTypes.func,
+  setActionBarMode: PropTypes.func,
+  turnComplete: PropTypes.bool,
 };
 
 export function mapDispatchToProps(dispatch) {

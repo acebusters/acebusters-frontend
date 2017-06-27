@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import ActionButton from './ActionButton';
 import ControlBlank from './ControlBlank';
@@ -21,7 +22,7 @@ const ControlBetRaise = (props) => {
     if (mode === 'BET-SET') {
       return (
         <ActionButton
-          name="bet-confirm-button"
+          name="button-bet-confirm"
           text={amount === myStack ? 'All-In' : 'Bet'}
           type="BET-CONFIRM"
           handleClick={() => handleBet()}
@@ -31,7 +32,7 @@ const ControlBetRaise = (props) => {
     }
     return (
       <ActionButton
-        name="raise-confirm-button"
+        name="button-raise-confirm"
         text={amount === myStack ? 'All-In' : 'Raise'}
         type="RAISE-CONFIRM"
         handleClick={() => handleBet()}
@@ -41,12 +42,12 @@ const ControlBetRaise = (props) => {
   }
 
   // after confirming the raise amount in the slider,
-  // the buttons will change to (in the future) all you to
+  // the buttons will change to (in the future)
   // edit they raise or bet amount
   if (mode === 'RAISE-CONFIRM') {
     return (
       <ActionButton
-        name="raise-confirm-button"
+        name="button-raise-edit"
         text={amount === myStack ? 'All-In' : 'Raise'}
         type="RAISE-EDIT"
         handleClick={() => setActionBarBetSlider(true)}
@@ -57,7 +58,7 @@ const ControlBetRaise = (props) => {
   if (mode === 'BET-CONFIRM') {
     return (
       <ActionButton
-        name="bet-button"
+        name="button-bet-edit"
         text={amount === myStack ? 'All-In' : 'Bet'}
         type="BET-EDIT"
         handleClick={() => setActionBarBetSlider(true)}
@@ -103,15 +104,15 @@ const ControlBetRaise = (props) => {
   return <ControlBlank {...props} />;
 };
 ControlBetRaise.propTypes = {
-  amount: React.PropTypes.number,
-  amountToCall: React.PropTypes.number,
-  handleBet: React.PropTypes.func,
-  handleAllIn: React.PropTypes.func,
-  minRaise: React.PropTypes.number,
-  mode: React.PropTypes.string,
-  myStack: React.PropTypes.number,
-  sliderOpen: React.PropTypes.bool,
-  setActionBarBetSlider: React.PropTypes.func,
+  amount: PropTypes.number,
+  amountToCall: PropTypes.number,
+  handleBet: PropTypes.func,
+  handleAllIn: PropTypes.func,
+  minRaise: PropTypes.number,
+  mode: PropTypes.string,
+  myStack: PropTypes.number,
+  sliderOpen: PropTypes.bool,
+  setActionBarBetSlider: PropTypes.func,
 };
 
 export default ControlBetRaise;

@@ -7,18 +7,17 @@ import {
   number,
 } from '@storybook/addon-knobs';
 
-import tests, { combine } from '../tests';
-import * as tests2 from '../tests2';
+import * as tests from '../tests';
 
 import ActionBar from '../../index';
 
-const stories = storiesOf('ActionBar', module);
-
 const createStory = (test) => {
-  stories.add(combine(test.describe, test.it), () => (
+  stories.add(tests.combine(test.describe, test.it), () => (
     <ActionBar {...test.props} />
   ));
 };
+
+const stories = storiesOf('ActionBar', module);
 
 stories.addDecorator(withKnobs);
 
@@ -27,6 +26,7 @@ stories.add('Kitchen Sink', () => (
     active={boolean('active', true)}
     amount={number('amount', 200)}
     amountToCall={number('amountToCall', 100)}
+    buttonActive={text('buttonActive', '')}
     callAmount={number('callAmount', 0)}
     handleFold={() => {}}
     handleCall={() => {}}
@@ -34,39 +34,30 @@ stories.add('Kitchen Sink', () => (
     handleBet={() => {}}
     isMyTurn={boolean('isMyTurn', true)}
     minRaise={number('minRaise', 200)}
-    mode={text('mode', null)}
+    mode={text('mode', '')}
     myStack={number('myStack', 10000)}
     params={{ tableAddr: '0x33' }}
     potSize={number('potSize', 400)}
     setActionBarBetSlider={() => {}}
+    setActionBarButtonActive={() => {}}
+    setActionBarMode={() => {}}
     sliderOpen={boolean('sliderOpen', false)}
     state={text('state', 'flop')}
+    turnComplete={boolean('turnComplete', false)}
     updateAmount={() => {}}
     visible={boolean('visible', true)}
   />
 ));
 
-createStory(tests2.atTable0);
-createStory(tests2.atTable1);
-createStory(tests2.atTable2);
-createStory(tests2.amountToCheck);
-createStory(tests2.actionDispatchCheck);
-createStory(tests2.amountToCall0);
-createStory(tests2.actionDispatchCall);
-createStory(tests2.amountToCall1);
-createStory(tests2.minRaise0);
-createStory(tests2.actionDispatchAllIn);
-createStory(tests2.actionDispatchFold);
-createStory(tests2.buttonBet0);
-createStory(tests2.buttonBet1);
-createStory(tests2.actionDispatchBet);
-createStory(tests2.buttonRaise0);
-createStory(tests2.buttonRaise1);
-createStory(tests2.actionDispatchRaise);
-
-// iterate over tests and add a story for each
-tests.forEach((test) => {
-  stories.add(combine(test.describe, test.it), () => (
-    <ActionBar {...test.props} />
-  ));
-});
+createStory(tests.atTable0);
+createStory(tests.atTable1);
+createStory(tests.atTable2);
+createStory(tests.amountToCheck);
+createStory(tests.amountToCall0);
+createStory(tests.amountToCall1);
+createStory(tests.minRaise0);
+createStory(tests.buttonBet0);
+createStory(tests.buttonBet1);
+createStory(tests.buttonRaise0);
+createStory(tests.buttonRaise1);
+createStory(tests.actionDispatchRaise0);

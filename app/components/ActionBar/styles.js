@@ -114,6 +114,7 @@ export const ActionButtonWrapper = styled(Button)`
   }
   &:disabled {
     background-color: #777;
+    background-image: linear-gradient(0deg, #383838 0%, #7C7C7C 100%);
     color: #DDD;
   }
 `;

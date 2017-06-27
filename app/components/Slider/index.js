@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import RCSlider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 
@@ -21,10 +22,10 @@ const generateMarks = (sb, min, max) => {
   const marks = {};
   for (let i = min; i < max; i += step) {
     // add a mark
-    marks[i] = { style: {}, label: '' };
+    marks[i] = '';
     // add a mark for the last position
     if (i + step >= max) {
-      marks[max] = { style: {}, label: '' };
+      marks[max] = '';
     }
   }
   return marks;
@@ -67,11 +68,11 @@ const Slider = (props) => (
   </SliderWrapper>
   );
 Slider.propTypes = {
-  amount: React.PropTypes.number,
-  sb: React.PropTypes.number,
-  updateAmount: React.PropTypes.func,
-  minRaise: React.PropTypes.number,
-  myStack: React.PropTypes.number,
+  amount: PropTypes.number,
+  sb: PropTypes.number,
+  updateAmount: PropTypes.func,
+  minRaise: PropTypes.number,
+  myStack: PropTypes.number,
 };
 
 export default Slider;

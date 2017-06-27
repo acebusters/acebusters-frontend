@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import ActionButton from './ActionButton';
 import ControlBlank from './ControlBlank';
@@ -22,8 +23,8 @@ const ControlFold = (props) => {
   return <ControlBlank {...props} />;
 };
 ControlFold.propTypes = {
-  amountToCall: React.PropTypes.number,
-  handleFold: React.PropTypes.func,
+  amountToCall: PropTypes.number,
+  handleFold: PropTypes.func,
 };
 
 export default ControlFold;

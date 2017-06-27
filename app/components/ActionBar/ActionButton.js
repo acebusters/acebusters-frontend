@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import {
   ActionButtonWrapper,
@@ -34,14 +35,17 @@ const ActionButton = (props) => {
     setActionBarMode(type);
     handleClick();
   };
+  const handleThisLeave = () => {
+    if (disabled) return;
+    setActionBarButtonActive('');
+  };
   return (
     <ActionButtonWrapper
       type={type}
       name={name}
-      // onClick={handleThisClick}
       onMouseDown={() => setActionBarButtonActive(type)}
       onMouseUp={handleThisClick}
-      onMouseLeave={() => setActionBarButtonActive('')}
+      onMouseLeave={handleThisLeave}
       disabled={disabled}
     >
       <ActionIndicator type={type} active={btnActive || selected} />
@@ -51,17 +55,17 @@ const ActionButton = (props) => {
 };
 
 ActionButton.propTypes = {
-  active: React.PropTypes.bool,
-  buttonActive: React.PropTypes.string,
-  disabled: React.PropTypes.bool,
-  mode: React.PropTypes.string,
-  name: React.PropTypes.string,
-  type: React.PropTypes.string,
-  setActionBarButtonActive: React.PropTypes.func,
-  handleClick: React.PropTypes.func,
-  setActionBarMode: React.PropTypes.func,
-  setActionBarBetSlider: React.PropTypes.func,
-  text: React.PropTypes.string,
+  active: PropTypes.bool,
+  buttonActive: PropTypes.string,
+  disabled: PropTypes.bool,
+  mode: PropTypes.string,
+  name: PropTypes.string,
+  type: PropTypes.string,
+  setActionBarButtonActive: PropTypes.func,
+  handleClick: PropTypes.func,
+  setActionBarMode: PropTypes.func,
+  setActionBarBetSlider: PropTypes.func,
+  text: PropTypes.string,
 };
 
 export default ActionButton;

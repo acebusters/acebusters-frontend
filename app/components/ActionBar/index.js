@@ -2,6 +2,7 @@
  * Created by helge on 24.08.16.
  */
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import FlagAmountBet from './FlagAmountBet';
 import FlagAmountCall from './FlagAmountCall';
@@ -57,10 +58,10 @@ const ActionBar = (props) => {
 };
 
 ActionBar.propTypes = {
-  visible: React.PropTypes.bool.isRequired,
-  active: React.PropTypes.bool.isRequired,
-  disabled: React.PropTypes.bool.isRequired,
-  sliderOpen: React.PropTypes.bool.isRequired,
+  visible: PropTypes.bool,
+  active: PropTypes.bool,
+  disabled: PropTypes.bool,
+  sliderOpen: PropTypes.bool,
 };
 
 export default ActionBar;

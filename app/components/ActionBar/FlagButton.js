@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { FlagButtonWrapper } from './styles';
 
@@ -29,11 +30,11 @@ const FlagButton = ({
   );
 };
 FlagButton.propTypes = {
-  potSize: React.PropTypes.number,
-  minRaise: React.PropTypes.number,
-  type: React.PropTypes.number,
-  sliderOpen: React.PropTypes.bool,
-  updateAmount: React.PropTypes.func,
+  potSize: PropTypes.number,
+  minRaise: PropTypes.number,
+  type: PropTypes.number,
+  sliderOpen: PropTypes.bool,
+  updateAmount: PropTypes.func,
 };
 
 export default FlagButton;

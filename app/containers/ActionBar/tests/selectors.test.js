@@ -10,6 +10,10 @@ import {
   makeAmountToCallSelector,
   makeSelectActionBarActive,
   makeSelectActionBarVisible,
+  getActionBarMode,
+  getActionBarSliderOpen,
+  getActionBarTurnComplete,
+  getActionBarButtonActive,
 } from '../selectors';
 
 import { checkABIs } from '../../../app.config';
@@ -287,29 +291,91 @@ describe('amountToCall Selector', () => {
 
 // action specific tests
 describe('makeSelectActionBarActive', () => {
-  it('should select the tableMenu active state', () => {
-    const mockedState = fromJS({
-      actionBar: {
-        active: false,
+  const mockedState = fromJS({
+    actionBar: { turnComplete: false },
+    account: { privKey: P1_KEY },
+    table: {
+      [TBL_ADDR]: {
+        4: {
+          state: 'flop',
+          lastRoundMaxBet: 1000,
+          lineup: [{
+            address: P1_ADDR,
+            last: new EWT(ABI_BET).bet(1, 1000).sign(P1_KEY),
+          }, {
+            address: P2_ADDR,
+            last: new EWT(ABI_BET).bet(1, 2000).sign(P2_KEY),
+          }, {
+            address: P3_ADDR,
+            last: new EWT(ABI_BET).bet(1, 1000).sign(P3_KEY),
+          }],
+        },
+        data: {
+          amounts: [1421, 50000, 20000],
+          smallBlind: 500,
+          lastHandNetted: 3,
+        },
       },
+    },
+  });
+  const selector = makeSelectActionBarActive();
+  const props = fromJS({
+    pos: 2,
+    isMyTurn: true,
+    params: {
+      handId: 4,
+      tableAddr: TBL_ADDR,
+    },
+  });
+  describe('if player\'s turn, correct handstate, !turnComplete', () => {
+    it('should return true', () => {
+      expect(selector(mockedState, props.toJS())).toBe(true);
     });
-    const statusSelector = makeSelectActionBarActive();
-    expect(statusSelector(mockedState)).toEqual(false);
+  });
+  describe('if turnComplete', () => {
+    it('should return false', () => {
+      const turnComplete = mockedState.setIn(
+        ['actionBar', 'turnComplete'],
+        true,
+      );
+      expect(selector(turnComplete, props.toJS())).toBe(false);
+    });
+  });
+  describe('if not appropriate handState', () => {
+    it('should return false', () => {
+      const handStateWaiting = mockedState.setIn(
+        ['table', TBL_ADDR, '4', 'state'],
+        'waiting',
+      );
+      expect(selector(handStateWaiting, props.toJS())).toBe(false);
+      const handStateDealing = mockedState.setIn(
+        ['table', TBL_ADDR, '4', 'state'],
+        'dealing',
+      );
+      expect(selector(handStateDealing, props.toJS())).toBe(false);
+      const handStateShowdown = mockedState.setIn(
+        ['table', TBL_ADDR, '4', 'state'],
+        'showdown',
+      );
+      expect(selector(handStateShowdown, props.toJS())).toBe(false);
+    });
+  });
+  describe('if not player\'s turn', () => {
+    it('should return false', () => {
+      const newProps = props.set('isMyTurn', false);
+      expect(selector(mockedState, newProps.toJS())).toBe(false);
+    });
   });
 });
 
 describe('makeSelectActionBarVisible', () => {
   const mockedState = fromJS({
-    actionBar: {
-      active: true,
-    },
-    account: {
-      privKey: P1_KEY,
-    },
+    actionBar: { turnComplete: false },
+    account: { privKey: P1_KEY },
     table: {
       [TBL_ADDR]: {
         4: {
-          state: 'waiting',
+          state: 'flop',
           lastRoundMaxBet: 1000,
           lineup: [{
             address: P1_ADDR,
@@ -332,65 +398,67 @@ describe('makeSelectActionBarVisible', () => {
   });
   const selector = makeSelectActionBarVisible();
   const props = fromJS({
-    isMyTurn: true,
     pos: 2,
+    myPos: 2,
+    isMyTurn: true,
     params: {
       handId: 4,
       tableAddr: TBL_ADDR,
     },
   });
-  describe('if table state is not ready', () => {
-    it('should not show ActionBar', () => {
-      // flop
-      const flopState = mockedState.setIn(
-        ['table', TBL_ADDR, '4', 'state'],
-        'flop',
-      );
-      expect(selector(flopState, props.toJS())).toBe(true);
-      // waiting
-      const waitingState = mockedState.setIn(
-        ['table', TBL_ADDR, '4', 'state'],
-        'waiting',
-      );
-      expect(selector(waitingState, props.toJS())).toBe(false);
-      // dealing
-      const dealingState = mockedState.setIn(
-        ['table', TBL_ADDR, '4', 'state'],
-        'dealing',
-      );
-      expect(selector(dealingState, props.toJS())).toBe(false);
-      // dealing
-      const showdownState = mockedState.setIn(
-        ['table', TBL_ADDR, '4', 'state'],
-        'showdown',
-      );
-      expect(selector(showdownState, props.toJS())).toBe(false);
+  describe('if typeof myPos is \'number\'', () => {
+    it('should return true', () => {
+      expect(selector(mockedState, props.toJS())).toBe(true);
+    });
+  });
+  describe('if myPos is undefined', () => {
+    it('should return false', () => {
+      const newProps = props.set('myPos', undefined);
+      expect(selector(mockedState, newProps.toJS())).toBe(false);
+    });
+  });
+  describe('else should default', () => {
+    it('should return false', () => {
+      const newProps = props.set('myPos', 'a');
+      expect(selector(mockedState, newProps.toJS())).toBe(false);
+    });
+  });
+});
+
+describe('misc actionBar state selectors', () => {
+  const mockedState = fromJS({
+    actionBar: {
+      turnComplete: false,
+      buttonActive: false,
+      sliderOpen: true,
+      mode: 'CALL',
+    },
+  });
+  describe('getActionBarMode', () => {
+    it('should return \'mode\'', () => {
+      const selector = getActionBarMode();
+      expect(selector(mockedState)).toBe('CALL');
     });
   });
 
-  describe('if !isMyTurn', () => {
-    it('should not show ActionBar', () => {
-      // flop
-      const flopState = mockedState.setIn(
-        ['table', TBL_ADDR, '4', 'state'],
-        'flop',
-      );
-      expect(selector(flopState, props.toJS())).toBe(true);
-      const newProps = props.set('isMyTurn', false);
-      expect(selector(flopState, newProps.toJS())).toBe(false);
+  describe('getActionBarSliderOpen', () => {
+    it('should return \'sliderOpen\'', () => {
+      const selector = getActionBarSliderOpen();
+      expect(selector(mockedState)).toBe(true);
     });
   });
 
-  describe('if Actionbar is !active', () => {
-    it('shuold not show ActionBar', () => {
-      // flop
-      const flopState = mockedState.setIn(
-        ['table', TBL_ADDR, '4', 'state'],
-        'flop',
-      );
-      expect(selector(flopState, props.toJS())).toBe(true);
-      const newProps = props.set('isMyTurn', false);
-      expect(selector(flopState, newProps.toJS())).toBe(false);
+  describe('getActionBarTurnComplete', () => {
+    it('should return \'turnComplete\'', () => {
+      const selector = getActionBarTurnComplete();
+      expect(selector(mockedState)).toBe(false);
+    });
+  });
+
+  describe('getActionBarButtonActive', () => {
+    it('should return \'buttonActive\'', () => {
+      const selector = getActionBarButtonActive();
+      expect(selector(mockedState)).toBe(false);
     });
   });
 });
