@@ -2,7 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import { browserHistory } from 'react-router';
-import onClickOutside from 'react-onclickoutside';
 import { setAuthState } from '../AccountProvider/actions';
 
 import {
@@ -21,20 +20,14 @@ import {
 
 import TableMenu from '../../components/TableMenu';
 
-class TableMenuContainer extends React.Component {
-  handleClickOutside() {
-    // only close the menu if it is already open
-    if (this.props.open) {
-      this.props.toggleMenuOpen();
-    }
-  }
-  render() {
-    return <TableMenu {...this.props} />;
-  }
-}
+const TableMenuContainer = (props) => (
+  <TableMenu
+    disableOnClickOutside={!props.open}
+    {...props}
+  />
+);
 TableMenuContainer.propTypes = {
   open: React.PropTypes.bool,
-  toggleMenuOpen: React.PropTypes.func,
 };
 
 const mapDispatchToProps = (dispatch) => ({
@@ -57,6 +50,4 @@ const mapStateToProps = createStructuredSelector({
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(
-  onClickOutside(TableMenuContainer),
-);
+)(TableMenuContainer);

@@ -43,7 +43,6 @@ const StyledNavbar = styled.nav`
     clear: both;
   }
   /* transitions */
-  -webkit-transition: margin-left ${transitionSpeed} ${transitionFn};
   -o-transition: margin-left ${transitionSpeed} ${transitionFn};
   transition: margin-left ${transitionSpeed} ${transitionFn};
   color: ${(props) => props.theme.navbarFontColor || '#333'};

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import {
   Hamburger,
@@ -37,12 +38,12 @@ const MenuHeader = ({
 };
 
 MenuHeader.propTypes = {
-  active: React.PropTypes.bool,
-  blocky: React.PropTypes.string,
-  nickName: React.PropTypes.string,
-  toggleMenuActive: React.PropTypes.func,
-  toggleMenuOpen: React.PropTypes.func,
-  open: React.PropTypes.bool,
+  active: PropTypes.bool,
+  blocky: PropTypes.string,
+  nickName: PropTypes.string,
+  toggleMenuActive: PropTypes.func,
+  toggleMenuOpen: PropTypes.func,
+  open: PropTypes.bool,
 };
 
 export default MenuHeader;

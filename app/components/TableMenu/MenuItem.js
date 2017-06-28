@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Link from '../Link';
 
 import {
@@ -50,9 +51,9 @@ const MenuItem = ({ item, ...props }) => {
   );
 };
 MenuItem.propTypes = {
-  item: React.PropTypes.object,
-  open: React.PropTypes.bool,
-  toggleMenuOpen: React.PropTypes.func,
+  item: PropTypes.object,
+  open: PropTypes.bool,
+  toggleMenuOpen: PropTypes.func,
 };
 
 export default MenuItem;
