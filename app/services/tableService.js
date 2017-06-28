@@ -194,6 +194,33 @@ TableService.prototype.timeOut = function timeOut() {
   });
 };
 
+TableService.prototype.lineup = function lineup() {
+  return new Promise((resolve, reject) => {
+    fetch(`${confParams.oracleUrl}/table/${this.tableAddr}/lineup`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      } }).then((rsp) => {
+        if (rsp.status >= 200 && rsp.status < 300) {
+          rsp.json().then((response) => {
+            resolve(response);
+          });
+          return;
+        }
+        if (rsp.status < 500) {
+          rsp.json().then((response) => {
+            reject(response.errorMessage);
+          });
+          return;
+        }
+        reject('server error.');
+      }).catch((error) => {
+        reject(error);
+      });
+  });
+};
+
 
 TableService.prototype.net = function net(handId, payload) {
   return new Promise((resolve, reject) => {

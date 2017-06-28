@@ -51,8 +51,6 @@ import {
   makeLastReceiptSelector,
 } from '../Seat/selectors';
 
-import { blockNotify } from '../AccountProvider/actions';
-
 import {
   makeTableDataSelector,
   makeIsMyTurnSelector,
@@ -119,6 +117,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       tableAddr: this.tableAddr,
       handId,
     });
+    this.tableService = new TableService(this.props.params.tableAddr, this.props.privKey);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -137,8 +136,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
       if (timeOut > 0) {
         this.timeOut = setTimeout(() => {
-          const table = new TableService(this.props.params.tableAddr);
-          table.timeOut().then((res) => {
+          this.tableService.timeOut().then((res) => {
             Raven.captureMessage(`timeout: ${res}`, { tags: {
               tableAddr: this.props.params.tableAddr,
               handId,
@@ -311,7 +309,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     const handId = parseInt(this.props.params.handId, 10);
     const state = this.props.state;
     const exitHand = (state !== 'waiting') ? handId : handId - 1;
-    const table = new TableService(this.props.params.tableAddr, this.props.privKey);
     this.props.setExitHand(this.tableAddr, this.props.params.handId, pos, exitHand);
     const statusElement = (<div>
       <p>
@@ -324,7 +321,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.props.modalDismiss();
     this.props.modalAdd(statusElement);
 
-    return table.leave(exitHand).catch((err) => {
+    return this.tableService.leave(exitHand).catch((err) => {
       Raven.captureException(err, { tags: {
         tableAddr: this.props.params.tableAddr,
         handId,
@@ -361,16 +358,8 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
         ];
 
         if (result.args && result.args.addr === this.props.proxyAddr) {
-          // notify backend about new block
-          this.props.blockNotify();
-          // show modal
-
-          // const statusElement = (<div>
-          //   <h2>Join Successful!</h2>
-          //   <Button onClick={this.handleJoinComplete}>OK!</Button>
-          // </div>);
-          // this.props.modalDismiss();
-          // this.props.modalAdd(statusElement);
+          // notify backend about change in lineup
+          this.tableService.lineup();
         }
 
         // update lineup when join successful
@@ -378,6 +367,12 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           this.props.lineupReceived(...lineupReceivedArgs(rsp));
         });
 
+        break;
+      }
+
+      case 'Leave': {
+        // notify backend about change in lineup
+        this.tableService.lineup();
         break;
       }
 
@@ -511,7 +506,6 @@ export function mapDispatchToProps() {
     setExitHand: (tableAddr, handId, pos, exitHand) => (setExitHand(tableAddr, handId, pos, exitHand)),
     updateReceived: (tableAddr, hand) => (updateReceived(tableAddr, hand)),
     addMessage: (message, tableAddr, privKey, created) => (addMessage(message, tableAddr, privKey, created)),
-    blockNotify: () => (blockNotify()),
   };
 }
 
@@ -556,7 +550,6 @@ Table.propTypes = {
   data: React.PropTypes.any,
   myPos: React.PropTypes.any,
   modalAdd: React.PropTypes.func,
-  blockNotify: React.PropTypes.func,
   handRequest: React.PropTypes.func,
   pendingToggle: React.PropTypes.func,
   setExitHand: React.PropTypes.func,
