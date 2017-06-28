@@ -19,9 +19,7 @@ const CurtainToggler = (props) => {
   return (
     <CurtainTogglerWrapper name="curtain-toggler" {...props}>
       <ToggleTriangle />
-      <ToggleIcon>
-        <i className="fa fa-2x fa-comments-o fa-fw" />
-      </ToggleIcon>
+      <ToggleIcon className="fa fa-2x fa-comments-o" />
       <ToggleText name="toggle-text">Chat</ToggleText>
     </CurtainTogglerWrapper>
   );
