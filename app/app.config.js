@@ -54,7 +54,7 @@ export function conf() {
     txUrl: 'https://khengvfg6c.execute-api.eu-west-1.amazonaws.com/v0',
     accountUrl: 'https://hsqkzjp3m8.execute-api.eu-west-1.amazonaws.com/v0',
     ntzAddr: '0x367b75f1c23a9e6bde655eb81df49dbb28a311f2',
-    accountFactory: '0xf8fc7db81608d5c641f7d3c4e8b47eecb8a3dfb8',
+    accountFactory: '0xe8bd683b5aa86ccb221ad85c4a190dd75f5ec0f5',
     tableFactory: '0xcea862d3a13ce089d3c00fc407dc142c206cab9e',
     sentryDSN: 'https://8c3e021848b247ddaf627c8040f94e07@sentry.io/153017',
     gaProperty: 'UA-XXXXX-Y',
