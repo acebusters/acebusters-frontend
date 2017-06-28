@@ -51,6 +51,8 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     this.tableFactory.getTables.call();
 
     if (this.props.account.proxy) {
+      this.token.floor.call();
+      this.token.ceiling.call();
       this.token.balanceOf.call(this.props.account.proxy);
       this.web3.eth.getBalance(this.props.account.proxy);
       this.watchProxyEvents(this.props.account.proxy);
