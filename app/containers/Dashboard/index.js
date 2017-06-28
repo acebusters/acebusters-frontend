@@ -20,8 +20,7 @@ import List from '../../components/List';
 import H2 from '../../components/H2';
 import Alert from '../../components/Alert';
 import TransferDialog from '../TransferDialog';
-import PurchaseDialog from '../PurchaseDialog';
-import SellDialog from '../SellDialog';
+import ExchangeDialog from '../ExchangeDialog';
 import Container from '../../components/Container';
 import Button from '../../components/Button';
 import SubmitButton from '../../components/SubmitButton';
@@ -68,6 +67,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
   componentWillReceiveProps(nextProps) {
     if (this.props.account.proxy === undefined && nextProps.account.proxy) {
       this.token.floor.call();
+      this.token.ceiling.call();
       this.watchProxyEvents(nextProps.account.proxy);
       this.watchTokenEvents(nextProps.account.proxy);
       this.token.balanceOf.call(nextProps.account.proxy);
@@ -229,6 +229,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     const qrUrl = `ether:${this.props.account.proxy}`;
     const weiBalance = this.web3.eth.balance(this.props.account.proxy);
     const floor = this.token.floor();
+    const ceiling = this.token.ceiling();
     const babzBalance = this.token.balanceOf(this.props.account.proxy);
     const tables = this.tableFactory.getTables();
 
@@ -297,10 +298,12 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
               align="left"
               onClick={() => {
                 this.props.modalAdd(
-                  <SellDialog
-                    handleSell={this.handleNTZSell}
+                  <ExchangeDialog
+                    title={<FormattedMessage {...messages.sellTitle} />}
+                    amountUnit="ntz"
+                    calcExpectedAmount={(amount) => new BigNumber(amount).div(floor)}
+                    handleExchange={this.handleNTZSell}
                     maxAmount={babzBalance.div(NTZ_DECIMALS)}
-                    floorPrice={floor}
                   />
                 );
               }}
@@ -343,13 +346,17 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
               TRANSFER
             </Button>
           }
-          {weiBalance &&
+          {weiBalance && ceiling &&
             <Button
               align="left"
               onClick={() => {
                 this.props.modalAdd(
-                  <PurchaseDialog
-                    handlePurchase={this.handleNTZPurchase}
+                  <ExchangeDialog
+                    title={<FormattedMessage {...messages.purchaseTitle} />}
+                    amountUnit="eth"
+                    calcExpectedAmount={(amount) => ceiling.mul(amount)}
+                    handleExchange={this.handleNTZPurchase}
+                    maxAmount={weiBalance.div(ETH_DECIMALS)}
                   />
                 );
               }}
