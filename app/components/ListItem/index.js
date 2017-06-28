@@ -21,14 +21,17 @@ const Td = styled.td`
   border-top: 1px solid #eceeef;
 `;
 
-function ListItem({ values }) {
+function ListItem({ values, columnsStyle = {} }) {
   return (
     <Tr>
       {!values && <td />}
       {values && values.map((val, i) => {
         const Comp = i === 0 ? Th : Td;
         return (
-          <Comp key={i}>
+          <Comp
+            key={i}
+            style={columnsStyle[i]}
+          >
             {typeof val === 'number'
               ? String(val).replace(/^-/, '−')
               : val
@@ -42,6 +45,7 @@ function ListItem({ values }) {
 
 ListItem.propTypes = {
   values: React.PropTypes.array,
+  columnsStyle: React.PropTypes.object,
 };
 
 export default ListItem;

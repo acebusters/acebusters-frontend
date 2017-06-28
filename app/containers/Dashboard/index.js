@@ -10,25 +10,27 @@ import makeSelectAccountData, { makeSignerAddrSelector, makeSelectPrivKey } from
 import messages from './messages';
 import { modalAdd, modalDismiss } from '../App/actions';
 import web3Connect from '../AccountProvider/web3Connect';
-import { contractEvents, accountLoaded, transferETH, claimETH, proxyEvent } from '../AccountProvider/actions';
-import { isUserEvent } from '../AccountProvider/utils';
+import { contractEvents, accountLoaded, transferETH, proxyEvents } from '../AccountProvider/actions';
+import { addEventsDate, isUserEvent } from '../AccountProvider/utils';
 import { createBlocky } from '../../services/blockies';
-import { ABI_TOKEN_CONTRACT, ABI_ACCOUNT_FACTORY, ABI_PROXY, conf } from '../../app.config';
+import { ABI_TOKEN_CONTRACT, ABI_ACCOUNT_FACTORY, ABI_PROXY, ABI_TABLE_FACTORY, conf } from '../../app.config';
 import { ETH_DECIMALS, NTZ_DECIMALS, formatEth, formatNtz } from '../../utils/amountFormater';
 
 import List from '../../components/List';
+import H2 from '../../components/H2';
 import Alert from '../../components/Alert';
-import A from '../../components/A';
 import TransferDialog from '../TransferDialog';
 import PurchaseDialog from '../PurchaseDialog';
 import SellDialog from '../SellDialog';
 import Container from '../../components/Container';
 import Button from '../../components/Button';
+import SubmitButton from '../../components/SubmitButton';
 import Blocky from '../../components/Blocky';
-// import FormGroup from '../../components/Form/FormGroup';
 import WithLoading from '../../components/WithLoading';
 
 import { Section } from './styles';
+import { createDashboardTxsSelector } from './selectors';
+import { txnsToList } from './txnsToList';
 
 const confParams = conf();
 
@@ -45,6 +47,9 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     this.web3 = props.web3Redux.web3;
 
     this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(confParams.ntzAddr);
+    this.tableFactory = this.web3.eth.contract(ABI_TABLE_FACTORY).at(confParams.tableFactory);
+
+    this.tableFactory.getTables.call();
 
     if (this.props.account.proxy) {
       this.token.balanceOf.call(this.props.account.proxy);
@@ -69,6 +74,25 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
       this.web3.eth.getBalance(nextProps.account.proxy);
     }
 
+    if (this.props.dashboardTxs.txError !== nextProps.dashboardTxs.txError && nextProps.dashboardTxs.txError) {
+      this.props.modalAdd(
+        <div>
+          <H2>
+            <FormattedMessage {...messages.transactionErrorTitle} />
+          </H2>
+          <p>{nextProps.dashboardTxs.txError}</p>
+          <SubmitButton
+            onClick={() => {
+              this.props.dispatch(nextProps.dashboardTxs.failedTxAction);
+              this.props.modalDismiss();
+            }}
+          >
+            <FormattedMessage {...messages.retryTransaction} />
+          </SubmitButton>
+        </div>
+      );
+    }
+
     // Note: listen to AccountFactory's AccountCreated Event if proxy address is not ready
     if (nextProps.account && this.props
         && nextProps.account.proxy !== this.props.account.proxy
@@ -80,9 +104,22 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
   watchProxyEvents(proxyAddr) {
     const web3 = getWeb3();
     this.proxy = web3.eth.contract(ABI_PROXY).at(proxyAddr);
-    this.proxy.Received({ toBlock: 'latest' }).watch((error, event) => {
+
+    this.web3.eth.getBlockNumber((err, blockNumber) => {
+      this.proxy.allEvents({
+        fromBlock: blockNumber - LOOK_BEHIND_PERIOD,
+        toBlock: 'latest',
+      }).get((error, eventList) => {
+        addEventsDate(eventList.filter(isUserEvent(proxyAddr)))
+          .then(this.props.proxyEvents);
+      });
+    });
+
+    this.proxy.Received({
+      toBlock: 'latest',
+    }).watch((error, event) => {
       if (!error && event) {
-        this.props.proxyEvent(event);
+        addEventsDate([event]).then(this.props.proxyEvents);
         this.web3.eth.getBalance(proxyAddr);
       }
     });
@@ -94,31 +131,28 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
         fromBlock: blockNumber - LOOK_BEHIND_PERIOD,
         toBlock: 'latest',
       }).get((error, eventList) => {
-        this.props.contractEvents(
-          eventList
-            .filter(({ event }) => event === 'Transfer')
-            .filter(isUserEvent(proxyAddr))
-        );
+        addEventsDate(eventList.filter(isUserEvent(proxyAddr)))
+          .then(this.props.contractEvents);
       });
+    });
 
-      this.token.allEvents({
-        toBlock: 'latest',
-      }).watch((watchError, event) => {
-        if (!watchError && isUserEvent(proxyAddr)(event)) {
-          this.token.balanceOf.call(this.props.account.proxy);
-          this.web3.eth.getBalance(this.props.account.proxy);
-          const { pendingSell = [] } = this.props.account;
-          if (pendingSell.indexOf(event.transactionHash) > -1) {
-            this.token.transferFrom.sendTransaction(
-              confParams.ntzAddr,
-              this.props.account.proxy,
-              0,
-              { from: this.props.account.proxy }
-            );
-            this.props.claimETH(event.transactionHash);
-          }
+    this.token.allEvents({
+      toBlock: 'latest',
+    }).watch((watchError, event) => {
+      if (!watchError && isUserEvent(proxyAddr)(event)) {
+        this.token.balanceOf.call(this.props.account.proxy);
+        this.web3.eth.getBalance(this.props.account.proxy);
+        const { pendingSell = [] } = this.props.dashboardTxs;
+
+        if (pendingSell.indexOf(event.transactionHash) > -1) {
+          this.token.transferFrom.sendTransaction(
+            confParams.ntzAddr,
+            this.props.account.proxy,
+            0,
+            { from: this.props.account.proxy }
+          );
         }
-      });
+      }
     });
 
     // Check if we have unfinished sell
@@ -134,6 +168,27 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
           { from: this.props.account.proxy }
         );
       }
+    });
+  }
+
+  watchAccountCreated() {
+    const web3 = getWeb3();
+    const privKey = this.props.privKey;
+    const privKeyBuffer = new Buffer(privKey.replace('0x', ''), 'hex');
+    const signer = `0x${ethUtil.privateToAddress(privKeyBuffer).toString('hex')}`;
+    const accountFactory = web3.eth.contract(ABI_ACCOUNT_FACTORY).at(confParams.accountFactory);
+    const events = accountFactory.AccountCreated({ signer }, { fromBlock: 'latest' });
+
+    events.watch((err, ev) => {  // eslint-disable-line no-unused-vars
+      accountFactory.getAccount.call(signer, (e, res) => {
+        const proxy = res[0];
+        const controller = res[1];
+        const lastNonce = res[2].toNumber();
+
+        this.props.accountLoaded({ proxy, controller, lastNonce });
+      });
+
+      events.stopWatching();
     });
   }
 
@@ -170,39 +225,18 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     this.props.modalDismiss();
   }
 
-  watchAccountCreated() {
-    const web3 = getWeb3();
-    const privKey = this.props.privKey;
-    const privKeyBuffer = new Buffer(privKey.replace('0x', ''), 'hex');
-    const signer = `0x${ethUtil.privateToAddress(privKeyBuffer).toString('hex')}`;
-    const accountFactory = web3.eth.contract(ABI_ACCOUNT_FACTORY).at(confParams.accountFactory);
-    const events = accountFactory.AccountCreated({ signer }, { fromBlock: 'latest' });
-
-    events.watch((err, ev) => {  // eslint-disable-line no-unused-vars
-      accountFactory.getAccount.call(signer, (e, res) => {
-        const proxy = res[0];
-        const controller = res[1];
-        const lastNonce = res[2].toNumber();
-
-        this.props.accountLoaded({ proxy, controller, lastNonce });
-      });
-
-      events.stopWatching();
-    });
-  }
-
   render() {
     const qrUrl = `ether:${this.props.account.proxy}`;
     const weiBalance = this.web3.eth.balance(this.props.account.proxy);
     const floor = this.token.floor();
     const babzBalance = this.token.balanceOf(this.props.account.proxy);
+    const tables = this.tableFactory.getTables();
 
-    const listPending = pendingToList(this.props.account.pending);
-
-    let listTxns = null;
-    if (this.props.account[confParams.ntzAddr]) {
-      listTxns = txnsToList(this.props.account[confParams.ntzAddr].transactions, this.props.account.proxy);
-    }
+    const listTxns = txnsToList(
+      this.props.dashboardTxs.dashboardEvents,
+      tables,
+      this.props.account.proxy
+    );
 
     return (
       <Container>
@@ -328,22 +362,25 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
         </Section>
 
         <Section>
-          <h2><FormattedMessage {...messages.pending} /></h2>
-          <List
-            items={listPending}
-            headers={['#', 'txHash']}
-            noDataMsg="No Pending Transactions"
-          />
-
           <h2><FormattedMessage {...messages.included} /></h2>
           <List
             items={listTxns}
             headers={[
-              'TX hash',
-              'From',
-              'To',
+              '',
+              'Address',
+              'Date',
+              '',
               'Amount',
+              '',
             ]}
+            columnsStyle={{
+              0: { width: 20 },
+              1: { textAlign: 'left', width: 10, whiteSpace: 'nowrap' },
+              2: { width: 20 },
+              3: { textAlign: 'left', whiteSpace: 'nowrap' },
+              4: { textAlign: 'right', whiteSpace: 'nowrap' },
+              5: { width: '100%', textAlign: 'left' },
+            }}
             noDataMsg="No Transactions Yet"
           />
         </Section>
@@ -352,55 +389,24 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
   }
 }
 
-const pendingToList = (pending = {}) => (
-  Object.keys(pending).map((key) => [
-    key,
-    <A
-      href={`${confParams.etherscanUrl}tx/${pending[key].txHash}`}
-      target="_blank"
-    >
-      {pending[key].txHash}
-    </A>,
-  ])
-);
-
-const txnsToList = (txns, proxyAddr) => {
-  if (txns) {
-    return Object.keys(txns)
-      .filter((key) => txns[key] && txns[key].from && txns[key].to)
-      .sort((a, b) => txns[b].blockNumber - txns[a].blockNumber)
-      .map((key) => [
-        <A
-          href={`${confParams.etherscanUrl}tx/${key}`}
-          target="_blank"
-        >
-          {key.substring(2, 8)}
-        </A>, // txHash
-        txns[key].from.substring(2, 8), // from
-        txns[key].to.substring(2, 8), // to
-        new BigNumber((txns[key].to === proxyAddr) ? txns[key].value : txns[key].value * -1).div(NTZ_DECIMALS).toNumber(), // value
-      ]);
-  }
-
-  return null;
-};
-
 Dashboard.propTypes = {
   modalAdd: PropTypes.func,
   transferETH: PropTypes.func,
-  claimETH: PropTypes.func,
-  proxyEvent: PropTypes.func,
+  proxyEvents: PropTypes.func,
   modalDismiss: PropTypes.func,
   contractEvents: PropTypes.func,
   accountLoaded: PropTypes.func,
   web3Redux: PropTypes.any,
   signerAddr: PropTypes.string,
-  account: PropTypes.any,
+  account: PropTypes.object,
+  dashboardTxs: PropTypes.object,
   privKey: PropTypes.string,
+  dispatch: PropTypes.func,
 };
 
 const mapStateToProps = createStructuredSelector({
   account: makeSelectAccountData(),
+  dashboardTxs: createDashboardTxsSelector(),
   signerAddr: makeSignerAddrSelector(),
   privKey: makeSelectPrivKey(),
 });
@@ -410,8 +416,7 @@ function mapDispatchToProps() {
     modalAdd,
     modalDismiss,
     transferETH,
-    proxyEvent,
-    claimETH,
+    proxyEvents,
     contractEvents,
     accountLoaded,
   };

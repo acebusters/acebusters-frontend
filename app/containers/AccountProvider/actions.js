@@ -18,13 +18,11 @@ export const CONTRACT_TX_SEND = 'acebusters/AccountProvider/CONTRACT_TX_SEND';
 export const CONTRACT_TX_SUCCESS = 'acebusters/AccountProvider/CONTRACT_TX_SUCCESS';
 export const CONTRACT_TX_ERROR = 'acebusters/AccountProvider/CONTRACT_TX_ERROR';
 
-export const ETH_CLAIM = 'acebusters/AccountProvider/ETH_CLAIM';
-
 export const ETH_TRANSFER = 'acebusters/AccountProvider/ETH_TRANSFER';
 export const ETH_TRANSFER_SUCCESS = 'acebusters/AccountProvider/ETH_TRANSFER_SUCCESS';
 export const ETH_TRANSFER_ERROR = 'acebusters/AccountProvider/ETH_TRANSFER_ERROR';
 
-export const PROXY_EVENT = 'acebusters/AccountProvider/PROXY_EVENT';
+export const PROXY_EVENTS = 'acebusters/AccountProvider/PROXY_EVENTS';
 
 export const CONTRACT_EVENTS = 'acebusters/AccountProvider/CONTRACT_EVENTS';
 
@@ -141,10 +139,6 @@ export function contractMethodError({ address, key, payload }) {
   return { type: CONTRACT_METHOD_ERROR, address, key, payload };
 }
 
-export function claimETH(payload) {
-  return { type: ETH_CLAIM, payload };
-}
-
 export function transferETH(payload) {
   return { type: ETH_TRANSFER, payload };
 }
@@ -159,8 +153,15 @@ export function transferETHError(payload) {
 
 export function proxyEvent(event) {
   return {
-    type: PROXY_EVENT,
-    payload: { event },
+    type: PROXY_EVENTS,
+    payload: [event],
+  };
+}
+
+export function proxyEvents(events) {
+  return {
+    type: PROXY_EVENTS,
+    payload: events,
   };
 }
 
@@ -172,14 +173,14 @@ export function contractTxSuccess(payload) {
   return { type: CONTRACT_TX_SUCCESS, payload };
 }
 
-export function contractTxError({ address, nonce, error }) {
-  return { type: CONTRACT_TX_ERROR, payload: { address, nonce, error } };
+export function contractTxError(payload) {
+  return { type: CONTRACT_TX_ERROR, payload };
 }
 
-export function contractEvent({ event }) {
-  return { type: CONTRACT_EVENTS, events: [event] };
+export function contractEvent(event) {
+  return { type: CONTRACT_EVENTS, payload: [event] };
 }
 
 export function contractEvents(events) {
-  return { type: CONTRACT_EVENTS, events };
+  return { type: CONTRACT_EVENTS, payload: events };
 }

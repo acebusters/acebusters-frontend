@@ -74,7 +74,7 @@ class List extends React.Component {
   }
 
   render() {
-    const { headers, sortableColumns = [], noDataMsg = 'No Data' } = this.props;
+    const { headers, sortableColumns = [], noDataMsg = 'No Data', columnsStyle = {} } = this.props;
     const { sortBy, sortDir } = this.state;
     const items = this.sortedItems();
 
@@ -86,7 +86,7 @@ class List extends React.Component {
               {headers && headers.map((header, i) => {
                 const sortable = sortableColumns.indexOf(i) !== -1;
                 return (
-                  <th key={i}>
+                  <th key={i} style={columnsStyle[i]}>
                     {!sortable && header}
                     {sortable &&
                       <SortButton onClick={() => this.handleHeaderClick(i)}>
@@ -107,6 +107,7 @@ class List extends React.Component {
                 <ListItem
                   key={i}
                   values={item}
+                  columnsStyle={columnsStyle}
                 />
               ))}
             </tbody>
@@ -131,6 +132,7 @@ List.propTypes = {
   items: PropTypes.arrayOf(PropTypes.node),
   headers: PropTypes.arrayOf(PropTypes.node),
   sortableColumns: PropTypes.arrayOf(PropTypes.number),
+  columnsStyle: PropTypes.object,
   noDataMsg: PropTypes.string,
 };
 

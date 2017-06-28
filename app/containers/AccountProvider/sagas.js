@@ -1,4 +1,3 @@
-import Web3 from 'web3';
 import ethUtil from 'ethereumjs-util';
 import { takeLatest, select, actionChannel, put, fork, take, takeEvery, call } from 'redux-saga/effects';
 import { delay, eventChannel, END } from 'redux-saga';
@@ -7,7 +6,6 @@ import Raven from 'raven-js';
 import { Receipt } from 'poker-helper';
 import * as storageService from '../../services/localStorage';
 
-import WebsocketProvider from '../../services/wsProvider';
 import { createBlocky } from '../../services/blockies';
 import { nickNameByAddress } from '../../services/nicknames';
 import {
@@ -16,6 +14,8 @@ import {
   ABI_CONTROLLER,
   ABI_ACCOUNT_FACTORY,
 } from '../../app.config';
+
+import { addEventsDate, getWeb3, isUserEvent } from './utils';
 
 import {
   WEB3_CONNECT,
@@ -35,22 +35,14 @@ import {
   contractMethodError,
   contractTxSuccess,
   contractTxError,
-  contractEvent,
+  contractEvents,
   transferETHSuccess,
   transferETHError,
 } from './actions';
 
-import { isUserEvent } from './utils';
+export { getWeb3 } from './utils';
 
-let web3Instance;
 const confParams = conf();
-
-export function getWeb3() {
-  if (typeof web3Instance === 'undefined') {
-    web3Instance = new Web3(new WebsocketProvider(confParams.gethUrl));
-  }
-  return web3Instance;
-}
 
 const getPeerCount = (web3) => (
   new Promise((resolve, reject) => {
@@ -85,7 +77,7 @@ function websocketChannel() {
       // Note: when websocket first emit this connect event, it seems to be still not initialized yet.
       // and it could cause `accountLoginSaga` get called and throw an error in web3
       if (!firstConnect) {
-        emitter(web3Connected({ web3: web3Instance, isConnected: true }));
+        emitter(web3Connected({ web3: getWeb3(), isConnected: true }));
       }
 
       firstConnect = false;
@@ -127,7 +119,7 @@ function* web3ConnectSaga() {
   try {
     yield getPeerCount(getWeb3());
     yield put(web3Connected({ isConnected: true }));
-    const tokenContract = web3Instance.eth.contract(ABI_TOKEN_CONTRACT).at(confParams.ntzAddr);
+    const tokenContract = getWeb3().eth.contract(ABI_TOKEN_CONTRACT).at(confParams.ntzAddr);
     yield call(delay, 500);
     yield fork(ethEventListenerSaga, tokenContract);
   } catch (err) {
@@ -197,7 +189,7 @@ function* accountLoginSaga() {
         id: signer,
       });
       // this reads account data from the account factory
-      const res = yield getAccount(web3Instance, signer);
+      const res = yield getAccount(getWeb3(), signer);
       const proxy = res[0];
       const controller = res[1];
       const lastNonce = res[2].toNumber();
@@ -209,7 +201,7 @@ function* accountLoginSaga() {
 
       // start listen on the account controller for events
       // mostly auth errors
-      const controllerContract = web3Instance.eth.contract(ABI_CONTROLLER).at(controller);
+      const controllerContract = getWeb3().eth.contract(ABI_CONTROLLER).at(controller);
       yield fork(ethEventListenerSaga, controllerContract);
     }
   }
@@ -244,8 +236,8 @@ function sendTx(forwardReceipt) {
 function* contractTransactionSendSaga() {
   const txChan = yield actionChannel(CONTRACT_TX_SEND);
   while (true) { // eslint-disable-line no-constant-condition
-    const req = yield take(txChan);
-    const { dest, key, data, privKey, callback, args, methodName } = req.payload;
+    const action = yield take(txChan);
+    const { dest, key, data, privKey, callback, args, methodName } = action.payload;
     const state = yield select();
     const nonce = state.get('account').get('lastNonce') + 1;
     const controller = state.get('account').get('controller');
@@ -262,7 +254,7 @@ function* contractTransactionSendSaga() {
       if (callback) {
         yield call(callback, error);
       }
-      yield put(contractTxError({ address: dest, nonce, error, args, methodName }));
+      yield put(contractTxError({ address: dest, nonce, error, args, methodName, action }));
     }
   }
 }
@@ -301,17 +293,17 @@ function* updateLoggedInStatusSaga(action) { // SET_AUTH action
 }
 
 const ethEvent = (contract) => eventChannel((emitter) => {
-  const contractEvents = contract.allEvents({ fromBlock: 'latest' });
-  contractEvents.watch((error, results) => {
+  const events = contract.allEvents({ fromBlock: 'latest' });
+  events.watch((error, results) => {
     if (error) {
       emitter(END);
-      contractEvents.stopWatching();
+      events.stopWatching();
       return;
     }
     emitter(results);
   });
   return () => {
-    contractEvents.stopWatching();
+    events.stopWatching();
   };
 });
 
@@ -321,8 +313,9 @@ export function* ethEventListenerSaga(contract) {
     try {
       const event = yield take(chan);
       const state = yield select();
-      if (isUserEvent(state.get('proxy'))(event)) {
-        yield put(contractEvent(event));
+      if (isUserEvent(state.getIn(['account', 'proxy']))(event)) {
+        const events = yield call(addEventsDate, [event]);
+        yield put(contractEvents(events));
       }
     } catch (e) {} // eslint-disable-line no-empty
   }
