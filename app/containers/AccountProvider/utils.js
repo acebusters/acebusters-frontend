@@ -14,6 +14,9 @@ export function getWeb3() {
 }
 
 export function addEventsDate(events) {
+  if (events.length === 0) {
+    return Promise.resolve(events);
+  }
   const web3 = getWeb3();
   const batch = web3.createBatch();
   const result = Promise.all(events.map((event) => (
