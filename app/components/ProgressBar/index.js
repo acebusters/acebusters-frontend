@@ -9,43 +9,57 @@ function withProgressBar(WrappedComponent) {
         progress: 0,
         loadedRoutes: props.location && [props.location.pathname],
       };
-      this.updateProgress = this.updateProgress.bind(this);
     }
 
     componentWillMount() {
       // Store a reference to the listener.
       /* istanbul ignore next */
-      this.unsubscribeHistory = this.props.router && this.props.router.listenBefore((location) => {
-        // Do not show progress bar for already loaded routes.
-        if (this.state.loadedRoutes.indexOf(location.pathname) === -1) {
-          // Note: progress auto increase to 99% in 1000 ms
-          this.updateProgress(-1000);
-        }
-      });
+      if (this.props.router) {
+        this.unsubscribeHistory = this.props.router.listenBefore((location) => {
+          const { pathname } = location;
+          this.setState((state) => {
+            // Do not show progress bar for already loaded routes.
+            if (state.loadedRoutes.indexOf(pathname) === -1) {
+              // Note: progress auto increase to 99% in 1000 ms
+              return { progress: -1000 };
+            }
+
+            return null;
+          });
+        });
+      }
     }
 
-    componentWillUpdate(newProps, newState) {
-      const { loadedRoutes, progress } = this.state;
-      const { pathname } = newProps.location;
+    componentWillReceiveProps(nextProps) {
+      // Complete progress when route changes
+      if (this.props.location.pathname !== nextProps.location.pathname) {
+        this.setState((state, props) => {
+          const { location: { pathname } } = props;
+          if (
+            state.loadedRoutes.indexOf(pathname) === -1 &&
+            state.progress !== 0 && state.progress < 100
+          ) {
+            return {
+              loadedRoutes: state.loadedRoutes.concat([pathname]),
+              progress: 100,
+            };
+          }
 
-      // Complete progress when route changes. But prevent state update while re-rendering.
-      if (loadedRoutes.indexOf(pathname) === -1 && progress !== 0 && newState.progress < 100) {
-        this.updateProgress(100);
-        this.setState({  // eslint-disable-line react/no-will-update-set-state
-          loadedRoutes: loadedRoutes.concat([pathname]),
+          return null;
         });
-      } else if (newProps.progress !== this.props.progress) {
-        this.updateProgress(newProps.progress);
+      }
+
+      if (nextProps.progress !== this.props.progress) {
+        this.setState({ progress: nextProps.progress });
       }
     }
 
     componentWillUnmount() {
       // Unset unsubscribeHistory since it won't be garbage-collected.
-      this.unsubscribeHistory = undefined;
-    }
-
-    updateProgress(progress) {
-      this.setState({ progress });
+      if (typeof this.unsubscribeHistory === 'function') {
+        this.unsubscribeHistory();
+        this.unsubscribeHistory = undefined;
+      }
     }
 
     render() {

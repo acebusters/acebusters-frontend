@@ -78,16 +78,6 @@ describe('withProgressBar()', () => {
     expect(inst.unsubscribeHistory).toBeFalsy();
   });
 
-  it('Should update state.progress when called updateProgress()', () => {
-    const renderedComponent = mount(
-      <HocComponent location={{ pathname: '/' }} router={router} />
-    );
-
-    const inst = renderedComponent.instance();
-    inst.updateProgress(10);
-    expect(renderedComponent.state().progress).toBe(10);
-  });
-
   it('Should start progress bar for a new route', () => {
     const renderedComponent = mount(
       <HocComponent location={{ pathname: '/' }} router={router} />
