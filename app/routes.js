@@ -120,7 +120,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: '/register',
+      path: '/register(/ref/:refCode)',
       name: 'register',
       getComponent(nextState, cb) {
         const importModules = Promise.all([

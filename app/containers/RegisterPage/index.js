@@ -136,7 +136,11 @@ function mapDispatchToProps(dispatch) {
 }
 
 // Which props do we want to inject, given the global state?
-const mapStateToProps = () => ({});
+const mapStateToProps = (state, props) => ({
+  initialValues: {
+    referral: props.params.refCode,
+  },
+});
 
 // Wrap the component to inject dispatch and state into it
 export default connect(mapStateToProps, mapDispatchToProps)(
