@@ -1,6 +1,6 @@
 import { take, put, call } from 'redux-saga/effects';
-import { startSubmit, stopSubmit, startAsyncValidation, stopAsyncValidation, change } from 'redux-form/immutable';
-import { CHANGE } from 'redux-form/lib/actionTypes';
+import { startSubmit, stopSubmit, startAsyncValidation, stopAsyncValidation, change, touch } from 'redux-form/immutable';
+import { CHANGE, INITIALIZE } from 'redux-form/lib/actionTypes';
 import { push } from 'react-router-redux';
 import account from '../../services/account';
 import { setProgress } from '../App/actions';
@@ -40,27 +40,35 @@ export function* registerSaga() {
   }
 }
 
+function* validateRefCode(value) {
+  if (value.length === 8) {
+    yield put(startAsyncValidation('register'));
+
+    try {
+      yield call(account.checkReferral, value);
+      yield put(stopAsyncValidation('register'));
+    } catch (err) {
+      const message = yield call(refCodeErrorByCode, err);
+
+      yield put(
+        stopAsyncValidation(
+          'register',
+          { referral: message },
+        )
+      );
+    }
+  }
+}
+
 export function* refCodeValidationSaga() {
   while (true) { // eslint-disable-line no-constant-condition
-    const { meta, payload: value = '' } = yield take(CHANGE);
+    const { payload: value = '' } = yield take((action) => (
+      action.type === CHANGE &&
+      action.meta.form === 'register' &&
+      action.meta.field === 'referral'
+    ));
 
-    if (meta.form === 'register' && meta.field === 'referral' && value.length === 8) {
-      yield put(startAsyncValidation('register'));
-
-      try {
-        yield call(account.checkReferral, value);
-        yield put(stopAsyncValidation('register'));
-      } catch (err) {
-        const message = yield call(refCodeErrorByCode, err);
-
-        yield put(
-          stopAsyncValidation(
-            'register',
-            { referral: message },
-          )
-        );
-      }
-    }
+    yield call(validateRefCode, value);
   }
 }
 
@@ -87,8 +95,18 @@ function refCodeErrorByCode(err) {
   }
 }
 
+function* initalRefCodeValidationSaga() {
+  const { payload } = yield take((action) => action.type === INITIALIZE && action.meta.form === 'register');
+  const refCode = payload.get('referral', '');
+  if (refCode.length > 0) {
+    yield call(validateRefCode, refCode);
+    yield put(touch('register', 'referral'));
+  }
+}
+
 export default [
   registerSaga,
   refCodeValidationSaga,
   defaultRefCodeChecking,
+  initalRefCodeValidationSaga,
 ];
