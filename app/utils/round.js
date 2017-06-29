@@ -1,3 +1,4 @@
 export function round(n, prec) {
-  return Math.round(n * prec * 10) / prec / 10;
+  const dec = prec ** 10;
+  return Math.round(n * dec) / dec;
 }
