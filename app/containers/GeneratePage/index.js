@@ -1,13 +1,13 @@
 /* eslint no-multi-spaces: "off", key-spacing: "off" */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Form, Field, reduxForm, SubmissionError, propTypes, change, formValueSelector } from 'redux-form/immutable';
 import { browserHistory } from 'react-router';
 import { Receipt, Type } from 'poker-helper';
 // components
 import Container from '../../components/Container';
-import Label from '../../components/Label';
 import FormField from '../../components/Form/FormField';
 import Button from '../../components/Button';
 import H1 from '../../components/H1';
@@ -47,9 +47,14 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
 
   constructor(props) {
     super(props);
-
     this.handleWorkerMessage = this.handleWorkerMessage.bind(this);
+    this.handleSaveEntropyClick = this.handleSaveEntropyClick.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.updateEntropy = this.updateEntropy.bind(this);
+    this.state = {
+      secretCreated: false,
+      entropySaved: false, // not actually saved, just a UI device
+    };
   }
 
   componentDidMount() {
@@ -82,6 +87,10 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
       this.props.onWorkerError(evt);
       throw new SubmissionError({ _error: evt });
     }
+  }
+
+  handleSaveEntropyClick() {
+    this.setState({ entropySaved: true });
   }
 
   handleSubmit(values, dispatch) {
@@ -139,39 +148,56 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     ));
   }
 
+  updateEntropy(data) {
+    this.setState({ secretCreated: true });
+    this.props.onEntropyUpdated(JSON.stringify(data ? data.raw : null));
+  }
+
   render() {
     const workerPath = this.props.workerPath + encodeURIComponent(location.origin);
-    const { error, handleSubmit, submitting, entropy } = this.props;
-    const updateEntropy = (data) => {
-      this.props.onEntropyUpdated(JSON.stringify(data ? data.raw : null));
-    };
-
+    const { error, handleSubmit, submitting, entropy, invalid } = this.props;
+    const { entropySaved, secretCreated } = this.state;
     return (
       <Container>
-        <div>
-          <H1>Encrypt & Store new account!</H1>
-          <Form
-            onSubmit={handleSubmit(this.handleSubmit)}
-          >
-            <Label style={{ float: 'none' }}>Random Secret</Label>
-            <MouseEntropy totalBits={768} width="100%" height="200px" onFinish={updateEntropy} sampleRate={0} />
-            <Field name="entropy" type="hidden" component={FormField} label="" value={entropy} />
-            <Field name="password" type="password" component={FormField} label="password" />
-            <Field name="confirmedPassword" type="password" component={FormField} label="confirm password" />
-            {error && <ErrorMessage error={error} />}
-            <Button type="submit" disabled={submitting} size="large">
-              { (!submitting) ? 'Encrypt and Store' : 'Please wait ...' }
-            </Button>
-          </Form>
-          <iframe
-            src={workerPath}
-            title="iframe_generate"
-            style={{ display: 'none' }}
-            onLoad={(event) => {
-              this.frame = event.target;
-            }}
-          />
-        </div>
+
+        {!entropySaved ?
+          <div>
+            <H1>Create Randomness for Secret</H1>
+            <Form onSubmit={handleSubmit(this.handleSaveEntropyClick)}>
+              <MouseEntropy totalBits={768} width="100%" height="200px" onFinish={this.updateEntropy} sampleRate={0} />
+              <Field name="entropy" type="hidden" component={FormField} label="" value={entropy} />
+              {error && <ErrorMessage error={error} />}
+              <Button
+                type="submit"
+                disabled={!secretCreated || entropySaved}
+                size="large"
+              >
+                { (!entropySaved) ? 'Save Entropy' : 'Entropy Saved' }
+              </Button>
+            </Form>
+          </div>
+          :
+          <div>
+            <H1>Encrypt & Save Your Account!</H1>
+            <Form onSubmit={handleSubmit(this.handleSubmit)}>
+              <Field name="password" type="password" component={FormField} label="Password" />
+              <Field name="confirmedPassword" type="password" component={FormField} label="Confirm Password" />
+              {error && <ErrorMessage error={error} />}
+              <Button type="submit" disabled={submitting || invalid} size="large">
+                { (!submitting) ? 'Encrypt and Save' : 'Please wait ...' }
+              </Button>
+            </Form>
+          </div>
+        }
+
+        <iframe
+          src={workerPath}
+          title="iframe_generate"
+          style={{ display: 'none' }}
+          onLoad={(event) => {
+            this.frame = event.target;
+          }}
+        />
         { this.props.progress && submitting &&
           <div>
             <H1>Registering please wait ...</H1>
@@ -188,12 +214,12 @@ GeneratePage.defaultProps = {
 
 GeneratePage.propTypes = {
   ...propTypes,
-  workerPath: React.PropTypes.string,
-  onWorkerError: React.PropTypes.func,
-  onWorkerInitialized: React.PropTypes.func,
-  onWorkerProgress: React.PropTypes.func,
-  onWalletExported: React.PropTypes.func,
-  input: React.PropTypes.any,
+  workerPath: PropTypes.string,
+  onWorkerError:PropTypes.func,
+  onWorkerInitialized: PropTypes.func,
+  onWorkerProgress: PropTypes.func,
+  onWalletExported: PropTypes.func,
+  input: PropTypes.any,
 };
 
 function mapDispatchToProps(dispatch) {
