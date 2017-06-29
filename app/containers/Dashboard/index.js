@@ -117,7 +117,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
       });
     });
 
-    this.proxy.Received({
+    this.proxy.allEvents({
       toBlock: 'latest',
     }).watch((error, event) => {
       if (!error && event) {

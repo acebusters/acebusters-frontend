@@ -64,13 +64,13 @@ function dashboardReducer(state = initialState, action) {
 
     case PROXY_EVENTS:
       return payload.reduce(
-        composeReducers(addProxyEvent, completePending),
+        composeReducers(addProxyContractEvent, completePending),
         setProxy(initEvents(state), meta.proxy)
       );
 
     case CONTRACT_EVENTS:
       return payload.reduce(
-        composeReducers(addNTZContractEvent, completePending),
+        composeReducers(addNutzContractEvent, completePending),
         setProxy(initEvents(state), meta.proxy)
       );
 
@@ -160,19 +160,19 @@ function addNTZPending(state, { methodName, args, txHash }) {
   return state;
 }
 
-function addProxyEvent(state, event) {
-  const isReceived = event.event === 'Received';
+function addProxyContractEvent(state, event) {
+  const isDeposit = event.event === 'Deposit';
   return state.setIn(
     ['events', event.transactionHash],
     makeDashboardEvent(event, {
-      address: isReceived ? event.args.sender : event.address,
+      address: isDeposit ? event.args.sender : event.args.to,
       unit: 'eth',
-      type: isReceived ? 'income' : 'outcome',
+      type: isDeposit ? 'income' : 'outcome',
     }),
   );
 }
 
-function addNTZContractEvent(state, event) {
+function addNutzContractEvent(state, event) {
   if (event.event === 'Transfer') {
     const isIncome = event.args.to === state.get('proxy');
     return state.setIn(
