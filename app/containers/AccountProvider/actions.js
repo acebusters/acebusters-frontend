@@ -151,17 +151,15 @@ export function transferETHError(payload) {
   return { type: ETH_TRANSFER_ERROR, payload };
 }
 
-export function proxyEvent(event) {
-  return {
-    type: PROXY_EVENTS,
-    payload: [event],
-  };
+export function proxyEvent(event, proxy) {
+  return proxyEvents([event], proxy);
 }
 
-export function proxyEvents(events) {
+export function proxyEvents(events, proxy) {
   return {
     type: PROXY_EVENTS,
     payload: events,
+    meta: { proxy },
   };
 }
 
@@ -177,10 +175,10 @@ export function contractTxError(payload) {
   return { type: CONTRACT_TX_ERROR, payload };
 }
 
-export function contractEvent(event) {
-  return { type: CONTRACT_EVENTS, payload: [event] };
+export function contractEvent(event, proxy) {
+  return contractEvents([event], proxy);
 }
 
-export function contractEvents(events) {
-  return { type: CONTRACT_EVENTS, payload: events };
+export function contractEvents(events, proxy) {
+  return { type: CONTRACT_EVENTS, payload: events, meta: { proxy } };
 }

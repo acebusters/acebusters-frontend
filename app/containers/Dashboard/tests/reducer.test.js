@@ -53,7 +53,7 @@ describe('dashboard reducer tests', () => {
 
   it('should handle proxy event', () => {
     expect(dashboardReducer(
-      fromJS({ events: null, pending: {} }),
+      fromJS({ events: null }),
       proxyEvent({
         event: 'Received',
         address: '0x7c08ca8bef208ac8be8cd03ad15fbef643dd355c',
@@ -76,15 +76,29 @@ describe('dashboard reducer tests', () => {
           type: 'income',
         },
       },
-      pending: {},
     }));
+  });
+
+  it('should get proxy address from action meta', () => {
+    expect(dashboardReducer(
+      fromJS({ events: null }),
+      proxyEvent({
+        event: 'Received',
+        address: '0x7c08ca8bef208ac8be8cd03ad15fbef643dd355c',
+        blockNumber: 582975,
+        transactionHash: '0x67ed561b9e1842016fda612d1940135465968cd3de0ea7008e7240347fe80bc1',
+        args: {
+          sender: '0x7caaca8bef208ac8be8cd03ad15fbef643dd355c',
+          value: '10000000',
+        },
+      }, '0x7caaca8bef208ac8be8cd03ad15fbef643dd355c')
+    ).get('proxy')).toEqual('0x7caaca8bef208ac8be8cd03ad15fbef643dd355c');
   });
 
   it('should handle nutz contract transfer event', () => {
     expect(dashboardReducer(
       fromJS({
         events: null,
-        pending: {},
         proxy: '0x7c08ca8bef208ac8be8cd03ad15fbef643dd355c',
       }),
       contractEvent({
@@ -110,7 +124,6 @@ describe('dashboard reducer tests', () => {
           type: 'income',
         },
       },
-      pending: {},
       proxy: '0x7c08ca8bef208ac8be8cd03ad15fbef643dd355c',
     }));
   });

@@ -313,9 +313,10 @@ export function* ethEventListenerSaga(contract) {
     try {
       const event = yield take(chan);
       const state = yield select();
-      if (isUserEvent(state.getIn(['account', 'proxy']))(event)) {
+      const proxy = state.getIn(['account', 'proxy']);
+      if (isUserEvent(proxy)(event)) {
         const events = yield call(addEventsDate, [event]);
-        yield put(contractEvents(events));
+        yield put(contractEvents(events, proxy));
       }
     } catch (e) {} // eslint-disable-line no-empty
   }

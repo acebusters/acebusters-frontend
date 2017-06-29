@@ -22,10 +22,10 @@ const confParams = conf();
 /**
  * interface DashboardEvent {
  *   unit: 'eth' | 'ntz';
- *   value: string;
+ *   value?: string;
  *   blockNumber?: number;
  *   address: string;
- *   type: 'income' | 'outcome' | 'pending';
+ *   type: 'income' | 'outcome';
  *   transactionHash: string;
  *   timestamp?: number;
  *   pending?: boolean;
@@ -38,6 +38,8 @@ const initialState = fromJS({
 });
 
 function dashboardReducer(state = initialState, action) {
+  const { payload, meta = {} } = action;
+
   switch (action.type) {
     case ACCOUNT_LOADED:
       return state.set('proxy', action.data.proxy);
@@ -45,31 +47,31 @@ function dashboardReducer(state = initialState, action) {
     case CONTRACT_TX_SUCCESS:
       return addNTZPending(
         initEvents(state),
-        action.payload
+        payload
       );
 
     case ETH_TRANSFER_SUCCESS:
       return addETHPending(
         initEvents(state),
-        action.payload
+        payload
       );
 
     case CONTRACT_TX_ERROR:
-      return state.set('failedTx', fromJS(action.payload));
+      return state.set('failedTx', fromJS(payload));
 
     case MODAL_DISMISS:
       return state.set('failedTx', null);
 
     case PROXY_EVENTS:
-      return action.payload.reduce(
+      return payload.reduce(
         composeReducers(addProxyEvent, completePending),
-        initEvents(state)
+        setProxy(initEvents(state), meta.proxy)
       );
 
     case CONTRACT_EVENTS:
-      return action.payload.reduce(
+      return payload.reduce(
         composeReducers(addNTZContractEvent, completePending),
-        initEvents(state)
+        setProxy(initEvents(state), meta.proxy)
       );
 
     default:
@@ -82,6 +84,14 @@ export default dashboardReducer;
 function initEvents(state) {
   if (state.get('events') === null) {
     return state.set('events', fromJS({}));
+  }
+
+  return state;
+}
+
+function setProxy(state, proxy) {
+  if (proxy) {
+    return state.set('proxy', proxy);
   }
 
   return state;
@@ -133,7 +143,6 @@ function addNTZPending(state, { methodName, args, txHash }) {
   } else if ( // eth claim
     methodName === 'transferFrom' &&
     args[0] === confParams.ntzAddr &&
-    args[1] === state.get('proxy') &&
     args[2] === 0
   ) {
     return state.setIn(
@@ -187,7 +196,7 @@ function addNTZContractEvent(state, event) {
     return state.setIn(
       ['events', event.transactionHash],
       makeDashboardEvent(event, {
-        address: state.get('proxy'),
+        address: event.args.purchaser,
         unit: 'ntz',
         type: 'income',
       }),
