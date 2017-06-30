@@ -17,7 +17,7 @@ const SeatComponent = (props) => {
     pending,
   } = props;
   if (open) {
-    if (myPos === undefined) {
+    if (myPos === undefined || pending) {
       return (
         <ButtonJoinSeat
           onClickHandler={() => isTaken(open, myPos, pending, pos)}
