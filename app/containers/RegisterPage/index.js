@@ -4,6 +4,8 @@ import ReCAPTCHA from 'react-google-recaptcha';
 import { Form, Field, reduxForm, propTypes } from 'redux-form/immutable';
 import { FormattedMessage } from 'react-intl';
 
+import { conf } from '../../app.config';
+
 // components
 import Container from '../../components/Container';
 import FormGroup from '../../components/Form/FormGroup';
@@ -57,7 +59,7 @@ const warn = (values) => {
 const Captcha = (props) => (
   <div style={{ marginBottom: '15px' }}>
     <ReCAPTCHA
-      sitekey={'6LcE0RQUAAAAAEf6UWFsHEPedPBmRPAQiaSiWynN'}
+      sitekey={conf().recaptchaKey}
       onChange={props.input.onChange}
     />
   </div>

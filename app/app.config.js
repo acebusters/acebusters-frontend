@@ -14,6 +14,7 @@ export function conf() {
   // ### PRODUCTION ENVIRONMENT CONFIG
   if (sub === 'app') {
     return {
+      recaptchaKey: '',
       defaultRefCode: DEFAULT_REF_CODE,
       etherscanUrl: 'https://etherscan.io/',
       gethUrl: '',
@@ -31,6 +32,7 @@ export function conf() {
   // ### STAGING ENVIRONMENT CONFIG
   if (sub === 'beta') {
     return {
+      recaptchaKey: '6LcE0RQUAAAAAEf6UWFsHEPedPBmRPAQiaSiWynN',
       defaultRefCode: DEFAULT_REF_CODE,
       etherscanUrl: 'https://rinkeby.etherscan.io/',
       gethUrl: 'ws://rinkeby.acebusters.com:8546',
@@ -47,6 +49,7 @@ export function conf() {
 
   // ### SANDBOX ENVIRONMENT CONFIG
   return {
+    recaptchaKey: '6LcE0RQUAAAAAEf6UWFsHEPedPBmRPAQiaSiWynN',
     defaultRefCode: DEFAULT_REF_CODE,
     etherscanUrl: 'https://rinkeby.etherscan.io/',
     gethUrl: 'ws://geth.ocolin.com:8546',
