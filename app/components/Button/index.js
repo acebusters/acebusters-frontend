@@ -22,7 +22,6 @@ const SharedButton = styled.button`
   display: inline-block;
   box-sizing: border-box;
   text-decoration: none;
-  margin: 0 auto;
   border-radius: 4px;
   user-select: none;
   cursor: pointer;
@@ -36,7 +35,7 @@ const SharedButton = styled.button`
   }
 `;
 
-const Medium = styled(SharedButton)`{
+const Medium = styled(SharedButton)`
   padding: 0.1em 0.5em;
   font-size: 16px;
   background-color: ${black};
@@ -48,7 +47,7 @@ const Medium = styled(SharedButton)`{
   &:active {
     color: ${baseColor};
   }
-}`;
+`;
 
 const Large = styled(SharedButton)`
   padding: 10px;
@@ -76,12 +75,7 @@ const Large = styled(SharedButton)`
 
 const Icon = styled.i`
   padding-left: 0.5em;
-  ${(props) => {
-    if (props.content.length === 0) {
-      return 'padding-right: 0.5em;';
-    }
-    return 'padding-right: 0';
-  }}
+  padding-right: ${(props) => props.content.length === 0 ? '0.5em' : 0};
 `;
 
 const sizes = {

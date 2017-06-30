@@ -19,6 +19,10 @@ export const StyledIcon = styled.i`
   &:hover {
     color: ${white};
   }
+
+  @media (max-width: 500px) {
+    font-size: 3em !important;
+  }
 `;
 
 const CenterDiv = styled.div`
@@ -27,36 +31,38 @@ const CenterDiv = styled.div`
 `;
 
 const IconContainer = styled.div`
-    margin-left: -20px;
+    
+`;
+
+const Icons = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin: 0 10em;
+
+  @media (max-width: 500px) {
+    margin: 0 2em;
+  }
 `;
 
 function Footer() {
   return (
     <Wrapper>
-      <Grid xs={1 / 1}>
-        <Grid xs={1 / 4}>
-          <CenterDiv>
-            <a href="https://github.com/acebusters" target="_blank"><StyledIcon className="fa fa-github"></StyledIcon></a>
-          </CenterDiv>
-        </Grid>
-        <Grid xs={1 / 4}>
-          <CenterDiv>
-            <IconContainer>
-              <a href="https://discordapp.com/invite/7PesDTZ" target="_blank"><StyledIcon className="fa icon-discord"></StyledIcon></a>
-            </IconContainer>
-          </CenterDiv>
-        </Grid>
-        <Grid xs={1 / 4}>
-          <CenterDiv>
-            <a href="https://twitter.com/ace_busters" target="_blank"><StyledIcon className="fa fa-twitter" ></StyledIcon></a>
-          </CenterDiv>
-        </Grid>
-        <Grid xs={1 / 4}>
-          <CenterDiv>
-            <a href="https://www.facebook.com/acebusters.poker" target="_blank"><StyledIcon className="fa fa-facebook"></StyledIcon></a>
-          </CenterDiv>
-        </Grid>
-      </Grid>
+      <Icons>
+        <CenterDiv>
+          <a href="https://github.com/acebusters" target="_blank"><StyledIcon className="fa fa-github"></StyledIcon></a>
+        </CenterDiv>
+        <CenterDiv>
+          <IconContainer>
+            <a href="https://discordapp.com/invite/7PesDTZ" target="_blank"><StyledIcon className="fa icon-discord"></StyledIcon></a>
+          </IconContainer>
+        </CenterDiv>
+        <CenterDiv>
+          <a href="https://twitter.com/ace_busters" target="_blank"><StyledIcon className="fa fa-twitter" ></StyledIcon></a>
+        </CenterDiv>
+        <CenterDiv>
+          <a href="https://www.facebook.com/acebusters.poker" target="_blank"><StyledIcon className="fa fa-facebook"></StyledIcon></a>
+        </CenterDiv>
+      </Icons>
       <Grid xs={1 / 1}>
         <CenterDiv>
           <LocaleToggle />

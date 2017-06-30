@@ -5,7 +5,7 @@ import {
 } from '../../variables';
 
 const Wrapper = styled.footer`
-  padding: 3em 10em;
+  padding: 3em 0;
   border-top: 1px solid #666;
   color: ${white};
   background: ${black};

@@ -3,6 +3,10 @@ import styled from 'styled-components';
 import WithLoading from '../WithLoading';
 import ListItem from '../ListItem';
 
+const Wrapper = styled.div`
+  overflow-y: auto;
+`;
+
 const Table = styled.table`
   border-collapse: collapse;
   background-color: transparent;
@@ -79,7 +83,7 @@ class List extends React.Component {
     const items = this.sortedItems();
 
     return (
-      <div>
+      <Wrapper>
         <TableStriped>
           <thead>
             <tr>
@@ -123,7 +127,7 @@ class List extends React.Component {
             </div>
           )}
         </WithLoading>
-      </div>
+      </Wrapper>
     );
   }
 }

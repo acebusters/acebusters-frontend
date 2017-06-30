@@ -22,12 +22,11 @@ import Alert from '../../components/Alert';
 import TransferDialog from '../TransferDialog';
 import ExchangeDialog from '../ExchangeDialog';
 import Container from '../../components/Container';
-import Button from '../../components/Button';
 import SubmitButton from '../../components/SubmitButton';
 import Blocky from '../../components/Blocky';
 import WithLoading from '../../components/WithLoading';
 
-import { Section } from './styles';
+import { Section, DBButton, Address } from './styles';
 import { createDashboardTxsSelector } from './selectors';
 import { txnsToList } from './txnsToList';
 
@@ -255,7 +254,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
             loadingSize="40px"
             styles={{ layout: { transform: 'translateY(-50%)', left: 0 } }}
           >
-            <p> { this.props.account.proxy } </p>
+            <Address>{this.props.account.proxy}</Address>
             <QRCode value={qrUrl} size={120} />
 
             <Alert theme="danger">
@@ -279,8 +278,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
             </WithLoading>
           </p>
           {babzBalance &&
-            <Button
-              align="left"
+            <DBButton
               onClick={() => {
                 this.props.modalAdd(
                   <TransferDialog
@@ -294,11 +292,10 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
               icon="fa fa-money"
             >
               TRANSFER
-            </Button>
+            </DBButton>
           }
           {babzBalance && floor &&
-            <Button
-              align="left"
+            <DBButton
               onClick={() => {
                 this.props.modalAdd(
                   <ExchangeDialog
@@ -314,11 +311,10 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
               icon="fa fa-money"
             >
               SELL
-            </Button>
+            </DBButton>
           }
           {weiBalance && ceiling &&
-            <Button
-              align="left"
+            <DBButton
               onClick={() => {
                 this.props.modalAdd(
                   <ExchangeDialog
@@ -334,7 +330,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
               icon="fa fa-money"
             >
               PURCHASE
-            </Button>
+            </DBButton>
           }
         </Section>
 
@@ -352,8 +348,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
             </WithLoading>
           </p>
           {weiBalance &&
-            <Button
-              align="left"
+            <DBButton
               onClick={() => {
                 this.props.modalAdd(
                   <TransferDialog
@@ -367,7 +362,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
               icon="fa fa-money"
             >
               TRANSFER
-            </Button>
+            </DBButton>
           }
         </Section>
 
