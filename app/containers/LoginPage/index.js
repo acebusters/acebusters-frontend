@@ -136,7 +136,7 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
       <div>
         <H1>Log into your account!</H1>
         <Form onSubmit={handleSubmit(this.handleSubmit)}>
-          <Field name="email" type="text" component={FormField} label="Email" />
+          <Field name="email" type="email" component={FormField} label="Email" />
           <Field name="password" type="password" component={FormField} label="Password" />
           {error && <ErrorMessage error={error} />}
           <Button type="submit" size="large" disabled={submitting || invalid}>

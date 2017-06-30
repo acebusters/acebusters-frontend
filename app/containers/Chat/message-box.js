@@ -12,8 +12,10 @@ class MessageBox extends React.PureComponent { // eslint-disable-line react/pref
     if (event.which === 13) {
       const text = this.input.value.trim();
       event.preventDefault();
-      this.props.onAddMessage(text);
-      this.input.value = '';
+      if (text.length > 0) {
+        this.props.onAddMessage(text);
+        this.input.value = '';
+      }
     }
   }
 
