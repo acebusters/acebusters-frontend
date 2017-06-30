@@ -22,14 +22,6 @@ export const TableContainer = styled.div`
   }
 `;
 
-export const TableHeader = styled.div`
-   position: relative;
-   
-   text-align: left;
-   color: ${white};
-   padding-left: 10em;
-`;
-
 export const Wrapper = styled.div`
   position: absolute;
   left: 2em;

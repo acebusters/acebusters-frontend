@@ -3,15 +3,16 @@
 */
 import styled from 'styled-components';
 
+import { LogoContainer } from '../Logo';
+
 import {
   curtainStickyWidth,
-  curtainHalfWidth,
+  menuClose,
 } from '../../variables';
 
 const menuActiveBG = '#35c5e3'; // electric blue
 const menuBoxShadow = '0 2px 4px 0 rgba(0,0,0,0.31)';
 const menuColor = '#ebe8e8'; // light gray
-export const menuClose = 'linear-gradient(0deg, #606060 0%, #808080 100%)';
 const menuOpen = 'linear-gradient(0deg, #383838 0%, #717171 100%)';
 const menuHoverBoxShadow = 'inset 1px 1px 5px 1px rgba(0,0,0,0.3)';
 const menuActiveBoxShadow = 'inset 2px 1px 5px 2px rgba(0,0,0,0.50)';
@@ -45,19 +46,18 @@ export const Button = styled.button`
 // Logo
 export const LogoWrapper = styled.div`
   position: absolute;
+  top: 24px;
+  left: 18px;
+  display: flex;
+  align-items: center;
   pointer-events: none;
-  top: 0;
-  left: 0;
-  width: 128px;
-  height: 46px;
-  border: 1px dashed red;
   @media (min-width: ${curtainStickyWidth}) {
-    left: calc(${curtainHalfWidth} * 2);
+    display: none;
   }
 `;
 
-export const Logo = styled.div`
-  color: grey;
+export const TableLogoContainer = styled(LogoContainer)`
+  color: #272727;
 `;
 
 // table-menu

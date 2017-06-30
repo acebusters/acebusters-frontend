@@ -14,6 +14,7 @@ export const gray = '#999999';
 export const green = '#A0FFB1';
 export const white = '#FFF';
 export const hover = '#C85C5C';
+export const menuClose = 'linear-gradient(0deg, #606060 0%, #808080 100%)';
 
 // FONTS
 // --------------------------------------------------------

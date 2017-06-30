@@ -6,10 +6,16 @@ import MenuHeader from './MenuHeader';
 import MenuItem from './MenuItem';
 
 import {
- Logo,
  LogoWrapper,
+ TableLogoContainer,
  MenuContainer,
 } from './styles';
+
+import {
+  Logo,
+  LogoName,
+  NameContainer,
+} from '../Logo';
 
 class TableMenu extends React.Component {
   handleClickOutside() {
@@ -114,7 +120,12 @@ class TableMenu extends React.Component {
     return (
       <div>
         <LogoWrapper name="logo-wrapper">
-          <Logo>AceBusters Logo</Logo>
+          <TableLogoContainer>
+            <Logo />
+          </TableLogoContainer>
+          <NameContainer>
+            <LogoName name="logo-name" />
+          </NameContainer>
         </LogoWrapper>
         <MenuContainer open={open} name="menu-container">
           <MenuHeader {...this.props} />
