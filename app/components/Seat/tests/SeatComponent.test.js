@@ -27,8 +27,11 @@ describe('components.seat.seatComponent', () => {
         pos: 0, // to maxTable
       };
       const el = shallow(<SeatComponent {...props} />);
-      it('should render <ButtonInvite />', () => {
-        expect(el.find('ButtonInvite').length).toEqual(1);
+      // it('should render <ButtonInvite />', () => {
+      //   expect(el.find('ButtonInvite').length).toEqual(1);
+      // });
+      it('should render <ButtonOpenSeat />', () => {
+        expect(el.find('ButtonOpenSeat').length).toEqual(1);
       });
     });
   });

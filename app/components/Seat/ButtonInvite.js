@@ -1,6 +1,7 @@
 /**
 * Created by jzobro 20170519
 */
+/* Replaced by ButtonOpenSeat until Invite process is complete */
 import React from 'react';
 import {
   ButtonIcon,

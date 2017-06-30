@@ -2,10 +2,11 @@
 * Created by jzobro 20170517
 */
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import Seat from './Seat';
 import ButtonJoinSeat from './ButtonJoinSeat';
-import ButtonInvite from './ButtonInvite';
+import ButtonOpenSeat from './ButtonOpenSeat';
 
 const SeatComponent = (props) => {
   const {
@@ -25,22 +26,17 @@ const SeatComponent = (props) => {
       );
     }
     if (typeof myPos === 'number') {
-      return (
-        <ButtonInvite
-          onClickHandler={() => isTaken(open, myPos, pending, pos)}
-          {...props}
-        />
-      );
+      return <ButtonOpenSeat {...props} />;
     }
   }
   return <Seat {...props} />;
 };
 SeatComponent.propTypes = {
-  isTaken: React.PropTypes.func,
-  myPos: React.PropTypes.number, // action bar position
-  open: React.PropTypes.bool,
-  pos: React.PropTypes.number,
-  pending: React.PropTypes.bool,
+  isTaken: PropTypes.func,
+  myPos: PropTypes.number,
+  open: PropTypes.bool,
+  pos: PropTypes.number,
+  pending: PropTypes.bool,
 };
 
 export default SeatComponent;
