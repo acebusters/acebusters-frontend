@@ -393,6 +393,33 @@ const makeMyMaxBetSelector = () => createSelector(
   }
 );
 
+const winnerAddrSelector = (state, props) => props.params.winnerAddr;
+
+const makeWinnerPosSelector = () => createSelector(
+  [makeLineupSelector(), winnerAddrSelector],
+  (lineup, winnerAddress) => {
+    try {
+      return pokerHelper.getMyPos(lineup.toJS(), winnerAddress);
+    } catch (e) {
+      return undefined;
+    }
+  }
+);
+
+const makeWinnerMaxBetSelector = () => createSelector(
+  [makeLineupSelector(), winnerAddrSelector, makeWinnerPosSelector()],
+  (lineup, winnerAddress, myPos) => {
+    if (!lineup || !lineup.toJS || !winnerAddress || myPos === undefined) {
+      return undefined;
+    }
+    try {
+      return pokerHelper.getMyMaxBet(lineup.toJS(), winnerAddress);
+    } catch (e) {
+      return undefined;
+    }
+  }
+);
+
 const makeMissingHandSelector = () => createSelector(
   [tableStateSelector],
   (table) => {
@@ -485,4 +512,5 @@ export {
     makeMissingHandSelector,
     makeMessagesSelector,
     makePlayersCountSelector,
+    makeWinnerMaxBetSelector,
 };

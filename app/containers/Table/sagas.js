@@ -47,6 +47,7 @@ import {
   makeLineupSelector,
   makeHandSelector,
   makeSelectWinners,
+  makeWinnerMaxBetSelector,
 } from './selectors';
 
 import TableService, { getHand } from '../../services/tableService';
@@ -237,6 +238,7 @@ export function* updateScanner() {
   const sbSelector = makeSbSelector();
   const myCardsSelector = makeMyCardsSelector();
   const winnnersSelector = makeSelectWinners();
+  const winnerMaxBetSelector = makeWinnerMaxBetSelector();
   // toggle variables to avoid duplicate requests
   const payedBlind = {};
   const showed = {};
@@ -309,7 +311,12 @@ export function* updateScanner() {
         storageService.setItem(`won[${toggleKey}]`, true);
         const winnerMessages = winners.map((winner) => {
           const handString = (winner.hand) ? `with ${winner.hand}` : '';
-          return `player ${nickNameByAddress(winner.addr)} won ${formatNtz(winner.amount)} NTZ ${handString}`;
+          const winnerMaxBet = winnerMaxBetSelector(state, { params: {
+            tableAddr: action.tableAddr,
+            handId: action.hand.handId,
+            winnerAddr: winner.addr,
+          } }) || 0;
+          return `player ${nickNameByAddress(winner.addr)} won ${formatNtz(winner.amount - winnerMaxBet)} NTZ ${handString}`;
         });
         yield put(addMessage(winnerMessages.join(', '), action.tableAddr, null, Date.now()));
         continue; // eslint-disable-line no-continue
