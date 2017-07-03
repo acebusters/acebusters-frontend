@@ -10,24 +10,20 @@ import {
   SeatWrapper,
 } from './styles';
 
-const ButtonJoinSeat = ({ coords, onClickHandler, pending }) => {
-  const iconType = pending ? 'fa fa-refresh fa-spin' : 'fa fa-plus';
-  const message = pending ? 'Pending' : 'Join';
-  return (
-    <SeatWrapper coords={coords}>
-      <ButtonWrapper onClick={onClickHandler}>
-        <ButtonStyle pending={pending}>
-          <ButtonIcon className={iconType} aria-hidden="true" />
-          <ButtonText>{message}</ButtonText>
-        </ButtonStyle>
-      </ButtonWrapper>
-    </SeatWrapper>
-  );
-};
+const ButtonJoinSeat = ({ coords, onClickHandler }) => (
+  <SeatWrapper coords={coords}>
+    <ButtonWrapper onClick={onClickHandler}>
+      <ButtonStyle>
+        <ButtonIcon className="fa fa-plus" aria-hidden="true" />
+        <ButtonText>Join</ButtonText>
+      </ButtonStyle>
+    </ButtonWrapper>
+  </SeatWrapper>
+);
+
 ButtonJoinSeat.propTypes = {
   coords: React.PropTypes.array,
   onClickHandler: React.PropTypes.func,
-  pending: React.PropTypes.bool,
 };
 
 export default ButtonJoinSeat;

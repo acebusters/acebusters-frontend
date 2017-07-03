@@ -6,7 +6,8 @@ import tableReducer from '../reducer';
 import {
   updateReceived,
   setCards,
-  pendingToggle,
+  setPending,
+  dropPending,
   lineupReceived,
 } from '../actions';
 
@@ -249,10 +250,13 @@ describe('table reducer tests', () => {
     });
 
     // execute action
-    const nextState = tableReducer(before, pendingToggle(tableAddr, 2, 0));
+    const nextState = tableReducer(
+      before,
+      setPending(tableAddr, 2, 0, {})
+    );
 
     // check state after execution
-    const after = before.setIn([tableAddr, '2', 'lineup', 0, 'pending'], true);
+    const after = before.setIn([tableAddr, '2', 'lineup', 0, 'pending'], fromJS({}));
     expect(nextState).toEqual(after);
   });
 
@@ -271,7 +275,10 @@ describe('table reducer tests', () => {
     });
 
     // execute action
-    const nextState = tableReducer(before, pendingToggle(tableAddr, 2, 0));
+    const nextState = tableReducer(
+      before,
+      dropPending(tableAddr, 2, 0)
+    );
 
     // check state after execution
     const after = before.deleteIn([tableAddr, '2', 'lineup', 0, 'pending']);

@@ -8,10 +8,6 @@ import { createStructuredSelector } from 'reselect';
 import { modalAdd, modalDismiss } from '../App/actions';
 
 import {
-  pendingToggle,
-} from '../Table/actions';
-
-import {
   makeCardsSelector,
   makeLastAmountSelector,
   makeFoldedSelector,
@@ -90,17 +86,15 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
         {...this.props}
         timeLeft={timeLeft}
         wasMostRecentAction={this.state.wasMostRecentAction}
-      >
-      </SeatComponent>
+      />
     );
   }
 }
 
 export function mapDispatchToProps() {
   return {
-    modalAdd: (node) => (modalAdd(node)),
-    modalDismiss: () => (modalDismiss()),
-    pendingToggle: (tableAddr, handId, pos) => (pendingToggle(tableAddr, handId, pos)),
+    modalAdd,
+    modalDismiss,
   };
 }
 

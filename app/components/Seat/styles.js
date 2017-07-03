@@ -271,7 +271,7 @@ export const TimerBar = styled.div`
 // ButtonJoin
 export const ButtonStyle = styled(SharedMiddle)`
   border-radius: ${scaleButtonJoin(4)};
-  width: ${(props) => props.pending ? scaleButtonJoin(60) : scaleButtonJoin(44)};
+  width: ${scaleButtonJoin(44)};
 `;
 
 export const ButtonWrapper = styled.button`

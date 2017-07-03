@@ -4,6 +4,7 @@
 import { Map, List, fromJS } from 'immutable';
 import * as TableActions from './actions';
 import * as storageService from '../../services/localStorage';
+import { createBlocky } from '../../services/blockies';
 
 // Expecting a structure of the state like this:
   // [tableAddr]: {
@@ -97,13 +98,20 @@ export default function tableReducer(state = initialState, action) {
       return state.setIn([action.tableAddr, handIdStr, 'lineup', action.pos, 'exitHand'], action.exitHand);
     }
 
-    case TableActions.PENDING_TOGGLE: {
-      const handIdStr = action.handId.toString();
-      const pending = state.getIn([action.tableAddr, handIdStr, 'lineup', action.pos, 'pending']);
-      if (!pending) {
-        return state.setIn([action.tableAddr, handIdStr, 'lineup', action.pos, 'pending'], true);
+    case TableActions.PENDING_SET: {
+      const { payload: { handId, tableAddr, pos, data = {} } } = action;
+      const path = [tableAddr, handId.toString(), 'lineup', pos, 'pending'];
+
+      if (data.signerAddr) {
+        data.blocky = createBlocky(data.signerAddr);
       }
-      return state.deleteIn([action.tableAddr, handIdStr, 'lineup', action.pos, 'pending']);
+      return state.setIn(path, fromJS(data));
+    }
+
+    case TableActions.PENDING_DROP: {
+      const { payload: { handId, tableAddr, pos } } = action;
+      const path = [tableAddr, handId.toString(), 'lineup', pos, 'pending'];
+      return state.deleteIn(path);
     }
 
     case TableActions.SET_CARDS: {

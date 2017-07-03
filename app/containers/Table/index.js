@@ -35,7 +35,7 @@ import {
   lineupReceived,
   updateReceived,
   addMessage,
-  pendingToggle,
+  setPending,
   setExitHand,
   sitOutToggle,
   bet,
@@ -201,9 +201,15 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       this.props.updateReceived(this.tableAddr, event.payload);
     } else if (event.type === 'joinRequest') {
       if (event.payload.signer !== this.props.signerAddr) {
-        const posString = event.payload.data.slice(201);
-        const pos = parseInt(posString, 16) - 1;
-        this.props.pendingToggle(this.tableAddr, this.props.params.handId, pos);
+        const data = event.payload.data.slice(2);
+        const amount = parseInt(data.slice(8, 72), 16);
+        const pos = parseInt(data.slice(136), 16) - 1;
+        this.props.setPending(
+          this.tableAddr,
+          this.props.params.handId,
+          pos,
+          { signerAddr: event.payload.signer, stackSize: amount },
+        );
       }
     }
   }
@@ -242,7 +248,12 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
     this.props.modalDismiss();
     this.props.modalAdd(slides);
-    this.props.pendingToggle(this.tableAddr, this.props.params.handId, pos);
+    this.props.setPending(
+      this.tableAddr,
+      this.props.params.handId,
+      pos,
+      { signerAddr: this.props.signerAddr, stackSize: amount }
+    );
   }
 
   isTaken(open, myPos, pending, pos) {
@@ -390,7 +401,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
         let msg = 'Ups Something went wrong';
         const errorCode = result.args.errorCode.toNumber();
-        this.props.pendingToggle(this.tableAddr, this.props.params.handId);
         if (errorCode === 1) {
           msg = 'Wrong Amount';
         }
@@ -430,7 +440,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     }
     for (let i = 0; i < lineup.length; i += 1) {
       const sitout = lineup[i].sitout;
-      const seat = (
+      seats.push(
         <Seat
           key={i}
           pos={i}
@@ -439,9 +449,8 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           params={this.props.params}
           changed={changed}
           isTaken={this.isTaken}
-        >
-        </Seat>);
-      seats.push(seat);
+        />
+      );
     }
     return seats;
   }
@@ -502,14 +511,14 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
 export function mapDispatchToProps() {
   return {
-    handRequest: (tableAddr, handId) => handRequest(tableAddr, handId),
-    lineupReceived: (...args) => (lineupReceived(...args)),
-    modalAdd: (node) => (modalAdd(node)),
-    modalDismiss: () => (modalDismiss()),
-    pendingToggle: (tableAddr, handId, pos) => (pendingToggle(tableAddr, handId, pos)),
-    setExitHand: (tableAddr, handId, pos, exitHand) => (setExitHand(tableAddr, handId, pos, exitHand)),
-    updateReceived: (tableAddr, hand) => (updateReceived(tableAddr, hand)),
-    addMessage: (message, tableAddr, privKey, created) => (addMessage(message, tableAddr, privKey, created)),
+    handRequest,
+    lineupReceived,
+    modalAdd,
+    modalDismiss,
+    setPending,
+    setExitHand,
+    updateReceived,
+    addMessage,
   };
 }
 
@@ -555,7 +564,7 @@ Table.propTypes = {
   myPos: React.PropTypes.any,
   modalAdd: React.PropTypes.func,
   handRequest: React.PropTypes.func,
-  pendingToggle: React.PropTypes.func,
+  setPending: React.PropTypes.func,
   setExitHand: React.PropTypes.func,
   modalDismiss: React.PropTypes.func,
   winners: React.PropTypes.array,

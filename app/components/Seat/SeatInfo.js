@@ -25,20 +25,28 @@ const SeatInfo = ({
   stackSize,
 }) => (
   <InfoWrapper>
-    {seatStatus && seatStatus === STATUS_MSG.active ?
+    {seatStatus && seatStatus === STATUS_MSG.active &&
       <ChipButtonContainer className="chip-button-container">
-        <DealerButton dealer={dealer} pos={pos}>D</DealerButton>
-        { lastAmount > 0 &&
-          <Pot className="pot" potSize={lastAmount} left={`${amountCoords[0]}em`} top={`${amountCoords[1]}em `} />
+        <DealerButton dealer={dealer} pos={pos}>
+          D
+        </DealerButton>
+        {lastAmount > 0 &&
+          <Pot
+            className="pot"
+            potSize={lastAmount}
+            left={`${amountCoords[0]}em`}
+            top={`${amountCoords[1]}em `}
+          />
         }
       </ChipButtonContainer>
-        : null
     }
 
     <AvatarImage className="avatar-image" bgImg={blocky} />
     <DetailWrapper>
       <NameBox className="name-box">{nickNameByAddress(signerAddr)}</NameBox>
-      <StackBox className="stack-box">{formatNtz(stackSize)}</StackBox>
+      <StackBox className="stack-box">
+        {formatNtz(stackSize)} NTZ
+      </StackBox>
     </DetailWrapper>
   </InfoWrapper>
 );

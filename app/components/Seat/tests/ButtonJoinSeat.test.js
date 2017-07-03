@@ -19,18 +19,4 @@ describe('components.seat.ButtonJoinSeat', () => {
       expect(el.text()).toEqual('Join');
     });
   });
-
-  describe('after join click', () => {
-    const props = {
-      coords: [0, 0],
-      pending: true,
-      onClickHandler: () => {},
-    };
-    it('should render joining animation', () => {
-      const el = mount(<ButtonJoinSeat {...props} />);
-
-      expect(el.find('.fa-refresh').length).toEqual(1);
-      expect(el.text()).toEqual('Pending');
-    });
-  });
 });

@@ -15,7 +15,8 @@ export const FOLD = 'acebusters/Table/FOLD';
 export const CHECK = 'acebusters/Table/CHECK';
 export const SHOW = 'acebusters/Table/SHOW';
 export const NET = 'acebusters/Table/NET';
-export const PENDING_TOGGLE = 'acebusters/Table/PENDING_TOGGLE';
+export const PENDING_SET = 'acebusters/Table/PENDING_SET';
+export const PENDING_DROP = 'acebusters/Table/PENDING_DROP';
 export const EXIT_HAND_SET = 'acebusters/Table/EXIT_HAND_SET';
 export const RECEIPT_SET = 'acebusters/Table/RECEIPT_SET';
 export const ADD_MESSAGE = 'acebusters/Chat/ADD_MESSAGE';
@@ -62,8 +63,12 @@ export function tableReceived(tableAddr) {
   return { type: TABLE_RECEIVED, tableAddr };
 }
 
-export function pendingToggle(tableAddr, handId, pos) {
-  return { type: PENDING_TOGGLE, tableAddr, handId, pos };
+export function setPending(tableAddr, handId, pos, data = {}) {
+  return { type: PENDING_SET, payload: { tableAddr, handId, pos, data } };
+}
+
+export function dropPending(tableAddr, handId, pos) {
+  return { type: PENDING_DROP, payload: { tableAddr, handId, pos } };
 }
 
 export function setExitHand(tableAddr, handId, pos, exitHand) {
