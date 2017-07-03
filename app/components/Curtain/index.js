@@ -16,6 +16,7 @@ import {
 
 export const CurtainWrapper = styled.div`
   width: ${curtainWidth};
+  max-width: 100%;
   background-color: #5D5D5D;
   position: absolute;
   top: 0px;
@@ -32,13 +33,9 @@ export const CurtainWrapper = styled.div`
 
 export const CurtainTogglerWrapper = styled.div`
   position: absolute;
-  ${(props) => props.isOpen ?
-    `top: 40px;
-    left: 356px;`
-    :
-    `top: 80px;
-    left: 400px;`
-  }
+  top: ${(props) => props.isOpen ? '40px' : '80px'};
+  left: ${(props) => props.isOpen ? 'auto' : '400px'};
+  right: ${(props) => props.isOpen ? '24px' : 'auto'};
   cursor: pointer;
   display: flex;
   align-items: center;
