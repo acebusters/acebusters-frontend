@@ -22,6 +22,8 @@ import {
   STATUS_MSG,
 } from '../../app.config';
 
+import { getPosCoords } from './utils';
+
 const rc = new ReceiptCache();
 const pokerHelper = new PokerHelper(rc);
 
@@ -135,7 +137,7 @@ const makeFoldedSelector = () => createSelector(
 
 const makeCoordsSelector = () => createSelector(
   [makeLineupSelector(), posSelector],
-  (lineup, pos) => (lineup && pos > -1) ? SEAT_COORDS[pos] : null
+  (lineup, pos) => (lineup && pos > -1) ? getPosCoords(SEAT_COORDS, lineup.size, pos) : null
 );
 
 const makeAmountCoordsSelector = () => createSelector(
