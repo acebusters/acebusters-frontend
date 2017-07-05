@@ -264,6 +264,26 @@ const makeMyHandValueSelector = () => createSelector(
   }
 );
 
+const selectMaxBet = (lineup, address) => {
+  let pos;
+  try {
+    pos = pokerHelper.getMyPos(lineup, address);
+  } catch (e) {
+    pos = undefined;
+  }
+
+  let maxBet;
+  if (pos !== undefined) {
+    try {
+      maxBet = pokerHelper.getMyMaxBet(lineup, address);
+    } catch (e) {
+      maxBet = undefined;
+    }
+  }
+
+  return maxBet || 0;
+};
+
 const makeSelectWinners = () => createSelector(
   [makeHandSelector(), makeBoardSelector()],
   (hand, board) => {
@@ -296,14 +316,21 @@ const makeSelectWinners = () => createSelector(
 
     if (handState !== 'showdown') {
       const lastMan = pokerHelper.nextPlayer(lineup, 0, 'active', handState);
-      return [{ addr: lineup[lastMan].address, amount: amounts[lineup[lastMan].address] }];
+      return [{
+        addr: lineup[lastMan].address,
+        amount: amounts[lineup[lastMan].address],
+        maxBet: selectMaxBet(lineup, lineup[lastMan].address),
+      }];
     }
 
     const winners = pokerHelper.getWinners(lineup, dealer, board);
     const winnersWithAmounts = [];
     winners.forEach((winner) => {
       if (amounts[winner.addr]) {
-        winnersWithAmounts.push(Object.assign({}, winner, { amount: amounts[winner.addr] }));
+        winnersWithAmounts.push(Object.assign({}, winner, {
+          amount: amounts[winner.addr],
+          maxBet: selectMaxBet(lineup, winner.addr),
+        }));
       }
     });
     return winnersWithAmounts;
@@ -387,33 +414,6 @@ const makeMyMaxBetSelector = () => createSelector(
     }
     try {
       return pokerHelper.getMyMaxBet(lineup.toJS(), myAddress);
-    } catch (e) {
-      return undefined;
-    }
-  }
-);
-
-const winnerAddrSelector = (state, props) => props.params.winnerAddr;
-
-const makeWinnerPosSelector = () => createSelector(
-  [makeLineupSelector(), winnerAddrSelector],
-  (lineup, winnerAddress) => {
-    try {
-      return pokerHelper.getMyPos(lineup.toJS(), winnerAddress);
-    } catch (e) {
-      return undefined;
-    }
-  }
-);
-
-const makeWinnerMaxBetSelector = () => createSelector(
-  [makeLineupSelector(), winnerAddrSelector, makeWinnerPosSelector()],
-  (lineup, winnerAddress, myPos) => {
-    if (!lineup || !lineup.toJS || !winnerAddress || myPos === undefined) {
-      return undefined;
-    }
-    try {
-      return pokerHelper.getMyMaxBet(lineup.toJS(), winnerAddress);
     } catch (e) {
       return undefined;
     }
@@ -512,5 +512,4 @@ export {
     makeMissingHandSelector,
     makeMessagesSelector,
     makePlayersCountSelector,
-    makeWinnerMaxBetSelector,
 };
