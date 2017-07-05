@@ -7,7 +7,7 @@ import Raven from 'raven-js';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
 
-import TableService from '../../services/tableService';
+import { playIsPlayerTurn } from '../../sounds';
 
 import {
   setActionBarTurnComplete,
@@ -55,17 +55,10 @@ class ActionBarContainer extends React.Component {
     this.handleCall = this.handleCall.bind(this);
     this.handleFold = this.handleFold.bind(this);
     this.updateAmount = this.updateAmount.bind(this);
-    this.table = new TableService(props.params.tableAddr, this.props.privKey);
     this.state = {
       amount: 0,
       disabled: false,
     };
-  }
-
-  componentWillMount() {
-    if (this.props.minRaise) {
-      this.updateAmount(this.props.minRaise);
-    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -75,6 +68,15 @@ class ActionBarContainer extends React.Component {
     }
     if (nextProps.minRaise && nextProps.minRaise !== this.props.minRaise) {
       this.updateAmount(nextProps.minRaise);
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const wasDisabled = !prevProps.active || prevState.disabled;
+    const disabled = !this.props.active || this.state.disabled;
+    // should play sound
+    if (wasDisabled && !disabled) {
+      playIsPlayerTurn();
     }
   }
 
@@ -197,6 +199,7 @@ class ActionBarContainer extends React.Component {
 }
 
 ActionBarContainer.propTypes = {
+  active: PropTypes.bool,
   bet: PropTypes.func,
   callAmount: PropTypes.number,
   check: PropTypes.func,

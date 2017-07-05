@@ -72,6 +72,12 @@ module.exports = (options) => ({
         use: 'json-loader',
       },
       {
+        test: /\.wav$/,
+        use: {
+          loader: 'file-loader',
+        },
+      },
+      {
         test: /\.(mp4|webm)$/,
         use: {
           loader: 'url-loader',
