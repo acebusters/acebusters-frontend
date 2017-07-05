@@ -2117,9 +2117,9 @@
       "resolved": "https://registry.npmjs.org/ab-pokersolver/-/ab-pokersolver-2.1.3.tgz"
     },
     "ab-vector-cards": {
-      "version": "0.2.0",
+      "version": "0.2.1",
       "from": "ab-vector-cards@>=0.2.0 <0.3.0",
-      "resolved": "https://registry.npmjs.org/ab-vector-cards/-/ab-vector-cards-0.2.0.tgz"
+      "resolved": "https://registry.npmjs.org/ab-vector-cards/-/ab-vector-cards-0.2.1.tgz"
     },
     "abab": {
       "version": "1.0.3",
