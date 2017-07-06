@@ -13,8 +13,8 @@ import web3Connect from '../AccountProvider/web3Connect';
 import { contractEvents, accountLoaded, transferETH, proxyEvents } from '../AccountProvider/actions';
 import { addEventsDate, isUserEvent } from '../AccountProvider/utils';
 import { createBlocky } from '../../services/blockies';
-import { ABI_TOKEN_CONTRACT, ABI_ACCOUNT_FACTORY, ABI_PROXY, ABI_TABLE_FACTORY, conf } from '../../app.config';
-import { ETH_DECIMALS, NTZ_DECIMALS, formatEth, formatNtz } from '../../utils/amountFormater';
+import { ABI_TOKEN_CONTRACT, ABI_POWER_CONTRACT, ABI_ACCOUNT_FACTORY, ABI_PROXY, ABI_TABLE_FACTORY, conf } from '../../app.config';
+import { ETH_DECIMALS, NTZ_DECIMALS, ABP_DECIMALS, formatEth, formatNtz, formatAbp } from '../../utils/amountFormater';
 
 import List from '../../components/List';
 import H2 from '../../components/H2';
@@ -42,20 +42,20 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     this.handleNTZPurchase = this.handleNTZPurchase.bind(this);
     this.handleNTZSell = this.handleNTZSell.bind(this);
     this.handleETHTransfer = this.handleETHTransfer.bind(this);
+    this.handlePowerUp = this.handlePowerUp.bind(this);
+    this.handlePowerDown = this.handlePowerDown.bind(this);
     this.web3 = props.web3Redux.web3;
 
     this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(confParams.ntzAddr);
+    this.power = this.web3.eth.contract(ABI_POWER_CONTRACT).at(confParams.pwrAddr);
     this.tableFactory = this.web3.eth.contract(ABI_TABLE_FACTORY).at(confParams.tableFactory);
 
     this.tableFactory.getTables.call();
 
     if (this.props.account.proxy) {
-      this.token.floor.call();
-      this.token.ceiling.call();
-      this.token.balanceOf.call(this.props.account.proxy);
-      this.web3.eth.getBalance(this.props.account.proxy);
       this.watchProxyEvents(this.props.account.proxy);
       this.watchTokenEvents(this.props.account.proxy);
+      this.power.balanceOf.call(this.props.account.proxy);
     }
   }
 
@@ -67,12 +67,9 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
 
   componentWillReceiveProps(nextProps) {
     if (this.props.account.proxy === undefined && nextProps.account.proxy) {
-      this.token.floor.call();
-      this.token.ceiling.call();
       this.watchProxyEvents(nextProps.account.proxy);
       this.watchTokenEvents(nextProps.account.proxy);
-      this.token.balanceOf.call(nextProps.account.proxy);
-      this.web3.eth.getBalance(nextProps.account.proxy);
+      this.power.balanceOf.call(nextProps.account.proxy);
     }
 
     if (this.props.dashboardTxs.txError !== nextProps.dashboardTxs.txError && nextProps.dashboardTxs.txError) {
@@ -128,6 +125,12 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
   }
 
   watchTokenEvents(proxyAddr) {
+    this.token.floor.call();
+    this.token.ceiling.call();
+    this.token.powerAddr.call();
+    this.token.balanceOf.call(proxyAddr);
+    this.web3.eth.getBalance(proxyAddr);
+
     this.web3.eth.getBlockNumber((err, blockNumber) => {
       this.token.allEvents({
         fromBlock: blockNumber - LOOK_BEHIND_PERIOD,
@@ -142,6 +145,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
       toBlock: 'latest',
     }).watch((watchError, event) => {
       if (!watchError && isUserEvent(proxyAddr)(event)) {
+        this.power.balanceOf.call(proxyAddr);
         this.token.balanceOf.call(proxyAddr);
         this.web3.eth.getBalance(proxyAddr);
         const { pendingSell = [] } = this.props.dashboardTxs;
@@ -194,7 +198,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     });
   }
 
-  handleNTZTransfer(to, amount) {
+  handleNTZTransfer(amount, to) {
     this.token.transfer.sendTransaction(
       to,
       new BigNumber(amount).mul(NTZ_DECIMALS)
@@ -219,11 +223,27 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     this.props.modalDismiss();
   }
 
-  handleETHTransfer(dest, amount) {
+  handleETHTransfer(amount, dest) {
     this.props.transferETH({
       dest,
       amount: new BigNumber(amount).mul(ETH_DECIMALS),
     });
+    this.props.modalDismiss();
+  }
+
+  handlePowerUp(amount) {
+    this.token.transfer.sendTransaction(
+      confParams.pwrAddr,
+      new BigNumber(amount).mul(NTZ_DECIMALS)
+    );
+    this.props.modalDismiss();
+  }
+
+  handlePowerDown(amount) {
+    this.power.transfer.sendTransaction(
+      confParams.ntzAddr,
+      new BigNumber(amount).mul(ABP_DECIMALS)
+    );
     this.props.modalDismiss();
   }
 
@@ -233,6 +253,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     const floor = this.token.floor();
     const ceiling = this.token.ceiling();
     const babzBalance = this.token.balanceOf(this.props.account.proxy);
+    const pwrBalance = this.power.balanceOf(this.props.account.proxy);
     const tables = this.tableFactory.getTables();
 
     const listTxns = txnsToList(
@@ -282,6 +303,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
               onClick={() => {
                 this.props.modalAdd(
                   <TransferDialog
+                    title={<FormattedMessage {...messages.ntzTransferTitle} />}
                     handleTransfer={this.handleNTZTransfer}
                     maxAmount={babzBalance.div(NTZ_DECIMALS)}
                     amountUnit="NTZ"
@@ -291,7 +313,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
               size="medium"
               icon="fa fa-money"
             >
-              TRANSFER
+              Transfer
             </DBButton>
           }
           {babzBalance && floor &&
@@ -310,7 +332,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
               size="medium"
               icon="fa fa-money"
             >
-              SELL
+              Sell
             </DBButton>
           }
           {weiBalance && ceiling &&
@@ -329,7 +351,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
               size="medium"
               icon="fa fa-money"
             >
-              PURCHASE
+              Purchase
             </DBButton>
           }
         </Section>
@@ -352,6 +374,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
               onClick={() => {
                 this.props.modalAdd(
                   <TransferDialog
+                    title={<FormattedMessage {...messages.ethTransferTitle} />}
                     handleTransfer={this.handleETHTransfer}
                     maxAmount={weiBalance.div(ETH_DECIMALS)}
                     amountUnit="ETH"
@@ -361,7 +384,63 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
               size="medium"
               icon="fa fa-money"
             >
-              TRANSFER
+              Transfer
+            </DBButton>
+          }
+        </Section>
+
+        <Section>
+          <h2>Power</h2>
+          <p>
+            <span>Balance: </span>
+            <WithLoading
+              isLoading={!pwrBalance}
+              loadingSize="14px"
+              type="inline"
+              styles={{ layout: { marginLeft: '15px' } }}
+            >
+              <span>{pwrBalance && formatAbp(pwrBalance, 5)} ABP</span>
+            </WithLoading>
+          </p>
+
+          {babzBalance &&
+            <DBButton
+              onClick={() => {
+                this.props.modalAdd(
+                  <TransferDialog
+                    handleTransfer={this.handlePowerUp}
+                    maxAmount={babzBalance.div(NTZ_DECIMALS)}
+                    hideAddress
+                    title={<FormattedMessage {...messages.powerUpTitle} />}
+                    amountUnit="NTZ"
+                  />
+                );
+              }}
+              size="medium"
+              icon="fa fa-money"
+            >
+              Power Up
+            </DBButton>
+          }
+
+          {pwrBalance &&
+            <DBButton
+              onClick={() => {
+                this.props.modalAdd(
+                  <TransferDialog
+                    title={<FormattedMessage {...messages.powerDownTitle} />}
+                    description="Power Down will convert ABP back to NTZ over a period of 3 month"
+                    handleTransfer={this.handlePowerDown}
+                    maxAmount={pwrBalance.div(ABP_DECIMALS)}
+                    hideAddress
+                    amountUnit="ABP"
+                  />
+                );
+              }}
+              size="medium"
+              icon="fa fa-money"
+            >
+              Power Down
             </DBButton>
           }
         </Section>

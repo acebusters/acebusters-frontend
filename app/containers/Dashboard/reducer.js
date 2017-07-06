@@ -115,7 +115,11 @@ function addETHPending(state, { txHash, amount, address }) {
   );
 }
 
-function addNTZPending(state, { methodName, args, txHash }) {
+function addNTZPending(state, { methodName, args, txHash, address }) {
+  if (address === confParams.pwrAddr) {
+    return state;
+  }
+
   if (methodName === 'transfer' && args[0] !== confParams.ntzAddr) {
     return state.setIn(
       ['events', txHash],

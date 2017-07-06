@@ -62,7 +62,9 @@ function formatDate(timestamp) {
 const cutAddress = (addr) => addr.substring(2, 8);
 
 function formatTxAddress(address, tableAddrs, proxyAddr) {
-  if (address === confParams.ntzAddr) {
+  if (address === confParams.pwrAddr) {
+    return <FormattedMessage {...messages.powerContract} />;
+  } else if (address === confParams.ntzAddr) {
     return <FormattedMessage {...messages.nutzContract} />;
   } else if (tableAddrs.indexOf(address) > -1) {
     return (
@@ -112,6 +114,8 @@ function txDescription(event, tableAddrs, proxyAddr) {
         {...(event.type === 'income' ? messages.tableLeave : messages.tableJoin)}
       />
     );
+  } else if (event.address === confParams.pwrAddr) {
+    return <FormattedMessage {...messages.powerUpStatus} />;
   } else if (isSellEndEvent(event)) {
     return <FormattedMessage {...messages.sellEnd} />;
   } else if (isSellStartEvent(event)) {
@@ -122,6 +126,6 @@ function txDescription(event, tableAddrs, proxyAddr) {
     return <FormattedMessage {...messages.purchaseStart} />;
   }
 
-  return <FormattedMessage {...messages.trasnferStatus} />;
+  return <FormattedMessage {...messages.transferStatus} />;
 }
 

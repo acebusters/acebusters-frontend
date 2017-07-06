@@ -11,9 +11,16 @@ export const ETH_DECIMALS = new BigNumber(10).pow(18);
 // 1 x 10^0 - Babz
 export const NTZ_DECIMALS = new BigNumber(10).pow(12);
 
+export const ABP_DECIMALS = new BigNumber(10).pow(12);
+
 export function formatNtz(babzAmount, decimals = 0) {
   const babzAmountBn = (typeof babzAmount === 'object') ? babzAmount : new BigNumber(babzAmount || 0);
   return babzAmountBn.div(NTZ_DECIMALS).toFormat(decimals);
+}
+
+export function formatAbp(pwrAmount, decimals = 0) {
+  const pwrAmountBn = (typeof pwrAmount === 'object') ? pwrAmount : new BigNumber(pwrAmount || 0);
+  return pwrAmountBn.div(ABP_DECIMALS).toFormat(decimals);
 }
 
 export function formatEth(weiAmount, decimals) {

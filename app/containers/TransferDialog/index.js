@@ -2,7 +2,6 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 
 import { Form, Field, reduxForm } from 'redux-form/immutable';
-import { FormattedMessage } from 'react-intl';
 import BigNumber from 'bignumber.js';
 
 import { ErrorMessage } from '../../components/FormMessages';
@@ -11,15 +10,14 @@ import FormField from '../../components/Form/FormField';
 import H2 from '../../components/H2';
 
 import { isEthereumAddress } from './isEthereumAddress';
-import messages from './messages';
 
-const validate = (values) => {
+const validate = (values, props) => {
   const errors = {};
   if (!values.get('amount')) {
     errors.amount = 'Required';
   }
 
-  if (!values.get('address')) {
+  if (!values.get('address') && !props.hideAddress) {
     errors.address = 'Required';
   } else if (!isEthereumAddress(values.get('address'))) {
     errors.address = 'Invalid Ethereum Address.';
@@ -40,13 +38,22 @@ class TransferDialog extends React.Component { // eslint-disable-line react/pref
 
   handleSubmit(values) {
     this.props.handleTransfer(
+      values.get('amount'),
       values.get('address'),
-      values.get('amount')
     );
   }
 
   render() {
-    const { error, handleSubmit, submitting, amountUnit, maxAmount } = this.props;
+    const {
+      error,
+      handleSubmit,
+      submitting,
+      amountUnit,
+      maxAmount,
+      hideAddress,
+      title,
+      description,
+    } = this.props;
 
     const limitAmount = (value) => {
       const numValue = Math.max(0, Number(value));
@@ -56,7 +63,8 @@ class TransferDialog extends React.Component { // eslint-disable-line react/pref
 
     return (
       <div>
-        <H2><FormattedMessage {...messages.header} /></H2>
+        {title && <H2>{title}</H2>}
+        {description && <p>{description}</p>}
         <Form onSubmit={handleSubmit(this.handleSubmit)}>
           <Field
             name="amount"
@@ -66,12 +74,14 @@ class TransferDialog extends React.Component { // eslint-disable-line react/pref
             normalize={maxAmount && limitAmount}
           />
 
-          <Field
-            name="address"
-            component={FormField}
-            type="text"
-            label="Ethereum address"
-          />
+          {!hideAddress &&
+            <Field
+              name="address"
+              component={FormField}
+              type="text"
+              label="Ethereum address"
+            />
+          }
 
           {error && <ErrorMessage>{error}</ErrorMessage>}
 
@@ -83,12 +93,19 @@ class TransferDialog extends React.Component { // eslint-disable-line react/pref
 }
 
 TransferDialog.propTypes = {
+  title: PropTypes.any,
+  description: PropTypes.any,
   submitting: PropTypes.bool,
+  hideAddress: PropTypes.bool,
   maxAmount: PropTypes.object, // BigNumber
   amountUnit: PropTypes.string,
   handleSubmit: PropTypes.func,
   handleTransfer: PropTypes.func,
   error: PropTypes.any,
+};
+
+TransferDialog.defaultProps = {
+  hideAddress: false,
 };
 
 

@@ -26,6 +26,22 @@ export default defineMessages({
     id: 'app.containers.Dashboard.ethAlert',
     defaultMessage: 'Never send real ether to this address. It is a Rinkeby Testnet Address. Only send Rinkaby TestEther to this Address. Otherwise your Ether will be lost',
   },
+  ntzTransferTitle: {
+    id: 'app.containers.Dashboard.ntzTransferTitle',
+    defaultMessage: 'Transfer NTZ',
+  },
+  ethTransferTitle: {
+    id: 'app.containers.Dashboard.ethTransferTitle',
+    defaultMessage: 'Transfer ETH',
+  },
+  powerUpTitle: {
+    id: 'app.containers.Dashboard.powerUpTitle',
+    defaultMessage: 'Power Up',
+  },
+  powerDownTitle: {
+    id: 'app.containers.Dashboard.powerDownTitle',
+    defaultMessage: 'Power Down',
+  },
   sellTitle: {
     id: 'app.containers.Dashboard.sellTitle',
     defaultMessage: 'Sell NTZ',
@@ -62,6 +78,10 @@ export default defineMessages({
     id: 'app.containers.Dashboard.nutzContract',
     defaultMessage: 'Nutz contract',
   },
+  powerContract: {
+    id: 'app.containers.Dashboard.powerContract',
+    defaultMessage: 'Power contract',
+  },
   me: {
     id: 'app.containers.Dashboard.me',
     defaultMessage: 'Nutz contract',
@@ -70,8 +90,12 @@ export default defineMessages({
     id: 'app.containers.Dashboard.tableAddress',
     defaultMessage: 'Table {address}',
   },
-  trasnferStatus: {
-    id: 'app.containers.Dashboard.trasnferStatus',
+  transferStatus: {
+    id: 'app.containers.Dashboard.transferStatus',
     defaultMessage: 'Transfer',
+  },
+  powerUpStatus: {
+    id: 'app.containers.Dashboard.powerUpStatus',
+    defaultMessage: 'Power Up',
   },
 });
