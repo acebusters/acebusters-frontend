@@ -477,9 +477,31 @@ const makeLatestHandSelector = () => createSelector(
   }
 );
 
+const makeLastRoundMaxBetSelector = () => createSelector(
+  [makeHandSelector()],
+  (hand) => (hand && hand.get && hand.get('lastRoundMaxBet')) ? hand.get('lastRoundMaxBet') : 0
+);
+
 const makePotSizeSelector = () => createSelector(
   makeLineupSelector(),
   (lineup) => (lineup) ? pokerHelper.calculatePotsize(lineup.toJS()) : 0
+);
+
+const makeAmountInTheMiddleSelector = () => createSelector(
+  [makeLineupSelector(), makeLastRoundMaxBetSelector()],
+  (lineupImmu, lastRoundMaxBet) => {
+    if (!lineupImmu || !lineupImmu.toJS) {
+      return 0;
+    }
+    const lineup = lineupImmu.toJS();
+    let potSize = 0;
+    for (let i = 0; i < lineup.length; i += 1) {
+      const receipt = lineup[i].last ? rc.get(lineup[i].last) : undefined;
+      const bet = receipt ? receipt.values[1] : 0;
+      potSize += bet < lastRoundMaxBet ? bet : lastRoundMaxBet;
+    }
+    return potSize;
+  }
 );
 
 export {
@@ -512,4 +534,6 @@ export {
     makeMissingHandSelector,
     makeMessagesSelector,
     makePlayersCountSelector,
+    makeLastRoundMaxBetSelector,
+    makeAmountInTheMiddleSelector,
 };

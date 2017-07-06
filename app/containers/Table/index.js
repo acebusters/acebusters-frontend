@@ -54,7 +54,7 @@ import {
 import {
   makeTableDataSelector,
   makeIsMyTurnSelector,
-  makePotSizeSelector,
+  makeAmountInTheMiddleSelector,
   makeBoardSelector,
   makeHandSelector,
   makeHandStateSelector,
@@ -499,6 +499,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           board={board}
           seats={seats}
           hand={this.props.hand}
+          potSize={this.props.potSize}
           onLeave={() => this.handleLeave(this.props.myPos)}
           onSitout={this.handleSitout}
         >
@@ -534,7 +535,7 @@ const mapStateToProps = createStructuredSelector({
   missingHands: makeMissingHandSelector(),
   myHand: makeMyHandValueSelector(),
   myPos: makeMyPosSelector(),
-  potSize: makePotSizeSelector(),
+  potSize: makeAmountInTheMiddleSelector(),
   privKey: makeSelectPrivKey(),
   proxyAddr: makeSelectProxyAddr(),
   sitoutAmount: makeSitoutAmountSelector(),
@@ -562,6 +563,7 @@ Table.propTypes = {
   web3Redux: React.PropTypes.any,
   data: React.PropTypes.any,
   myPos: React.PropTypes.any,
+  potSize: React.PropTypes.number,
   modalAdd: React.PropTypes.func,
   handRequest: React.PropTypes.func,
   setPending: React.PropTypes.func,

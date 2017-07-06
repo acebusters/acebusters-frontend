@@ -12,6 +12,7 @@ import {
   tableStateSelector,
   makeWhosTurnSelector,
   makeSbSelector,
+  makeLastRoundMaxBetSelector,
 } from '../Table/selectors';
 
 import { createBlocky } from '../../services/blockies';
@@ -45,11 +46,6 @@ const makeLastReceiptSelector = () => createSelector(
 const makeSeatSelector = () => createSelector(
     [makeHandSelector(), posSelector],
     (hand, pos) => (hand && pos > -1 && hand.getIn && hand.getIn(['lineup', pos])) ? hand.getIn(['lineup', pos]) : undefined
-);
-
-const makeLastRoundMaxBetSelector = () => createSelector(
-  [makeHandSelector()],
-  (hand) => (hand && hand.get && hand.get('lastRoundMaxBet')) ? hand.get('lastRoundMaxBet') : 0
 );
 
 const makeLastAmountSelector = () => createSelector(
