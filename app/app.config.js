@@ -81,11 +81,11 @@ export const STATUS_MSG = {
     style: 'info',
     msg: 'active',
   },
-  // allIn: {
-  //   type: 'action',
-  //   style: 'warning',
-  //   msg: 'all-in',
-  // },
+  allIn: {
+    type: 'action',
+    style: 'warning',
+    msg: 'all-in',
+  },
   bet: {
     type: 'action',
     style: 'danger',

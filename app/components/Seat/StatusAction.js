@@ -23,7 +23,7 @@ const StatusAction = ({
   }
 
   // if seat is in sitout, show the sitout timer
-  if (sitout >= 0) return <SitoutTimer sitout={sitout} />;
+  if (typeof sitout === 'number' && sitout >= 0) return <SitoutTimer sitout={sitout} />;
 
   // if seat has a status, show action status
   if (!isEmpty(showStatus)) {
@@ -46,7 +46,10 @@ const StatusAction = ({
 StatusAction.propTypes = {
   pos: React.PropTypes.number,
   showStatus: React.PropTypes.object,
-  sitout: React.PropTypes.number,
+  sitout: React.PropTypes.oneOfType([
+    React.PropTypes.string,
+    React.PropTypes.number,
+  ]),
   timeLeft: React.PropTypes.number,
   wasMostRecentAction: React.PropTypes.bool,
   whosTurn: React.PropTypes.number,
