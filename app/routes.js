@@ -6,6 +6,7 @@ import { getAsyncInjectors } from './utils/asyncInjectors';
 import { accountSaga } from './containers/AccountProvider/sagas';
 import { tableStateSaga } from './containers/Table/sagas';
 import { selectAccount } from './containers/AccountProvider/selectors';
+import { notificationsSaga } from './containers/Notifications/sagas';
 
 const errorLoading = (err) => {
   console.error('Dynamic page loading failed', err); // eslint-disable-line no-console
@@ -34,7 +35,7 @@ export default function createRoutes(store) {
     }
   };
 
-  injectSagas([accountSaga, tableStateSaga]);
+  injectSagas([accountSaga, tableStateSaga, notificationsSaga]);
 
   return [
     {

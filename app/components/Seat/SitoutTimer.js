@@ -13,7 +13,7 @@ const SitoutTimer = () => (
   <TimerWrapper>
     <TimerBackground>
       <TimerBar
-        type="sitout"
+        type="info"
         width={`${100}%`}
       />
     </TimerBackground>

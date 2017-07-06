@@ -15,6 +15,21 @@ export const green = '#A0FFB1';
 export const white = '#FFF';
 export const hover = '#C85C5C';
 export const menuClose = 'linear-gradient(0deg, #606060 0%, #808080 100%)';
+export const successBg = 'linear-gradient(0deg, #B4ED50 0%, #78D049 100%)';
+export const infoBg = 'linear-gradient(0deg, #D4D4D4 0%, #4D4D4D 100%)';
+export const infoBgInverse = 'linear-gradient(0deg, #4D4D4D 0%, #D4D4D4 100%)';
+export const warningBg = 'linear-gradient(0deg, #F7F8CB 0%, #F7F51C 100%)';
+export const dangerBg = 'linear-gradient(0deg, #FBDA61 0%, #F76B1C 100%)';
+export const activeColor = '#35C5E3'; // tealish
+export const successColor = '#305209'; // greenish
+export const infoColor = 'white'; // white
+export const warningColor = '#5E5F3B'; // yellowish
+export const dangerColor = '#63430F';  // orangish
+
+export const successBgSolid = 'lightgreen';
+export const infoBgSolid = 'white';
+export const warningBgSolid = 'lightyellow';
+export const dangerBgSolid = '#f89435'; // orangish
 
 // FONTS
 // --------------------------------------------------------

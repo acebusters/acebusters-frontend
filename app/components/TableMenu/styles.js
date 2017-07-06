@@ -10,6 +10,8 @@ import {
   menuClose,
 } from '../../variables';
 
+import { Button as SharedButton } from '../../utils/styleUtils';
+
 const menuActiveBG = '#35c5e3'; // electric blue
 const menuBoxShadow = '0 2px 4px 0 rgba(0,0,0,0.31)';
 const menuColor = '#ebe8e8'; // light gray
@@ -17,18 +19,12 @@ const menuOpen = 'linear-gradient(0deg, #383838 0%, #717171 100%)';
 const menuHoverBoxShadow = 'inset 1px 1px 5px 1px rgba(0,0,0,0.3)';
 const menuActiveBoxShadow = 'inset 2px 1px 5px 2px rgba(0,0,0,0.50)';
 
-export const Button = styled.button`
-  padding: 0;
-  margin: 0;
+const Button = styled(SharedButton)`
   color: ${menuColor};
-  border: none;
   background: none;
   text-decoration: none;
-  &:focus {
-    outline: none;
-  }
+  &:focus {}
   &:hover {
-    cursor: pointer;
     box-shadow: ${menuHoverBoxShadow};
   }
   &:active {
@@ -37,8 +33,6 @@ export const Button = styled.button`
   }
   &:disabled{
     color: #8e8e8e;
-    cursor: default;
-    ${''/* box-shadow: ${menuActiveBoxShadow}; */}
     box-shadow: none;
   }
 `;

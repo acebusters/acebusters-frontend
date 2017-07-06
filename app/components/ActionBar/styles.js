@@ -8,23 +8,11 @@ import {
   curtainHalfWidth,
 } from '../../variables';
 
+import { Button } from '../../utils/styleUtils';
+
 const active = '#35c5e3'; // electric blue
 const largeBoxShadow = '0 2px 4px 1px rgba(0,0,0,0.50)';
 const medBoxShadow = '0 2px 4px 0px rgba(0,0,0,0.50)';
-const Button = styled.button`
-  padding: 0;
-  margin: 0;
-  border: none;
-  &:focus {
-    outline: none;
-  }
-  &:hover {
-    cursor: pointer;
-  }
-  &:disabled{
-    cursor: default;
-  }
-`;
 
 export const ActionBarWrapper = styled.div`
   position: fixed;

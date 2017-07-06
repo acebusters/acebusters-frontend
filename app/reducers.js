@@ -12,6 +12,7 @@ import actionBarReducer from 'containers/ActionBar/reducer';
 import globalReducer from 'containers/App/reducer';
 import tableReducer from 'containers/Table/reducer';
 import tableMenuReducer from 'containers/TableMenu/reducer';
+import notificationsReducer from 'containers/Notifications/reducer';
 import headerReducer from 'containers/Header/reducer';
 import languageProviderReducer from 'containers/LanguageProvider/reducer';
 import accountProviderReducer from 'containers/AccountProvider/reducer';
@@ -58,6 +59,7 @@ export default function createReducer(asyncReducers) {
     tableMenu: tableMenuReducer,
     form: formReducer,
     header: headerReducer,
+    notifications: notificationsReducer,
     ...asyncReducers,
   });
 }

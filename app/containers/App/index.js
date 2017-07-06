@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
@@ -8,6 +9,7 @@ import Footer from 'components/Footer';
 import Content from 'components/Content';
 import withProgressBar from 'components/ProgressBar';
 import Header from '../Header';
+import Notifications from '../../containers/Notifications';
 
 import {
   makeSelectProgress,
@@ -15,6 +17,10 @@ import {
   makeModalStackSelector,
   selectWorkerProgress,
 } from './selectors';
+
+import { selectNotifications } from '../Notifications/selectors';
+import { makeSelectLoggedIn } from '../AccountProvider/selectors';
+
 import { setAuthState } from '../AccountProvider/actions';
 import { modalDismiss } from './actions';
 
@@ -49,25 +55,31 @@ const StyledDashboard = styled.div`
 `;
 
 export function App(props) {
+  const { notifications, loggedIn } = props;
   const modalContent = props.modalStack[props.modalStack.length - 1];
+  const isNotTable = props.location.pathname.indexOf('table') === -1;
   return (
     <div name="app-container">
       <StyledDashboard params={props.params} name="styled-dashboard">
-        { props.location.pathname.indexOf('table') === -1 &&
+        {isNotTable &&
           <Header
             onClickLogout={props.handleClickLogout}
             {...props}
           />
         }
-        <Content
-          fixed={props.fixed}
-          name="content-wrapper"
-        >
-          {React.Children.toArray(props.children)}
-        </Content>
+        <div>
+          <Notifications isNotTable={isNotTable} />
+          <Content
+            showNavigation={!loggedIn || notifications.length > 0}
+            fixed={props.fixed}
+            name="content-wrapper"
+          >
+            {React.Children.toArray(props.children)}
+          </Content>
+        </div>
 
       </StyledDashboard>
-      { props.location.pathname.indexOf('table') === -1 &&
+      {isNotTable &&
         <Footer />
       }
       { modalContent &&
@@ -91,13 +103,15 @@ App.defaultProps = {
 };
 
 App.propTypes = {
-  children: React.PropTypes.node,
-  handleClickLogout: React.PropTypes.func,
-  modalDismiss: React.PropTypes.func,
-  fixed: React.PropTypes.bool,
-  params: React.PropTypes.object,
-  location: React.PropTypes.object,
-  modalStack: React.PropTypes.array,
+  children: PropTypes.node,
+  handleClickLogout: PropTypes.func,
+  modalDismiss: PropTypes.func,
+  fixed: PropTypes.bool,
+  params: PropTypes.object,
+  location: PropTypes.object,
+  modalStack: PropTypes.array,
+  notifications: PropTypes.array,
+  loggedIn: PropTypes.bool,
 };
 
 function mapDispatchToProps(dispatch) {
@@ -115,6 +129,8 @@ const mapStateToProps = createStructuredSelector({
   isModalOpen: makeSelectTransferShow(),
   modalStack: makeModalStackSelector(),
   progress: makeSelectProgress(),
+  notifications: selectNotifications(),
+  loggedIn: makeSelectLoggedIn(),
 });
 
 // Wrap the component to inject dispatch and state into it
