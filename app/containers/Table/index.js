@@ -11,6 +11,8 @@ import { FormattedMessage } from 'react-intl';
 import { Receipt } from 'poker-helper';
 
 // components and styles
+import TableDebug from '../../containers/TableDebug';
+
 import Card from '../../components/Card';
 import { BoardCardWrapper } from '../../components/Table/Board';
 import Seat from '../Seat';
@@ -487,6 +489,11 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     const pending = (lineup && lineup[this.props.myPos]) ? lineup[this.props.myPos].pending : false;
     return (
       <div>
+        <TableDebug
+          contract={this.table}
+          tableService={this.tableService}
+        />
+
         { this.props.state &&
         <TableComponent
           {...this.props}
