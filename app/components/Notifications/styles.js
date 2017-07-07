@@ -66,6 +66,10 @@ export const Wrapper = styled.div`
   };
 `;
 
+export const CenterWrapper = styled(Wrapper)`
+  justify-content: center;
+`;
+
 export const Category = styled.h3`
   font-size: 12px;
 `;
