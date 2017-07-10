@@ -172,12 +172,7 @@ export const StyledUserMenu = styled.li`
 
   @media (max-width: ${screenXsMax}) {
     width: 100%;
-    display: ${(props) => {
-      if (props.collapsed) {
-        return 'none';
-      }
-      return 'block';
-    }};
+    display: ${(props) => props.collapsed ? 'none' : 'block'};
   }
 `;
 
@@ -323,12 +318,7 @@ export const StyledItem = styled.li`
   border-left: ${(props) => props.theme.navbarItemBorder || 'none'};
 
   @media (max-width: ${screenXsMax}) {
-    width: 100%;
-    display: ${(props) => {
-      if (props.collapsed) {
-        return 'none';
-      }
-      return 'block';
-    }};
+    width: ${(props) => props.collapseOnMobile ? '100%' : 'auto'};
+    display: ${(props) => props.collapsed ? 'none' : 'block'};
   }
 `;

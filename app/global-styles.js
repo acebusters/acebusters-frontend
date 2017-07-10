@@ -51,9 +51,4 @@ injectGlobal`
     box-sizing: border-box;
   }
 
-  p,
-  label {
-    font-family: Georgia, Times, 'Times New Roman', serif;
-    line-height: 1.5em;
-  }
 `;

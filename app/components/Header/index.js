@@ -24,12 +24,7 @@ class Header extends React.Component {
   }
 
   render() {
-    const toggleCollapsedMenu = () => {
-      if (this.props.collapsed) {
-        return this.props.setCollapsed(false);
-      }
-      return this.props.setCollapsed(true);
-    };
+    const toggleCollapsedMenu = () => this.props.setCollapsed(!this.props.collapsed);
     const navButtons = this.props.loggedIn ? ([
       <NavToggle
         onClick={toggleCollapsedMenu}
@@ -59,12 +54,14 @@ class Header extends React.Component {
       />,
     ]) : ([
       <NavItem
+        collapseOnMobile={false}
         to="/register"
         key="1"
         title="Register"
         location={this.props.location}
       />,
       <NavItem
+        collapseOnMobile={false}
         to="/login"
         key="2"
         title="Login"
@@ -77,9 +74,7 @@ class Header extends React.Component {
         fixed={this.props.fixed}
         id="header"
       >
-        <Navbar
-          loggedIn={this.props.loggedIn}
-        >
+        <Navbar loggedIn={this.props.loggedIn}>
           {navButtons}
         </Navbar>
       </StyledHeader>

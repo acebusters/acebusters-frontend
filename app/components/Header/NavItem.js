@@ -20,9 +20,10 @@ const displayImage = (src, icon) => {
   return null;
 };
 
-const NavItem = ({ title, to, image, iconClass, collapsed }) => (
+const NavItem = ({ title, to, image, iconClass, collapsed, collapseOnMobile }) => (
   <StyledItem
     collapsed={collapsed}
+    collapseOnMobile={collapseOnMobile}
   >
     <Link
       component={StyledLink}
@@ -38,9 +39,14 @@ const NavItem = ({ title, to, image, iconClass, collapsed }) => (
 NavItem.propTypes = {
   title: PropTypes.string,
   collapsed: PropTypes.bool,
+  collapseOnMobile: PropTypes.bool,
   to: PropTypes.any,
   image: PropTypes.string,
   iconClass: PropTypes.string,
+};
+
+NavItem.defaultProps = {
+  collapseOnMobile: true,
 };
 
 export default NavItem;

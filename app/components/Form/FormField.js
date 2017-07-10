@@ -7,7 +7,7 @@ import { ErrorMessage, WarningMessage } from '../../components/FormMessages';
 const FormField = ({ input, label, type, meta: { touched, error, warning } }) => (
   <FormGroup>
     <Label htmlFor={input.name}>{label}</Label>
-    <Input {...input} type={type} />
+    <Input {...input} type={type} id={input.name} />
     {touched && error && <ErrorMessage error={error} />}
     {touched && warning && <WarningMessage error={warning} />}
   </FormGroup>

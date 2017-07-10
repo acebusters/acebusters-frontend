@@ -67,8 +67,10 @@ const Captcha = (props) => (
 
 const renderCheckBox = ({ input, label, type, meta: { touched, error, warning } }) => (
   <FormGroup>
-    <CheckBox {...input} placeholder={label} type={type} />
-    <Label htmlFor={input.name}><FormattedMessage {...messages.terms.agree} /> {label}</Label>
+    <Label>
+      <CheckBox {...input} placeholder={label} type={type} />
+      <FormattedMessage {...messages.terms.agree} /> {label}
+    </Label>
     {touched && ((error && <ErrorMessage error={error} />) || (warning && <WarningMessage warning={warning} />))}
   </FormGroup>
 );
@@ -100,7 +102,7 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
           <Form
             onSubmit={handleSubmit(this.handleSubmit)}
           >
-            <Field name="email" type="text" component={FormField} label="e-mail" />
+            <Field name="email" type="email" component={FormField} label="e-mail" />
             <Field
               name="referral"
               type="text"

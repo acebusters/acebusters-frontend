@@ -56,7 +56,6 @@ const StyledDashboard = styled.div`
 
 export function App(props) {
   const { notifications, loggedIn } = props;
-  const modalContent = props.modalStack[props.modalStack.length - 1];
   const isNotTable = props.location.pathname.indexOf('table') === -1;
   return (
     <div name="app-container">
@@ -77,19 +76,20 @@ export function App(props) {
             {React.Children.toArray(props.children)}
           </Content>
         </div>
-
       </StyledDashboard>
+
       {isNotTable &&
         <Footer />
       }
-      { modalContent &&
+
+      {props.modalStack.length > 0 &&
         <ModalContainer zIndex={7}>
           <ModalDialog
             onClose={props.modalDismiss}
             dismissOnBackgroundClick={false}
             closeButtonParam={{ margin: 5 }}
           >
-            { modalContent }
+            {props.modalStack[props.modalStack.length - 1]}
           </ModalDialog>
         </ModalContainer>
       }

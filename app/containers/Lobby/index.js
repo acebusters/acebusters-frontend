@@ -3,7 +3,6 @@
  */
 
 import React from 'react';
-import Grid from 'grid-styled';
 import { connect } from 'react-redux';
 import Button from 'components/Button';
 import Container from 'components/Container';
@@ -17,7 +16,7 @@ import { fetchTables } from '../../services/tableService';
 import WithLoading from '../../components/WithLoading';
 
 
-class LobbyComponent extends React.PureComponent {  // eslint-disable-line
+class LobbyComponent extends React.PureComponent { // eslint-disable-line
 
   constructor(props) {
     super(props);
@@ -35,13 +34,7 @@ class LobbyComponent extends React.PureComponent {  // eslint-disable-line
 
   render() {
     const { lobby } = this.props;
-    let content = [];
 
-    if (lobby) {
-      content = lobby.map((tableAddr, i) =>
-        <LobbyItem key={i} tableAddr={tableAddr} />
-      );
-    }
     return (
       <Container>
         <H2> Table Overview </H2>
@@ -49,16 +42,18 @@ class LobbyComponent extends React.PureComponent {  // eslint-disable-line
         <TableStriped>
           <thead>
             <tr>
-              <th key="number"> # </th>
-              <th key="blind"> Blind </th>
-              <th key="play"> Players </th>
-              <th key="hand"> Hand </th>
-              <th key="actn"> Action </th>
+              <th key="number">#</th>
+              <th key="blind">Blind</th>
+              <th key="play">Players </th>
+              <th key="hand">Hand</th>
+              <th key="actn" />
             </tr>
           </thead>
           {lobby && lobby.length > 0 && (
             <tbody>
-              {content}
+              {lobby.map((tableAddr, i) =>
+                <LobbyItem key={i} tableAddr={tableAddr} />
+              )}
             </tbody>
           )}
         </TableStriped>
@@ -67,11 +62,7 @@ class LobbyComponent extends React.PureComponent {  // eslint-disable-line
           isLoading={lobby.length === 0}
         />
 
-        <Grid xs={1 / 4} >
-          <Button onClick={this.handleGetTables} size="medium" icon="fa fa-refresh">REFRESH</Button>
-        </Grid>
-        <Grid xs={3 / 4}>
-        </Grid>
+        <Button onClick={this.handleGetTables} size="medium" icon="fa fa-refresh">REFRESH</Button>
       </Container>
     );
   }

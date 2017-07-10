@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
 import { Form, Field, reduxForm, SubmissionError, propTypes, change, formValueSelector } from 'redux-form/immutable';
+
 import FormField from '../../components/Form/FormField';
 import Button from '../../components/Button';
 import Link from '../../components/Link';
@@ -12,6 +13,8 @@ import { workerError, walletImported, login } from './actions';
 import { modalAdd, modalDismiss, setProgress } from '../App/actions';
 import { setAuthState } from '../AccountProvider/actions';
 import H1 from '../../components/H1';
+
+import { ForgotField } from './styles';
 
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
 
@@ -132,26 +135,35 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
     const workerPath = this.props.workerPath + encodeURIComponent(location.origin);
     const { error, handleSubmit, invalid, submitting } = this.props;
 
-    return (<Container>
-      <div>
-        <H1>Log into your account!</H1>
-        <Form onSubmit={handleSubmit(this.handleSubmit)}>
-          <Field name="email" type="email" component={FormField} label="Email" />
-          <Field name="password" type="password" component={FormField} label="Password" />
-          {error && <ErrorMessage error={error} />}
-          <Button type="submit" size="large" disabled={submitting || invalid}>
-            { (!submitting) ? 'Login' : 'Please wait ...' }
-          </Button>
-        </Form>
-        <iframe
-          src={workerPath}
-          title="login_iframe"
-          style={{ display: 'none' }}
-          onLoad={(event) => { this.frame = event.target; }}
-        />
-        <Link to="reset">forgot password</Link>
-      </div>
-    </Container>);
+    return (
+      <Container>
+        <div>
+          <H1>Log into your account!</H1>
+
+          <Form onSubmit={handleSubmit(this.handleSubmit)}>
+            <Field name="email" type="email" component={FormField} label="Email" />
+            <Field name="password" type="password" component={FormField} label="Password" />
+            {error && <ErrorMessage error={error} />}
+            <Button type="submit" size="large" disabled={submitting || invalid}>
+              {(!submitting) ? 'Login' : 'Please wait ...'}
+            </Button>
+          </Form>
+
+          <ForgotField>
+            <Link to="reset">
+              Forgot password
+            </Link>
+          </ForgotField>
+
+          <iframe
+            src={workerPath}
+            title="login_iframe"
+            style={{ display: 'none' }}
+            onLoad={(event) => { this.frame = event.target; }}
+          />
+        </div>
+      </Container>
+    );
   }
 }
 

@@ -28,7 +28,7 @@ const StyledNavbarMenu = styled.div`
   display: block;
   float: right;
   @media (max-width: ${screenXsMax}) {
-    width: 100%;
+    width: ${(props) => props.loggedIn ? '100%' : 'auto'};
   }
 `;
 
@@ -61,7 +61,7 @@ const Navbar = (props) => (
   <StyledNavbar
     topNav={props.topNav}
   >
-    <StyledNavbarMenu collapsed={props.collapsed}>
+    <StyledNavbarMenu loggedIn={props.loggedIn} collapsed={props.collapsed}>
       <StyledNavbarMenuList name="navbar-menu-wrapper">
         {props.children}
       </StyledNavbarMenuList>
@@ -74,6 +74,7 @@ Navbar.propTypes = {
   children: React.PropTypes.node,
   topNav: React.PropTypes.bool,
   collapsed: React.PropTypes.bool,
+  loggedIn: React.PropTypes.bool,
 };
 
 export default Navbar;

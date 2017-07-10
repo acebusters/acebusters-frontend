@@ -12,11 +12,18 @@ const Container = styled.div`
   padding-right: 2em;
   padding-left: 2em;
   padding-top: 2em;
+  padding-bottom: 3em;
   border-radius: 0.5em;
-  min-height: 50em;
   background: ${white};
   @media (min-width: 768px) {
     width: 750px;
+  }
+
+  @media (max-width: 500px) {
+    padding-right: 0.5em;
+    padding-left: 0.5em;
+    padding-top: 1em;
+    padding-bottom: 1.5em;
   }
 `;
 
