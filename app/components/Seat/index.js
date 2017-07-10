@@ -15,9 +15,10 @@ const SeatComponent = (props) => {
     open,
     pos,
     pending,
+    myPending,
   } = props;
   if (open) {
-    if (myPos === undefined || pending) {
+    if ((myPos === undefined && !myPending) || pending) {
       if (pending) {
         return (
           <Seat {...props} {...pending} />
@@ -31,7 +32,7 @@ const SeatComponent = (props) => {
         />
       );
     }
-    if (typeof myPos === 'number') {
+    if (typeof myPos === 'number' || myPending) {
       return <ButtonOpenSeat {...props} />;
     }
   }
@@ -43,6 +44,7 @@ SeatComponent.propTypes = {
   open: PropTypes.bool,
   pos: PropTypes.number,
   pending: PropTypes.any,
+  myPending: PropTypes.any,
 };
 
 export default SeatComponent;
