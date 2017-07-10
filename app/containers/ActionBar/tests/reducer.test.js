@@ -3,9 +3,9 @@ import { fromJS } from 'immutable';
 import reducer from '../reducer';
 import {
   setActionBarTurnComplete,
-  setActionBarMode,
-  setActionBarBetSlider,
   setActionBarButtonActive,
+  updateActionBar,
+  CALL,
 } from '../actions';
 
 describe('setActionBarTurnComplete', () => {
@@ -18,28 +18,6 @@ describe('setActionBarTurnComplete', () => {
   });
 });
 
-describe('setActionBarMode', () => {
-  it('should toggle "visible" value', () => {
-    const before = fromJS({
-      mode: '',
-    });
-    const nextState0 = reducer(before, setActionBarMode('CALL'));
-    expect(nextState0.get('mode')).toEqual('CALL');
-    const nextState1 = reducer(before, setActionBarMode(null));
-    expect(nextState1.get('mode')).toEqual('');
-  });
-});
-
-describe('setActionBarBetSlider', () => {
-  it('should set "sliderOpen" value', () => {
-    const before = fromJS({
-      sliderOpen: false,
-    });
-    const nextState = reducer(before, setActionBarBetSlider(true));
-    expect(nextState.get('sliderOpen')).toEqual(true);
-  });
-});
-
 describe('setActionBarButtonActive', () => {
   it('should set "sliderOpen" value', () => {
     const before = fromJS({
@@ -47,5 +25,22 @@ describe('setActionBarButtonActive', () => {
     });
     const nextState = reducer(before, setActionBarButtonActive('CALL'));
     expect(nextState.get('buttonActive')).toEqual('CALL');
+  });
+});
+
+describe('update', () => {
+  it('shuold merge payload to state', () => {
+    const before = fromJS({
+      buttonActive: '', // used for activeIndicator
+      sliderOpen: false, // toggles slider open/closed
+      turnComplete: false,
+      mode: '', // tracks active button's life-cycle
+      executeAction: false,
+    });
+    const nextState = reducer(before, updateActionBar({
+      mode: CALL,
+      executeAction: true,
+    }));
+    expect(nextState.get('mode')).toEqual(CALL);
   });
 });

@@ -1,5 +1,10 @@
 import { fromJS } from 'immutable';
 import sinon from 'sinon';
+import {
+  BET_SET,
+  CHECK,
+} from '../../../containers/ActionBar/actions';
+
 export const combine = (describe, it) => `${describe}, ${it}`;
 
 export const baseProps = fromJS({
@@ -18,9 +23,8 @@ export const baseProps = fromJS({
   sliderOpen: false,
   turnComplete: false,
   visible: false,
-  setActionBarMode: sinon.spy(),
-  setActionBarBetSlider: sinon.spy(),
   setActionBarButtonActive: sinon.spy(),
+  handleClickButton: sinon.spy(),
   handleFold: sinon.spy(),
   handleCheck: sinon.spy(),
   handleCall: sinon.spy(),
@@ -50,7 +54,7 @@ export const atTable2 = {
   props: baseProps.merge({
     active: true,
     visible: true,
-    buttonActive: 'CHECK',
+    buttonActive: CHECK,
   }).toJS(),
 };
 
@@ -126,7 +130,7 @@ export const buttonBet1 = {
     callAmount: 0,
     myStack: 2000,
     minRaise: 100,
-    mode: 'BET-SET',
+    mode: BET_SET,
     sliderOpen: true,
     visible: true,
   }).toJS(),
@@ -157,92 +161,8 @@ export const buttonRaise1 = {
     callAmount: 1000,
     visible: true,
     sliderOpen: true,
-    mode: 'RAISE-SET',
+    mode: BET_SET,
     minRaise: 1900,
     myStack: 2000,
-  }).toJS(),
-};
-
-export const actionDispatchAllIn = {
-  describe: 'player selects ALL-IN action',
-  it: 'should dispatch All-In',
-  props: fromJS(amountToCall1.props).merge({
-    active: true,
-    mode: '',
-    buttonActive: 'ALL-IN',
-    visible: true,
-  }).toJS(),
-};
-
-export const actionDispatchCall = {
-  describe: 'player selects CALL action',
-  it: 'should highlight CALL button',
-  props: fromJS(amountToCall0.props).merge({
-    active: true,
-    mode: '',
-    buttonActive: 'CALL',
-    sliderOpen: false,
-    visible: true,
-  }).toJS(),
-};
-
-export const actionDispatchFold = {
-  describe: 'player selects FOLD action',
-  it: 'should highlight FOLD button',
-  props: fromJS(amountToCall1.props).merge({
-    active: true,
-    mode: '',
-    buttonActive: 'FOLD',
-    sliderOpen: false,
-    visible: true,
-  }).toJS(),
-};
-
-export const actionDispatchBet0 = {
-  describe: 'player selects BET action',
-  it: 'should open slider',
-  props: fromJS(buttonBet0.props).merge({
-    active: true,
-    mode: '',
-    buttonActive: 'BET-SET',
-    visible: true,
-    setActionBarBetSlider: sinon.spy(),
-  }).toJS(),
-};
-
-export const actionDispatchBet1 = {
-  describe: 'player confirms BET action',
-  it: 'should close slider, and dispatch BET action',
-  props: fromJS(buttonBet1.props).merge({
-    active: true,
-    mode: 'BET-SET',
-    buttonActive: 'BET-CONFIRM',
-    visible: true,
-    setActionBarBetSlider: sinon.spy(),
-  }).toJS(),
-};
-
-export const actionDispatchRaise0 = {
-  describe: 'player selects RAISE action',
-  it: 'should open slider',
-  props: fromJS(buttonRaise0.props).merge({
-    active: true,
-    buttonActive: 'RAISE-SET',
-    mode: '',
-    visible: true,
-    setActionBarBetSlider: sinon.spy(),
-  }).toJS(),
-};
-
-export const actionDispatchRaise1 = {
-  describe: 'player confirms RAISE action',
-  it: 'should close slider, and dispatch RAISE action',
-  props: fromJS(buttonRaise1.props).merge({
-    active: true,
-    buttonActive: 'RAISE-CONFIRM',
-    mode: 'RAISE-SET',
-    visible: true,
-    handleBet: sinon.spy(),
-    setActionBarBetSlider: sinon.spy(),
   }).toJS(),
 };

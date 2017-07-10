@@ -11,11 +11,9 @@ const ActionButton = (props) => {
   const {
     active,
     buttonActive,
-    handleClick,
+    handleClickButton,
     mode,
     name,
-    setActionBarMode,
-    setActionBarBetSlider,
     setActionBarButtonActive,
     type,
     text,
@@ -30,10 +28,7 @@ const ActionButton = (props) => {
     if (disabled) return;
     // handle situation where player mouseDown drags button from another button
     if (buttonActive !== type) return;
-    setActionBarButtonActive('');
-    setActionBarBetSlider(false);
-    setActionBarMode(type);
-    handleClick();
+    handleClickButton(type);
   };
   const handleThisLeave = () => {
     if (disabled) return;
@@ -58,13 +53,11 @@ ActionButton.propTypes = {
   active: PropTypes.bool,
   buttonActive: PropTypes.string,
   disabled: PropTypes.bool,
+  handleClickButton: PropTypes.func,
   mode: PropTypes.string,
   name: PropTypes.string,
   type: PropTypes.string,
   setActionBarButtonActive: PropTypes.func,
-  handleClick: PropTypes.func,
-  setActionBarMode: PropTypes.func,
-  setActionBarBetSlider: PropTypes.func,
   text: PropTypes.string,
 };
 

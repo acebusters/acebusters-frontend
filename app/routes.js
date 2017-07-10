@@ -7,6 +7,7 @@ import { accountSaga } from './containers/AccountProvider/sagas';
 import { tableStateSaga } from './containers/Table/sagas';
 import { selectAccount } from './containers/AccountProvider/selectors';
 import { notificationsSaga } from './containers/Notifications/sagas';
+import { actionBarSaga } from './containers/ActionBar/sagas';
 
 const errorLoading = (err) => {
   console.error('Dynamic page loading failed', err); // eslint-disable-line no-console
@@ -35,7 +36,7 @@ export default function createRoutes(store) {
     }
   };
 
-  injectSagas([accountSaga, tableStateSaga, notificationsSaga]);
+  injectSagas([accountSaga, actionBarSaga, tableStateSaga, notificationsSaga]);
 
   return [
     {

@@ -10,13 +10,19 @@ import { connect } from 'react-redux';
 import { playIsPlayerTurn } from '../../sounds';
 
 import {
+  handleClickButton,
   setActionBarTurnComplete,
-  setActionBarMode,
-  setActionBarBetSlider,
   setActionBarButtonActive,
+  updateActionBar,
+  ALL_IN,
+  BET,
+  CHECK,
+  CALL,
+  FOLD,
 } from './actions';
 
 import {
+  getExecuteAction,
   getActionBarSliderOpen,
   getActionBarMode,
   getActionBarTurnComplete,
@@ -56,18 +62,38 @@ class ActionBarContainer extends React.Component {
     this.handleFold = this.handleFold.bind(this);
     this.updateAmount = this.updateAmount.bind(this);
     this.state = {
-      amount: 0,
+      amount: this.props.minRaise,
       disabled: false,
     };
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps) { // eslint-disable-line consistent-return
     if (nextProps.turnComplete === true) {
       this.props.setActionBarTurnComplete(false);
-      this.props.setActionBarMode('');
     }
     if (nextProps.minRaise && nextProps.minRaise !== this.props.minRaise) {
       this.updateAmount(nextProps.minRaise);
+    }
+    const { executeAction, mode } = nextProps;
+    // after handleClickButton saga updates state to execute action
+    if (executeAction) {
+      const handId = parseInt(this.props.params.handId, 10);
+      this.resetActionBar();
+      this.disableTemporarilyAfterAction();
+      switch (mode) {
+        case ALL_IN:
+          return this.handleAllIn();
+        case BET:
+          return this.handleBet();
+        case CHECK:
+          return this.handleCheck();
+        case CALL:
+          return this.handleCall();
+        case FOLD:
+          return this.handleFold();
+        default:
+          return this.captureError(handId);
+      }
     }
   }
 
@@ -94,6 +120,15 @@ class ActionBarContainer extends React.Component {
     this.setState({ amount });
   }
 
+  resetActionBar() {
+    this.props.updateActionBar({
+      executeAction: false,
+      mode: '',
+      buttonActive: '',
+      turnComplete: true,
+    });
+  }
+
   captureError(handId) {
     const self = this;
 
@@ -102,8 +137,7 @@ class ActionBarContainer extends React.Component {
         tableAddr: self.props.params.tableAddr,
         handId,
       } });
-      this.props.setActionBarTurnComplete(true);
-      this.props.setActionBarMode('');
+      this.resetActionBar();
     };
   }
 
@@ -115,11 +149,8 @@ class ActionBarContainer extends React.Component {
   }
 
   handleBet() {
-    this.props.setActionBarTurnComplete(true);
-    this.disableTemporarilyAfterAction();
-    const amount = this.state.amount + this.props.myMaxBet;
     const handId = parseInt(this.props.params.handId, 10);
-
+    const amount = this.state.amount + this.props.myMaxBet;
     const betAction = this.props.bet(this.props.params.tableAddr, handId, amount, this.props.privKey, this.props.myPos, this.props.lastReceipt);
     return this.props.pay(betAction, this.props.dispatch)
     .then((cards) => {
@@ -136,8 +167,6 @@ class ActionBarContainer extends React.Component {
   }
 
   handleCheck() {
-    this.props.setActionBarTurnComplete(true);
-    this.disableTemporarilyAfterAction();
     const amount = this.props.myMaxBet;
     const handId = parseInt(this.props.params.handId, 10);
     const checkStates = ['preflop', 'turn', 'river', 'flop'];
@@ -161,8 +190,6 @@ class ActionBarContainer extends React.Component {
   }
 
   handleFold() {
-    this.props.setActionBarTurnComplete(true);
-    this.disableTemporarilyAfterAction();
     const amount = this.props.myMaxBet;
     const handId = parseInt(this.props.params.handId, 10);
     const action = this.props.fold(
@@ -186,11 +213,6 @@ class ActionBarContainer extends React.Component {
       <ActionBar
         amount={this.state.amount}
         disabled={this.state.disabled}
-        handleAllIn={this.handleAllIn}
-        handleBet={this.handleBet}
-        handleCheck={this.handleCheck}
-        handleCall={this.handleCall}
-        handleFold={this.handleFold}
         updateAmount={this.updateAmount}
         {...this.props}
       />
@@ -216,8 +238,10 @@ ActionBarContainer.propTypes = {
   setCards: PropTypes.func,
   state: PropTypes.string,
   setActionBarTurnComplete: PropTypes.func,
-  setActionBarMode: PropTypes.func,
   turnComplete: PropTypes.bool,
+  executeAction: PropTypes.bool,
+  mode: PropTypes.string,
+  updateActionBar: PropTypes.func,
 };
 
 export function mapDispatchToProps(dispatch) {
@@ -234,10 +258,10 @@ export function mapDispatchToProps(dispatch) {
       ) => check(
         tableAddr, handId, amount, privKey, myPos, lastReceipt, checkType
     ),
+    handleClickButton: (type) => dispatch(handleClickButton(type)),
     setActionBarTurnComplete: (complete) => dispatch(setActionBarTurnComplete(complete)),
-    setActionBarBetSlider: (open) => dispatch(setActionBarBetSlider(open)),
-    setActionBarMode: (mode) => dispatch(setActionBarMode(mode)),
-    setActionBarButtonActive: (whichBtn) => dispatch(setActionBarButtonActive(whichBtn)),
+    setActionBarButtonActive: (btn) => dispatch(setActionBarButtonActive(btn)),
+    updateActionBar: (payload) => dispatch(updateActionBar(payload)),
   };
 }
 
@@ -258,6 +282,7 @@ const mapStateToProps = createStructuredSelector({
   sliderOpen: getActionBarSliderOpen(),
   turnComplete: getActionBarTurnComplete(),
   visible: makeSelectActionBarVisible(),
+  executeAction: getExecuteAction(),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ActionBarContainer);

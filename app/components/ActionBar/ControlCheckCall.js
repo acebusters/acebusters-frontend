@@ -4,12 +4,11 @@ import PropTypes from 'prop-types';
 import ActionButton from './ActionButton';
 import ControlBlank from './ControlBlank';
 
+import { CALL, CHECK } from '../../containers/ActionBar/actions';
 
 const ControlCheckCall = (props) => {
   const {
     amountToCall,
-    handleCall,
-    handleCheck,
     myStack,
   } = props;
   if (amountToCall > myStack) {
@@ -20,8 +19,7 @@ const ControlCheckCall = (props) => {
       <ActionButton
         name="button-call"
         text="Call"
-        type="CALL"
-        handleClick={() => handleCall()}
+        type={CALL}
         {...props}
       />
     );
@@ -31,8 +29,7 @@ const ControlCheckCall = (props) => {
       <ActionButton
         name="button-check"
         text="Check"
-        type="CHECK"
-        handleClick={() => handleCheck()}
+        type={CHECK}
         {...props}
       />
     );
@@ -41,8 +38,6 @@ const ControlCheckCall = (props) => {
 };
 ControlCheckCall.propTypes = {
   amountToCall: PropTypes.number,
-  handleCall: PropTypes.func,
-  handleCheck: PropTypes.func,
   myStack: PropTypes.number,
 };
 

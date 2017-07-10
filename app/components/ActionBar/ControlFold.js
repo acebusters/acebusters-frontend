@@ -3,19 +3,18 @@ import PropTypes from 'prop-types';
 
 import ActionButton from './ActionButton';
 import ControlBlank from './ControlBlank';
+import { FOLD } from '../../containers/ActionBar/actions';
 
 const ControlFold = (props) => {
   const {
     amountToCall,
-    handleFold,
   } = props;
   if (amountToCall > 0) {
     return (
       <ActionButton
         name="button-fold"
         text="Fold"
-        type="FOLD"
-        handleClick={() => handleFold()}
+        type={FOLD}
         {...props}
       />
     );
@@ -24,7 +23,6 @@ const ControlFold = (props) => {
 };
 ControlFold.propTypes = {
   amountToCall: PropTypes.number,
-  handleFold: PropTypes.func,
 };
 
 export default ControlFold;

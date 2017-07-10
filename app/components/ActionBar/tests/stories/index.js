@@ -38,9 +38,7 @@ stories.add('Kitchen Sink', () => (
     myStack={number('myStack', 10000)}
     params={{ tableAddr: '0x33' }}
     potSize={number('potSize', 400)}
-    setActionBarBetSlider={() => {}}
     setActionBarButtonActive={() => {}}
-    setActionBarMode={() => {}}
     sliderOpen={boolean('sliderOpen', false)}
     state={text('state', 'flop')}
     turnComplete={boolean('turnComplete', false)}
