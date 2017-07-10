@@ -26,7 +26,7 @@ class TableMenu extends React.Component {
   }
   render() {
     const {
-      loggedIn, open, myPos, sitout, handleClickLogout, onLeave, onSitout,
+      loggedIn, open, myPos, sitout, handleClickLogout, onLeave, onSitout, standingUp,
     } = this.props;
     const menuClose = [
       // Note: sitout value possibilities
@@ -40,14 +40,14 @@ class TableMenu extends React.Component {
         icon: (typeof sitout === 'number') ? 'fa fa-play' : 'fa fa-pause',
         title: (typeof sitout === 'number') ? 'Sit-In' : 'Sit-Out',
         onClick: onSitout,
-        disabled: myPos === undefined || sitout === 0 || sitout === null,
+        disabled: myPos === undefined || sitout === 0 || sitout === null || standingUp,
       },
       {
         name: 'standup',
         icon: 'fa fa-external-link',
         title: 'Stand-Up',
         onClick: onLeave,
-        disabled: myPos === undefined,
+        disabled: myPos === undefined || standingUp,
         /* TODO add seatStatus to UI redux state and
           mapStateToProps in TableMenu container to be used here */
         // disabled: myPos === undefined ||
@@ -147,6 +147,7 @@ TableMenu.propTypes = {
   onSitout: PropTypes.func,
   toggleMenuOpen: PropTypes.func,
   open: PropTypes.bool,
+  standingUp: PropTypes.bool,
 };
 
 export default onClickOutside(TableMenu);

@@ -13,6 +13,7 @@ import {
   makeNickNameSelector,
   makeSelectLoggedIn,
 } from '../AccountProvider/selectors';
+import { makeStandingUpSelector } from '../Seat/selectors';
 import {
   toggleMenuOpen,
   toggleMenuActive,
@@ -45,6 +46,7 @@ const mapStateToProps = createStructuredSelector({
   active: makeSelectActive(),
   blocky: makeBlockySelector(),
   nickName: makeNickNameSelector(),
+  standingUp: makeStandingUpSelector(),
 });
 
 export default connect(
