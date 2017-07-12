@@ -97,7 +97,7 @@ function refCodeErrorByCode(err) {
 
 function* initalRefCodeValidationSaga() {
   const { payload } = yield take((action) => action.type === INITIALIZE && action.meta.form === 'register');
-  const refCode = payload.get('referral', '');
+  const refCode = payload.get('referral') || '';
   if (refCode.length > 0) {
     yield call(validateRefCode, refCode);
     yield put(touch('register', 'referral'));

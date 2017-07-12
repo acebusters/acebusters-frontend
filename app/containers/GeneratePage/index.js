@@ -6,6 +6,8 @@ import { connect } from 'react-redux';
 import { Form, Field, reduxForm, SubmissionError, propTypes, change, formValueSelector } from 'redux-form/immutable';
 import { browserHistory } from 'react-router';
 import { Receipt, Type } from 'poker-helper';
+import Pusher from 'pusher-js';
+
 // components
 import Container from '../../components/Container';
 import FormField from '../../components/Form/FormField';
@@ -16,7 +18,11 @@ import { ErrorMessage } from '../../components/FormMessages';
 
 import account from '../../services/account';
 import * as storageService from '../../services/localStorage';
+import { getWeb3 } from '../../containers/AccountProvider/utils';
+import { waitForTx } from '../../utils/waitForTx';
+
 import { workerError, walletExported, register } from './actions';
+
 
 const validate = (values) => {
   const errors = {};
@@ -42,6 +48,19 @@ const warn = (values) => {
   }
   return warnings;
 };
+
+function waitForAccountTx(signerAddr) {
+  const pusher = new Pusher('d4832b88a2a81f296f53', { cluster: 'eu', encrypted: true });
+  const channel = pusher.subscribe(signerAddr);
+  return new Promise((resolve) => {
+    channel.bind('update', (event) => {
+      if (event.type === 'txHash') {
+        resolve(waitForTx(getWeb3(), event.payload));
+        channel.unbind('update');
+      }
+    });
+  });
+}
 
 export class GeneratePage extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
@@ -133,18 +152,20 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
       throw new SubmissionError({ _error: `error, Registration failed due to worker error: ${workerErr}` });
     }).then((workerRsp) => (
       // If worker success, ...
-      request(confCode, workerRsp.data.wallet).catch((err) => {
-        // If store account failed, ...
-        const errMsg = 'Registration failed!';
-        if (err === 409) {
-          throw new SubmissionError({ email: 'Email taken.', _error: errMsg });
-        } else {
-          throw new SubmissionError({ _error: `Registration failed with error code ${err}` });
-        }
-      }).then(() => {
-        // If store account success, ...
-        browserHistory.push('/login');
-      })
+      request(confCode, workerRsp.data.wallet)
+        .catch((err) => {
+          // If store account failed...
+          if (err === 409) {
+            throw new SubmissionError({ email: 'Email taken.', _error: 'Registration failed!' });
+          } else {
+            throw new SubmissionError({ _error: `Registration failed with error code ${err}` });
+          }
+        })
+        .then(() => waitForAccountTx(workerRsp.data.wallet.address))
+        .catch((err) => {
+          throw new SubmissionError({ _error: `Registration failed with message: ${err}` });
+        })
+        .then(() => browserHistory.push('/login'))
     ));
   }
 
