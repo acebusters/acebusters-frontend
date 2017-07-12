@@ -1,7 +1,7 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import styled from 'styled-components';
-import EWT from 'ethereum-web-token';
+import { Receipt } from 'poker-helper';
 import { FormattedDate, FormattedTime } from 'react-intl';
 
 import { formatNtz } from '../../utils/amountFormatter';
@@ -185,7 +185,7 @@ export default class TableDebug extends React.Component {
   }
 
   renderDbHands(hands) {
-    const dists = hands.map((hand) => parseDistribution(hand.distribution));
+    const dists = hands.map((hand) => parseDistribution(hand.distribution, hand.lineup));
 
     return (
       <div>
@@ -292,23 +292,17 @@ TableDebug.propTypes = {
   tableService: PropTypes.object.isRequired,
 };
 
-function parseDistribution(distribution) {
+function parseDistribution(distribution, lineup) {
   if (!distribution) {
     return {};
   }
 
-  const { values } = EWT.parse(distribution);
-  const lineup = values[2];
+  const { outs } = Receipt.parse(distribution);
 
-  return lineup.reduce((memo, seat) => {
-    const signerAddr = `0x${seat.slice(0, 40)}`;
-    const amount = parseInt(seat.slice(40), 16);
-
-    return {
-      ...memo,
-      [signerAddr]: amount,
-    };
-  }, {});
+  return lineup.reduce((memo, seat, pos) => ({
+    ...memo,
+    [seat.address]: outs[pos],
+  }), {});
 }
 
 function parseLastReceiptAmount(receipt) {
@@ -316,9 +310,7 @@ function parseLastReceiptAmount(receipt) {
     return null;
   }
 
-  const { values } = EWT.parse(receipt);
-
-  return values[1];
+  return Receipt.parse(receipt).amount;
 }
 
 function renderNtz(amount) {

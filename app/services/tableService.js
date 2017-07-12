@@ -1,19 +1,10 @@
-import EWT from 'ethereum-web-token';
 import fetch from 'isomorphic-fetch';
 import { Receipt } from 'poker-helper';
 
 import { getWeb3 } from '../containers/AccountProvider/sagas';
+import { babz } from '../utils/amountFormatter';
 
-import {
-  ABI_BET,
-  ABI_SHOW,
-  ABI_FOLD,
-  ABI_LEAVE,
-  ABI_SIT_OUT,
-  ABI_TABLE_FACTORY,
-  checkABIs,
-  conf,
-} from '../app.config';
+import { conf, ABI_TABLE_FACTORY } from '../app.config';
 
 const confParams = conf();
 
@@ -32,7 +23,7 @@ TableService.prototype.sendMessage = function sendMessage(text) {
 };
 
 TableService.prototype.betReceipt = function betReceipt(handId, amount) {
-  return new EWT(ABI_BET).bet(handId, amount).sign(this.privKey);
+  return new Receipt(this.tableAddr).bet(handId, babz(amount)).sign(this.privKey);
 };
 
 TableService.prototype.bet = function bet(handId, amount) {
@@ -41,7 +32,7 @@ TableService.prototype.bet = function bet(handId, amount) {
 };
 
 TableService.prototype.foldReceipt = function foldReceipt(handId, amount) {
-  return new EWT(ABI_FOLD).fold(handId, amount).sign(this.privKey);
+  return new Receipt(this.tableAddr).fold(handId, babz(amount)).sign(this.privKey);
 };
 
 TableService.prototype.fold = function fold(handId, amount) {
@@ -50,7 +41,7 @@ TableService.prototype.fold = function fold(handId, amount) {
 };
 
 TableService.prototype.checkPreflopReceipt = function checkPreflopReceipt(handId, amount) {
-  return new EWT(checkABIs.preflop).checkPre(handId, amount).sign(this.privKey);
+  return new Receipt(this.tableAddr).checkPre(handId, babz(amount)).sign(this.privKey);
 };
 
 TableService.prototype.checkPreflop = function checkPreflop(handId, amount) {
@@ -59,7 +50,7 @@ TableService.prototype.checkPreflop = function checkPreflop(handId, amount) {
 };
 
 TableService.prototype.checkFlopReceipt = function checkFlopReceipt(handId, amount) {
-  return new EWT(checkABIs.flop).checkFlop(handId, amount).sign(this.privKey);
+  return new Receipt(this.tableAddr).checkFlop(handId, babz(amount)).sign(this.privKey);
 };
 
 TableService.prototype.checkFlop = function checkFlop(handId, amount) {
@@ -68,7 +59,7 @@ TableService.prototype.checkFlop = function checkFlop(handId, amount) {
 };
 
 TableService.prototype.checkTurnReceipt = function checkTurnReceipt(handId, amount) {
-  return new EWT(checkABIs.turn).checkTurn(handId, amount).sign(this.privKey);
+  return new Receipt(this.tableAddr).checkTurn(handId, babz(amount)).sign(this.privKey);
 };
 
 TableService.prototype.checkTurn = function checkTurn(handId, amount) {
@@ -77,7 +68,7 @@ TableService.prototype.checkTurn = function checkTurn(handId, amount) {
 };
 
 TableService.prototype.checkRiverReceipt = function checkRiverReceipt(handId, amount) {
-  return new EWT(checkABIs.river).checkRiver(handId, amount).sign(this.privKey);
+  return new Receipt(this.tableAddr).checkRiver(handId, babz(amount)).sign(this.privKey);
 };
 
 TableService.prototype.checkRiver = function checkRiver(handId, amount) {
@@ -158,7 +149,7 @@ TableService.prototype.pay = function pay(receipt) {
 
 TableService.prototype.leave = function leave(handId) {
   return new Promise((resolve, reject) => {
-    const receipt = new EWT(ABI_LEAVE).leave(handId, 0).sign(this.privKey);
+    const receipt = new Receipt(this.tableAddr).leave(handId, 0).sign(this.privKey);
     const header = new Headers({ Authorization: receipt });
     const myInit = { headers: header, method: 'POST' };
     const request = new Request(`${confParams.oracleUrl}/table/${this.tableAddr}/leave`, myInit);
@@ -174,7 +165,7 @@ TableService.prototype.leave = function leave(handId) {
 
 TableService.prototype.show = function show(handId, amount, holeCards) {
   return new Promise((resolve, reject) => {
-    const receipt = new EWT(ABI_SHOW).show(handId, amount).sign(this.privKey);
+    const receipt = new Receipt(this.tableAddr).show(handId, babz(amount)).sign(this.privKey);
     const header = new Headers({ Authorization: receipt, 'Content-Type': 'application/json' });
     const data = JSON.stringify({ cards: holeCards });
     const myInit = { headers: header, body: data, method: 'POST' };
@@ -190,7 +181,7 @@ TableService.prototype.show = function show(handId, amount, holeCards) {
 };
 
 TableService.prototype.sitOut = function sitOut(handId, amount) {
-  const receipt = new EWT(ABI_SIT_OUT).sitOut(handId, amount).sign(this.privKey);
+  const receipt = new Receipt(this.tableAddr).sitOut(handId, babz(amount)).sign(this.privKey);
   return this.pay(receipt);
 };
 

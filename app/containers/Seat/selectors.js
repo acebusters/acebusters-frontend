@@ -2,9 +2,8 @@
  * Created by helge on 02.02.17.
  */
 
-import { PokerHelper, ReceiptCache } from 'poker-helper';
+import { Type, PokerHelper, ReceiptCache } from 'poker-helper';
 import { createSelector } from 'reselect';
-import EWT from 'ethereum-web-token';
 import {
   makeHandSelector,
   makeLineupSelector,
@@ -53,11 +52,11 @@ const makeSeatSelector = () => createSelector(
 const makeLastAmountSelector = () => createSelector(
     [makeLastReceiptSelector(), makeLastRoundMaxBetSelector(), makeHandSelector()],
     (lastReceipt, maxBet, hand) => {
-      if (lastReceipt && lastReceipt.values && hand && hand.get) {
+      if (lastReceipt && lastReceipt.amount && hand && hand.get) {
         if (hand.get('state') === 'preflop') {
-          return lastReceipt.values[1];
+          return lastReceipt.amount.toNumber();
         }
-        return lastReceipt.values[1] - maxBet;
+        return lastReceipt.amount.toNumber() - maxBet;
       }
       return 0;
     }
@@ -67,7 +66,7 @@ const makeLastActionSelector = () => createSelector(
   [posSelector, makeHandSelector()],
   (pos, hand) => {
     if (hand && hand.getIn && hand.getIn(['lineup', pos, 'last'])) {
-      return rc.get(hand.getIn(['lineup', pos, 'last'])).abi[0].name;
+      return rc.get(hand.getIn(['lineup', pos, 'last'])).type;
     }
     return null;
   }
@@ -140,7 +139,7 @@ const makeMyCardsSelector = () => createSelector(
 
 const makeFoldedSelector = () => createSelector(
     makeLastReceiptSelector(),
-    (lastReceipt) => (lastReceipt && lastReceipt.abi) ? lastReceipt.abi[0].name === 'fold' : false
+    (lastReceipt) => (lastReceipt && lastReceipt.type) ? lastReceipt.type === Type.FOLD : false
 );
 
 const makeCoordsSelector = () => createSelector(
@@ -186,11 +185,11 @@ const makeSeatStatusSelector = () => createSelector(
       return STATUS_MSG.sitOut;
     }
     // player is returning from sitOut
-    if (lastAction === 'sitOut' && !lineup[pos].sitout) {
+    if (lastAction === Type.SIT_OUT && !lineup[pos].sitout) {
       return STATUS_MSG.sittingIn;
     }
     // player is sitting at table playing
-    if (lastReceipt && lastReceipt.values[0] >= 0) {
+    if (lastReceipt && lastReceipt.handId >= 0) {
       return STATUS_MSG.active;
     }
     return STATUS_MSG.waiting;
@@ -201,7 +200,7 @@ const makeShowStatusSelector = () => createSelector(
   [tableStateSelector, makeHandSelector(), makeLastActionSelector(), makeLastRoundMaxBetSelector(), makeLastReceiptSelector(), makeSbSelector(), posSelector],
   (table, hand, lastAction, lastRoundMaxBet, lastReceipt, sb, pos) => {
     if (lastAction && lastReceipt && hand && hand.get) {
-      const amount = lastReceipt.values[1];
+      const amount = lastReceipt.amount.toNumber();
       const state = hand.get('state');
       const lineup = hand.get('lineup').toJS();
       if (hand.get('state') === 'preflop') {
@@ -226,11 +225,11 @@ const makeShowStatusSelector = () => createSelector(
           return STATUS_MSG.blindBig;
         }
       }
-      if (lastAction === 'fold') {
+      if (lastAction === Type.FOLD) {
         return STATUS_MSG.fold;
       }
       if (state !== 'waiting' && state !== 'dealing') {
-        if (lastAction.indexOf('bet') > -1) {
+        if (lastAction === Type.BET) {
           // trying to find the previous player here
           // 1. reverse the lineup
           const reverseLineup = hand.get('lineup').reverse().toJS();
@@ -246,7 +245,7 @@ const makeShowStatusSelector = () => createSelector(
             prevPos = pokerHelper.nextPlayer(reverseLineup, reversePos, 'involved', state);
           }
 
-          const prevAmount = (lineup[prevPos].last) ? rc.get(lineup[prevPos].last).values[1] : 0;
+          const prevAmount = (lineup[prevPos].last) ? rc.get(lineup[prevPos].last).amount.toNumber() : 0;
           // bet: amount higher than previous player && previous player amount <= lastRoundMaxBet
           if (amount > prevAmount && prevAmount <= lastRoundMaxBet) {
             return STATUS_MSG.bet;
@@ -265,7 +264,13 @@ const makeShowStatusSelector = () => createSelector(
             return STATUS_MSG.raise;
           }
         }
-        if (lastAction.toLowerCase().indexOf(state) > -1) {
+        /* eslint-disable no-nested-ternary */
+        const checkType = (state === 'preflop') ?
+          Type.CHECK_PRE : (state === 'flop') ?
+            Type.CHECK_FLOP : (state === 'turn') ?
+              Type.CHECK_TURN : Type.CHECK_RIVER;
+        /* eslint-enable no-nested-ternary */
+        if (lastAction === checkType) {
           return STATUS_MSG.check;
         }
       }
@@ -289,7 +294,7 @@ const selectStack = (table, pos) => {
   if (typeof lastHandNetted === 'undefined' || lastHandNetted < 1) {
     return null;
   }
-  const addr = table.getIn(['data', 'seats', pos, 'address']);
+  // const addr = table.getIn(['data', 'seats', pos, 'address']);
   let amount = table.getIn(['data', 'amounts', pos]);
   // get progress of state channel
   let maxHand = 0;
@@ -309,20 +314,15 @@ const selectStack = (table, pos) => {
   for (let i = lastHandNetted + 1; i <= maxHand; i += 1) {
     // get all the bets
     const rec = table.getIn([i.toString(), 'lineup', pos, 'last']);
-    const bet = (rec) ? rc.get(rec).values[1] : 0;
-    if (typeof bet !== 'undefined') {
+    const bet = (rec) ? rc.get(rec).amount.toNumber() : 0;
+    if (bet) {
       amount -= bet;
     }
     // get all the winnings
     const distsRec = table.getIn([i.toString(), 'distribution']);
     if (distsRec) {
-      const dists = rc.get(distsRec);
-      for (let j = 0; j < dists.values[2].length; j += 1) {
-        const dist = EWT.separate(dists.values[2][j]);
-        if (dist.address === addr) {
-          amount += dist.amount;
-        }
-      }
+      const dist = rc.get(distsRec);
+      amount += dist.outs[pos].toNumber();
     }
   }
   return amount;

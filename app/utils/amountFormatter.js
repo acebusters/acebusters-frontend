@@ -13,6 +13,8 @@ export const NTZ_DECIMALS = new BigNumber(10).pow(12);
 
 export const ABP_DECIMALS = new BigNumber(10).pow(12);
 
+export const babz = (ntz) => new BigNumber(NTZ_DECIMALS).mul(ntz);
+
 export function formatAmount(decimals, amount, dp) {
   const amountBn = (typeof amount === 'object' && amount !== null) ? amount : new BigNumber(amount || 0);
   const divBn = amountBn.div(decimals);

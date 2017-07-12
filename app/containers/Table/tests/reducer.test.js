@@ -1,6 +1,6 @@
-import EWT from 'ethereum-web-token';
 import BigNumber from 'bignumber.js';
 import { fromJS, is } from 'immutable';
+import { Receipt } from 'poker-helper';
 
 import tableReducer from '../reducer';
 import {
@@ -11,7 +11,7 @@ import {
   lineupReceived,
 } from '../actions';
 
-import { ABI_BET } from '../../../app.config';
+import { babz } from '../../../utils/amountFormatter';
 
 // secretSeed: 'rural tent tests net drip fatigue uncle action repeat couple lawn rival'
 const P1_ADDR = '0x6d2f2c0fa568243d2def3e999a791a6df45d816e';
@@ -33,10 +33,10 @@ describe('table reducer tests', () => {
     // set up previous state
     const lineup = [{
       address: P1_ADDR,
-      last: new EWT(ABI_BET).bet(1, 50).sign(P1_KEY),
+      last: new Receipt(tableAddr).bet(1, babz(50)).sign(P1_KEY),
     }, {
       address: P2_ADDR,
-      last: new EWT(ABI_BET).bet(1, 50).sign(P2_KEY),
+      last: new Receipt(tableAddr).bet(1, babz(50)).sign(P2_KEY),
     }];
     const before = fromJS({
       [tableAddr]: {
@@ -110,7 +110,7 @@ describe('table reducer tests', () => {
 
     const newLineup = [{
       address: P1_ADDR,
-      last: new EWT(ABI_BET).bet(1, 50).sign(P1_KEY),
+      last: new Receipt(tableAddr).bet(1, babz(50)).sign(P1_KEY),
     }, {
       address: P2_ADDR,
     }];

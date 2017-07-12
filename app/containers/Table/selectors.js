@@ -215,7 +215,7 @@ const lastAmountByAction = createSelector(
       return -1;
     }
     const receipt = rc.get(action.hand.lineup[myPos].last);
-    return receipt.values[1];
+    return receipt.amount.toNumber();
   }
 );
 
@@ -497,7 +497,7 @@ const makeAmountInTheMiddleSelector = () => createSelector(
     let potSize = 0;
     for (let i = 0; i < lineup.length; i += 1) {
       const receipt = lineup[i].last ? rc.get(lineup[i].last) : undefined;
-      const bet = receipt ? receipt.values[1] : 0;
+      const bet = receipt ? receipt.amount.toNumber() : 0;
       potSize += bet < lastRoundMaxBet ? bet : lastRoundMaxBet;
     }
     return potSize;
