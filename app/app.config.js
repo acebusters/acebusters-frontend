@@ -58,10 +58,10 @@ export function conf() {
     oracleUrl: 'https://evm4rumeob.execute-api.eu-west-1.amazonaws.com/v0',
     txUrl: 'https://khengvfg6c.execute-api.eu-west-1.amazonaws.com/v0',
     accountUrl: 'https://hsqkzjp3m8.execute-api.eu-west-1.amazonaws.com/v0',
-    ntzAddr: '0x83476ad5599dd7a6f55b3ae7590739f7afd566cf',
-    pwrAddr: '0x17aab0a8cd34b076e292dd3e53ea9c6928918e91',
+    ntzAddr: '0x6fc33c5dc1c10a9e6dc85a5196542d71ea900034',
+    pwrAddr: '0x801694ddf0aee59cfc50ea0d52c35dc970f3afcf',
     accountFactory: '0xe8bd683b5aa86ccb221ad85c4a190dd75f5ec0f5',
-    tableFactory: '0x0b506f3acd132cc782aaaef0c9b5fedf05e50e9d',
+    tableFactory: '0x14e67182916939dd09f935f9b82c11b1bd4bff4a',
     sentryDSN: 'https://8c3e021848b247ddaf627c8040f94e07@sentry.io/153017',
     gaProperty: 'UA-XXXXX-Y',
   };

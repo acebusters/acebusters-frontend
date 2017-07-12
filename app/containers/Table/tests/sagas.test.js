@@ -29,7 +29,7 @@ describe('Saga Tests', () => {
     const hand = {
       state: 'waiting',
       dealer: 0,
-      sb: 50,
+      sb: babz(50),
       handId: 1,
       lineup: [{
         address: PLAYER1.address,
@@ -47,7 +47,7 @@ describe('Saga Tests', () => {
         privKey: PLAYER2.key,
       },
       table: {
-        [tableAddr]: { data: { smallBlind: 500 } },
+        [tableAddr]: { data: { smallBlind: babz(500) } },
       },
     });
 
@@ -55,7 +55,7 @@ describe('Saga Tests', () => {
     sagaTester.start(updateScanner);
     sagaTester.dispatch(updateReceived(tableAddr, hand));
     expect(sagaTester.getLatestCalledAction().type).toEqual(BET);
-    expect(sagaTester.getLatestCalledAction().amount).toEqual(500);
+    expect(sagaTester.getLatestCalledAction().amount).toEqual(babz(500));
     expect(sagaTester.getCalledActions().length).toEqual(2);
     // do the same thing again, and make sure the request
     // is deduplicated
@@ -82,7 +82,7 @@ describe('Saga Tests', () => {
         privKey: PLAYER1.key,
       },
       table: {
-        [tableAddr]: { data: { smallBlind: 500 } },
+        [tableAddr]: { data: { smallBlind: babz(500) } },
       },
     });
 
@@ -90,7 +90,7 @@ describe('Saga Tests', () => {
     sagaTester.start(updateScanner);
     sagaTester.dispatch(updateReceived(tableAddr, hand));
     expect(sagaTester.getLatestCalledAction().type).toEqual(BET);
-    expect(sagaTester.getLatestCalledAction().amount).toEqual(500);
+    expect(sagaTester.getLatestCalledAction().amount).toEqual(babz(500));
     expect(sagaTester.getCalledActions().length).toEqual(2);
     // do the same thing again, and make sure the request
     // is deduplicated
@@ -104,7 +104,7 @@ describe('Saga Tests', () => {
       state: 'dealing',
       dealer: 0,
       handId: 1,
-      sb: 50,
+      sb: babz(50),
       lineup: [{
         address: PLAYER1.address,
       }, {
@@ -122,7 +122,7 @@ describe('Saga Tests', () => {
         privKey: PLAYER3.key,
       },
       table: {
-        [tableAddr]: { data: { smallBlind: 500 } },
+        [tableAddr]: { data: { smallBlind: babz(500) } },
       },
     });
 
@@ -131,7 +131,7 @@ describe('Saga Tests', () => {
     sagaTester.dispatch(updateReceived(tableAddr, hand));
     expect(sagaTester.getLatestCalledAction().type).toEqual(BET);
     expect(sagaTester.getCalledActions().length).toEqual(2);
-    expect(sagaTester.getLatestCalledAction().amount).toEqual(1000);
+    expect(sagaTester.getLatestCalledAction().amount).toEqual(babz(1000));
     // do the same thing again, and make sure the request
     // is deduplicated
     sagaTester.dispatch(updateReceived(tableAddr, hand));
@@ -144,7 +144,7 @@ describe('Saga Tests', () => {
       handId: 3,
       state: 'showdown',
       dealer: 0,
-      sb: 50,
+      sb: babz(50),
       lineup: [{
         address: PLAYER1.address,
         last: new Receipt(tableAddr).show(1, babz(1000)).sign(PLAYER1.key),
@@ -188,7 +188,7 @@ describe('Saga Tests', () => {
       handId: 4,
       state: 'showdown',
       dealer: 0,
-      sb: 50,
+      sb: babz(50),
       lineup: [{
         address: PLAYER1.address,
         last: new Receipt(tableAddr).show(1, babz(1000)).sign(PLAYER1.key),
@@ -308,7 +308,7 @@ describe('Saga Tests', () => {
     const sagaTester = new SagaTester({ initialState });
     sagaTester.start(formActionSaga);
     sagaTester.start(payFlow);
-    const payAction = bet(tableAddr, 3, 500, PLAYER2.key, 1, 'prevReceipt');
+    const payAction = bet(tableAddr, 3, babz(500), PLAYER2.key, 1, 'prevReceipt');
     const rsp = await pay(payAction, (action) => sagaTester.dispatch(action));
     expect(rsp).toEqual([12, 13]);
     const receipt = sagaTester.getCalledActions()[1];
@@ -341,7 +341,7 @@ describe('Saga Tests', () => {
     const sagaTester = new SagaTester({ initialState });
     sagaTester.start(formActionSaga);
     sagaTester.start(payFlow);
-    const payAction = bet(tableAddr, 3, 500, PLAYER2.key, 1, 'prevReceipt');
+    const payAction = bet(tableAddr, 3, babz(500), PLAYER2.key, 1, 'prevReceipt');
     pay(payAction, (action) => sagaTester.dispatch(action)).catch((err) => {
       expect(err).toEqual('unauthorized');
       const receiptAction = sagaTester.getCalledActions()[2];

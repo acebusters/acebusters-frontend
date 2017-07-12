@@ -15,8 +15,10 @@ export const ABP_DECIMALS = new BigNumber(10).pow(12);
 
 export const babz = (ntz) => new BigNumber(NTZ_DECIMALS).mul(ntz);
 
+export const bn = (amount) => (typeof amount === 'object' && amount !== null) ? amount : new BigNumber(amount || 0);
+
 export function formatAmount(decimals, amount, dp) {
-  const amountBn = (typeof amount === 'object' && amount !== null) ? amount : new BigNumber(amount || 0);
+  const amountBn = bn(amount);
   const divBn = amountBn.div(decimals);
   const decimalPlaces = dp === undefined ? divBn.dp() : dp;
   return divBn.toFormat(decimalPlaces);

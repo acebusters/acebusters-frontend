@@ -2,7 +2,7 @@ import fetch from 'isomorphic-fetch';
 import { Receipt } from 'poker-helper';
 
 import { getWeb3 } from '../containers/AccountProvider/sagas';
-import { babz } from '../utils/amountFormatter';
+import { bn } from '../utils/amountFormatter';
 
 import { conf, ABI_TABLE_FACTORY } from '../app.config';
 
@@ -23,7 +23,7 @@ TableService.prototype.sendMessage = function sendMessage(text) {
 };
 
 TableService.prototype.betReceipt = function betReceipt(handId, amount) {
-  return new Receipt(this.tableAddr).bet(handId, babz(amount)).sign(this.privKey);
+  return new Receipt(this.tableAddr).bet(handId, bn(amount)).sign(this.privKey);
 };
 
 TableService.prototype.bet = function bet(handId, amount) {
@@ -32,7 +32,7 @@ TableService.prototype.bet = function bet(handId, amount) {
 };
 
 TableService.prototype.foldReceipt = function foldReceipt(handId, amount) {
-  return new Receipt(this.tableAddr).fold(handId, babz(amount)).sign(this.privKey);
+  return new Receipt(this.tableAddr).fold(handId, bn(amount)).sign(this.privKey);
 };
 
 TableService.prototype.fold = function fold(handId, amount) {
@@ -41,7 +41,7 @@ TableService.prototype.fold = function fold(handId, amount) {
 };
 
 TableService.prototype.checkPreflopReceipt = function checkPreflopReceipt(handId, amount) {
-  return new Receipt(this.tableAddr).checkPre(handId, babz(amount)).sign(this.privKey);
+  return new Receipt(this.tableAddr).checkPre(handId, bn(amount)).sign(this.privKey);
 };
 
 TableService.prototype.checkPreflop = function checkPreflop(handId, amount) {
@@ -50,7 +50,7 @@ TableService.prototype.checkPreflop = function checkPreflop(handId, amount) {
 };
 
 TableService.prototype.checkFlopReceipt = function checkFlopReceipt(handId, amount) {
-  return new Receipt(this.tableAddr).checkFlop(handId, babz(amount)).sign(this.privKey);
+  return new Receipt(this.tableAddr).checkFlop(handId, bn(amount)).sign(this.privKey);
 };
 
 TableService.prototype.checkFlop = function checkFlop(handId, amount) {
@@ -59,7 +59,7 @@ TableService.prototype.checkFlop = function checkFlop(handId, amount) {
 };
 
 TableService.prototype.checkTurnReceipt = function checkTurnReceipt(handId, amount) {
-  return new Receipt(this.tableAddr).checkTurn(handId, babz(amount)).sign(this.privKey);
+  return new Receipt(this.tableAddr).checkTurn(handId, bn(amount)).sign(this.privKey);
 };
 
 TableService.prototype.checkTurn = function checkTurn(handId, amount) {
@@ -68,7 +68,7 @@ TableService.prototype.checkTurn = function checkTurn(handId, amount) {
 };
 
 TableService.prototype.checkRiverReceipt = function checkRiverReceipt(handId, amount) {
-  return new Receipt(this.tableAddr).checkRiver(handId, babz(amount)).sign(this.privKey);
+  return new Receipt(this.tableAddr).checkRiver(handId, bn(amount)).sign(this.privKey);
 };
 
 TableService.prototype.checkRiver = function checkRiver(handId, amount) {
@@ -165,7 +165,7 @@ TableService.prototype.leave = function leave(handId) {
 
 TableService.prototype.show = function show(handId, amount, holeCards) {
   return new Promise((resolve, reject) => {
-    const receipt = new Receipt(this.tableAddr).show(handId, babz(amount)).sign(this.privKey);
+    const receipt = new Receipt(this.tableAddr).show(handId, bn(amount)).sign(this.privKey);
     const header = new Headers({ Authorization: receipt, 'Content-Type': 'application/json' });
     const data = JSON.stringify({ cards: holeCards });
     const myInit = { headers: header, body: data, method: 'POST' };
@@ -181,7 +181,7 @@ TableService.prototype.show = function show(handId, amount, holeCards) {
 };
 
 TableService.prototype.sitOut = function sitOut(handId, amount) {
-  const receipt = new Receipt(this.tableAddr).sitOut(handId, babz(amount)).sign(this.privKey);
+  const receipt = new Receipt(this.tableAddr).sitOut(handId, bn(amount)).sign(this.privKey);
   return this.pay(receipt);
 };
 
