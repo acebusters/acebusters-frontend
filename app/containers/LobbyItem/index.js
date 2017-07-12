@@ -9,7 +9,7 @@ import { lineupReceived, updateReceived } from '../Table/actions';
 import { fetchTableState } from '../../services/tableService';
 import { makeSelectTableData, makeSelectTableLastHandId } from './selectors';
 import { ABI_TABLE } from '../../app.config';
-import { formatNtz } from '../../utils/amountFormater';
+import { formatNtz } from '../../utils/amountFormatter';
 
 const Tr = styled.tr`
   &:nth-of-type(odd) {

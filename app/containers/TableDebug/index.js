@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import EWT from 'ethereum-web-token';
 import { FormattedDate, FormattedTime } from 'react-intl';
 
-import { formatNtz } from '../../utils/amountFormater';
+import { formatNtz } from '../../utils/amountFormatter';
 
 const Wrapper = styled.div`
   position: fixed;

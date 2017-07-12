@@ -2,7 +2,7 @@ import React from 'react';
 
 import Pot from '../Pot';
 import { nickNameByAddress } from '../../services/nicknames';
-import { formatNtz } from '../../utils/amountFormater';
+import { formatNtz } from '../../utils/amountFormatter';
 import {
   AvatarImage,
   ChipButtonContainer,

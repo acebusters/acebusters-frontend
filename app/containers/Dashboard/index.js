@@ -14,7 +14,7 @@ import { contractEvents, accountLoaded, transferETH, proxyEvents } from '../Acco
 import { addEventsDate, isUserEvent } from '../AccountProvider/utils';
 import { createBlocky } from '../../services/blockies';
 import { ABI_TOKEN_CONTRACT, ABI_POWER_CONTRACT, ABI_ACCOUNT_FACTORY, ABI_PROXY, ABI_TABLE_FACTORY, conf } from '../../app.config';
-import { ETH_DECIMALS, NTZ_DECIMALS, ABP_DECIMALS, formatEth, formatNtz, formatAbp } from '../../utils/amountFormater';
+import { ETH_DECIMALS, NTZ_DECIMALS, ABP_DECIMALS, formatEth, formatNtz, formatAbp } from '../../utils/amountFormatter';
 
 import List from '../../components/List';
 import H2 from '../../components/H2';
@@ -399,7 +399,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
               type="inline"
               styles={{ layout: { marginLeft: '15px' } }}
             >
-              <span>{pwrBalance && formatAbp(pwrBalance, 5)} ABP</span>
+              <span>{pwrBalance && formatAbp(pwrBalance)} ABP</span>
             </WithLoading>
           </p>
 

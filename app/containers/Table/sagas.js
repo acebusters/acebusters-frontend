@@ -51,7 +51,7 @@ import {
 
 import TableService, { getHand } from '../../services/tableService';
 import { nickNameByAddress } from '../../services/nicknames';
-import { formatNtz } from '../../utils/amountFormater';
+import { formatNtz } from '../../utils/amountFormatter';
 import * as storageService from '../../services/sessionStorage';
 
 const rc = new ReceiptCache();

@@ -20,7 +20,7 @@ import Button from '../../components/Button';
 import Slides from '../../components/Slides';
 import { nickNameByAddress } from '../../services/nicknames';
 import messages from './messages';
-import { formatNtz } from '../../utils/amountFormater';
+import { formatNtz } from '../../utils/amountFormatter';
 
 // config data
 import {

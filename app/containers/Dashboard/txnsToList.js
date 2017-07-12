@@ -6,7 +6,7 @@ import BigNumber from 'bignumber.js';
 import A from '../../components/A';
 import WithLoading from '../../components/WithLoading';
 import { conf } from '../../app.config';
-import { formatEth, formatNtz } from '../../utils/amountFormater';
+import { formatEth, formatNtz } from '../../utils/amountFormatter';
 
 import { Icon, TypeIcon, typeIcons } from './styles';
 import messages from './messages';

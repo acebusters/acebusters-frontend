@@ -8,7 +8,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { chipValues } from '../../app.config';
 import { white } from '../../variables';
-import { formatNtz } from '../../utils/amountFormater';
+import { formatNtz } from '../../utils/amountFormatter';
 
 export const Chip = styled.div`
   position: absolute;

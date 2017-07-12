@@ -8,7 +8,7 @@ import H2 from '../../components/H2';
 
 import { makeSbSelector } from '../Table/selectors';
 import { makeSelectProxyAddr } from '../AccountProvider/selectors';
-import { formatNtz } from '../../utils/amountFormater';
+import { formatNtz } from '../../utils/amountFormatter';
 
 export class JoinDialog extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
