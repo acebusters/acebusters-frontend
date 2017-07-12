@@ -236,8 +236,13 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   handleJoin(pos, amount) {
-    this.token.approve.sendTransaction(this.tableAddr, amount);
-    this.table.join.sendTransaction(amount, this.props.signerAddr, pos + 1, '');
+    const { signerAddr } = this.props;
+
+    this.token.transData.sendTransaction(
+      this.tableAddr,
+      amount,
+      `0x0${(pos).toString(16)}${signerAddr.replace('0x', '')}`
+    );
 
     const slides = (
       <div>
