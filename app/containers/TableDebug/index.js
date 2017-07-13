@@ -171,12 +171,12 @@ export default class TableDebug extends React.Component {
             <tr>
               <th>Bal.</th>
               {contractData.lineup.map((seat, i) =>
-                <td key={i} colSpan={2}>{renderNtz(seat.amount)}</td>)}
+                <td key={i} colSpan={2}>{seat.amount}</td>)}
             </tr>
             <tr>
               <th>Exit hand</th>
               {contractData.lineup.map((seat, i) =>
-                <td key={i} colSpan={2}>{renderNtz(seat.exitHand)}</td>)}
+                <td key={i} colSpan={2}>{seat.exitHand}</td>)}
             </tr>
           </tfoot>
         </Table>

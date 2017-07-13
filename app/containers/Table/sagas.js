@@ -79,7 +79,7 @@ export function* submitSignedNetting(action) {
     const priv = new Buffer(action.privKey.replace('0x', ''), 'hex');
     const hash = ethUtil.sha3(payload);
     const sig = ethUtil.ecsign(hash, priv);
-    payload = `0x${sig.r.toString('hex')}${sig.s.toString('hex')}${sig.v.toString(16)}`;
+    payload = `0x${sig.v.toString(16)}${sig.r.toString('hex')}${sig.s.toString('hex')}`;
     const table = new TableService(action.tableAddr, action.privKey);
     yield table.net(action.handId, payload);
   } catch (err) {
