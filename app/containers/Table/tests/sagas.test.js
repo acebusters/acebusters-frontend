@@ -131,7 +131,7 @@ describe('Saga Tests', () => {
     sagaTester.dispatch(updateReceived(tableAddr, hand));
     expect(sagaTester.getLatestCalledAction().type).toEqual(BET);
     expect(sagaTester.getCalledActions().length).toEqual(2);
-    expect(sagaTester.getLatestCalledAction().amount).toEqual(babz(1000));
+    expect(sagaTester.getLatestCalledAction().amount).toEqual(babz(1000).toNumber());
     // do the same thing again, and make sure the request
     // is deduplicated
     sagaTester.dispatch(updateReceived(tableAddr, hand));

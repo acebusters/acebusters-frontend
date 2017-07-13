@@ -328,9 +328,15 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   handleLeave(pos) {
+    const lineup = (this.props.lineup) ? this.props.lineup.toJS() : null;
     const handId = parseInt(this.props.params.handId, 10);
     const state = this.props.state;
     const exitHand = (state !== 'waiting') ? handId : handId - 1;
+
+    if (!lineup) {
+      return Promise.reject('Lineup is empty');
+    }
+
     this.props.setExitHand(this.tableAddr, this.props.params.handId, pos, exitHand);
     const statusElement = (<div>
       <p>
@@ -343,7 +349,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.props.modalDismiss();
     this.props.modalAdd(statusElement);
 
-    return this.tableService.leave(exitHand).catch((err) => {
+    return this.tableService.leave(exitHand, lineup[pos].address).catch((err) => {
       Raven.captureException(err, { tags: {
         tableAddr: this.props.params.tableAddr,
         handId,

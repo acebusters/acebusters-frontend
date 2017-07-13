@@ -7,6 +7,8 @@ import {
   suits,
 } from '../../app.config';
 
+import { babz } from '../../utils/amountFormatter';
+
 const rc = new ReceiptCache();
 const pokerHelper = new PokerHelper(rc);
 
@@ -374,7 +376,7 @@ const makeSitoutAmountSelector = () => createSelector(
 
       // comeback from sitout
       if (sitout) {
-        return 1;
+        return babz(1).toNumber();
       }
 
       // If we want to sitout during any other state we have to pay at least 1
@@ -498,7 +500,7 @@ const makeAmountInTheMiddleSelector = () => createSelector(
     for (let i = 0; i < lineup.length; i += 1) {
       const receipt = lineup[i].last ? rc.get(lineup[i].last) : undefined;
       const bet = receipt ? receipt.amount.toNumber() : 0;
-      potSize += bet < lastRoundMaxBet ? bet : lastRoundMaxBet;
+      potSize += Number(bet < lastRoundMaxBet ? bet : lastRoundMaxBet);
     }
     return potSize;
   }

@@ -415,7 +415,7 @@ describe('sitout Selector', () => {
       },
     };
     const selectSitoutAmount = makeSitoutAmountSelector();
-    expect(selectSitoutAmount(mockedState, props)).toEqual(1);
+    expect(selectSitoutAmount(mockedState, props)).toEqual(babz(1).toNumber());
   });
 
   it('should return 0 when state is waiting when i am in sitout.', () => {

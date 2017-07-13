@@ -147,9 +147,9 @@ TableService.prototype.pay = function pay(receipt) {
   });
 };
 
-TableService.prototype.leave = function leave(handId) {
+TableService.prototype.leave = function leave(handId, leaverAddr) {
   return new Promise((resolve, reject) => {
-    const receipt = new Receipt(this.tableAddr).leave(handId, 0).sign(this.privKey);
+    const receipt = new Receipt(this.tableAddr).leave(handId, leaverAddr).sign(this.privKey);
     const header = new Headers({ Authorization: receipt });
     const myInit = { headers: header, method: 'POST' };
     const request = new Request(`${confParams.oracleUrl}/table/${this.tableAddr}/leave`, myInit);
