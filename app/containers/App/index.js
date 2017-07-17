@@ -56,7 +56,9 @@ const StyledDashboard = styled.div`
 
 export function App(props) {
   const { notifications, loggedIn } = props;
-  const isNotTable = props.location.pathname.indexOf('table') === -1;
+  const pathname = props.location.pathname;
+  const isNotTable = pathname.indexOf('table') === -1;
+  const showNotifications = pathname.match(/table|lobby|dashboard/);
   return (
     <div name="app-container">
       <StyledDashboard params={props.params} name="styled-dashboard">
@@ -67,7 +69,9 @@ export function App(props) {
           />
         }
         <div>
-          <Notifications isNotTable={isNotTable} />
+          {showNotifications &&
+            <Notifications isNotTable={isNotTable} />
+          }
           <Content
             showNavigation={!loggedIn || notifications.length > 0}
             fixed={props.fixed}
