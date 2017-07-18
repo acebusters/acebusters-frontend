@@ -229,7 +229,6 @@
     "ethereumjs-util": "^5.1.0",
     "express": "4.15.3",
     "fontfaceobserver": "2.0.9",
-    "grid-styled": "^1.0.1",
     "immutable": "3.8.1",
     "intl": "1.2.5",
     "invariant": "2.2.2",

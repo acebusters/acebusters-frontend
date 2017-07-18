@@ -8,15 +8,23 @@ import {
   gray,
 } from 'variables';
 
-import Grid from 'grid-styled';
 import H1 from '../../components/H1';
 import Radial from '../../components/RadialProgress';
 import messages from './messages';
 import Slides from '../../components/Slides';
 
 const StyledDiv = styled.div`
-    font-size: 8em;
-    text-align: center;
+  font-size: 8em;
+  text-align: center;
+`;
+
+const Columns = styled.div`
+  display: flex;
+`;
+
+const Column = styled.div`
+  width: 33.33333%;
+  padding: 0 32px;
 `;
 
 function JoinSlides() {
@@ -37,36 +45,38 @@ function JoinSlides() {
         <H1>
           <FormattedMessage {...messages.slides.second.header} />
         </H1>
-        <Grid sm={1 / 3}>
-          <Radial
-            percent="100"
-            strokeWidth="10"
-            strokeColor={baseColor}
-          />
-          <p>
-            <FormattedMessage {...messages.slides.second.active} />
-          </p>
-        </Grid>
-        <Grid sm={1 / 3}>
-          <Radial
-            percent="100"
-            strokeWidth="10"
-            strokeColor={green}
-          />
-          <p>
-            <FormattedMessage {...messages.slides.second.isTurn} />
-          </p>
-        </Grid>
-        <Grid sm={1 / 3}>
-          <Radial
-            percent="100"
-            strokeWidth="10"
-            strokeColor={gray}
-          />
-          <p>
-            <FormattedMessage {...messages.slides.second.sitOut} />
-          </p>
-        </Grid>
+        <Columns>
+          <Column>
+            <Radial
+              percent="100"
+              strokeWidth="10"
+              strokeColor={baseColor}
+            />
+            <p>
+              <FormattedMessage {...messages.slides.second.active} />
+            </p>
+          </Column>
+          <Column>
+            <Radial
+              percent="100"
+              strokeWidth="10"
+              strokeColor={green}
+            />
+            <p>
+              <FormattedMessage {...messages.slides.second.isTurn} />
+            </p>
+          </Column>
+          <Column>
+            <Radial
+              percent="100"
+              strokeWidth="10"
+              strokeColor={gray}
+            />
+            <p>
+              <FormattedMessage {...messages.slides.second.sitOut} />
+            </p>
+          </Column>
+        </Columns>
       </div>
       <div>
         <H1>

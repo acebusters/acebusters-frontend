@@ -1,6 +1,5 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import Grid from 'grid-styled';
 import styled from 'styled-components';
 import A from 'components/A';
 import LocaleToggle from 'containers/LocaleToggle';
@@ -63,7 +62,7 @@ function Footer() {
           <a href="https://www.facebook.com/acebusters.poker" target="_blank"><StyledIcon className="fa fa-facebook"></StyledIcon></a>
         </CenterDiv>
       </Icons>
-      <Grid xs={1 / 1}>
+      <div>
         <CenterDiv>
           <LocaleToggle />
         </CenterDiv>
@@ -78,7 +77,7 @@ function Footer() {
         <CenterDiv>
           <A href="http://www.acebusters.com/terms_of_use.html">Terms of Use</A>
         </CenterDiv>
-      </Grid>
+      </div>
     </Wrapper>
   );
 }
