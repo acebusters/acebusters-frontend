@@ -1,4 +1,4 @@
-import { put, takeEvery } from 'redux-saga/effects';
+import { put, takeEvery, select, call } from 'redux-saga/effects';
 import { delay } from 'redux-saga';
 import uuid from 'uuid/v4';
 
@@ -10,11 +10,12 @@ import {
   notifyRemoving,
 } from './actions';
 
-import { SET_AUTH } from '../AccountProvider/actions';
+import { SET_AUTH, ACCOUNT_LOADED, INJECT_ACCOUNT_UPDATE } from '../AccountProvider/actions';
 
 import {
   TEMP,
   loggedInSuccess,
+  noWeb3Danger,
   temp,
   persist,
 } from './constants';
@@ -58,8 +59,26 @@ function* authNotification({ newAuthState }) {
   }
 }
 
+function* injectedWeb3Notification({ payload: { isLocked } }) {
+  if (!isLocked) {
+    const state = yield select();
+    const injected = yield call([state, state.getIn], ['account', 'injected']);
+    if (!injected) {
+      yield* createPersistNotification(noWeb3Danger);
+    }
+  }
+}
+
+function* injectedWeb3NotificationDismiss({ payload: injected }) {
+  if (typeof injected === 'string') {
+    yield put(notifyDelete(noWeb3Danger.txId));
+  }
+}
+
 export function* notificationsSaga() {
   yield takeEvery(SET_AUTH, authNotification);
+  yield takeEvery(ACCOUNT_LOADED, injectedWeb3Notification);
+  yield takeEvery(INJECT_ACCOUNT_UPDATE, injectedWeb3NotificationDismiss);
   yield takeEvery(NOTIFY_CREATE, selectNotification);
   yield takeEvery(NOTIFY_REMOVE, removeNotification);
 }

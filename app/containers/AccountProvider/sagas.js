@@ -11,8 +11,8 @@ import { nickNameByAddress } from '../../services/nicknames';
 import {
   conf,
   ABI_TOKEN_CONTRACT,
-  ABI_CONTROLLER,
   ABI_ACCOUNT_FACTORY,
+  ABI_PROXY,
 } from '../../app.config';
 
 import { addEventsDate, getWeb3, isUserEvent } from './utils';
@@ -25,6 +25,7 @@ import {
   SET_AUTH,
   WEB3_CONNECTED,
   ETH_TRANSFER,
+  NETWORK_SUPPORT_UPDATE,
   web3Error,
   web3Connected,
   web3Disconnected,
@@ -38,6 +39,7 @@ import {
   contractEvents,
   transferETHSuccess,
   transferETHError,
+  updateInjectedAccount,
 } from './actions';
 
 export { getWeb3 } from './utils';
@@ -189,20 +191,24 @@ function* accountLoginSaga() {
         id: signer,
       });
       // this reads account data from the account factory
-      const res = yield getAccount(getWeb3(), signer);
-      const proxy = res[0];
-      const controller = res[1];
-      const lastNonce = res[2].toNumber();
+      const [proxy, owner, isLocked] = yield getAccount(getWeb3(), signer);
       const blocky = createBlocky(signer);
       const nickName = nickNameByAddress(signer);
 
       // write data into the state
-      yield put(accountLoaded({ proxy, controller, lastNonce, blocky, nickName, signer }));
+      yield put(accountLoaded({
+        proxy,
+        owner,
+        isLocked,
+        blocky,
+        nickName,
+        signer,
+      }));
 
-      // start listen on the account controller for events
+      // start listen on the account factory for events
       // mostly auth errors
-      const controllerContract = getWeb3().eth.contract(ABI_CONTROLLER).at(controller);
-      yield fork(ethEventListenerSaga, controllerContract);
+      const accFactoryContract = getWeb3().eth.contract(ABI_ACCOUNT_FACTORY).at(confParams.accountFactory);
+      yield fork(ethEventListenerSaga, accFactoryContract);
     }
   }
 }
@@ -233,48 +239,135 @@ function sendTx(forwardReceipt) {
   });
 }
 
+function* contractTransactionSecureSend(action) {
+  const { data } = action.payload;
+  const state = yield select();
+  const proxyAddr = yield call([state, state.getIn], ['account', 'proxy']);
+  const injectedAddr = yield call([state, state.getIn], ['account', 'injected']);
+  const web3 = yield call(getWeb3, true);
+  const proxy = web3.eth.contract(ABI_PROXY).at(proxyAddr);
+
+  return new Promise((resolve, reject) => {
+    proxy.forward.estimateGas(
+      confParams.ntzAddr,
+      0,
+      data,
+      { from: injectedAddr },
+      (gasErr, gas) => {
+        if (gasErr) {
+          reject(gasErr);
+        } else {
+          proxy.forward(
+            confParams.ntzAddr,
+            0,
+            data,
+            { from: injectedAddr, gas: Math.round(gas * 1.9) },
+            (forwardErr, result) => {
+              if (forwardErr) {
+                reject(forwardErr);
+              } else {
+                resolve(result);
+              }
+            }
+          );
+        }
+      }
+    );
+  });
+}
+
 function* contractTransactionSendSaga() {
   const txChan = yield actionChannel(CONTRACT_TX_SEND);
   while (true) { // eslint-disable-line no-constant-condition
     const action = yield take(txChan);
-    const { dest, key, data, privKey, callback, args, methodName } = action.payload;
+    const { dest, key, data, privKey, callback = (() => null), args, methodName } = action.payload;
+
     const state = yield select();
-    const nonce = state.get('account').get('lastNonce') + 1;
-    const controller = state.get('account').get('controller');
-    const forwardReceipt = new Receipt(controller).forward(nonce, dest, 0, data).sign(privKey);
-    // send it.
+    const isLocked = yield call([state, state.getIn], ['account', 'isLocked']);
+
     try {
-      const value = yield sendTx(forwardReceipt);
-      if (callback) {
-        yield call(callback, null, value.txHash);
+      let txHash;
+      if (isLocked) {
+        const owner = yield call([state, state.getIn], ['account', 'owner']);
+        const forwardReceipt = new Receipt(owner).forward(0, dest, 0, data).sign(privKey);
+        const value = yield sendTx(forwardReceipt);
+        txHash = value.txHash;
+      } else {
+        // two yields to wait for returned promise
+        txHash = yield yield call(contractTransactionSecureSend, action);
       }
-      yield put(contractTxSuccess({ address: dest, nonce, txHash: value.txHash, key, args, methodName }));
+      yield call(callback, null, txHash);
+      yield put(contractTxSuccess({ address: dest, txHash, key, args, methodName }));
     } catch (err) {
       const error = err.message || err;
-      if (callback) {
-        yield call(callback, error);
-      }
-      yield put(contractTxError({ address: dest, nonce, error, args, methodName, action }));
+      yield call(callback, error);
+      yield put(contractTxError({ address: dest, error, args, methodName, action }));
     }
   }
+}
+
+function* secureTransferETH(action) {
+  const { payload: { dest, amount } } = action;
+  const state = yield select();
+  const proxyAddr = yield call([state, state.getIn], ['account', 'proxy']);
+  const injectedAddr = yield call([state, state.getIn], ['account', 'injected']);
+
+  const web3 = getWeb3(true);
+  const proxy = web3.eth.contract(ABI_PROXY).at(proxyAddr);
+  const token = web3.eth.contract(ABI_TOKEN_CONTRACT).at(confParams.ntzAddr);
+  const data = token.transfer.getData(dest, amount);
+
+  return new Promise((resolve, reject) => {
+    proxy.forward.estimateGas(
+      dest,
+      `0x${amount.toString(16)}`,
+      data,
+      { from: injectedAddr },
+      (gasErr, gas) => {
+        proxy.forward.sendTransaction(
+          dest,
+          `0x${amount.toString(16)}`,
+          data,
+          { from: injectedAddr, gas: gas * 1.9 },
+          (err, result) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(result);
+            }
+          }
+        );
+      }
+    );
+  });
 }
 
 function* transferETHSaga() {
   const transferChan = yield actionChannel(ETH_TRANSFER);
   while (true) { // eslint-disable-line no-constant-condition
-    const { payload: { dest, amount } } = yield take(transferChan);
+    const action = yield take(transferChan);
+    const { payload: { dest, amount, callback = (() => null) } } = action;
     const state = yield select();
-    const nonce = state.get('account').get('lastNonce') + 1;
-    const controller = state.get('account').get('controller');
-    const privKey = state.get('account').get('privKey');
-    const receipt = new Receipt(controller).forward(nonce, dest, amount, '').sign(privKey);
+    const isLocked = yield call([state, state.getIn], ['account', 'isLocked']);
 
     try {
-      const value = yield sendTx(receipt);
-      yield put(transferETHSuccess({ address: dest, nonce, amount, txHash: value.txHash }));
+      let txHash;
+      if (isLocked) {
+        const owner = yield call([state, state.getIn], ['account', 'owner']);
+        const privKey = state.get('account').get('privKey');
+        const receipt = new Receipt(owner).forward(0, dest, amount, '').sign(privKey);
+        const value = yield call(sendTx, receipt);
+        txHash = value.txHash;
+      } else {
+        txHash = yield yield call(secureTransferETH, action);
+      }
+
+      yield call(callback, null, txHash);
+      yield put(transferETHSuccess({ address: dest, amount, txHash }));
     } catch (err) {
       const error = (err.message) ? err.message : err;
-      yield put(transferETHError({ address: dest, amount, nonce, error }));
+      yield call(callback, error);
+      yield put(transferETHError({ address: dest, amount, error }));
     }
   }
 }
@@ -322,6 +415,36 @@ export function* ethEventListenerSaga(contract) {
   }
 }
 
+export function* injectedWeb3ListenerSaga() {
+  while (true) { // eslint-disable-line no-constant-condition
+    yield call(delay, 1000);
+    const state = yield select();
+    const prevInjected = yield call([state, state.getIn], ['account', 'injected']);
+    const injected = window.web3 && window.web3.eth.accounts[0];
+
+    if (prevInjected !== injected) {
+      yield put(updateInjectedAccount(injected));
+    }
+  }
+}
+
+function getFirstBlockHash() {
+  return new Promise((resolve, reject) => {
+    const web3 = getWeb3(true);
+    if (web3) {
+      web3.eth.getBlock(0, (err, block) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(block.hash);
+        }
+      });
+    } else {
+      reject('Smart contracts is not supported');
+    }
+  });
+}
+
 // The root saga is what is sent to Redux's middleware.
 export function* accountSaga() {
   yield takeLatest(WEB3_CONNECT, web3ConnectSaga);
@@ -332,6 +455,15 @@ export function* accountSaga() {
   yield fork(transferETHSaga);
   yield fork(accountLoginSaga);
   yield fork(contractTransactionSendSaga);
+  yield fork(injectedWeb3ListenerSaga);
+
+  try {
+    const hash = yield call(getFirstBlockHash);
+    yield put({
+      type: NETWORK_SUPPORT_UPDATE,
+      payload: hash === confParams.firstBlockHash,
+    });
+  } catch (err) {} // eslint-disable-line no-empty
 }
 
 export default [

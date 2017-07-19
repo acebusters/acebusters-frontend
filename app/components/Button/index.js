@@ -8,6 +8,7 @@
 
 import React, { PropTypes, Children } from 'react';
 import styled from 'styled-components';
+import A from '../A';
 
 import {
   baseColor,
@@ -33,6 +34,10 @@ const SharedButton = styled.button`
   & + & {
     margin-left: 10px;
   }
+
+  &:disabled {
+    cursor: default;
+  }
 `;
 
 const Medium = styled(SharedButton)`
@@ -46,6 +51,11 @@ const Medium = styled(SharedButton)`
 
   &:active {
     color: ${baseColor};
+  }
+
+  &:disabled {
+    color: ${white};
+    opacity: 0.6;
   }
 `;
 
@@ -69,7 +79,6 @@ const Large = styled(SharedButton)`
     color: ${background};
     background-color: ${disabled};
     border-color: ${disabled};
-    cursor: not-allowed;
   }
 `;
 
@@ -81,6 +90,7 @@ const Icon = styled.i`
 const sizes = {
   medium: Medium,
   large: Large,
+  link: A,
 };
 
 function Button({
@@ -104,7 +114,7 @@ function Button({
 Button.propTypes = {
   onClick: PropTypes.func,
   type: PropTypes.string,
-  size: PropTypes.oneOf(['large', 'medium']),
+  size: PropTypes.oneOf(['large', 'medium', 'link']),
   icon: PropTypes.string,
   disabled: PropTypes.bool,
   children: PropTypes.node,

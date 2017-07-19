@@ -11,14 +11,15 @@ function degrade(fn, fallback) {
   }
 }
 
-function getMethodKey({ groupName, methodName, args }) {
+export function getMethodKey({ groupName, methodName, args }) {
   return `${groupName || ''}.${methodName}(${JSON.stringify(args)})`;
 }
 
 function generateContractInstanceApi({ abi, address, getState, dispatch }) {
   // cached version doesn't exist, create it
   const contractInstance = getWeb3().eth.contract(abi).at(address);
-  // // reduce the abi into the redux methods
+
+  // reduce the abi into the redux methods
   const api = abi.reduce((o, definition) => {
     // skip if we're not dealing with a function
     if (definition.type !== 'function') { return o; }
@@ -32,7 +33,7 @@ function generateContractInstanceApi({ abi, address, getState, dispatch }) {
         key: getMethodKey({ methodName, args }),
         method: contractInstance[methodName].call,
       }),
-      // creates receipt for to invoke contract through account controller
+      // creates receipt for to invoke contract
       sendTransaction: (...args) => contractTxSend({
         args,
         methodName,

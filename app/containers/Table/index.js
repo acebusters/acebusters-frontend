@@ -217,22 +217,27 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   handleRebuy(amount) {
-    this.table.rebuy.sendTransaction(amount);
+    this.table.rebuy.sendTransaction(
+      amount,
+      (err) => {
+        if (!err) {
+          const slides = (
+            <Slides width={600} height={400}>
+              <div>
+                <h1>Request for rebuy sent! Please wait!</h1>
+                <p>Here is the introduction to the online poker game</p>
+              </div>
+              <div>
+                <h1>FAQ</h1>
+              </div>
+            </Slides>
+          );
 
-    const slides = (
-      <Slides width={600} height={400}>
-        <div>
-          <h1>Request for rebuy sent! Please wait!</h1>
-          <p>Here is the introduction to the online poker game</p>
-        </div>
-        <div>
-          <h1>FAQ</h1>
-        </div>
-      </Slides>
+          this.props.modalDismiss();
+          this.props.modalAdd(slides);
+        }
+      }
     );
-
-    this.props.modalDismiss();
-    this.props.modalAdd(slides);
   }
 
   handleJoin(pos, amount) {
@@ -241,25 +246,28 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.token.transData.sendTransaction(
       this.tableAddr,
       amount,
-      `0x0${(pos).toString(16)}${signerAddr.replace('0x', '')}`
-    );
+      `0x0${(pos).toString(16)}${signerAddr.replace('0x', '')}`,
+      (err) => {
+        if (!err) {
+          const slides = (
+            <div>
+              <JoinSlides />
+              <Button size="large" onClick={this.props.modalDismiss}>
+                <FormattedMessage {...messages.joinModal.buttonDismiss} />
+              </Button>
+            </div>
+          );
 
-    const slides = (
-      <div>
-        <JoinSlides></JoinSlides>
-        <Button size="large" onClick={this.props.modalDismiss}>
-          <FormattedMessage {...messages.joinModal.buttonDismiss} />
-        </Button>
-      </div>
-    );
-
-    this.props.modalDismiss();
-    this.props.modalAdd(slides);
-    this.props.setPending(
-      this.tableAddr,
-      this.props.params.handId,
-      pos,
-      { signerAddr: this.props.signerAddr, stackSize: amount }
+          this.props.modalDismiss();
+          this.props.modalAdd(slides);
+          this.props.setPending(
+            this.tableAddr,
+            this.props.params.handId,
+            pos,
+            { signerAddr: this.props.signerAddr, stackSize: amount }
+          );
+        }
+      }
     );
   }
 

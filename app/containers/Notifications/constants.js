@@ -12,6 +12,17 @@ export const loggedInSuccess = {
   type: 'success',
 };
 
+export const noWeb3Danger = {
+  txId: 'NO_WEB3_MESSAGE',
+  notifyType: 'ACCOUNT_LOADED',
+  category: 'Browser doesn\'t support smart contracts!',
+  details: 'Install MetaMask or ethereum browser',
+  removing: false,
+  dismissable: true,
+  date: new Date(),
+  type: 'danger',
+};
+
 export const temp = {
   notifyType: 'FUNDS_TRANSFERRED_NTZ',
   category: 'NTZ Wallet',

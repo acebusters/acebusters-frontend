@@ -1,10 +1,12 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-// import BigNumber from 'bignumber.js';
 
 import { Form, reduxForm, formValueSelector } from 'redux-form/immutable';
 import { FormattedMessage } from 'react-intl';
 
+import { makeSelectInjectedAccount, makeSelectNetworkSupported } from '../../containers/AccountProvider/selectors';
+import NoWeb3Message from '../../components/Web3Alerts/NoWeb3';
+import UnsupportedNetworkMessage from '../../components/Web3Alerts/UnsupportedNetwork';
 import SubmitButton from '../../components/SubmitButton';
 import FormField from '../../components/Form/FormField';
 import AmountField from '../../components/AmountField';
@@ -36,7 +38,7 @@ class ExchangeDialog extends React.Component { // eslint-disable-line react/pref
   }
 
   handleSubmit(values) {
-    this.props.handleExchange(values.get('amount'));
+    return this.props.handleExchange(values.get('amount'));
   }
 
   render() {
@@ -48,6 +50,9 @@ class ExchangeDialog extends React.Component { // eslint-disable-line react/pref
       calcExpectedAmount,
       amountUnit,
       title,
+      invalid,
+      injected,
+      networkSupported,
     } = this.props;
     const expectedAmountUnit = amountUnit.toLowerCase() === 'ntz' ? 'eth' : 'ntz';
     const formatExpValue = expectedAmountUnit === 'ntz' ? formatNtz : formatEth;
@@ -77,7 +82,15 @@ class ExchangeDialog extends React.Component { // eslint-disable-line react/pref
             maxAmount={maxAmount}
           />
 
-          <SubmitButton disabled={submitting}>Submit</SubmitButton>
+          {!injected && <NoWeb3Message />}
+          {!networkSupported && <UnsupportedNetworkMessage />}
+
+          <SubmitButton
+            disabled={invalid || !injected || !networkSupported}
+            submitting={submitting}
+          >
+            Submit
+          </SubmitButton>
         </Form>
       </div>
     );
@@ -86,6 +99,9 @@ class ExchangeDialog extends React.Component { // eslint-disable-line react/pref
 
 ExchangeDialog.propTypes = {
   submitting: PropTypes.bool,
+  invalid: PropTypes.bool,
+  networkSupported: PropTypes.bool,
+  injected: PropTypes.string,
   maxAmount: PropTypes.object, // BigNumber
   calcExpectedAmount: PropTypes.func,
   handleSubmit: PropTypes.func,
@@ -95,20 +111,15 @@ ExchangeDialog.propTypes = {
   amountUnit: PropTypes.string.isRequired,
 };
 
-
-function mapDispatchToProps(dispatch) {
-  return {
-    dispatch,
-  };
-}
-
 const valueSelector = formValueSelector('exchange');
 
 const mapStateToProps = (state) => ({
   amount: valueSelector(state, 'amount'),
+  injected: makeSelectInjectedAccount()(state),
+  networkSupported: makeSelectNetworkSupported()(state),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(
+export default connect(mapStateToProps)(
   reduxForm({
     form: 'exchange',
     validate,

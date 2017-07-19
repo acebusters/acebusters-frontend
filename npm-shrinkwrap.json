@@ -4058,6 +4058,11 @@
       "integrity": "sha1-kTbgUD3MBqMBaQ8LsU/042TpSfA=",
       "dev": true
     },
+    "es6-promise": {
+      "version": "4.1.1",
+      "resolved": "https://registry.npmjs.org/es6-promise/-/es6-promise-4.1.1.tgz",
+      "integrity": "sha512-OaU1hHjgJf+b0NzsxCg7NdIYERD6Hy/PEmFLTjw+b65scuisG3Kt4QoTvJ66BBkPZ581gr0kpoVzKnxniM8nng=="
+    },
     "es6-set": {
       "version": "https://registry.npmjs.org/es6-set/-/es6-set-0.1.5.tgz",
       "integrity": "sha1-0rPsXU2ADO2BjbU40ol02wpzzLE=",
@@ -4834,7 +4839,7 @@
         },
         "glob": {
           "version": "https://registry.npmjs.org/glob/-/glob-7.1.2.tgz",
-          "integrity": "sha512-MJTUg1kjuLeQCJ+ccE4Vpa6kKVXkPYJ2mOCQyUuKLcLQsdrMCpBPUi8qVE6+YuaJkozeA9NusTAw3hLr8Xe5EQ==",
+          "integrity": "sha1-wZyd+aAocC1nhhI4SmVSQExjbRU=",
           "dev": true
         },
         "graceful-fs": {
@@ -4977,7 +4982,7 @@
         },
         "minimatch": {
           "version": "https://registry.npmjs.org/minimatch/-/minimatch-3.0.4.tgz",
-          "integrity": "sha512-yJHVQEhyqPLUTgt9B83PXu6W3rx4MvvHvSUvToogpwoGDOUQ+yDrR0HRot+yOCdCO7u4hX3pWft6kWBBcqh0UA==",
+          "integrity": "sha1-UWbihkV/AzBgZL5Ul+jbsMPTIIM=",
           "dev": true
         },
         "minimist": {
@@ -5010,7 +5015,7 @@
         },
         "npmlog": {
           "version": "https://registry.npmjs.org/npmlog/-/npmlog-4.1.0.tgz",
-          "integrity": "sha512-ocolIkZYZt8UveuiDS0yAkkIjid1o7lPG8cYm05yNYzBn8ykQtaiPMEGp8fY9tKdDgm8okpdKzkvu1y9hUYugA==",
+          "integrity": "sha1-3Fm+6F9k8A7UJO+yrweD3yXRwLU=",
           "dev": true,
           "optional": true
         },
@@ -5236,7 +5241,7 @@
         },
         "wide-align": {
           "version": "https://registry.npmjs.org/wide-align/-/wide-align-1.1.2.tgz",
-          "integrity": "sha512-ijDLlyQ7s6x1JgCLur53osjm/UXUYD9+0PbYKrBsYisYXzCxN+HC3mYDNy/dWdmf3AwqwU3CXwDCvsNgGK1S0w==",
+          "integrity": "sha1-Vx4PGwYEY268DfwhsDObvjE0FxA=",
           "dev": true,
           "optional": true
         },
@@ -7723,15 +7728,13 @@
       }
     },
     "poker-helper": {
-      "version": "https://registry.npmjs.org/poker-helper/-/poker-helper-0.4.0.tgz",
-      "integrity": "sha1-Blcma9W+2XSJcyuriI5N6fESRRU=",
+      "version": "0.4.1",
+      "resolved": "https://registry.npmjs.org/poker-helper/-/poker-helper-0.4.1.tgz",
+      "integrity": "sha1-wKQJKs/5K3B9nqHTm8+6raznZpE=",
       "dependencies": {
-        "es6-promise": {
-          "version": "https://registry.npmjs.org/es6-promise/-/es6-promise-4.1.0.tgz",
-          "integrity": "sha1-3aA8qPn4m8WX5omEKSnee6jOvfA="
-        },
         "ethereumjs-util": {
-          "version": "https://registry.npmjs.org/ethereumjs-util/-/ethereumjs-util-4.5.0.tgz",
+          "version": "4.5.0",
+          "resolved": "https://registry.npmjs.org/ethereumjs-util/-/ethereumjs-util-4.5.0.tgz",
           "integrity": "sha1-PpQosxfuvaPXJg2FT93alUsfG8Y="
         }
       }

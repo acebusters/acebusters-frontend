@@ -13,6 +13,9 @@ import {
   ETH_TRANSFER_SUCCESS,
   CONTRACT_EVENTS,
   ACCOUNT_LOADED,
+  ACCOUNT_UNLOCKED,
+  INJECT_ACCOUNT_UPDATE,
+  NETWORK_SUPPORT_UPDATE,
   READY_STATE,
 } from './actions';
 
@@ -23,6 +26,7 @@ const initialState = fromJS({
   nickName: null,
   signerAddr: null,
   web3ReadyState: READY_STATE.CONNECTING,
+  onSupportedNetwork: false,
   web3ErrMsg: null,
 });
 
@@ -37,13 +41,22 @@ function accountProviderReducer(state = initialState, action) {
     case WEB3_ERROR:
       return state.set('web3ErrMsg', action.err ? (action.err.message || 'Connection Error') : null);
 
+    case ACCOUNT_UNLOCKED:
+      return state.set('isLocked', false);
+
+    case INJECT_ACCOUNT_UPDATE:
+      return state.set('injected', action.payload);
+
+    case NETWORK_SUPPORT_UPDATE:
+      return state.set('onSupportedNetwork', action.payload);
+
     case ACCOUNT_LOADED:
-      return state.set('proxy', action.data.proxy)
-        .set('controller', action.data.controller)
-        .set('lastNonce', action.data.lastNonce)
-        .set('blocky', action.data.blocky)
-        .set('nickName', action.data.nickName)
-        .set('signerAddr', action.data.signer);
+      return state.set('proxy', action.payload.proxy)
+        .set('isLocked', action.payload.isLocked)
+        .set('owner', action.payload.owner)
+        .set('blocky', action.payload.blocky)
+        .set('nickName', action.payload.nickName)
+        .set('signerAddr', action.payload.signer);
 
     case WEB3_METHOD_SUCCESS:
       return state.setIn(['web3', 'methods', action.key], fromJS(action.payload));
@@ -66,7 +79,7 @@ function accountProviderReducer(state = initialState, action) {
 
     case CONTRACT_TX_SUCCESS:
     case ETH_TRANSFER_SUCCESS:
-      return state.set('lastNonce', action.payload.nonce);
+      return state;
 
     case CONTRACT_EVENTS:
       return action.payload.reduce(handleEvent, state);

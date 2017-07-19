@@ -10,6 +10,7 @@ describe('account reducer tests', () => {
       email: undefined,
       blocky: null,
       nickName: null,
+      onSupportedNetwork: false,
       signerAddr: null,
       loggedIn: false,
       web3ReadyState: 0,

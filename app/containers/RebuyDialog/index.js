@@ -1,4 +1,3 @@
-
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
@@ -9,6 +8,10 @@ import { createStructuredSelector } from 'reselect';
 import SubmitButton from '../../components/SubmitButton';
 import H2 from '../../components/H2';
 import { makeSbSelector } from '../Table/selectors';
+import { makeSelectInjectedAccount, makeSelectNetworkSupported } from '../AccountProvider/selectors';
+
+import NoWeb3Message from '../../components/Web3Alerts/NoWeb3';
+import UnsupportedNetworkMessage from '../../components/Web3Alerts/UnsupportedNetwork';
 
 import messages from './messages';
 
@@ -39,7 +42,7 @@ export class RebuyDialog extends React.Component {
   }
 
   handleSubmit() {
-    this.props.handleRebuy(this.state.amount);
+    return this.props.handleRebuy(this.state.amount);
   }
 
   handleLeave() {
@@ -47,11 +50,12 @@ export class RebuyDialog extends React.Component {
   }
 
   render() {
-    const min = this.props.sb * 40;
-    const max = Math.min(this.props.balance, this.props.sb * 200);
+    const { injected, sb, balance, modalDismiss, submitting, networkSupported } = this.props;
+    const min = sb * 40;
+    const max = Math.min(balance, sb * 200);
     const { amount } = this.state;
 
-    if (this.props.balance < min) {
+    if (balance < min) {
       return (
         <div style={{ minWidth: '20em' }}>
           <H2>
@@ -60,12 +64,13 @@ export class RebuyDialog extends React.Component {
           <p>
             <FormattedMessage {...messages.balanceOut} />
           </p>
-          <SubmitButton onClick={this.props.modalDismiss}>
+          <SubmitButton onClick={modalDismiss}>
             <FormattedMessage {...messages.ok} />
           </SubmitButton>
         </div>
       );
     }
+
     return (
       <div style={{ minWidth: '20em' }}>
         <Slider
@@ -76,13 +81,16 @@ export class RebuyDialog extends React.Component {
           max={max}
           step={1}
           onChange={this.updateAmount}
-        >
-        </Slider>
+        />
         <div>
           <FormattedMessage {...messages.max} />
           <span>{max}</span>
         </div>
         <div>{amount}</div>
+
+        {!injected && <NoWeb3Message />}
+        {!networkSupported && <UnsupportedNetworkMessage />}
+
         <ButtonContainer>
           <ButtonBox>
             <SubmitButton onClick={this.handleLeave}>
@@ -90,7 +98,11 @@ export class RebuyDialog extends React.Component {
             </SubmitButton>
           </ButtonBox>
           <ButtonBox>
-            <SubmitButton onClick={this.handleSubmit}>
+            <SubmitButton
+              onClick={this.handleSubmit}
+              disabled={!injected || !networkSupported}
+              submitting={submitting}
+            >
               <FormattedMessage {...messages.rebuy} />
             </SubmitButton>
           </ButtonBox>
@@ -102,13 +114,18 @@ export class RebuyDialog extends React.Component {
 
 const mapStateToProps = createStructuredSelector({
   sb: makeSbSelector(),
+  injected: makeSelectInjectedAccount(),
+  networkSupported: makeSelectNetworkSupported(),
 });
 
 RebuyDialog.propTypes = {
   handleRebuy: PropTypes.func,
+  submitting: PropTypes.bool,
+  networkSupported: PropTypes.bool,
   handleLeave: PropTypes.func,
   modalDismiss: PropTypes.func,
   balance: React.PropTypes.number,
+  injected: React.PropTypes.string,
   sb: PropTypes.number,
 };
 

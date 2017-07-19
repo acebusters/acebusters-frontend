@@ -237,7 +237,7 @@
     "localStorage": "1.0.3",
     "lodash": "4.17.2",
     "minimist": "1.2.0",
-    "poker-helper": "0.4.0",
+    "poker-helper": "^0.4.1",
     "prop-types": "^15.5.10",
     "pusher-js": "^4.0.0",
     "qrcode.react": "^0.6.1",

@@ -19,20 +19,26 @@ import { ETH_DECIMALS, NTZ_DECIMALS, ABP_DECIMALS, formatEth, formatNtz, formatA
 import List from '../../components/List';
 import H2 from '../../components/H2';
 import Alert from '../../components/Alert';
+import Button from '../../components/Button';
 import TransferDialog from '../TransferDialog';
 import ExchangeDialog from '../ExchangeDialog';
+import UpgradeDialog from '../UpgradeDialog';
 import Container from '../../components/Container';
 import SubmitButton from '../../components/SubmitButton';
 import Blocky from '../../components/Blocky';
 import WithLoading from '../../components/WithLoading';
 
+import AccountProgress from './AccountProgress';
+
 import { Section, DBButton, Address } from './styles';
 import { createDashboardTxsSelector } from './selectors';
 import { txnsToList } from './txnsToList';
+// import { waitForTx } from '../../utils/waitForTx';
 
 const confParams = conf();
 
 const LOOK_BEHIND_PERIOD = 4 * 60 * 24;
+const ETH_FISH_LIMIT = new BigNumber(0.1);
 
 export class Dashboard extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
@@ -151,12 +157,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
         const { pendingSell = [] } = this.props.dashboardTxs;
 
         if (pendingSell.indexOf(event.transactionHash) > -1) {
-          this.token.transferFrom.sendTransaction(
-            confParams.ntzAddr,
-            proxyAddr,
-            0,
-            { from: proxyAddr }
-          );
+          this.handleETHClaim(proxyAddr);
         }
       }
     });
@@ -167,12 +168,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
       proxyAddr,
     ).then((value) => {
       if (!value.eq(0)) {
-        this.token.transferFrom.sendTransaction(
-          confParams.ntzAddr,
-          proxyAddr,
-          0,
-          { from: proxyAddr }
-        );
+        this.handleETHClaim(proxyAddr);
       }
     });
   }
@@ -186,80 +182,115 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     const events = accountFactory.AccountCreated({ signer }, { fromBlock: 'latest' });
 
     events.watch((err, ev) => {  // eslint-disable-line no-unused-vars
-      accountFactory.getAccount.call(signer, (e, res) => {
-        const proxy = res[0];
-        const controller = res[1];
-        const lastNonce = res[2].toNumber();
-
-        this.props.accountLoaded({ proxy, controller, lastNonce });
+      accountFactory.getAccount.call(signer, (e, [proxy, owner, isLocked]) => {
+        this.props.accountLoaded({ proxy, owner, isLocked });
       });
 
       events.stopWatching();
     });
   }
 
-  handleNTZTransfer(amount, to) {
-    this.token.transfer.sendTransaction(
-      to,
-      new BigNumber(amount).mul(NTZ_DECIMALS)
+  handleETHClaim(proxyAddr) {
+    this.token.transferFrom.sendTransaction(
+      confParams.ntzAddr,
+      proxyAddr,
+      0,
+      { from: proxyAddr }
     );
-    this.props.modalDismiss();
   }
 
-  handleNTZPurchase(amount) {
-    this.props.transferETH({
-      dest: confParams.ntzAddr,
-      amount: new BigNumber(amount).mul(ETH_DECIMALS),
+  handleTxSubmit(txFn) {
+    return new Promise((resolve, reject) => {
+      txFn((err, result) => {
+        this.props.modalDismiss();
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result);
+        }
+      });
     });
-    this.props.modalDismiss();
+  }
+
+  handleNTZTransfer(amount, to) {
+    return this.handleTxSubmit((callback) => {
+      this.token.transfer.sendTransaction(
+        to,
+        new BigNumber(amount).mul(NTZ_DECIMALS),
+        callback
+      );
+    });
   }
 
   handleNTZSell(amount) {
-    this.token.transfer.sendTransaction(
-      confParams.ntzAddr,
-      new BigNumber(amount).mul(NTZ_DECIMALS),
-      { from: this.props.account.proxy }
-    );
-    this.props.modalDismiss();
+    return this.handleTxSubmit((callback) => {
+      this.token.transfer.sendTransaction(
+        confParams.ntzAddr,
+        new BigNumber(amount).mul(NTZ_DECIMALS),
+        { from: this.props.account.proxy },
+        callback
+      );
+    });
+  }
+
+  handleNTZPurchase(amount) {
+    return this.handleTxSubmit((callback) => {
+      this.props.transferETH({
+        dest: confParams.ntzAddr,
+        amount: new BigNumber(amount).mul(ETH_DECIMALS),
+        callback,
+      });
+    });
   }
 
   handleETHTransfer(amount, dest) {
-    this.props.transferETH({
-      dest,
-      amount: new BigNumber(amount).mul(ETH_DECIMALS),
+    return this.handleTxSubmit((callback) => {
+      this.props.transferETH({
+        dest,
+        amount: new BigNumber(amount).mul(ETH_DECIMALS),
+        callback,
+      });
     });
-    this.props.modalDismiss();
   }
 
   handlePowerUp(amount) {
-    this.token.transfer.sendTransaction(
-      confParams.pwrAddr,
-      new BigNumber(amount).mul(NTZ_DECIMALS)
-    );
-    this.props.modalDismiss();
+    return this.handleTxSubmit((callback) => {
+      this.token.transfer.sendTransaction(
+        confParams.pwrAddr,
+        new BigNumber(amount).mul(NTZ_DECIMALS),
+        callback
+      );
+    });
   }
 
   handlePowerDown(amount) {
-    this.power.transfer.sendTransaction(
-      confParams.ntzAddr,
-      new BigNumber(amount).mul(ABP_DECIMALS)
-    );
-    this.props.modalDismiss();
+    return this.handleTxSubmit((callback) => {
+      this.power.transfer.sendTransaction(
+        confParams.ntzAddr,
+        new BigNumber(amount).mul(ABP_DECIMALS),
+        callback
+      );
+    });
   }
 
   render() {
-    const qrUrl = `ether:${this.props.account.proxy}`;
-    const weiBalance = this.web3.eth.balance(this.props.account.proxy);
+    const { account, signerAddr } = this.props;
+    const qrUrl = `ether:${account.proxy}`;
+    const weiBalance = this.web3.eth.balance(account.proxy);
+    const ethBalance = weiBalance && weiBalance.div(ETH_DECIMALS);
     const floor = this.token.floor();
     const ceiling = this.token.ceiling();
-    const babzBalance = this.token.balanceOf(this.props.account.proxy);
-    const pwrBalance = this.power.balanceOf(this.props.account.proxy);
+    const babzBalance = this.token.balanceOf(account.proxy);
+    const nutzBalance = babzBalance && babzBalance.div(NTZ_DECIMALS);
+    const pwrBalance = this.power.balanceOf(account.proxy);
     const tables = this.tableFactory.getTables();
+    const calcETHAmount = (ntz) => new BigNumber(ntz).div(floor);
+    const calcNTZAmount = (eth) => ceiling.mul(eth);
 
     const listTxns = txnsToList(
       this.props.dashboardTxs.dashboardEvents,
       tables,
-      this.props.account.proxy
+      account.proxy
     );
 
     return (
@@ -267,23 +298,50 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
         <h1><FormattedMessage {...messages.header} /></h1>
 
         <Section>
-          <Blocky blocky={createBlocky(this.props.signerAddr)} />
+          <Blocky blocky={createBlocky(signerAddr)} />
           <h3>Your address:</h3>
 
           <WithLoading
-            isLoading={!this.props.account.proxy || this.props.account.proxy === '0x'}
+            isLoading={!account.proxy || account.proxy === '0x'}
             loadingSize="40px"
             styles={{ layout: { transform: 'translateY(-50%)', left: 0 } }}
           >
-            <Address>{this.props.account.proxy}</Address>
+            <Address>{account.proxy}</Address>
             <QRCode value={qrUrl} size={120} />
 
             <Alert theme="danger">
               <FormattedMessage {...messages.ethAlert} />
             </Alert>
           </WithLoading>
-
         </Section>
+
+        {account.isLocked &&
+          <Section>
+            <Alert theme="warning">
+              Warning: account limit {ETH_FISH_LIMIT.toString()} ETH<br />
+              <Button
+                size="link"
+                onClick={() => this.props.modalAdd(
+                  <UpgradeDialog
+                    proxyContract={this.proxy}
+                    onSuccessButtonClick={this.props.modalDismiss}
+                  />
+                )}
+              >
+                Upgrade to shark account
+              </Button> to deposit more
+            </Alert>
+
+            {ethBalance && nutzBalance && floor &&
+              <AccountProgress
+                ethBalance={ethBalance}
+                nutzBalance={nutzBalance}
+                floor={floor}
+                ethLimit={ETH_FISH_LIMIT}
+              />
+            }
+          </Section>
+        }
 
         <Section>
           <h2>Nutz</h2>
@@ -311,7 +369,6 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
                 );
               }}
               size="medium"
-              icon="fa fa-money"
             >
               Transfer
             </DBButton>
@@ -323,14 +380,18 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
                   <ExchangeDialog
                     title={<FormattedMessage {...messages.sellTitle} />}
                     amountUnit="ntz"
-                    calcExpectedAmount={(amount) => new BigNumber(amount).div(floor)}
+                    calcExpectedAmount={calcETHAmount}
                     handleExchange={this.handleNTZSell}
-                    maxAmount={babzBalance.div(NTZ_DECIMALS)}
+                    maxAmount={BigNumber.min(
+                      account.isLocked
+                        ? BigNumber.max(ETH_FISH_LIMIT.sub(ethBalance), 0).mul(floor)
+                        : nutzBalance,
+                      nutzBalance
+                    )}
                   />
                 );
               }}
               size="medium"
-              icon="fa fa-money"
             >
               Sell
             </DBButton>
@@ -342,14 +403,18 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
                   <ExchangeDialog
                     title={<FormattedMessage {...messages.purchaseTitle} />}
                     amountUnit="eth"
-                    calcExpectedAmount={(amount) => ceiling.mul(amount)}
+                    calcExpectedAmount={calcNTZAmount}
                     handleExchange={this.handleNTZPurchase}
-                    maxAmount={weiBalance.div(ETH_DECIMALS)}
+                    maxAmount={BigNumber.min(
+                      account.isLocked
+                        ? BigNumber.max(ETH_FISH_LIMIT.sub(calcETHAmount(nutzBalance)), 0)
+                        : ethBalance,
+                      ethBalance
+                    )}
                   />
                 );
               }}
               size="medium"
-              icon="fa fa-money"
             >
               Purchase
             </DBButton>
@@ -376,13 +441,12 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
                   <TransferDialog
                     title={<FormattedMessage {...messages.ethTransferTitle} />}
                     handleTransfer={this.handleETHTransfer}
-                    maxAmount={weiBalance.div(ETH_DECIMALS)}
+                    maxAmount={ethBalance}
                     amountUnit="ETH"
                   />
                 );
               }}
               size="medium"
-              icon="fa fa-money"
             >
               Transfer
             </DBButton>
@@ -417,7 +481,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
                 );
               }}
               size="medium"
-              icon="fa fa-money"
+              disabled={account.isLocked}
             >
               Power Up
             </DBButton>
@@ -438,7 +502,7 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
                 );
               }}
               size="medium"
-              icon="fa fa-money"
+              disabled={account.isLocked}
             >
               Power Down
             </DBButton>

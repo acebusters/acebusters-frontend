@@ -5,8 +5,17 @@ import { conf } from '../../app.config';
 const confParams = conf();
 
 let web3Instance;
+let web3InjectedInstance;
 
-export function getWeb3() {
+export function getWeb3(injected = false) {
+  if (injected) {
+    if (typeof web3InjectedInstance === 'undefined' && window.web3) {
+      web3InjectedInstance = new Web3(window.web3.currentProvider);
+    }
+
+    return web3InjectedInstance;
+  }
+
   if (typeof web3Instance === 'undefined') {
     web3Instance = new Web3(new WebsocketProvider(confParams.gethUrl));
   }

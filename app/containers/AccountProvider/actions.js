@@ -1,5 +1,8 @@
 export const SET_AUTH = 'acebusters/AccountProvider/SET_AUTH';
 export const ACCOUNT_LOADED = 'acebusters/AccountProvider/ACCOUNT_LOADED';
+export const ACCOUNT_UNLOCKED = 'acebusters/AccountProvider/ACCOUNT_UNLOCKED';
+export const INJECT_ACCOUNT_UPDATE = 'acebusters/AccountProvider/INJECT_ACCOUNT_UPDATE';
+export const NETWORK_SUPPORT_UPDATE = 'acebusters/AccountProvider/NETWORK_SUPPORT_UPDATE';
 
 export const WEB3_ERROR = 'acebusters/AccountProvider/WEB3_ERROR';
 export const WEB3_CONNECT = 'acebusters/AccountProvider/WEB3_CONNECT';
@@ -79,8 +82,16 @@ export function setAuthState(newAuthState) {
   return { type: SET_AUTH, newAuthState };
 }
 
-export function accountLoaded(data) {
-  return { type: ACCOUNT_LOADED, data };
+export function accountUnlocked() {
+  return { type: ACCOUNT_UNLOCKED };
+}
+
+export function updateInjectedAccount(account) {
+  return { type: INJECT_ACCOUNT_UPDATE, payload: account };
+}
+
+export function accountLoaded(payload) {
+  return { type: ACCOUNT_LOADED, payload };
 }
 
 export function web3Error(err) {
