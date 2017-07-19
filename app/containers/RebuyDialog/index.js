@@ -8,7 +8,7 @@ import { createStructuredSelector } from 'reselect';
 import SubmitButton from '../../components/SubmitButton';
 import H2 from '../../components/H2';
 import { makeSbSelector } from '../Table/selectors';
-import { makeSelectInjectedAccount, makeSelectNetworkSupported } from '../AccountProvider/selectors';
+import { makeSelectHasWeb3, makeSelectNetworkSupported } from '../AccountProvider/selectors';
 
 import NoWeb3Message from '../../components/Web3Alerts/NoWeb3';
 import UnsupportedNetworkMessage from '../../components/Web3Alerts/UnsupportedNetwork';
@@ -50,7 +50,7 @@ export class RebuyDialog extends React.Component {
   }
 
   render() {
-    const { injected, sb, balance, modalDismiss, submitting, networkSupported } = this.props;
+    const { hasWeb3, sb, balance, modalDismiss, submitting, networkSupported } = this.props;
     const min = sb * 40;
     const max = Math.min(balance, sb * 200);
     const { amount } = this.state;
@@ -88,7 +88,7 @@ export class RebuyDialog extends React.Component {
         </div>
         <div>{amount}</div>
 
-        {!injected && <NoWeb3Message />}
+        {!hasWeb3 && <NoWeb3Message />}
         {!networkSupported && <UnsupportedNetworkMessage />}
 
         <ButtonContainer>
@@ -100,7 +100,7 @@ export class RebuyDialog extends React.Component {
           <ButtonBox>
             <SubmitButton
               onClick={this.handleSubmit}
-              disabled={!injected || !networkSupported}
+              disabled={!hasWeb3 || !networkSupported}
               submitting={submitting}
             >
               <FormattedMessage {...messages.rebuy} />
@@ -114,7 +114,7 @@ export class RebuyDialog extends React.Component {
 
 const mapStateToProps = createStructuredSelector({
   sb: makeSbSelector(),
-  injected: makeSelectInjectedAccount(),
+  hasWeb3: makeSelectHasWeb3(),
   networkSupported: makeSelectNetworkSupported(),
 });
 
@@ -125,7 +125,7 @@ RebuyDialog.propTypes = {
   handleLeave: PropTypes.func,
   modalDismiss: PropTypes.func,
   balance: React.PropTypes.number,
-  injected: React.PropTypes.string,
+  hasWeb3: React.PropTypes.bool,
   sb: PropTypes.number,
 };
 

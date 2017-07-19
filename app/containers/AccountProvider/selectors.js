@@ -69,14 +69,14 @@ const makeSelectPrivKey = () => createSelector(
   (account) => account.get('privKey')
 );
 
-const makeSelectInjectedAccount = () => createSelector(
+const makeSelectHasWeb3 = () => createSelector(
   selectAccount,
-  (account) => account.get('injected')
+  (account) => !!(account.get('isLocked') || account.get('injected'))
 );
 
 const makeSelectNetworkSupported = () => createSelector(
   selectAccount,
-  (account) => account.get('isLocked') || account.get('onSupportedNetwork'),
+  (account) => account.get('isLocked') || account.get('onSupportedNetwork')
 );
 
 const makeSelectProxyAddr = () => createSelector(
@@ -100,6 +100,6 @@ export {
   makeSelectLoggedIn,
   makeSelectIsWeb3Connected,
   makeSelectWeb3ErrMsg,
-  makeSelectInjectedAccount,
+  makeSelectHasWeb3,
   makeSelectNetworkSupported,
 };

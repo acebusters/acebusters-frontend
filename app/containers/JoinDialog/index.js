@@ -9,7 +9,7 @@ import NoWeb3Message from '../../components/Web3Alerts/NoWeb3';
 import UnsupportedNetworkMessage from '../../components/Web3Alerts/UnsupportedNetwork';
 
 import { makeSbSelector } from '../Table/selectors';
-import { makeSelectProxyAddr, makeSelectInjectedAccount, makeSelectNetworkSupported } from '../AccountProvider/selectors';
+import { makeSelectProxyAddr, makeSelectHasWeb3, makeSelectNetworkSupported } from '../AccountProvider/selectors';
 import { formatNtz } from '../../utils/amountFormatter';
 
 export class JoinDialog extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -34,7 +34,7 @@ export class JoinDialog extends React.Component { // eslint-disable-line react/p
   }
 
   render() {
-    const { sb, injected, balance, modalDismiss, networkSupported } = this.props;
+    const { sb, hasWeb3, balance, modalDismiss, networkSupported } = this.props;
     const { submitting } = this.state;
 
     const min = sb * 40;
@@ -63,12 +63,12 @@ export class JoinDialog extends React.Component { // eslint-disable-line react/p
         <div>Max: {formatNtz(max)} NTZ</div>
         <div>{ (this.state) ? formatNtz(this.state.amount) : formatNtz(min) } NTZ</div>
 
-        {!injected && <NoWeb3Message />}
+        {!hasWeb3 && <NoWeb3Message />}
         {!networkSupported && <UnsupportedNetworkMessage />}
 
         <SubmitButton
           onClick={this.handleSubmit}
-          disabled={!injected || !networkSupported}
+          disabled={!hasWeb3 || !networkSupported}
           submitting={submitting}
         >
           Join
@@ -88,14 +88,14 @@ function mapDispatchToProps(dispatch) {
 const mapStateToProps = createStructuredSelector({
   sb: makeSbSelector(),
   proxyAddr: makeSelectProxyAddr(),
-  injected: makeSelectInjectedAccount(),
+  hasWeb3: makeSelectHasWeb3(),
   networkSupported: makeSelectNetworkSupported(),
 });
 
 JoinDialog.propTypes = {
   handleJoin: PropTypes.func,
   modalDismiss: PropTypes.func,
-  injected: PropTypes.string,
+  hasWeb3: PropTypes.bool,
   networkSupported: PropTypes.bool,
   pos: PropTypes.any,
   sb: PropTypes.number,

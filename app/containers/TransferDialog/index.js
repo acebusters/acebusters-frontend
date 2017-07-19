@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 
 import { Form, Field, reduxForm } from 'redux-form/immutable';
 
-import { makeSelectInjectedAccount, makeSelectNetworkSupported } from '../../containers/AccountProvider/selectors';
+import { makeSelectHasWeb3, makeSelectNetworkSupported } from '../../containers/AccountProvider/selectors';
 import NoWeb3Message from '../../components/Web3Alerts/NoWeb3';
 import UnsupportedNetworkMessage from '../../components/Web3Alerts/UnsupportedNetwork';
 import { ErrorMessage } from '../../components/FormMessages';
@@ -58,7 +58,7 @@ class TransferDialog extends React.Component { // eslint-disable-line react/pref
       title,
       description,
       invalid,
-      injected,
+      hasWeb3,
       networkSupported,
     } = this.props;
 
@@ -86,12 +86,12 @@ class TransferDialog extends React.Component { // eslint-disable-line react/pref
 
           {error && <ErrorMessage>{error}</ErrorMessage>}
 
-          {!injected && <NoWeb3Message />}
+          {!hasWeb3 && <NoWeb3Message />}
           {!networkSupported && <UnsupportedNetworkMessage />}
 
           <SubmitButton
             type="submit"
-            disabled={invalid || !injected || !networkSupported}
+            disabled={invalid || !hasWeb3 || !networkSupported}
             submitting={submitting}
           >
             Submit
@@ -105,7 +105,7 @@ class TransferDialog extends React.Component { // eslint-disable-line react/pref
 TransferDialog.propTypes = {
   title: PropTypes.any,
   description: PropTypes.any,
-  injected: PropTypes.string,
+  hasWeb3: PropTypes.string,
   networkSupported: PropTypes.bool,
   submitting: PropTypes.bool,
   invalid: PropTypes.bool,
@@ -122,7 +122,7 @@ TransferDialog.defaultProps = {
 };
 
 const mapStateToProps = createStructuredSelector({
-  injected: makeSelectInjectedAccount(),
+  hasWeb3: makeSelectHasWeb3(),
   networkSupported: makeSelectNetworkSupported(),
 });
 

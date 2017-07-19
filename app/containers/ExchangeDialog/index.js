@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { Form, reduxForm, formValueSelector } from 'redux-form/immutable';
 import { FormattedMessage } from 'react-intl';
 
-import { makeSelectInjectedAccount, makeSelectNetworkSupported } from '../../containers/AccountProvider/selectors';
+import { makeSelectHasWeb3, makeSelectNetworkSupported } from '../../containers/AccountProvider/selectors';
 import NoWeb3Message from '../../components/Web3Alerts/NoWeb3';
 import UnsupportedNetworkMessage from '../../components/Web3Alerts/UnsupportedNetwork';
 import SubmitButton from '../../components/SubmitButton';
@@ -51,7 +51,7 @@ class ExchangeDialog extends React.Component { // eslint-disable-line react/pref
       amountUnit,
       title,
       invalid,
-      injected,
+      hasWeb3,
       networkSupported,
     } = this.props;
     const expectedAmountUnit = amountUnit.toLowerCase() === 'ntz' ? 'eth' : 'ntz';
@@ -83,11 +83,11 @@ class ExchangeDialog extends React.Component { // eslint-disable-line react/pref
             autoFocus
           />
 
-          {!injected && <NoWeb3Message />}
+          {!hasWeb3 && <NoWeb3Message />}
           {!networkSupported && <UnsupportedNetworkMessage />}
 
           <SubmitButton
-            disabled={invalid || !injected || !networkSupported}
+            disabled={invalid || !hasWeb3 || !networkSupported}
             submitting={submitting}
           >
             Submit
@@ -102,7 +102,7 @@ ExchangeDialog.propTypes = {
   submitting: PropTypes.bool,
   invalid: PropTypes.bool,
   networkSupported: PropTypes.bool,
-  injected: PropTypes.string,
+  hasWeb3: PropTypes.bool,
   maxAmount: PropTypes.object, // BigNumber
   calcExpectedAmount: PropTypes.func,
   handleSubmit: PropTypes.func,
@@ -116,7 +116,7 @@ const valueSelector = formValueSelector('exchange');
 
 const mapStateToProps = (state) => ({
   amount: valueSelector(state, 'amount'),
-  injected: makeSelectInjectedAccount()(state),
+  hasWeb3: makeSelectHasWeb3()(state),
   networkSupported: makeSelectNetworkSupported()(state),
 });
 
