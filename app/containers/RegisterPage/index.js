@@ -102,7 +102,7 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
           <Form
             onSubmit={handleSubmit(this.handleSubmit)}
           >
-            <Field name="email" type="email" component={FormField} label="e-mail" />
+            <Field name="email" type="email" component={FormField} label="e-mail" autoFocus />
             <Field
               name="referral"
               type="text"

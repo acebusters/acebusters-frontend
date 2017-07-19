@@ -21,7 +21,7 @@
  */
 
 
-const _ = require('underscore');
+const _ = require('lodash');
 const errors = require('./errors');
 const WebSocket = require('websocket').w3cwebsocket;
 

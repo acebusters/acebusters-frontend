@@ -71,6 +71,7 @@ class TransferDialog extends React.Component { // eslint-disable-line react/pref
             name="amount"
             component={FormField}
             label={`Amount (${amountUnit})`}
+            autoFocus
             maxAmount={maxAmount}
           />
 

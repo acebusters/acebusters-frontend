@@ -80,6 +80,7 @@ class ExchangeDialog extends React.Component { // eslint-disable-line react/pref
             component={FormField}
             label={`Amount (${amountUnit.toUpperCase()})`}
             maxAmount={maxAmount}
+            autoFocus
           />
 
           {!injected && <NoWeb3Message />}
