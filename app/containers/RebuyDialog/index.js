@@ -46,7 +46,7 @@ export class RebuyDialog extends React.Component {
   }
 
   handleLeave() {
-    this.props.handleLeave();
+    this.props.handleLeave(this.props.pos);
   }
 
   render() {
@@ -127,6 +127,7 @@ RebuyDialog.propTypes = {
   balance: React.PropTypes.number,
   hasWeb3: React.PropTypes.bool,
   sb: PropTypes.number,
+  pos: PropTypes.number,
 };
 
 export default connect(mapStateToProps)(RebuyDialog);

@@ -44,9 +44,16 @@ const makeLastReceiptSelector = () => createSelector(
     (hand, pos) => (hand && pos > -1 && hand.getIn && hand.getIn(['lineup', pos])) ? rc.get(hand.getIn(['lineup', pos, 'last'])) : undefined
 );
 
+const seatSelector = (hand, pos) => (hand && pos > -1 && hand.getIn && hand.getIn(['lineup', pos])) ? hand.getIn(['lineup', pos]) : undefined;
+
 const makeSeatSelector = () => createSelector(
     [makeHandSelector(), posSelector],
-    (hand, pos) => (hand && pos > -1 && hand.getIn && hand.getIn(['lineup', pos])) ? hand.getIn(['lineup', pos]) : undefined
+    seatSelector
+);
+
+const makeMySeatSelector = () => createSelector(
+    [makeHandSelector(), makeMyPosSelector()],
+    seatSelector
 );
 
 const makeLastAmountSelector = () => createSelector(
@@ -162,9 +169,16 @@ const makeStackSelector = () => createSelector(
   selectStack
 );
 
+const standingUpSelector = (seat) => seat && seat.get('exitHand') !== undefined;
+
 const makeStandingUpSelector = () => createSelector(
   [makeSeatSelector()],
-  (seat) => seat && seat.get('exitHand') !== undefined
+  standingUpSelector
+);
+
+const makeMyStandingUpSelector = () => createSelector(
+  [makeMySeatSelector()],
+  standingUpSelector
 );
 
 const makeSeatStatusSelector = () => createSelector(
@@ -354,4 +368,5 @@ export {
   makeLastActionSelector,
   makeSeatStatusSelector,
   makeStandingUpSelector,
+  makeMyStandingUpSelector,
 };

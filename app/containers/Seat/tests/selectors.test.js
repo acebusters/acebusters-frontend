@@ -1,5 +1,5 @@
 import { fromJS } from 'immutable';
-import { Receipt } from 'poker-helper';
+import { Type, Receipt } from 'poker-helper';
 
 import { babz } from '../../../utils/amountFormatter';
 
@@ -11,6 +11,9 @@ import {
   makeStackSelector,
   makeShowStatusSelector,
   makeSeatStatusSelector,
+  makeLastActionSelector,
+  makeOpenSelector,
+  makeCoordsSelector,
 } from '../selectors';
 
 import {
@@ -24,6 +27,7 @@ const P1_KEY = '0x2e39143576f97f6ecd7439a0678f330d7144110cdc58b6476687cc243d7753
 // secretSeed: 'engine bargain deny liberty girl wedding plug valley pig admit kiss couch'
 const P2_ADDR = '0x1c5a1730ffc44ac21700bb85bf0ceefd12ce71d7';
 const P2_KEY = '0x99e69145c6e7f44ba04d579faac9ef4ce5e942dc02b96a9d42b5fcb03e508729';
+const EMPTY = '0x0000000000000000000000000000000000000000';
 
 const TBL_ADDR = '0x77aabb1133';
 
@@ -85,6 +89,139 @@ describe('lastAmountSelector', () => {
     };
     const lastAmountSelector = makeLastAmountSelector();
     expect(lastAmountSelector(mockedState, props)).toEqual(500000000000000);
+  });
+});
+
+describe('makeLastActionSelector', () => {
+  it('should return type of last action', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          0: {
+            state: 'flop',
+            lineup: [{
+              address: P1_ADDR,
+            }, {
+              address: P2_ADDR,
+              last: new Receipt(TBL_ADDR).bet(1, babz(1500)).sign(P2_KEY),
+            }],
+            lastRoundMaxBet: babz(1000),
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 1,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 0,
+      },
+    };
+    const lastActionSelector = makeLastActionSelector();
+    expect(lastActionSelector(mockedState, props)).toEqual(Type.BET);
+  });
+});
+
+describe('makeOpenSelector', () => {
+  it('should return false if seat is busy', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          data: {
+            seats: [],
+          },
+          0: {
+            state: 'waiting',
+            lineup: [{
+              address: P1_ADDR,
+            }, {
+              address: EMPTY,
+            }],
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 0,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 0,
+      },
+    };
+    const openSelector = makeOpenSelector();
+    expect(openSelector(mockedState, props)).toEqual(false);
+  });
+
+  it('should return true if seat is open', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          data: {
+            seats: [],
+          },
+          0: {
+            state: 'waiting',
+            lineup: [{
+              address: P1_ADDR,
+            }, {
+              address: EMPTY,
+            }],
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 1,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 0,
+      },
+    };
+    const openSelector = makeOpenSelector();
+    expect(openSelector(mockedState, props)).toEqual(true);
+  });
+});
+
+describe('makeCoordsSelector', () => {
+  it('should return coords', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          data: {
+            seats: [],
+          },
+          0: {
+            state: 'waiting',
+            lineup: [{
+              address: P1_ADDR,
+            }, {
+              address: P2_ADDR,
+            }],
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 0,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 0,
+      },
+    };
+    const propsSecond = {
+      pos: 1,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 0,
+      },
+    };
+    const coordsSelector = makeCoordsSelector();
+    expect(coordsSelector(mockedState, props)).toEqual([10, 40, 0]);
+    expect(coordsSelector(mockedState, propsSecond)).toEqual([90, 40, 0]);
   });
 });
 

@@ -16,6 +16,7 @@ import {
   pay,
   updateReceived,
   UPDATE_RECEIVED,
+  ADD_MESSAGE,
   RECEIPT_SET,
   BET,
   SHOW,
@@ -352,5 +353,62 @@ describe('Saga Tests', () => {
       expect(receiptAction.tableAddr).toEqual(tableAddr);
       done();
     });
+  });
+
+  it('should add anonymous message about winner!', () => {
+    const hand = {
+      handId: 3,
+      state: 'showdown',
+      dealer: 0,
+      sb: babz(50),
+
+      lineup: [{
+        address: PLAYER1.address,
+        last: new Receipt(tableAddr).show(1, babz(1000)).sign(PLAYER1.key),
+        cards: [21, 32],
+      }, {
+        address: PLAYER2.address,
+        last: new Receipt(tableAddr).show(1, babz(1000)).sign(PLAYER2.key),
+        cards: [36, 49],
+      }],
+      cards: [8, 23, 10],
+    };
+
+    const initialState = fromJS({
+      account: {
+        privKey: PLAYER2.key,
+      },
+      table: {
+        [tableAddr]: {
+          data: {},
+          3: {
+            lineup: [{
+              address: PLAYER1.address,
+              last: new Receipt(tableAddr).bet(1, babz(1000)).sign(PLAYER1.key),
+              cards: [21, 32],
+            }, {
+              address: PLAYER2.address,
+              last: new Receipt(tableAddr).bet(1, babz(1000)).sign(PLAYER1.key),
+              cards: [36, 49],
+            }],
+            state: 'dealing',
+          },
+        },
+      },
+    });
+
+    const sagaTester = new SagaTester({ initialState });
+    sagaTester.start(updateScanner);
+    sagaTester.dispatch(updateReceived(tableAddr, hand));
+    const show = sagaTester.getLatestCalledAction();
+    expect(show.type).toEqual(ADD_MESSAGE);
+    expect(show.message).toEqual('player MARVIN won 0 NTZ ');
+    expect(show.tableAddr).toEqual(tableAddr);
+    expect(show.privKey).toEqual(null);
+    // do the same thing again, and make sure the request
+    // is deduplicated
+    sagaTester.dispatch(updateReceived(tableAddr, hand));
+    expect(sagaTester.getLatestCalledAction().type).toEqual(UPDATE_RECEIVED);
+    expect(sagaTester.getCalledActions().length).toEqual(3);
   });
 });

@@ -9,6 +9,7 @@ import Pusher from 'pusher-js';
 import Raven from 'raven-js';
 import { FormattedMessage } from 'react-intl';
 import { Receipt } from 'poker-helper';
+import * as storageService from '../../services/sessionStorage';
 
 // components and styles
 import TableDebug from '../../containers/TableDebug';
@@ -17,7 +18,6 @@ import Card from '../../components/Card';
 import { BoardCardWrapper } from '../../components/Table/Board';
 import Seat from '../Seat';
 import Button from '../../components/Button';
-import Slides from '../../components/Slides';
 import { nickNameByAddress } from '../../services/nicknames';
 import messages from './messages';
 import { formatNtz } from '../../utils/amountFormatter';
@@ -51,6 +51,8 @@ import makeSelectAccountData, {
 
 import {
   makeLastReceiptSelector,
+  makeMyStackSelector,
+  makeMyStandingUpSelector,
 } from '../Seat/selectors';
 
 import {
@@ -76,6 +78,7 @@ import TableService, { getHand } from '../../services/tableService';
 import JoinDialog from '../JoinDialog';
 import JoinSlides from '../JoinDialog/slides';
 import InviteDialog from '../InviteDialog';
+import RebuyDialog from '../RebuyDialog';
 
 const getTableData = (table, props) => {
   const lineup = table.getLineup.callPromise();
@@ -179,6 +182,26 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
         }
       }
     }
+
+    const toggleKey = this.tableAddr + handId;
+    // display Rebuy modal if state === 'waiting' and user stack is no greater than 0
+    if (nextProps.state === 'waiting' && nextProps.myStack !== null && nextProps.myStack <= 0
+        && (nextProps.state !== this.props.state || nextProps.myStack !== this.props.myStack)
+        && !nextProps.standingUp && !storageService.getItem(`rebuyModal[${toggleKey}]`)) {
+      const balance = parseInt(this.balance.toString(), 10);
+
+      this.props.modalDismiss();
+      this.props.modalAdd((
+        <RebuyDialog
+          pos={this.props.myPos}
+          handleRebuy={this.handleRebuy}
+          handleLeave={this.handleLeave}
+          modalDismiss={this.props.modalDismiss}
+          params={this.props.params}
+          balance={balance}
+        />
+      ));
+    }
   }
 
   componentWillUnmount() {
@@ -217,27 +240,19 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   handleRebuy(amount) {
-    this.table.rebuy.sendTransaction(
-      amount,
-      (err) => {
-        if (!err) {
-          const slides = (
-            <Slides width={600} height={400}>
-              <div>
-                <h1>Request for rebuy sent! Please wait!</h1>
-                <p>Here is the introduction to the online poker game</p>
-              </div>
-              <div>
-                <h1>FAQ</h1>
-              </div>
-            </Slides>
-          );
+    const handId = parseInt(this.props.params.handId, 10);
+    const toggleKey = this.tableAddr + handId;
+    storageService.setItem(`rebuyModal[${toggleKey}]`, true);
 
-          this.props.modalDismiss();
-          this.props.modalAdd(slides);
-        }
-      }
+    const { signerAddr, myPos } = this.props;
+
+    this.token.transData.sendTransaction(
+      this.tableAddr,
+      amount,
+      `0x0${(myPos).toString(16)}${signerAddr.replace('0x', '')}`
     );
+
+    this.props.modalDismiss();
   }
 
   handleJoin(pos, amount) {
@@ -560,6 +575,7 @@ const mapStateToProps = createStructuredSelector({
   lastReceipt: makeLastReceiptSelector(),
   missingHands: makeMissingHandSelector(),
   myHand: makeMyHandValueSelector(),
+  myStack: makeMyStackSelector(),
   myPos: makeMyPosSelector(),
   potSize: makeAmountInTheMiddleSelector(),
   privKey: makeSelectPrivKey(),
@@ -569,6 +585,7 @@ const mapStateToProps = createStructuredSelector({
   signerAddr: makeSignerAddrSelector(),
   sitout: makeMySitoutSelector(),
   winners: makeSelectWinners(),
+  standingUp: makeMyStandingUpSelector(),
 });
 
 Table.propTypes = {
@@ -576,6 +593,7 @@ Table.propTypes = {
   board: React.PropTypes.array,
   hand: React.PropTypes.object,
   myHand: React.PropTypes.object,
+  myStack: React.PropTypes.number,
   lineup: React.PropTypes.object,
   sitout: React.PropTypes.any,
   params: React.PropTypes.object,
@@ -584,6 +602,7 @@ Table.propTypes = {
   latestHand: React.PropTypes.any,
   missingHands: React.PropTypes.any,
   sitoutAmount: React.PropTypes.number,
+  standingUp: React.PropTypes.bool,
   proxyAddr: React.PropTypes.string,
   signerAddr: React.PropTypes.string,
   web3Redux: React.PropTypes.any,

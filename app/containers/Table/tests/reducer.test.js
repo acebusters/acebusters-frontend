@@ -9,6 +9,7 @@ import {
   setPending,
   dropPending,
   lineupReceived,
+  addMessage,
 } from '../actions';
 
 import { babz } from '../../../utils/amountFormatter';
@@ -283,5 +284,67 @@ describe('table reducer tests', () => {
     // check state after execution
     const after = before.deleteIn([tableAddr, '2', 'lineup', 0, 'pending']);
     expect(nextState).toEqual(after);
+  });
+
+  it('should add message', () => {
+    // set up previous state
+    const before = fromJS({
+      [tableAddr]: {
+        messages: [],
+      },
+    });
+
+    const date = new Date();
+
+    // execute action
+    const nextState = tableReducer(before, addMessage('hello!', tableAddr, P1_ADDR, date));
+
+    // check state after execution
+    const after = before.updateIn([tableAddr, 'messages'], (list) => list.push({
+      message: 'hello!',
+      signer: P1_ADDR,
+      created: date,
+    }));
+    expect(nextState).toEqual(after);
+  });
+
+  it('should not return old messages', () => {
+    // set up previous state
+    const lineup = [{
+      address: P1_ADDR,
+      last: new Receipt(tableAddr).bet(1, babz(50)).sign(P1_KEY),
+    }, {
+      address: P2_ADDR,
+      last: new Receipt(tableAddr).bet(1, babz(50)).sign(P2_KEY),
+    }];
+
+    const now = Date.now();
+    const min16ago = Date.now() - (60 * 16 * 1000);
+
+    const before = fromJS({
+      [tableAddr]: {
+        messages: [],
+      },
+    });
+
+    const firstMessage = tableReducer(before, addMessage('old!', tableAddr, P1_ADDR, min16ago));
+    const secondMessage = tableReducer(firstMessage, addMessage('hello!', tableAddr, P1_ADDR, now));
+
+    // execute action
+    const nextState = tableReducer(secondMessage, updateReceived(tableAddr, {
+      handId: 0,
+      dealer: 0,
+      changed: 123,
+      state: 'turn',
+      flopMaxBet: 50,
+      lineup,
+    }));
+
+    // check state after execution
+    expect(nextState.getIn([tableAddr, 'messages']).toJS()).toEqual([{
+      message: 'hello!',
+      signer: P1_ADDR,
+      created: now,
+    }]);
   });
 });
