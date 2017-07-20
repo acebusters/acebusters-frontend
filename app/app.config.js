@@ -59,7 +59,7 @@ export function conf() {
     defaultRefCode: DEFAULT_REF_CODE,
     etherscanUrl: 'https://rinkeby.etherscan.io/',
     gethUrl: 'ws://rinkeby.acebusters.com:8546',
-    firstBlockHash: '0x8efcd62cd4129f0c86fdb52c5623b86cbcc6376bea487aa2c34f000138fb9d62',
+    firstBlockHash: '0x6341fd3daf94b748c72ced5a5b26028f2474f5f00d824504e4fa37a75767e177',
     networkName: 'Rinkeby Testnet',
     oracleUrl: 'https://evm4rumeob.execute-api.eu-west-1.amazonaws.com/v0',
     txUrl: 'https://khengvfg6c.execute-api.eu-west-1.amazonaws.com/v0',
