@@ -77,6 +77,11 @@ function Footer() {
         <CenterDiv>
           <A href="http://www.acebusters.com/terms_of_use.html">Terms of Use</A>
         </CenterDiv>
+        <CenterDiv>
+          {// eslint-disable-next-line no-undef
+            __VERSION__
+          }
+        </CenterDiv>
       </div>
     </Wrapper>
   );

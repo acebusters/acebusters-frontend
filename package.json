@@ -190,6 +190,9 @@
     ]
   },
   "jest": {
+    "globals": {
+      "__VERSION__": ""
+    },
     "collectCoverageFrom": [
       "app/containers/Table/*.{js,jsx}",
       "!app/**/*.test.{js,jsx}",

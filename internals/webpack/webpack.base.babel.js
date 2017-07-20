@@ -4,6 +4,7 @@
 
 const path = require('path');
 const webpack = require('webpack');
+const packagejs = require('../../package.json');
 
 // Remove this line once the following warning goes away (it was meant for webpack loader authors not users):
 // 'DeprecationWarning: loaderUtils.parseQuery() received a non-string value which can be problematic,
@@ -101,6 +102,9 @@ module.exports = (options) => ({
       'process.env': {
         NODE_ENV: JSON.stringify(process.env.NODE_ENV),
       },
+      __VERSION__: JSON.stringify(`v${packagejs.version}_${Date.now()}`),
+      // __GIT_TAG__: JSON.stringify(childProcess.execSync('git describe --tags $(git rev-list --tags --max-count=1)').toString()),
+      // __GIT_HASH__: JSON.stringify(childProcess.execSync('git rev-parse --short HEAD').toString()),
     }),
     new webpack.NamedModulesPlugin(),
   ]),
