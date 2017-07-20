@@ -1,10 +1,17 @@
 import React from 'react';
+import { createStructuredSelector } from 'reselect';
 import * as PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Receipt } from 'poker-helper';
+import { connect } from 'react-redux';
 import { FormattedDate, FormattedTime } from 'react-intl';
+import { getWeb3 } from '../../containers/AccountProvider/utils';
 
-import { formatNtz } from '../../utils/amountFormatter';
+import { ABI_TABLE } from '../../app.config';
+
+import { makeHandsSelector } from '../Table/selectors';
+
+import { loadContractData } from './loadContractData';
+import { parseLastReceiptAmount, parseDistributionReceipt, renderNtz } from './utils';
 
 const Wrapper = styled.div`
   position: fixed;
@@ -59,12 +66,16 @@ const Table = styled.table`
   tbody th {
     border-right: 1px solid #ccc;
   }
+
+  tfoot tr:first-child {
+    border-top: 1px solid #ccc;
+  }
 `;
 
 window.enableTableDebug = () => null;
 window.disableTableDebug = () => null;
 
-export default class TableDebug extends React.Component {
+class TableDebug extends React.Component {
 
   constructor(props) {
     super(props);
@@ -73,9 +84,12 @@ export default class TableDebug extends React.Component {
 
     this.state = {
       data: null,
+      contractData: null,
       visible,
       expanded: false,
     };
+
+    this.table = getWeb3().eth.contract(ABI_TABLE).at(props.contract.address);
 
     this.handleRefresh = this.handleRefresh.bind(this);
     this.handleExpandedToggle = this.handleExpandedToggle.bind(this);
@@ -110,26 +124,24 @@ export default class TableDebug extends React.Component {
   }
 
   handleRefresh() {
-    const { tableService } = this.props;
-    tableService.debug().then((response) => {
-      this.setState({
-        data: response,
-      });
+    loadContractData(this.table).then((contractData) => {
+      this.setState({ contractData });
     });
   }
 
   renderContractData(contractData) {
     const lastNettingRequestTime = new Date(contractData.lastNettingRequestTime * 1000);
+
     return (
       <div>
         <ul>
           <li>
             <strong>lastHandNetted: </strong>
-            {contractData.lastHandNetted}
+            {contractData.lastHandNetted.toString()}
           </li>
           <li>
             <strong>lastNettingRequestHandId: </strong>
-            {contractData.lastNettingRequestHandId}
+            {contractData.lastNettingRequestHandId.toString()}
           </li>
           <li>
             <strong>lastNettingRequestTime: </strong>
@@ -157,11 +169,11 @@ export default class TableDebug extends React.Component {
                 <td>{handId}</td>
                 {contractData.lineup.reduce((memo, _, i) => memo.concat([
                   <td key={i * 2}>
-                    {contractData.hands[handId].ins[i]}
+                    {renderNtz(contractData.hands[handId].ins[i])}
                   </td>,
                   <td key={(i * 2) + 1}>
-                    {contractData.hands[handId].outs[i] &&
-                      contractData.hands[handId].outs[i].out}
+                    {renderNtz(contractData.hands[handId].outs[i] &&
+                      contractData.hands[handId].outs[i].out)}
                   </td>,
                 ]), [])}
               </tr>
@@ -171,12 +183,12 @@ export default class TableDebug extends React.Component {
             <tr>
               <th>Bal.</th>
               {contractData.lineup.map((seat, i) =>
-                <td key={i} colSpan={2}>{seat.amount}</td>)}
+                <td key={i} colSpan={2}>{renderNtz(seat.amount)}</td>)}
             </tr>
             <tr>
               <th>Exit hand</th>
               {contractData.lineup.map((seat, i) =>
-                <td key={i} colSpan={2}>{seat.exitHand}</td>)}
+                <td key={i} colSpan={2}>{seat.exitHand && seat.exitHand.toString()}</td>)}
             </tr>
           </tfoot>
         </Table>
@@ -185,7 +197,7 @@ export default class TableDebug extends React.Component {
   }
 
   renderDbHands(hands) {
-    const dists = hands.map((hand) => parseDistribution(hand.distribution, hand.lineup));
+    const dists = hands.map((hand) => parseDistributionReceipt(hand.distribution, hand.lineup));
 
     return (
       <div>
@@ -237,30 +249,34 @@ export default class TableDebug extends React.Component {
     );
   }
 
-  renderData(data) {
-    if (!data) {
+  renderData(hands, contractData) {
+    if (!hands && !contractData) {
       return null;
     }
 
     return (
       <div>
-
         <Columns>
-          <Column>
-            <h2>Contract</h2>
-            {this.renderContractData(data.contract)}
-          </Column>
-          <Column>
-            <h2>Db</h2>
-            {this.renderDbHands(data.db)}
-          </Column>
+          {contractData &&
+            <Column>
+              <h2>Contract</h2>
+              {this.renderContractData(contractData)}
+            </Column>
+          }
+          {hands &&
+            <Column>
+              <h2>Db</h2>
+              {this.renderDbHands(hands)}
+            </Column>
+          }
         </Columns>
       </div>
     );
   }
 
   render() {
-    const { visible, expanded, data } = this.state;
+    const { visible, expanded, contractData } = this.state;
+    const { hands } = this.props;
 
     if (!visible) {
       return null;
@@ -278,7 +294,7 @@ export default class TableDebug extends React.Component {
             </button>
             <hr />
 
-            {this.renderData(data)}
+            {this.renderData(hands, contractData)}
           </div>
         }
       </Wrapper>
@@ -289,34 +305,11 @@ export default class TableDebug extends React.Component {
 
 TableDebug.propTypes = {
   contract: PropTypes.object.isRequired,
-  tableService: PropTypes.object.isRequired,
+  hands: PropTypes.array.isRequired,
 };
 
-function parseDistribution(distribution, lineup) {
-  if (!distribution) {
-    return {};
-  }
+const mapStateToProps = createStructuredSelector({
+  hands: makeHandsSelector(),
+});
 
-  const { outs } = Receipt.parse(distribution);
-
-  return lineup.reduce((memo, seat, pos) => ({
-    ...memo,
-    [seat.address]: outs[pos],
-  }), {});
-}
-
-function parseLastReceiptAmount(receipt) {
-  if (!receipt) {
-    return null;
-  }
-
-  return Receipt.parse(receipt).amount;
-}
-
-function renderNtz(amount) {
-  if (amount) {
-    return `${formatNtz(amount, 1)} NTZ`;
-  }
-
-  return (amount === null || amount === undefined) ? '-' : amount;
-}
+export default connect(mapStateToProps)(TableDebug);

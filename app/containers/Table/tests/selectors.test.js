@@ -6,6 +6,7 @@ import {
   makeMissingHandSelector,
   makeSelectWinners,
   makeMyHandValueSelector,
+  makeHandsSelector,
   makeSitoutAmountSelector,
 } from '../selectors';
 
@@ -31,6 +32,76 @@ describe('tableStateSelector', () => {
       },
     });
     expect(tableStateSelector(mockedState, PROPS)).toEqual(tableState);
+  });
+});
+
+describe('missingHandSelector', () => {
+  it('should select missing hands.', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          5: {},
+          data: {
+            lastHandNetted: 3,
+          },
+        },
+      },
+    });
+    const missingHandSelector = makeMissingHandSelector();
+    expect(missingHandSelector(mockedState, PROPS)).toEqual([4]);
+  });
+
+  it('should return empty array if no hand missing.', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          4: {},
+          5: {},
+          data: {
+            lastHandNetted: 3,
+          },
+        },
+      },
+    });
+    const missingHandSelector = makeMissingHandSelector();
+    expect(missingHandSelector(mockedState, PROPS)).toEqual([]);
+  });
+
+  it('should return lastHandNetted + 1 if no hand available.', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          data: {
+            lastHandNetted: 3,
+          },
+        },
+      },
+    });
+    const missingHandSelector = makeMissingHandSelector();
+    expect(missingHandSelector(mockedState, PROPS)).toEqual([4]);
+  });
+});
+
+describe('handsSelector', () => {
+  it('should select the table hands', () => {
+    const tableState = fromJS({
+      0: {
+        lineup: [],
+      },
+      1: {
+        lineup: [],
+      },
+      data: {},
+    });
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: tableState,
+      },
+    });
+    expect(makeHandsSelector()(mockedState, PROPS)).toEqual([
+      { handId: 0, lineup: [] },
+      { handId: 1, lineup: [] },
+    ]);
   });
 });
 

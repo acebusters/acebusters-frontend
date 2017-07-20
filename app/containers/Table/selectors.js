@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import { fromJS } from 'immutable';
 import { PokerHelper, ReceiptCache } from 'poker-helper';
 import Solver from 'ab-pokersolver';
 import { makeSignerAddrSelector } from '../AccountProvider/selectors';
@@ -247,6 +248,25 @@ const makeLineupSelector = () => createSelector(
     // if we have a hand, just get the hand
     return hand.get('lineup');
   }
+);
+
+function selectTable(state, props) {
+  return state.getIn(['table', props.params.tableAddr]);
+}
+
+function getHands(table) {
+  return (
+    table
+      .filter((_, key) => !isNaN(Number(key)))
+      .reduce((memo, item, handId) => memo.push(item.set('handId', Number(handId))), fromJS([]))
+      .sort((a, b) => a.get('handId') - b.get('handId'))
+      .toJS()
+  );
+}
+
+const makeHandsSelector = () => createSelector(
+  [selectTable],
+  (table) => table ? getHands(table) : []
 );
 
 const makeMyHandValueSelector = () => createSelector(
@@ -538,4 +558,5 @@ export {
     makePlayersCountSelector,
     makeLastRoundMaxBetSelector,
     makeAmountInTheMiddleSelector,
+    makeHandsSelector,
 };

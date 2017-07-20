@@ -524,8 +524,8 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     return (
       <div>
         <TableDebug
+          params={this.props.params}
           contract={this.table}
-          tableService={this.tableService}
         />
 
         { this.props.state &&
