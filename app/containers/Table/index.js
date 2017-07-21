@@ -21,6 +21,7 @@ import Button from '../../components/Button';
 import { nickNameByAddress } from '../../services/nicknames';
 import messages from './messages';
 import { formatNtz } from '../../utils/amountFormatter';
+import { promisifyContractCall } from '../../utils/promisifyContractCall';
 
 // config data
 import {
@@ -244,46 +245,47 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     const toggleKey = this.tableAddr + handId;
     storageService.setItem(`rebuyModal[${toggleKey}]`, true);
 
-    const { signerAddr, myPos } = this.props;
+    const { signerAddr, myPos, account } = this.props;
 
-    this.token.transData.sendTransaction(
+    const promise = promisifyContractCall(this.token.transData.sendTransaction)(
       this.tableAddr,
       amount,
       `0x0${(myPos).toString(16)}${signerAddr.replace('0x', '')}`
     );
 
-    this.props.modalDismiss();
+    return Promise.resolve(account.isLocked ? null : promise).then(() => {
+      this.props.modalDismiss();
+    });
   }
 
   handleJoin(pos, amount) {
-    const { signerAddr } = this.props;
+    const { signerAddr, account } = this.props;
 
-    this.token.transData.sendTransaction(
+    const promise = promisifyContractCall(this.token.transData.sendTransaction)(
       this.tableAddr,
       amount,
       `0x0${(pos).toString(16)}${signerAddr.replace('0x', '')}`,
-      (err) => {
-        if (!err) {
-          const slides = (
-            <div>
-              <JoinSlides />
-              <Button size="large" onClick={this.props.modalDismiss}>
-                <FormattedMessage {...messages.joinModal.buttonDismiss} />
-              </Button>
-            </div>
-          );
-
-          this.props.modalDismiss();
-          this.props.modalAdd(slides);
-          this.props.setPending(
-            this.tableAddr,
-            this.props.params.handId,
-            pos,
-            { signerAddr: this.props.signerAddr, stackSize: amount }
-          );
-        }
-      }
     );
+
+    return Promise.resolve(account.isLocked ? null : promise).then(() => {
+      const slides = (
+        <div>
+          <JoinSlides />
+          <Button size="large" onClick={this.props.modalDismiss}>
+            <FormattedMessage {...messages.joinModal.buttonDismiss} />
+          </Button>
+        </div>
+      );
+
+      this.props.modalDismiss();
+      this.props.modalAdd(slides);
+      this.props.setPending(
+        this.tableAddr,
+        this.props.params.handId,
+        pos,
+        { signerAddr: this.props.signerAddr, stackSize: amount }
+      );
+    });
   }
 
   isTaken(open, myPos, pending, pos) {

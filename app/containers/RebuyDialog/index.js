@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import Slider from 'react-rangeslider';
+import { Form, Field, reduxForm, formValueSelector } from 'redux-form/immutable';
 import 'react-rangeslider/lib/index.css';
 import { createStructuredSelector } from 'reselect';
 import SubmitButton from '../../components/SubmitButton';
@@ -13,37 +14,41 @@ import { formatNtz } from '../../utils/amountFormatter';
 
 import NoWeb3Message from '../../components/Web3Alerts/NoWeb3';
 import UnsupportedNetworkMessage from '../../components/Web3Alerts/UnsupportedNetwork';
+import FormGroup from '../../components/Form/FormGroup';
 
 import messages from './messages';
 
 
 const ButtonContainer = styled.div`
   display: flex;
+
+  & > * {
+    flex: 1;
+  }
 `;
 
-const ButtonBox = styled.div`
-  flex: 1;
-`;
-
+/* eslint-disable react/prop-types */
+const renderSlider = ({ input, ...props }) => (
+  <FormGroup>
+    <Slider
+      data-orientation="vertical"
+      tooltip={false}
+      {...input}
+      {...props}
+    />
+  </FormGroup>
+);
+/* eslint-enable react/prop-types */
 
 export class RebuyDialog extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      amount: props.sb * 40,
-    };
-    this.updateAmount = this.updateAmount.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleLeave = this.handleLeave.bind(this);
   }
 
-  updateAmount(value) {
-    const amount = value;
-    this.setState({ amount });
-  }
-
-  handleSubmit() {
-    return this.props.handleRebuy(this.state.amount);
+  handleSubmit(values) {
+    return this.props.handleRebuy(values.get('amount'));
   }
 
   handleLeave() {
@@ -51,11 +56,20 @@ export class RebuyDialog extends React.Component {
   }
 
   render() {
-    const { hasWeb3, sb, balance, modalDismiss, submitting, networkSupported } = this.props;
+    const {
+      hasWeb3,
+      sb,
+      balance,
+      modalDismiss,
+      submitting,
+      networkSupported,
+      handleSubmit,
+      amount,
+    } = this.props;
+
     const min = sb * 40;
     const tableMax = sb * 200;
     const max = (balance < tableMax) ? balance - (balance % sb) : tableMax;
-    const { amount } = this.state;
 
     if (balance < min) {
       return (
@@ -74,16 +88,18 @@ export class RebuyDialog extends React.Component {
     }
 
     return (
-      <div style={{ minWidth: '20em' }}>
-        <Slider
-          data-orientation="vertical"
-          value={amount}
-          tooltip={false}
+      <Form
+        style={{ minWidth: '20em' }}
+        onSubmit={handleSubmit(this.handleSubmit)}
+      >
+        <Field
+          component={renderSlider}
+          name="amount"
           min={min}
           max={max}
           step={sb}
-          onChange={this.updateAmount}
         />
+
         <div>
           <FormattedMessage {...messages.max} />
           <span>{formatNtz(max)} NTZ</span>
@@ -94,34 +110,36 @@ export class RebuyDialog extends React.Component {
         {!networkSupported && <UnsupportedNetworkMessage />}
 
         <ButtonContainer>
-          <ButtonBox>
-            <SubmitButton onClick={this.handleLeave}>
-              <FormattedMessage {...messages.leave} />
-            </SubmitButton>
-          </ButtonBox>
-          <ButtonBox>
-            <SubmitButton
-              onClick={this.handleSubmit}
-              disabled={!hasWeb3 || !networkSupported}
-              submitting={submitting}
-            >
-              <FormattedMessage {...messages.rebuy} />
-            </SubmitButton>
-          </ButtonBox>
+          <SubmitButton onClick={this.handleLeave}>
+            <FormattedMessage {...messages.leave} />
+          </SubmitButton>
+
+          <SubmitButton
+            disabled={!hasWeb3 || !networkSupported}
+            submitting={submitting}
+          >
+            <FormattedMessage {...messages.rebuy} />
+          </SubmitButton>
         </ButtonContainer>
-      </div>
+      </Form>
     );
   }
 }
 
+const valueSelector = formValueSelector('rebuy');
 const mapStateToProps = createStructuredSelector({
   sb: makeSbSelector(),
   hasWeb3: makeSelectHasWeb3(),
   networkSupported: makeSelectNetworkSupported(),
+  valueSelector: (state) => valueSelector(state, 'amount'),
+  initialValues: (state, props) => ({
+    amount: makeSbSelector()(state, props) * 40,
+  }),
 });
 
 RebuyDialog.propTypes = {
   handleRebuy: PropTypes.func,
+  handleSubmit: PropTypes.func,
   submitting: PropTypes.bool,
   networkSupported: PropTypes.bool,
   handleLeave: PropTypes.func,
@@ -129,7 +147,10 @@ RebuyDialog.propTypes = {
   balance: React.PropTypes.number,
   hasWeb3: React.PropTypes.bool,
   sb: PropTypes.number,
+  amount: PropTypes.number,
   pos: PropTypes.number,
 };
 
-export default connect(mapStateToProps)(RebuyDialog);
+export default connect(mapStateToProps)(
+  reduxForm({ form: 'rebuy' })(RebuyDialog)
+);

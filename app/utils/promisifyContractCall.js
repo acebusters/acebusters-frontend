@@ -1,6 +1,6 @@
-export function promisifyContractCall(contract, method) {
+export function promisifyContractCall(method) {
   return (...args) => new Promise((resolve, reject) => {
-    contract[method].call(
+    method(
       ...args,
       (err, result) => {
         if (err) {

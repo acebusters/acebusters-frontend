@@ -105,7 +105,7 @@ class TransferDialog extends React.Component { // eslint-disable-line react/pref
 TransferDialog.propTypes = {
   title: PropTypes.any,
   description: PropTypes.any,
-  hasWeb3: PropTypes.string,
+  hasWeb3: PropTypes.bool,
   networkSupported: PropTypes.bool,
   submitting: PropTypes.bool,
   invalid: PropTypes.bool,
