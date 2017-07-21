@@ -107,7 +107,7 @@ export class RebuyDialog extends React.Component {
         <div>{formatNtz(amount)} NTZ</div>
 
         {!hasWeb3 && <NoWeb3Message />}
-        {!networkSupported && <UnsupportedNetworkMessage />}
+        {hasWeb3 && !networkSupported && <UnsupportedNetworkMessage />}
 
         <ButtonContainer>
           <SubmitButton onClick={this.handleLeave}>

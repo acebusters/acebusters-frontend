@@ -96,7 +96,8 @@ class UpgradeDialog extends React.Component {
         <H2>Upgrade your account</H2>
 
         {!account.injected && <NoWeb3Message />}
-        {!account.onSupportedNetwork && <UnsupportedNetworkMessage />}
+        {account.injected && !account.onSupportedNetwork &&
+          <UnsupportedNetworkMessage />}
 
         <Form onSubmit={handleSubmit(this.handleSubmit)}>
           {account.injected && !submitting && !success &&

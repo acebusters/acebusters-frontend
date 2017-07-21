@@ -76,7 +76,7 @@ export class JoinDialog extends React.Component { // eslint-disable-line react/p
         <div>{formatNtz(amount)} NTZ</div>
 
         {!hasWeb3 && <NoWeb3Message />}
-        {!networkSupported && <UnsupportedNetworkMessage />}
+        {hasWeb3 && !networkSupported && <UnsupportedNetworkMessage />}
 
         <SubmitButton
           disabled={!hasWeb3 || !networkSupported}

@@ -87,7 +87,7 @@ class TransferDialog extends React.Component { // eslint-disable-line react/pref
           {error && <ErrorMessage>{error}</ErrorMessage>}
 
           {!hasWeb3 && <NoWeb3Message />}
-          {!networkSupported && <UnsupportedNetworkMessage />}
+          {hasWeb3 && !networkSupported && <UnsupportedNetworkMessage />}
 
           <SubmitButton
             type="submit"

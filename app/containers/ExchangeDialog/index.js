@@ -84,7 +84,7 @@ class ExchangeDialog extends React.Component { // eslint-disable-line react/pref
           />
 
           {!hasWeb3 && <NoWeb3Message />}
-          {!networkSupported && <UnsupportedNetworkMessage />}
+          {hasWeb3 && !networkSupported && <UnsupportedNetworkMessage />}
 
           <SubmitButton
             disabled={invalid || !hasWeb3 || !networkSupported}
