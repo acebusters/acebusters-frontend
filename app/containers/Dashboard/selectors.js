@@ -21,3 +21,8 @@ export const createDashboardTxsSelector = () => createSelector(
     ),
   }),
 );
+
+export const getActiveTab = () => createSelector(
+  selectDashboard,
+  (dashboard) => dashboard.get('activeTab'),
+);

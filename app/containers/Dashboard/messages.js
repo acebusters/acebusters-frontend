@@ -6,6 +6,18 @@
 import { defineMessages } from 'react-intl';
 
 export default defineMessages({
+  overview: {
+    id: 'app.containers.Dashboard.overview',
+    defaultMessage: 'Overview',
+  },
+  wallet: {
+    id: 'app.containers.Dashboard.wallet',
+    defaultMessage: 'Wallet',
+  },
+  exchange: {
+    id: 'app.containers.Dashboard.exchange',
+    defaultMessage: 'Exchange',
+  },
   header: {
     id: 'app.containers.Dashboard.header',
     defaultMessage: 'Account Dashboard',

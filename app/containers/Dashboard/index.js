@@ -1,38 +1,49 @@
-import React, { PropTypes } from 'react';
-import QRCode from 'qrcode.react';
-import { FormattedMessage } from 'react-intl';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { createStructuredSelector } from 'reselect';
+import { FormattedMessage } from 'react-intl';
 import ethUtil from 'ethereumjs-util';
 import BigNumber from 'bignumber.js';
 
-import { getWeb3 } from '../AccountProvider/sagas';
-import makeSelectAccountData, { makeSignerAddrSelector, makeSelectPrivKey } from '../AccountProvider/selectors';
-import messages from './messages';
-import { modalAdd, modalDismiss } from '../App/actions';
 import web3Connect from '../AccountProvider/web3Connect';
-import { contractEvents, accountLoaded, transferETH, proxyEvents } from '../AccountProvider/actions';
+import { getWeb3 } from '../AccountProvider/sagas';
 import { addEventsDate, isUserEvent } from '../AccountProvider/utils';
-import { createBlocky } from '../../services/blockies';
-import { ABI_TOKEN_CONTRACT, ABI_POWER_CONTRACT, ABI_ACCOUNT_FACTORY, ABI_PROXY, ABI_TABLE_FACTORY, conf } from '../../app.config';
-import { ETH_DECIMALS, NTZ_DECIMALS, ABP_DECIMALS, formatEth, formatNtz, formatAbp } from '../../utils/amountFormatter';
-
-import List from '../../components/List';
-import H2 from '../../components/H2';
-import Alert from '../../components/Alert';
-import Button from '../../components/Button';
-import TransferDialog from '../TransferDialog';
-import ExchangeDialog from '../ExchangeDialog';
-import UpgradeDialog from '../UpgradeDialog';
-import Container from '../../components/Container';
-import SubmitButton from '../../components/SubmitButton';
-import Blocky from '../../components/Blocky';
-import WithLoading from '../../components/WithLoading';
-
-import AccountProgress from './AccountProgress';
-
-import { Section, DBButton, Address } from './styles';
-import { createDashboardTxsSelector } from './selectors';
+import {
+  ETH_DECIMALS,
+  NTZ_DECIMALS,
+  ABP_DECIMALS,
+} from '../../utils/amountFormatter';
+import { modalAdd, modalDismiss } from '../App/actions';
+import { contractEvents, accountLoaded, transferETH, proxyEvents } from '../AccountProvider/actions';
+import makeSelectAccountData, {
+  makeSignerAddrSelector,
+  makeSelectPrivKey,
+  makeBlockySelector,
+  makeNickNameSelector,
+} from '../AccountProvider/selectors';
+import {
+  OVERVIEW,
+  WALLET,
+  EXCHANGE,
+  setActiveTab,
+} from './actions';
+import messages from './messages';
 import { txnsToList } from './txnsToList';
+import { getActiveTab, createDashboardTxsSelector } from './selectors';
+
+import Container from '../../components/Container';
+import H2 from '../../components/H2';
+import Overview from '../../components/Dashboard/Overview';
+import Wallet from '../../components/Dashboard/Wallet';
+import Exchange from '../../components/Dashboard/Exchange';
+import SubmitButton from '../../components/SubmitButton';
+import Balances from '../../components/Dashboard/Balances';
+
+import PanesRoot from '../../components/Dashboard/PanesRoot';
+import Tabs from '../../components/Dashboard/Tabs';
+
+import { ABI_TOKEN_CONTRACT, ABI_POWER_CONTRACT, ABI_ACCOUNT_FACTORY, ABI_PROXY, ABI_TABLE_FACTORY, conf } from '../../app.config';
+
 // import { waitForTx } from '../../utils/waitForTx';
 
 const confParams = conf();
@@ -40,8 +51,31 @@ const confParams = conf();
 const LOOK_BEHIND_PERIOD = 4 * 60 * 24;
 const ETH_FISH_LIMIT = new BigNumber(0.1);
 
-export class Dashboard extends React.Component { // eslint-disable-line react/prefer-stateless-function
+const PANES = {
+  [OVERVIEW]: Overview,
+  [WALLET]: Wallet,
+  [EXCHANGE]: Exchange,
+};
 
+const TABS = [
+  {
+    name: OVERVIEW,
+    title: <FormattedMessage {...messages[OVERVIEW]} />,
+    icon: 'fa-tachometer',
+  },
+  {
+    name: WALLET,
+    title: <FormattedMessage {...messages[WALLET]} />,
+    icon: 'fa-money',
+  },
+  {
+    name: EXCHANGE,
+    title: <FormattedMessage {...messages[EXCHANGE]} />,
+    icon: 'fa-exchange',
+  },
+];
+
+class DashboardRoot extends React.Component {
   constructor(props) {
     super(props);
     this.handleNTZTransfer = this.handleNTZTransfer.bind(this);
@@ -57,7 +91,6 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
     this.tableFactory = this.web3.eth.contract(ABI_TABLE_FACTORY).at(confParams.tableFactory);
 
     this.tableFactory.getTables.call();
-
     if (this.props.account.proxy) {
       this.watchProxyEvents(this.props.account.proxy);
       this.watchTokenEvents(this.props.account.proxy);
@@ -272,17 +305,16 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
       );
     });
   }
-
   render() {
-    const { account, signerAddr } = this.props;
+    const { account } = this.props;
     const qrUrl = `ether:${account.proxy}`;
     const weiBalance = this.web3.eth.balance(account.proxy);
     const ethBalance = weiBalance && weiBalance.div(ETH_DECIMALS);
-    const floor = this.token.floor();
-    const ceiling = this.token.ceiling();
     const babzBalance = this.token.balanceOf(account.proxy);
     const nutzBalance = babzBalance && babzBalance.div(NTZ_DECIMALS);
     const pwrBalance = this.power.balanceOf(account.proxy);
+    const floor = this.token.floor();
+    const ceiling = this.token.ceiling();
     const tables = this.tableFactory.getTables();
     const calcETHAmount = (ntz) => new BigNumber(ntz).div(floor);
     const calcNTZAmount = (eth) => ceiling.mul(eth);
@@ -292,282 +324,79 @@ export class Dashboard extends React.Component { // eslint-disable-line react/pr
       tables,
       account.proxy
     );
-
     return (
       <Container>
-        <h1><FormattedMessage {...messages.header} /></h1>
-
-        <Section>
-          <Blocky blocky={createBlocky(signerAddr)} />
-          <h3>Your address:</h3>
-
-          <WithLoading
-            isLoading={!account.proxy || account.proxy === '0x'}
-            loadingSize="40px"
-            styles={{ layout: { transform: 'translateY(-50%)', left: 0 } }}
-          >
-            <Address>{account.proxy}</Address>
-            <QRCode value={qrUrl} size={120} />
-
-            <Alert theme="danger">
-              <FormattedMessage {...messages.ethAlert} />
-            </Alert>
-          </WithLoading>
-        </Section>
-
-        {account.isLocked &&
-          <Section>
-            <Alert theme="warning">
-              Warning: account limit {ETH_FISH_LIMIT.toString()} ETH<br />
-              <Button
-                size="link"
-                onClick={() => this.props.modalAdd(
-                  <UpgradeDialog
-                    proxyContract={this.proxy}
-                    onSuccessButtonClick={this.props.modalDismiss}
-                  />
-                )}
-              >
-                Upgrade to shark account
-              </Button> to deposit more
-            </Alert>
-
-            {ethBalance && nutzBalance && floor &&
-              <AccountProgress
-                ethBalance={ethBalance}
-                nutzBalance={nutzBalance}
-                floor={floor}
-                ethLimit={ETH_FISH_LIMIT}
-              />
-            }
-          </Section>
-        }
-
-        <Section>
-          <h2>Nutz</h2>
-          <p>
-            <span>Balance: </span>
-            <WithLoading
-              isLoading={!babzBalance}
-              loadingSize="14px"
-              type="inline"
-              styles={{ layout: { marginLeft: '15px' } }}
-            >
-              <span>{babzBalance && formatNtz(babzBalance)} NTZ</span>
-            </WithLoading>
-          </p>
-          {babzBalance &&
-            <DBButton
-              onClick={() => {
-                this.props.modalAdd(
-                  <TransferDialog
-                    title={<FormattedMessage {...messages.ntzTransferTitle} />}
-                    handleTransfer={this.handleNTZTransfer}
-                    maxAmount={babzBalance.div(NTZ_DECIMALS)}
-                    amountUnit="NTZ"
-                  />
-                );
-              }}
-              size="medium"
-            >
-              Transfer
-            </DBButton>
-          }
-          {babzBalance && floor &&
-            <DBButton
-              onClick={() => {
-                this.props.modalAdd(
-                  <ExchangeDialog
-                    title={<FormattedMessage {...messages.sellTitle} />}
-                    amountUnit="ntz"
-                    calcExpectedAmount={calcETHAmount}
-                    handleExchange={this.handleNTZSell}
-                    maxAmount={BigNumber.min(
-                      account.isLocked
-                        ? BigNumber.max(ETH_FISH_LIMIT.sub(ethBalance), 0).mul(floor)
-                        : nutzBalance,
-                      nutzBalance
-                    )}
-                  />
-                );
-              }}
-              size="medium"
-            >
-              Sell
-            </DBButton>
-          }
-          {weiBalance && ceiling &&
-            <DBButton
-              onClick={() => {
-                this.props.modalAdd(
-                  <ExchangeDialog
-                    title={<FormattedMessage {...messages.purchaseTitle} />}
-                    amountUnit="eth"
-                    calcExpectedAmount={calcNTZAmount}
-                    handleExchange={this.handleNTZPurchase}
-                    maxAmount={BigNumber.min(
-                      account.isLocked
-                        ? BigNumber.max(ETH_FISH_LIMIT.sub(calcETHAmount(nutzBalance)), 0)
-                        : ethBalance,
-                      ethBalance
-                    )}
-                  />
-                );
-              }}
-              size="medium"
-            >
-              Purchase
-            </DBButton>
-          }
-        </Section>
-
-        <Section>
-          <h2>Ether</h2>
-          <p>
-            <span>Balance: </span>
-            <WithLoading
-              isLoading={!weiBalance}
-              loadingSize="14px"
-              type="inline"
-              styles={{ layout: { marginLeft: '15px' } }}
-            >
-              <span>{weiBalance && formatEth(weiBalance)} ETH</span>
-            </WithLoading>
-          </p>
-          {weiBalance &&
-            <DBButton
-              onClick={() => {
-                this.props.modalAdd(
-                  <TransferDialog
-                    title={<FormattedMessage {...messages.ethTransferTitle} />}
-                    handleTransfer={this.handleETHTransfer}
-                    maxAmount={ethBalance}
-                    amountUnit="ETH"
-                  />
-                );
-              }}
-              size="medium"
-            >
-              Transfer
-            </DBButton>
-          }
-        </Section>
-
-        <Section>
-          <h2>Power</h2>
-          <p>
-            <span>Balance: </span>
-            <WithLoading
-              isLoading={!pwrBalance}
-              loadingSize="14px"
-              type="inline"
-              styles={{ layout: { marginLeft: '15px' } }}
-            >
-              <span>{pwrBalance && formatAbp(pwrBalance)} ABP</span>
-            </WithLoading>
-          </p>
-
-          {babzBalance &&
-            <DBButton
-              onClick={() => {
-                this.props.modalAdd(
-                  <TransferDialog
-                    handleTransfer={this.handlePowerUp}
-                    maxAmount={babzBalance.div(NTZ_DECIMALS)}
-                    hideAddress
-                    title={<FormattedMessage {...messages.powerUpTitle} />}
-                    amountUnit="NTZ"
-                  />
-                );
-              }}
-              size="medium"
-              disabled={account.isLocked}
-            >
-              Power Up
-            </DBButton>
-          }
-
-          {pwrBalance &&
-            <DBButton
-              onClick={() => {
-                this.props.modalAdd(
-                  <TransferDialog
-                    title={<FormattedMessage {...messages.powerDownTitle} />}
-                    description="Power Down will convert ABP back to NTZ over a period of 3 month"
-                    handleTransfer={this.handlePowerDown}
-                    maxAmount={pwrBalance.div(ABP_DECIMALS)}
-                    hideAddress
-                    amountUnit="ABP"
-                  />
-                );
-              }}
-              size="medium"
-              disabled={account.isLocked}
-            >
-              Power Down
-            </DBButton>
-          }
-        </Section>
-
-        <Section>
-          <h2><FormattedMessage {...messages.included} /></h2>
-          <List
-            items={listTxns}
-            headers={[
-              '',
-              'Address',
-              'Date',
-              '',
-              'Amount',
-              '',
-            ]}
-            columnsStyle={{
-              0: { width: 20 },
-              1: { textAlign: 'left', width: 10, whiteSpace: 'nowrap' },
-              2: { width: 20 },
-              3: { textAlign: 'left', whiteSpace: 'nowrap' },
-              4: { textAlign: 'right', whiteSpace: 'nowrap' },
-              5: { width: '100%', textAlign: 'left' },
-            }}
-            noDataMsg="No Transactions Yet"
-          />
-        </Section>
+        <Tabs tabs={TABS} {...this.props} />
+        <Balances
+          babzBalance={babzBalance}
+          pwrBalance={pwrBalance}
+          weiBalance={weiBalance}
+        />
+        <PanesRoot
+          panes={PANES}
+          paneType={this.props.activeTab}
+          paneProps={{
+            ETH_FISH_LIMIT,
+            calcETHAmount,
+            calcNTZAmount,
+            weiBalance,
+            floor,
+            ceiling,
+            babzBalance,
+            ethBalance,
+            pwrBalance,
+            nutzBalance,
+            listTxns,
+            qrUrl,
+            handleNTZSell: this.handleNTZSell,
+            handleNTZPurchase: this.handleNTZPurchase,
+            handleNTZTransfer: this.handleNTZTransfer,
+            handleETHTransfer: this.handleETHTransfer,
+            handlePowerDown: this.handlePowerDown,
+            handlePowerUp: this.handlePowerUp,
+            ...this.props,
+          }}
+        />
       </Container>
     );
   }
 }
-
-Dashboard.propTypes = {
-  modalAdd: PropTypes.func,
-  transferETH: PropTypes.func,
-  proxyEvents: PropTypes.func,
-  modalDismiss: PropTypes.func,
-  contractEvents: PropTypes.func,
-  accountLoaded: PropTypes.func,
-  web3Redux: PropTypes.any,
-  signerAddr: PropTypes.string,
+DashboardRoot.propTypes = {
+  activeTab: PropTypes.string,
   account: PropTypes.object,
+  accountLoaded: PropTypes.func,
+  contractEvents: PropTypes.func,
   dashboardTxs: PropTypes.object,
-  privKey: PropTypes.string,
   dispatch: PropTypes.func,
+  modalAdd: PropTypes.func,
+  modalDismiss: PropTypes.func,
+  privKey: PropTypes.string,
+  proxyEvents: PropTypes.func,
+  transferETH: PropTypes.func,
+  web3Redux: PropTypes.any,
 };
 
+const mapDispatchToProps = (dispatch) => ({
+  setActiveTab: (whichTab) => dispatch(setActiveTab(whichTab)),
+  modalAdd,
+  modalDismiss,
+  transferETH,
+  proxyEvents,
+  contractEvents,
+  accountLoaded,
+});
+
 const mapStateToProps = createStructuredSelector({
+  activeTab: getActiveTab(),
   account: makeSelectAccountData(),
+  blocky: makeBlockySelector(),
   dashboardTxs: createDashboardTxsSelector(),
+  nickName: makeNickNameSelector(),
   signerAddr: makeSignerAddrSelector(),
   privKey: makeSelectPrivKey(),
 });
 
-function mapDispatchToProps() {
-  return {
-    modalAdd,
-    modalDismiss,
-    transferETH,
-    proxyEvents,
-    contractEvents,
-    accountLoaded,
-  };
-}
-
-export default web3Connect(mapStateToProps, mapDispatchToProps)(Dashboard);
+export default web3Connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(DashboardRoot);
