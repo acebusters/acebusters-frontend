@@ -43,7 +43,7 @@ class LobbyComponent extends React.PureComponent { // eslint-disable-line
           <thead>
             <tr>
               <th key="number">#</th>
-              <th key="blind">Blind</th>
+              <th key="blind">Blinds</th>
               <th key="play">Players </th>
               <th key="hand">Hand</th>
               <th key="actn" />

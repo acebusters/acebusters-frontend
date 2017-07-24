@@ -58,11 +58,13 @@ class LobbyItem extends React.PureComponent { // eslint-disable-line
         players += 1;
       }
     });
+    const sb = this.props.data.smallBlind;
+    const bb = sb * 2;
     const ta = this.props.tableAddr.substring(2, 8);
     return (
       <Tr>
         <Td key="ta">{ta}</Td>
-        <Td key="sb">{formatNtz(this.props.data.smallBlind)} NTZ</Td>
+        <Td key="sb">{formatNtz(sb)} NTZ / {formatNtz(bb)} NTZ</Td>
         <Td key="np">{`${players}/${this.props.data.seats.length}`}</Td>
         <Td key="lh">{this.props.lastHandId}</Td>
         <Td key="ac">
