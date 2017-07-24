@@ -200,7 +200,8 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           modalDismiss={this.props.modalDismiss}
           params={this.props.params}
           balance={balance}
-        />
+        />,
+        this.handleLeave
       ));
     }
   }

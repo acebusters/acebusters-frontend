@@ -5,27 +5,30 @@
 import { createSelector } from 'reselect';
 import { formValueSelector } from 'redux-form/immutable';
 
-const selectGlobal = (state) => state.get('global');
+export const selectGlobal = (state) => state.get('global');
 
 const formSelector = formValueSelector('login');
-const selectWorkerProgress = (state) => formSelector(state, 'workerProgress');
+export const selectWorkerProgress = (state) => formSelector(state, 'workerProgress');
 
-const makeSelectTransferShow = () => createSelector(
+export const makeSelectTransferShow = () => createSelector(
   selectGlobal,
   (globalState) => globalState.get('transferShow')
 );
 
-const makeSelectProgress = () => createSelector(
+export const makeSelectProgress = () => createSelector(
   selectGlobal,
   (globalState) => globalState.get('progress')
 );
 
-const makeModalStackSelector = () => createSelector(
+export const makeModalSelector = () => createSelector(
   selectGlobal,
-  (state) => (state && state.get('modalStack')) ? state.get('modalStack').toJS() : []
+  (state) => (state && state.get('modalStack').size > 0) ? {
+    node: state.get('modalStack').last(),
+    closeHandler: state.get('modalCloseHandlers').last(),
+  } : null
 );
 
-const makeSelectLocationState = () => {
+export const makeSelectLocationState = () => {
   let prevRoutingState;
   let prevRoutingStateJS;
 
@@ -41,11 +44,3 @@ const makeSelectLocationState = () => {
   };
 };
 
-export {
-  selectGlobal,
-  selectWorkerProgress,
-  makeSelectTransferShow,
-  makeSelectProgress,
-  makeModalStackSelector,
-  makeSelectLocationState,
-};

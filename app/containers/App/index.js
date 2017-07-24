@@ -16,7 +16,7 @@ import Notifications from '../../containers/Notifications';
 import {
   makeSelectProgress,
   makeSelectTransferShow,
-  makeModalStackSelector,
+  makeModalSelector,
   selectWorkerProgress,
 } from './selectors';
 
@@ -56,11 +56,11 @@ const StyledDashboard = styled.div`
   `)}
 `;
 
-export function App(props) {
-  const { notifications, loggedIn } = props;
+export function App({ notifications, loggedIn, modal, ...props }) {
   const pathname = props.location.pathname;
   const isNotTable = pathname.indexOf('table') === -1;
   const showNotifications = pathname.match(/table|lobby|dashboard/);
+
   return (
     <div name="app-container">
       <StyledDashboard params={props.params} name="styled-dashboard">
@@ -89,10 +89,12 @@ export function App(props) {
       }
 
       <ModalsTransitionGroup>
-        {props.modalStack.length > 0 &&
+        {modal &&
           <ModalContainer style={{ zIndex: 7 }}>
-            <ModalDialog onClose={props.modalDismiss}>
-              {props.modalStack[props.modalStack.length - 1]}
+            <ModalDialog
+              onClose={modal.closeHandler || props.modalDismiss}
+            >
+              {modal.node}
             </ModalDialog>
           </ModalContainer>
         }
@@ -113,7 +115,10 @@ App.propTypes = {
   fixed: PropTypes.bool,
   params: PropTypes.object,
   location: PropTypes.object,
-  modalStack: PropTypes.array,
+  modal: PropTypes.shape({
+    node: PropTypes.any,
+    closeHandler: PropTypes.func,
+  }),
   notifications: PropTypes.array,
   loggedIn: PropTypes.bool,
 };
@@ -131,7 +136,7 @@ function mapDispatchToProps(dispatch) {
 const mapStateToProps = createStructuredSelector({
   workerProgress: selectWorkerProgress,
   isModalOpen: makeSelectTransferShow(),
-  modalStack: makeModalStackSelector(),
+  modal: makeModalSelector(),
   progress: makeSelectProgress(),
   notifications: selectNotifications(),
   loggedIn: makeSelectLoggedIn(),

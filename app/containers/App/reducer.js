@@ -9,26 +9,25 @@ import {
 // The initial state of the App
 const initialState = fromJS({
   modalStack: [],
+  modalCloseHandlers: [],
   progress: 0,
 });
 
 function appReducer(state = initialState, action) {
   switch (action.type) {
-    case MODAL_ADD: {
-      let newStack = state.get('modalStack');
-      newStack = newStack.push(action.node);
+    case MODAL_ADD:
       return state
-        .set('modalStack', newStack);
-    }
-    case MODAL_DISMISS: {
-      let newStack = state.get('modalStack');
-      newStack = newStack.pop();
+        .set('modalStack', state.get('modalStack').push(action.payload.node))
+        .set('modalCloseHandlers', state.get('modalCloseHandlers').push(action.payload.closeHandler));
+
+    case MODAL_DISMISS:
       return state
-        .set('modalStack', newStack);
-    }
-    case GLOBAL_PROGRESS: {
+        .set('modalStack', state.get('modalStack').pop())
+        .set('modalCloseHandlers', state.get('modalCloseHandlers').pop());
+
+    case GLOBAL_PROGRESS:
       return state.set('progress', action.data);
-    }
+
     default:
       return state;
   }
