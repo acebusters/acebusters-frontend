@@ -7,6 +7,7 @@ import {
   valuesShort,
   suits,
 } from '../../app.config';
+import { not } from '../../utils';
 
 import { babz } from '../../utils/amountFormatter';
 
@@ -484,18 +485,9 @@ const makeLatestHandSelector = () => createSelector(
       return null;
     }
 
-    // get progress of state channel
-    let maxHand = 2;
-    table.keySeq().forEach((k) => {
-      if (!isNaN(k)) {
-        const handId = parseInt(k, 10);
-        if (handId > maxHand) {
-          maxHand = handId;
-        }
-      }
-    });
-
-    return maxHand;
+    return Math.max(
+      ...table.keySeq().map(Number).filter(not(isNaN)).toList().push(2)
+    );
   }
 );
 

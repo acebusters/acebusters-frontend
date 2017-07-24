@@ -8,6 +8,7 @@ import {
   makeMyHandValueSelector,
   makeHandsSelector,
   makeSitoutAmountSelector,
+  makeLatestHandSelector,
 } from '../selectors';
 
 import { PLAYER1, PLAYER2, PLAYER3, PLAYER4, PLAYER_EMPTY } from './consts';
@@ -102,6 +103,31 @@ describe('handsSelector', () => {
       { handId: 0, lineup: [] },
       { handId: 1, lineup: [] },
     ]);
+  });
+});
+
+describe('latestHandSelect', () => {
+  it('should select latest handId on table', () => {
+    expect(makeLatestHandSelector()(fromJS({
+      table: {
+        [TBL_ADDR]: {
+          4: {
+            lineup: [],
+          },
+          5: {
+            lineup: [],
+          },
+          data: {},
+        },
+      },
+    }), PROPS)).toEqual(5);
+    expect(makeLatestHandSelector()(fromJS({
+      table: {
+        [TBL_ADDR]: {
+          data: {},
+        },
+      },
+    }), PROPS)).toEqual(2);
   });
 });
 

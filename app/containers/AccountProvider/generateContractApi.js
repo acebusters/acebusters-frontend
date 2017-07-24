@@ -1,7 +1,7 @@
 import { bindActionCreators } from 'redux';
 import { contractMethodCall, contractTxSend } from './actions';
 import { getWeb3 } from './sagas';
-import { last } from '../../utils/last';
+import { last } from '../../utils';
 
 function degrade(fn, fallback) {
   try {

@@ -13,7 +13,7 @@ import AmountField from '../../components/AmountField';
 import H2 from '../../components/H2';
 
 import { NTZ_DECIMALS, ETH_DECIMALS, formatNtz, formatEth } from '../../utils/amountFormatter';
-import { round } from '../../utils/round';
+import { round } from '../../utils';
 
 import messages from './messages';
 

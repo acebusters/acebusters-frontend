@@ -2,7 +2,7 @@ import React from 'react';
 import { object } from 'prop-types';
 import styled from 'styled-components';
 import BigNumber from 'bignumber.js';
-import { round } from '../../utils/round';
+import { round } from '../../utils';
 
 const Root = styled.div`
   position: relative;

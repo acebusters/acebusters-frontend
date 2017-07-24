@@ -1,6 +1,19 @@
 export const PERSIST = 'persist';
 export const TEMP = 'temp';
 
+/**
+ * type Notification = {
+ *  txId: string;
+ *  notifyType: string;
+ *  category: string;
+ *  details: string
+ *  removing: boolean;
+ *  dismissable: boolean;
+ *  date: Date;
+ *  type: 'success' | 'info' | 'warning' | 'danger';
+ * }
+ */
+
 export const loggedInSuccess = {
   txId: 'AUTH_LOGGED_IN',
   notifyType: 'AUTH_LOGGED_IN',
