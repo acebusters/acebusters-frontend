@@ -44,8 +44,6 @@ import Tabs from '../../components/Dashboard/Tabs';
 
 import { ABI_TOKEN_CONTRACT, ABI_POWER_CONTRACT, ABI_ACCOUNT_FACTORY, ABI_PROXY, ABI_TABLE_FACTORY, conf } from '../../app.config';
 
-// import { waitForTx } from '../../utils/waitForTx';
-
 const confParams = conf();
 
 const LOOK_BEHIND_PERIOD = 4 * 60 * 24;
@@ -105,10 +103,23 @@ class DashboardRoot extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.account.proxy === undefined && nextProps.account.proxy) {
-      this.watchProxyEvents(nextProps.account.proxy);
-      this.watchTokenEvents(nextProps.account.proxy);
-      this.power.balanceOf.call(nextProps.account.proxy);
+    const { account } = this.props;
+    const { account: nextAccount } = nextProps;
+
+    if (account.proxy === undefined && nextAccount.proxy) {
+      this.watchProxyEvents(nextAccount.proxy);
+      this.watchTokenEvents(nextAccount.proxy);
+      this.power.balanceOf.call(nextAccount.proxy);
+
+      // Check if we have unfinished sell
+      this.token.allowance.callPromise(
+        confParams.ntzAddr,
+        nextAccount.proxy,
+      ).then((value) => {
+        if (!value.eq(0)) {
+          this.handleETHClaim(nextAccount.proxy);
+        }
+      });
     }
 
     if (this.props.dashboardTxs.txError !== nextProps.dashboardTxs.txError && nextProps.dashboardTxs.txError) {
@@ -192,16 +203,6 @@ class DashboardRoot extends React.Component {
         if (pendingSell.indexOf(event.transactionHash) > -1) {
           this.handleETHClaim(proxyAddr);
         }
-      }
-    });
-
-    // Check if we have unfinished sell
-    this.token.allowance.callPromise(
-      confParams.ntzAddr,
-      proxyAddr,
-    ).then((value) => {
-      if (!value.eq(0)) {
-        this.handleETHClaim(proxyAddr);
       }
     });
   }
@@ -305,6 +306,7 @@ class DashboardRoot extends React.Component {
       );
     });
   }
+
   render() {
     const { account } = this.props;
     const qrUrl = `ether:${account.proxy}`;

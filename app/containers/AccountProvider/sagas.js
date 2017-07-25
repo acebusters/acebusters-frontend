@@ -26,6 +26,7 @@ import {
   WEB3_CONNECTED,
   ETH_TRANSFER,
   NETWORK_SUPPORT_UPDATE,
+  INJECT_ACCOUNT_UPDATE,
   web3Error,
   web3Connected,
   web3Disconnected,
@@ -239,11 +240,23 @@ function sendTx(forwardReceipt) {
   });
 }
 
+function* getInjectedAddr() {
+  const state = yield select();
+  const injectedAddr = yield call([state, state.getIn], ['account', 'injected']);
+  if (!injectedAddr) {
+    // wait for metamask loading
+    const action = yield take(INJECT_ACCOUNT_UPDATE);
+    return action.payload;
+  }
+
+  return injectedAddr;
+}
+
 function* contractTransactionSecureSend(action) {
   const { data } = action.payload;
+  const injectedAddr = yield call(getInjectedAddr);
   const state = yield select();
   const proxyAddr = yield call([state, state.getIn], ['account', 'proxy']);
-  const injectedAddr = yield call([state, state.getIn], ['account', 'injected']);
   const web3 = yield call(getWeb3, true);
   const proxy = web3.eth.contract(ABI_PROXY).at(proxyAddr);
 
@@ -308,9 +321,9 @@ function* contractTransactionSendSaga() {
 
 function* secureTransferETH(action) {
   const { payload: { dest, amount } } = action;
+  const injectedAddr = yield call(getInjectedAddr);
   const state = yield select();
   const proxyAddr = yield call([state, state.getIn], ['account', 'proxy']);
-  const injectedAddr = yield call([state, state.getIn], ['account', 'injected']);
 
   const web3 = getWeb3(true);
   const proxy = web3.eth.contract(ABI_PROXY).at(proxyAddr);
