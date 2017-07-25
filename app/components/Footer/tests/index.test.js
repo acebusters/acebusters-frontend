@@ -1,8 +1,7 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 
-import A from '../../A';
-import Footer from '../index';
+import Footer, { A } from '../index';
 
 describe('<Footer />', () => {
   it('should render the copyright notice', () => {
