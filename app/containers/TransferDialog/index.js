@@ -1,3 +1,4 @@
+import ethUtil from 'ethereumjs-util';
 import React, { PropTypes } from 'react';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
@@ -13,7 +14,7 @@ import FormField from '../../components/Form/FormField';
 import AmountField from '../../components/AmountField';
 import H2 from '../../components/H2';
 
-import { isEthereumAddress } from './isEthereumAddress';
+const isEthereumAddress = (address) => ethUtil.isValidAddress(address) || ethUtil.isValidChecksumAddress(address);
 
 const validate = (values, props) => {
   const errors = {};

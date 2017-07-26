@@ -1,10 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import ReCAPTCHA from 'react-google-recaptcha';
 import { Form, Field, reduxForm, propTypes } from 'redux-form/immutable';
 import { FormattedMessage } from 'react-intl';
-
-import { conf } from '../../app.config';
 
 // components
 import Container from '../../components/Container';
@@ -16,6 +13,7 @@ import Button from '../../components/Button';
 import H1 from '../../components/H1';
 import { ErrorMessage, WarningMessage } from '../../components/FormMessages';
 import messages from './messages';
+import Captcha from './captcha';
 
 import { register } from './actions';
 
@@ -56,15 +54,6 @@ const warn = (values) => {
 };
 
 /* eslint-disable react/prop-types */
-const Captcha = (props) => (
-  <div style={{ marginBottom: '15px' }}>
-    <ReCAPTCHA
-      sitekey={conf().recaptchaKey}
-      onChange={props.input.onChange}
-    />
-  </div>
-);
-
 const renderCheckBox = ({ input, label, type, meta: { touched, error, warning } }) => (
   <FormGroup>
     <Label>
@@ -109,7 +98,7 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
               component={FormField}
               label="referral code"
             />
-            <Field name="captchaResponse" component={Captcha} />
+            <Field name="captchaResponse" component={Captcha} error={error} />
             {error && <ErrorMessage error={error} />}
             <Field
               name="terms"
