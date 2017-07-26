@@ -54,7 +54,7 @@ export function* accountLoginSaga() {
       // this reads account data from the account factory
       const [proxy, owner, isLocked] = yield getAccount(getWeb3(), signer);
 
-      if (!proxy) {
+      if (proxy === '0x') {
         yield put(modalAdd(
           <div>
             Seems proxy contract is not deployed yet
