@@ -36,7 +36,7 @@ const Notification = ({
             <Icon className="fa fa-times" />
           </ButtonWrapper>
           :
-          <ButtonWrapper onClick={() => notifyRemove(txId)}>
+          <ButtonWrapper>
             <Icon className="fa fa-info-circle" />
           </ButtonWrapper>
         }

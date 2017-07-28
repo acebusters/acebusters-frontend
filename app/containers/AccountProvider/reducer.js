@@ -18,6 +18,7 @@ import {
   NETWORK_SUPPORT_UPDATE,
   READY_STATE,
 } from './actions';
+import { ACCOUNT_TX_HASH_RECEIVED } from '../GeneratePage/actions';
 
 // The initial application state
 const initialState = fromJS({
@@ -49,6 +50,9 @@ function accountProviderReducer(state = initialState, action) {
 
     case NETWORK_SUPPORT_UPDATE:
       return state.set('onSupportedNetwork', action.payload);
+
+    case ACCOUNT_TX_HASH_RECEIVED:
+      return state.set('proxyTxHash', action.payload);
 
     case ACCOUNT_LOADED:
       return state.set('proxy', action.payload.proxy)

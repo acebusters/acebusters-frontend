@@ -5,32 +5,20 @@ export const initialState = List([]);
 
 export default function notificationsReducer(state = initialState, action) {
   switch (action.type) {
+    case types.NOTIFY_ADD:
+      return state
+              .filter((note) => note.get('txId') !== action.notification.txId) // prevent duplicates
+              .push(Map(action.notification));
 
-    case types.NOTIFY_ADD: {
-      const notification = Map(action.notification);
-      const newState = state.push(notification);
-      return newState;
-    }
+    case types.NOTIFY_DELETE:
+      return state.filter((note) => note.get('txId') !== action.txId);
 
-    case types.NOTIFY_DELETE: {
-      const newState = state
-        .filter((note) => note.get('txId') !== action.txId);
-      return newState;
-    }
+    case types.NOTIFY_REMOVING:
+      return state.map(
+        (note) => note.set('removing', note.get('txId') === action.txId)
+      );
 
-    case types.NOTIFY_REMOVING: {
-      const newState = state
-        .map((note) => {
-          if (note.get('txId') === action.txId) {
-            return note.set('removing', true);
-          }
-          return note;
-        });
-      return newState;
-    }
-
-    default: {
+    default:
       return state;
-    }
   }
 }

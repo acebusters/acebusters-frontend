@@ -1,3 +1,6 @@
+import React from 'react';
+import Link from '../../components/Link';
+
 export const PERSIST = 'persist';
 export const TEMP = 'temp';
 
@@ -23,6 +26,27 @@ export const loggedInSuccess = {
   dismissable: true,
   date: new Date(),
   type: 'success',
+};
+
+export const notLoggedIn = {
+  txId: 'AUTH_NOT_LOGGED_IN',
+  notifyType: 'AUTH_NOT_LOGGED_IN',
+  category: 'Visitor Mode',
+  details: <span>Please <Link to="/login">login</Link> or <Link to="/register">signup</Link> to join a game</span>,
+  removing: false,
+  dismissable: false,
+  date: new Date(),
+  type: 'info',
+};
+
+export const firstLogin = {
+  txId: 'LOGGING_IN',
+  category: 'Logging in',
+  details: 'First time it may take awhile',
+  removing: false,
+  dismissable: true,
+  date: new Date(),
+  type: 'info',
 };
 
 export const noWeb3Danger = {

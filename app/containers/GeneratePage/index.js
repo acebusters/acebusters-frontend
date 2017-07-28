@@ -1,6 +1,7 @@
 /* eslint no-multi-spaces: "off", key-spacing: "off" */
 
 import React from 'react';
+import { delay } from 'redux-saga';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Form, Field, reduxForm, SubmissionError, propTypes, change, formValueSelector } from 'redux-form/immutable';
@@ -18,10 +19,10 @@ import { ErrorMessage } from '../../components/FormMessages';
 
 import account from '../../services/account';
 import * as storageService from '../../services/localStorage';
-import { getWeb3 } from '../../containers/AccountProvider/utils';
-import { waitForTx } from '../../utils/waitForTx';
+// import { getWeb3 } from '../../containers/AccountProvider/utils';
+// import { waitForTx } from '../../utils/waitForTx';
 
-import { workerError, walletExported, register } from './actions';
+import { workerError, walletExported, register, accountTxHashReceived } from './actions';
 
 
 const validate = (values) => {
@@ -49,13 +50,13 @@ const warn = (values) => {
   return warnings;
 };
 
-function waitForAccountTx(signerAddr) {
+function waitForAccountTxHash(signerAddr) {
   const pusher = new Pusher('d4832b88a2a81f296f53', { cluster: 'eu', encrypted: true });
   const channel = pusher.subscribe(signerAddr);
   return new Promise((resolve) => {
     channel.bind('update', (event) => {
       if (event.type === 'txHash') {
-        resolve(waitForTx(getWeb3(), event.payload));
+        resolve(event.payload);
         channel.unbind('update');
       }
     });
@@ -150,9 +151,11 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     return register(values, dispatch).catch((workerErr) => {
       // If worker failed, ...
       throw new SubmissionError({ _error: `error, Registration failed due to worker error: ${workerErr}` });
-    }).then((workerRsp) => (
+    }).then((workerRsp) => {
       // If worker success, ...
-      request(confCode, workerRsp.data.wallet)
+      waitForAccountTxHash(workerRsp.data.wallet.address)
+        .then(this.props.onAccountTxHashReceived);
+      return request(confCode, workerRsp.data.wallet)
         .catch((err) => {
           // If store account failed...
           if (err === 409) {
@@ -161,12 +164,12 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
             throw new SubmissionError({ _error: `Registration failed with error code ${err}` });
           }
         })
-        .then(() => waitForAccountTx(workerRsp.data.wallet.address))
         .catch((err) => {
           throw new SubmissionError({ _error: `Registration failed with message: ${err}` });
         })
-        .then(() => browserHistory.push('/login'))
-    ));
+        .then(() => delay(1000))
+        .then(() => browserHistory.push('/login'));
+    });
   }
 
   updateEntropy(data) {
@@ -180,7 +183,6 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     const { entropySaved, secretCreated } = this.state;
     return (
       <Container>
-
         {!entropySaved ?
           <div>
             <H1>Create Randomness for Secret</H1>
@@ -240,11 +242,13 @@ GeneratePage.propTypes = {
   onWorkerInitialized: PropTypes.func,
   onWorkerProgress: PropTypes.func,
   onWalletExported: PropTypes.func,
+  onAccountTxHashReceived: PropTypes.func,
   input: PropTypes.any,
 };
 
 function mapDispatchToProps(dispatch) {
   return {
+    onAccountTxHashReceived: (txHash) => dispatch(accountTxHashReceived(txHash)),
     onWorkerError: (event) => dispatch(workerError(event)),
     onWorkerInitialized: () => dispatch(change('register', 'isWorkerInitialized', true)),
     onWorkerProgress: (percent) => dispatch(change('register', 'workerProgress', percent)),

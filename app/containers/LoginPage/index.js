@@ -12,7 +12,12 @@ import account from '../../services/account';
 import { workerError, walletImported, login } from './actions';
 import { modalAdd, modalDismiss, setProgress } from '../App/actions';
 import { setAuthState } from '../AccountProvider/actions';
+import { notifyAdd } from '../Notifications/actions';
+import { selectAccount } from '../AccountProvider/selectors';
+import { getWeb3 } from '../AccountProvider/utils';
+import { waitForTx } from '../../utils/waitForTx';
 import H1 from '../../components/H1';
+import { firstLogin } from '../Notifications/constants';
 
 import { ForgotField } from './styles';
 
@@ -59,48 +64,72 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
   }
 
   handleSubmit(values, dispatch) {
-    return account.login(values.get('email')).catch((err) => {
-      const errMsg = 'Login failed!';
-      if (err === 404) {
-        throw new SubmissionError({ confCode: 'Email unknown.', _error: errMsg });
-      } else {
-        throw new SubmissionError({ _error: `Login failed with error code ${err}` });
-      }
-    }).then((data) => {
-      if (!this.props.isWorkerInitialized) {
-        throw new SubmissionError({ _error: 'Error: decryption worker not loaded.' });
-      }
-      this.frame.contentWindow.postMessage({
-        action: 'import',
-        json: data.wallet,
-        password: values.get('password'),
-      }, '*');
-      // Login saga is called, we return the promise here,
-      // so we can display form errors if any of the async ops fail.
-      return login(values, dispatch).catch((workerErr) => {
-        // If worker failed, ...
-        throw new SubmissionError({ _error: `error, Login failed due to worker error: ${workerErr}` });
-      }).then((workerRsp) => {
-        // If worker success, ...
-        // ...tell account provider about login.
-        dispatch(setAuthState({
-          privKey: workerRsp.data.privKey,
-          email: values.get('email'),
-          loggedIn: true,
-        }));
+    return (
+      account.login(values.get('email'))
+        .catch((err) => {
+          if (err === 404) {
+            throw new SubmissionError({ email: 'Email unknown.', _error: 'Login failed!' });
+          } else {
+            throw new SubmissionError({ _error: `Login failed with error code ${err}` });
+          }
+        })
+        // the best place for waiting for proxy tx, it allows to get login errors without delay
+        .then((data) => {
+          // if user just created account, we need to ensure that proxy contract is deployed before continue login process
+          const proxyTxHash = this.props.account.get('proxyTxHash');
+          if (proxyTxHash) {
+            this.props.notifyAdd(firstLogin);
+            return waitForTx(getWeb3(), proxyTxHash)
+              .then(
+                () => data,
+                () => {
+                  throw new SubmissionError({ _error: `Login failed. Account tx failed, tx has was: ${proxyTxHash}` });
+                }
+              );
+          }
 
-        const { location } = this.props;
-        let nextPath = '/lobby';
+          return data;
+        })
+        .then((data) => {
+          if (!this.props.isWorkerInitialized) {
+            throw new SubmissionError({ _error: 'Error: decryption worker not loaded.' });
+          }
+          this.frame.contentWindow.postMessage({
+            action: 'import',
+            json: data.wallet,
+            password: values.get('password'),
+          }, '*');
+          // Login saga is called, we return the promise here,
+          // so we can display form errors if any of the async ops fail.
+          return (
+            login(values, dispatch)
+              .catch((workerErr) => {
+                // If worker failed, ...
+                throw new SubmissionError({ _error: `Error: login failed due to worker error: ${workerErr}` });
+              })
+              .then((workerRsp) => {
+                // If worker success, ...
+                // ...tell account provider about login.
+                dispatch(setAuthState({
+                  privKey: workerRsp.data.privKey,
+                  email: values.get('email'),
+                  loggedIn: true,
+                }));
 
-        if (location.state && location.state.nextPathname) {
-          nextPath = location.state.nextPathname;
-        } else if (location.query && location.query.redirect) {
-          nextPath = decodeURIComponent(location.query.redirect);
-        }
+                const { location } = this.props;
+                let nextPath = '/lobby';
 
-        browserHistory.push(nextPath); // Go to page that was requested
-      });
-    });
+                if (location.state && location.state.nextPathname) {
+                  nextPath = location.state.nextPathname;
+                } else if (location.query && location.query.redirect) {
+                  nextPath = decodeURIComponent(location.query.redirect);
+                }
+
+                browserHistory.push(nextPath); // Go to page that was requested
+              })
+          );
+        })
+    );
   }
 
   handleWorkerMessage(evt) {
@@ -181,8 +210,8 @@ LoginPage.propTypes = {
   isWorkerInitialized: React.PropTypes.bool,
   progress: React.PropTypes.any,
   modalAdd: React.PropTypes.func,
+  notifyAdd: React.PropTypes.func,
   setProgress: React.PropTypes.func,
-  modalStack: React.PropTypes.array,
 };
 
 
@@ -192,6 +221,7 @@ function mapDispatchToProps(dispatch) {
     onWorkerInitialized: () => dispatch(change('login', 'isWorkerInitialized', true)),
     onWalletImported: (data) => dispatch(walletImported(data)),
     modalAdd: (node) => dispatch(modalAdd(node)),
+    notifyAdd: (notification) => dispatch(notifyAdd(notification)),
     modalDismiss: () => dispatch(modalDismiss()),
     setProgress: (percent) => dispatch(setProgress(percent)),
   };
@@ -203,9 +233,12 @@ const mapStateToProps = (state) => ({
   initialValues: {
     isWorkerInitialized: false,
   },
+  account: selectAccount(state),
   isWorkerInitialized: selector(state, 'isWorkerInitialized'),
 });
 
 
 // Wrap the component to inject dispatch and state into it
-export default connect(mapStateToProps, mapDispatchToProps)(reduxForm({ form: 'login', validate, warn })(LoginPage));
+export default connect(mapStateToProps, mapDispatchToProps)(
+  reduxForm({ form: 'login', validate, warn })(LoginPage)
+);
