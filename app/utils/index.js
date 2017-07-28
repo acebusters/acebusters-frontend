@@ -1,3 +1,5 @@
+export const indentity = (a) => a;
+
 export const last = (arr) => arr[arr.length - 1];
 
 export const not = (fn) => (...args) => !fn(...args);
