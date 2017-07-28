@@ -342,7 +342,7 @@ function* secureTransferETH(action) {
           dest,
           `0x${amount.toString(16)}`,
           data,
-          { from: injectedAddr, gas: gas * 1.9 },
+          { from: injectedAddr, gas: Math.round(gas * 1.9) },
           (err, result) => {
             if (err) {
               reject(err);
