@@ -328,20 +328,18 @@ function* secureTransferETH(action) {
 
   const web3 = getWeb3(true);
   const proxy = web3.eth.contract(ABI_PROXY).at(proxyAddr);
-  const token = web3.eth.contract(ABI_TOKEN_CONTRACT).at(confParams.ntzAddr);
-  const data = token.transfer.getData(dest, amount);
 
   return new Promise((resolve, reject) => {
     proxy.forward.estimateGas(
       dest,
       `0x${amount.toString(16)}`,
-      data,
+      '',
       { from: injectedAddr },
       (gasErr, gas) => {
         proxy.forward.sendTransaction(
           dest,
           `0x${amount.toString(16)}`,
-          data,
+          '',
           { from: injectedAddr, gas: Math.round(gas * 1.9) },
           (err, result) => {
             if (err) {
