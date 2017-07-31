@@ -1,7 +1,6 @@
 /* eslint no-multi-spaces: "off", key-spacing: "off" */
 
 import React from 'react';
-import { delay } from 'redux-saga';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Form, Field, reduxForm, SubmissionError, propTypes, change, formValueSelector } from 'redux-form/immutable';
@@ -19,11 +18,13 @@ import { ErrorMessage } from '../../components/FormMessages';
 
 import account from '../../services/account';
 import * as storageService from '../../services/localStorage';
-// import { getWeb3 } from '../../containers/AccountProvider/utils';
-// import { waitForTx } from '../../utils/waitForTx';
+import { getWeb3 } from '../../containers/AccountProvider/utils';
+import { waitForTx } from '../../utils/waitForTx';
+import { promisifyContractCall } from '../../utils/promisifyContractCall';
+import { conf, ABI_ACCOUNT_FACTORY, ABI_PROXY } from '../../app.config';
+import { sendTx } from '../../services/transactions';
 
 import { workerError, walletExported, register, accountTxHashReceived } from './actions';
-
 
 const validate = (values) => {
   const errors = {};
@@ -62,6 +63,11 @@ function waitForAccountTxHash(signerAddr) {
     });
   });
 }
+
+const requests = {
+  [Type.CREATE_CONF]: account.addWallet,
+  [Type.RESET_CONF]: account.resetWallet,
+};
 
 export class GeneratePage extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
@@ -113,6 +119,50 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     this.setState({ entropySaved: true });
   }
 
+  handleCreate(workerRsp, receipt, confCode) {
+    return account.addWallet(confCode, workerRsp.data.wallet)
+      .catch(throwSubmitError)
+      .then(() => waitForAccountTxHash(workerRsp.data.wallet.address))
+      .then((txHash) => {
+        this.props.onAccountTxHashReceived(txHash);
+        browserHistory.push('/login');
+      });
+  }
+
+  async handleRecovery(workerRsp, receipt, confCode, privKey) {
+    const factory = getWeb3().eth.contract(ABI_ACCOUNT_FACTORY).at(conf().accountFactory);
+    const getAccount = promisifyContractCall(factory.getAccount);
+    const newSignerAddr = workerRsp.data.wallet.address;
+
+    try {
+      const backedAccount = await account.getAccount(receipt.accountId);
+      const wallet = JSON.parse(backedAccount.wallet);
+
+      const acc = await getAccount(wallet.address);
+      const proxyAddr = acc[0];
+      const isLocked = acc[2];
+      const data = factory.handleRecovery.getData(newSignerAddr);
+
+      let txHash;
+      if (isLocked) {
+        const forwardReceipt = new Receipt(proxyAddr).forward(0, factory.address, 0, data).sign(privKey);
+        const result = await sendTx(forwardReceipt, confCode);
+        txHash = result.txHash;
+      } else {
+        const proxy = getWeb3(true).eth.contract(ABI_PROXY).at(proxyAddr);
+        const forward = promisifyContractCall(proxy.forward.sendTransaction);
+        txHash = await forward(factory.address, 0, data, { from: window.web3.eth.accounts[0] });
+      }
+
+      await waitForTx(getWeb3(), txHash);
+      await account.resetWallet(confCode, workerRsp.data.wallet);
+
+      browserHistory.push('/login');
+    } catch (e) {
+      throwSubmitError(e);
+    }
+  }
+
   handleSubmit(values, dispatch) {
     if (!this.props.isWorkerInitialized) {
       // The worker should have been loaded, while user typed.
@@ -125,18 +175,14 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     }
     confCode = decodeURIComponent(confCode);
     const receipt = Receipt.parse(confCode);
-    let request;
-    if (receipt.type === Type.CREATE_CONF) {
-      request = account.addWallet;
-    } else if (receipt.type === Type.RESET_CONF) {
-      request = account.resetWallet;
-    } else {
+    const request = requests[receipt.type];
+    if (!request) {
       throw new SubmissionError({ _error: `Error: unknown session type ${receipt.type}.` });
     }
 
     const entropy = JSON.parse(values.get('entropy'));
-    const seed    = Buffer.from(entropy.slice(0, 32));
-    const secret  = Buffer.from(entropy.slice(32));
+    const seed = Buffer.from(entropy.slice(0, 32));
+    const secret = Buffer.from(entropy.slice(32));
 
     // Strating the worker here.
     // Worker will encrypt seed with password in many rounds of crypt.
@@ -148,28 +194,16 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     }, '*');
     // Register saga is called, we return the promise here,
     // so we can display form errors if any of the async ops fail.
-    return register(values, dispatch).catch((workerErr) => {
-      // If worker failed, ...
-      throw new SubmissionError({ _error: `error, Registration failed due to worker error: ${workerErr}` });
-    }).then((workerRsp) => {
-      // If worker success, ...
-      waitForAccountTxHash(workerRsp.data.wallet.address)
-        .then(this.props.onAccountTxHashReceived);
-      return request(confCode, workerRsp.data.wallet)
-        .catch((err) => {
-          // If store account failed...
-          if (err === 409) {
-            throw new SubmissionError({ email: 'Email taken.', _error: 'Registration failed!' });
-          } else {
-            throw new SubmissionError({ _error: `Registration failed with error code ${err}` });
-          }
-        })
-        .catch((err) => {
-          throw new SubmissionError({ _error: `Registration failed with message: ${err}` });
-        })
-        .then(() => delay(1000))
-        .then(() => browserHistory.push('/login'));
-    });
+    return (
+      register(values, dispatch)
+        .catch(throwWorkerError)
+        // If worker success, ...
+        .then((workerRsp) => (
+          receipt.type === Type.RESET_CONF
+            ? this.handleRecovery(workerRsp, receipt, confCode, `0x${seed.toString('hex')}`)
+            : this.handleCreate(workerRsp, receipt, confCode)
+        ))
+    );
   }
 
   updateEntropy(data) {
@@ -183,6 +217,7 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     const { entropySaved, secretCreated } = this.state;
     return (
       <Container>
+
         {!entropySaved ?
           <div>
             <H1>Create Randomness for Secret</H1>
@@ -238,12 +273,25 @@ GeneratePage.defaultProps = {
 GeneratePage.propTypes = {
   ...propTypes,
   workerPath: PropTypes.string,
+  onAccountTxHashReceived:PropTypes.func,
   onWorkerError:PropTypes.func,
   onWorkerInitialized: PropTypes.func,
   onWorkerProgress: PropTypes.func,
   onWalletExported: PropTypes.func,
-  onAccountTxHashReceived: PropTypes.func,
   input: PropTypes.any,
+};
+
+const throwWorkerError = (workerErr) => {
+  throw new SubmissionError({ _error: `error, Registration failed due to worker error: ${workerErr}` });
+};
+
+const throwSubmitError = (err) => {
+  // If store account failed...
+  if (err === 409) {
+    throw new SubmissionError({ email: 'Email taken.', _error: 'Registration failed!' });
+  } else {
+    throw new SubmissionError({ _error: `Registration failed with error code ${err}` });
+  }
 };
 
 function mapDispatchToProps(dispatch) {

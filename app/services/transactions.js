@@ -2,7 +2,7 @@ import { conf } from '../app.config';
 
 const confParams = conf();
 
-export function sendTx(forwardReceipt) {
+export function sendTx(forwardReceipt, resetConfReceipt) {
   return new Promise((resolve, reject) => {
     fetch(`${confParams.txUrl}/forward`, {
       method: 'post',
@@ -10,7 +10,7 @@ export function sendTx(forwardReceipt) {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-      body: `{ "forwardReceipt" : "${forwardReceipt}" }`,
+      body: JSON.stringify({ forwardReceipt, resetConfReceipt }),
     }).then((rsp) => {
       rsp.json().then((response) => {
         if (rsp.status >= 200 && rsp.status < 300) {

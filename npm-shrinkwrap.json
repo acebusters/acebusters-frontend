@@ -4036,7 +4036,7 @@
     "es6-promise": {
       "version": "4.1.1",
       "resolved": "https://registry.npmjs.org/es6-promise/-/es6-promise-4.1.1.tgz",
-      "integrity": "sha512-OaU1hHjgJf+b0NzsxCg7NdIYERD6Hy/PEmFLTjw+b65scuisG3Kt4QoTvJ66BBkPZ581gr0kpoVzKnxniM8nng=="
+      "integrity": "sha1-iBHpCRXZoNujYnTwskLb2nj5ySo="
     },
     "es6-set": {
       "version": "https://registry.npmjs.org/es6-set/-/es6-set-0.1.5.tgz",
@@ -7652,9 +7652,9 @@
       }
     },
     "poker-helper": {
-      "version": "0.4.1",
-      "resolved": "https://registry.npmjs.org/poker-helper/-/poker-helper-0.4.1.tgz",
-      "integrity": "sha1-wKQJKs/5K3B9nqHTm8+6raznZpE=",
+      "version": "0.5.0",
+      "resolved": "https://registry.npmjs.org/poker-helper/-/poker-helper-0.5.0.tgz",
+      "integrity": "sha1-A8hszLriRQ0L+P1tl+gQbfrK0RY=",
       "dependencies": {
         "ethereumjs-util": {
           "version": "4.5.0",

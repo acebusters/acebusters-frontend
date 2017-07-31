@@ -53,6 +53,10 @@ const account = {
     });
   },
 
+  getAccount(accountId) {
+    return request(`account/${accountId}`, undefined, 'get');
+  },
+
   confirm(sessionReceipt) {
     return request('confirm', { sessionReceipt });
   },

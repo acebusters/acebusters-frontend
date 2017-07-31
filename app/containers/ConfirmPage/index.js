@@ -5,7 +5,7 @@ import { browserHistory } from 'react-router';
 import { FormattedMessage } from 'react-intl';
 import { Receipt, Type } from 'poker-helper';
 
-import account from '../../services/account';
+import accountService from '../../services/account';
 import * as storageService from '../../services/localStorage';
 
 // components
@@ -14,6 +14,12 @@ import Container from '../../components/Container';
 import Button from '../../components/Button';
 import H1 from '../../components/H1';
 import FieldIntl from '../../components/FieldIntl';
+import NoWeb3Message from '../../components/Web3Alerts/NoWeb3';
+import UnsupportedNetworkMessage from '../../components/Web3Alerts/UnsupportedNetwork';
+import { getWeb3 } from '../../containers/AccountProvider/utils';
+import { makeSelectHasWeb3, makeSelectNetworkSupported } from '../../containers/AccountProvider/selectors';
+import { promisifyContractCall } from '../../utils/promisifyContractCall';
+import { ABI_ACCOUNT_FACTORY, conf } from '../../app.config';
 
 import messages from './messages';
 
@@ -42,6 +48,34 @@ const warn = () => {
   return warnings;
 };
 
+function messagesByReceiptType(type) {
+  switch (type) {
+    case Type.CREATE_CONF:
+      return {
+        header: messages.registerHeader,
+        label: messages.registerLabel,
+        placeholder: messages.registerPlaceholder,
+        button: messages.registerButton,
+      };
+
+    case Type.RESET_CONF:
+      return {
+        header: messages.resetHeader,
+        label: messages.resetLabel,
+        placeholder: messages.resetPlaceholder,
+        button: messages.resetButton,
+      };
+
+    default:
+      return {
+        header: messages.header,
+        label: messages.label,
+        placeholder: messages.placeholder,
+        button: messages.button,
+      };
+  }
+}
+
 export class ConfirmPage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
@@ -49,6 +83,8 @@ export class ConfirmPage extends React.PureComponent { // eslint-disable-line re
     this.onChangeCode = this.onChangeCode.bind(this);
 
     this.state = {
+      type: null,
+      isLocked: null,
       msg: {
         header: messages.header,
         label: messages.label,
@@ -60,67 +96,40 @@ export class ConfirmPage extends React.PureComponent { // eslint-disable-line re
 
   componentDidMount() {
     if (this.props.params.confCode) {
-      this.updateMesseageByCode(this.props.params.confCode);
+      this.handleCodeUpdate(this.props.params.confCode);
     }
   }
 
   onChangeCode(e) {
     const code = e.target.value;
-    this.updateMesseageByCode(code);
+    this.handleCodeUpdate(code);
   }
 
-  updateMesseageByCode(code) {
-    let receipt;
-    let msg;
-
+  handleCodeUpdate(code) {
     try {
-      receipt = Receipt.parse(code);
+      const receipt = Receipt.parse(code);
+      this.setState({
+        type: receipt.type,
+        msg: messagesByReceiptType(receipt.type),
+        isLocked: null,
+      });
+
+      const factory = getWeb3().eth.contract(ABI_ACCOUNT_FACTORY).at(conf().accountFactory);
+      const getAccount = promisifyContractCall(factory.getAccount);
+
+      if (receipt.type === Type.RESET_CONF) {
+        getAccount(receipt.oldSignerAddr).then((acc) => this.setState({ isLocked: acc[2] }));
+      }
     } catch (e) {
       // Note: means that it is an invalid code
-      receipt = {};
     }
-
-    switch (receipt.type) {
-      case Type.CREATE_CONF: {
-        msg = {
-          header: messages.registerHeader,
-          label: messages.registerLabel,
-          placeholder: messages.registerPlaceholder,
-          button: messages.registerButton,
-        };
-
-        break;
-      }
-      case Type.RESET_CONF: {
-        msg = {
-          header: messages.resetHeader,
-          label: messages.resetLabel,
-          placeholder: messages.resetPlaceholder,
-          button: messages.resetButton,
-        };
-
-        break;
-      }
-      default: {
-        msg = {
-          header: messages.header,
-          label: messages.label,
-          placeholder: messages.placeholder,
-          button: messages.button,
-        };
-
-        break;
-      }
-    }
-
-    this.setState({ msg });
   }
 
   handleSubmit(values) {
     const confCode = decodeURIComponent(values.get('confCode'));
     const receipt = Receipt.parse(confCode);
     if (receipt.type === Type.CREATE_CONF) {
-      return account.confirm(confCode).catch((err) => {
+      return accountService.confirm(confCode).catch((err) => {
         const errMsg = 'Email Confirmation failed!';
         if (err === 409) {
           throw new SubmissionError({ confCode: 'Email already confirmed.', _error: errMsg });
@@ -141,9 +150,9 @@ export class ConfirmPage extends React.PureComponent { // eslint-disable-line re
   }
 
   render() {
-    const { error, handleSubmit, invalid, submitting } = this.props;
-
-    const { msg } = this.state;
+    const { error, handleSubmit, invalid, submitting, hasWeb3, isNetworkSupported } = this.props;
+    const { msg, isLocked, type } = this.state;
+    const allowSubmit = type === Type.CREATE_CONF || (hasWeb3 && isNetworkSupported && !isLocked) || isLocked;
 
     return (
       <Container>
@@ -159,10 +168,26 @@ export class ConfirmPage extends React.PureComponent { // eslint-disable-line re
             placeholder={msg.placeholder}
             onChange={this.onChangeCode}
           />
-          {error && <strong>{error}</strong>}
-          <Button type="submit" size="large" disabled={submitting || invalid}>
-            { (!submitting) ? (<FormattedMessage {...msg.button} />) : 'Please wait ...' }
 
+          {error && <strong>{error}</strong>}
+
+          {isLocked === false && !hasWeb3 &&
+            <NoWeb3Message />
+          }
+
+          {isLocked === false && hasWeb3 && !isNetworkSupported &&
+            <UnsupportedNetworkMessage />
+          }
+
+          <Button
+            type="submit"
+            size="large"
+            disabled={submitting || invalid || !allowSubmit}
+          >
+            {(!submitting)
+              ? <FormattedMessage {...msg.button} />
+              : 'Please wait ...'
+            }
           </Button>
         </Form>
       </Container>
@@ -174,6 +199,8 @@ ConfirmPage.propTypes = {
   ...propTypes,
   dispatch: PropTypes.func.isRequired,
   submitting: PropTypes.bool,
+  hasWeb3: PropTypes.bool,
+  isNetworkSupported: PropTypes.bool,
   handleSubmit: PropTypes.func,
   error: PropTypes.any,
 };
@@ -189,6 +216,8 @@ const mapStateToProps = (state, ownProps) => ({
   initialValues: {
     confCode: ownProps.params.confCode,
   },
+  hasWeb3: makeSelectHasWeb3()(state, ownProps),
+  isNetworkSupported: makeSelectNetworkSupported()(state, ownProps),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(reduxForm({ form: 'confirm', validate, warn })(ConfirmPage));

@@ -73,7 +73,6 @@ function* removeNotification({ txId }) {
 }
 
 function* authNotification({ newAuthState }) {
-  console.log('setauth');
   const { loggedIn } = newAuthState;
   if (loggedIn) {
     yield* removeNotification({ txId: notLoggedIn.txId });
