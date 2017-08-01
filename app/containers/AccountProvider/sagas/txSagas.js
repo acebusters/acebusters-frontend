@@ -1,6 +1,6 @@
 import { select, actionChannel, put, take, call } from 'redux-saga/effects';
 import { Receipt } from 'poker-helper';
-import { conf, ABI_PROXY } from '../../../app.config';
+import { ABI_PROXY } from '../../../app.config';
 import { sendTx } from '../../../services/transactions';
 
 import { getWeb3 } from '../utils';
@@ -10,10 +10,8 @@ import {
   contractTxSuccess, contractTxError, transferETHSuccess, transferETHError,
 } from '../actions';
 
-const { ntzAddr } = conf();
-
 function* contractTransactionSecureSend(action) {
-  const { data } = action.payload;
+  const { data, dest } = action.payload;
   const state = yield select();
   const proxyAddr = yield call([state, state.getIn], ['account', 'proxy']);
   const injectedAddr = yield call([state, state.getIn], ['account', 'injected']);
@@ -22,7 +20,7 @@ function* contractTransactionSecureSend(action) {
 
   return new Promise((resolve, reject) => {
     proxy.forward.estimateGas(
-      ntzAddr,
+      dest,
       0,
       data,
       { from: injectedAddr },
@@ -31,7 +29,7 @@ function* contractTransactionSecureSend(action) {
           reject(gasErr);
         } else {
           proxy.forward(
-            ntzAddr,
+            dest,
             0,
             data,
             { from: injectedAddr, gas: Math.round(gas * 1.9) },

@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { Button } from '../../utils/styleUtils';
+import AppButton from '../../components/Button';
 
 import {
   baseColor,
@@ -155,4 +156,15 @@ export const Input = styled.input`
   width: 100%;
   border: 1px solid ${gray};
   border-radius: 4px;
+`;
+
+export const DBButton = styled(AppButton)`
+  @media (max-width: 500px) {
+    display: block;
+
+    & + & {
+      margin-left: 0;
+      margin-top: 15px;
+    }
+  }
 `;

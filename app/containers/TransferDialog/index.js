@@ -2,6 +2,7 @@ import ethUtil from 'ethereumjs-util';
 import React, { PropTypes } from 'react';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
+import BigNumber from 'bignumber.js';
 
 import { Form, Field, reduxForm } from 'redux-form/immutable';
 
@@ -55,6 +56,7 @@ class TransferDialog extends React.Component { // eslint-disable-line react/pref
       submitting,
       amountUnit,
       maxAmount,
+      minAmount,
       hideAddress,
       title,
       description,
@@ -73,6 +75,7 @@ class TransferDialog extends React.Component { // eslint-disable-line react/pref
             component={FormField}
             label={`Amount (${amountUnit})`}
             autoFocus
+            minAmount={minAmount}
             maxAmount={maxAmount}
           />
 
@@ -112,6 +115,7 @@ TransferDialog.propTypes = {
   invalid: PropTypes.bool,
   hideAddress: PropTypes.bool,
   maxAmount: PropTypes.object, // BigNumber
+  minAmount: PropTypes.object, // BigNumber
   amountUnit: PropTypes.string,
   handleSubmit: PropTypes.func,
   handleTransfer: PropTypes.func,
@@ -120,6 +124,7 @@ TransferDialog.propTypes = {
 
 TransferDialog.defaultProps = {
   hideAddress: false,
+  minAmount: new BigNumber(0),
 };
 
 const mapStateToProps = createStructuredSelector({

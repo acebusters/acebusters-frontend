@@ -4,13 +4,13 @@ import BigNumber from 'bignumber.js';
 
 const AmountField = ({
   maxAmount,
+  minAmount = 0,
   ...props
 }) => {
-  const limitAmount = (value) => {
-    const numValue = Math.max(0, Number(value));
-
-    return maxAmount.gte(new BigNumber(numValue)) ? numValue : maxAmount.toNumber();
-  };
+  const limitAmount = (value) => BigNumber.min(
+    BigNumber.max(minAmount, value || 0),
+    maxAmount,
+  ).toNumber();
 
   return (
     <Field
@@ -23,6 +23,7 @@ const AmountField = ({
 
 AmountField.propTypes = {
   maxAmount: PropTypes.object,
+  minAmount: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
 };
 
 export default AmountField;

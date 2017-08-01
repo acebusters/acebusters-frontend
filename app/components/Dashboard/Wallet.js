@@ -2,7 +2,6 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 
-import { DBButton } from '../../containers/Dashboard/styles';
 import messages from '../../containers/Dashboard/messages';
 import TransferDialog from '../../containers/TransferDialog';
 
@@ -13,6 +12,7 @@ import {
   Section,
   SendContainer,
   TabIcon as ModeIcon,
+  DBButton,
 } from './styles';
 
 const Wallet = ({

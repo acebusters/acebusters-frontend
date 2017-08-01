@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormattedDate, FormattedTime, FormattedMessage } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import partition from 'lodash/partition';
 import BigNumber from 'bignumber.js';
 
@@ -10,7 +10,7 @@ import { formatEth, formatNtz } from '../../utils/amountFormatter';
 
 import { Icon, TypeIcon, typeIcons } from './styles';
 import messages from './messages';
-import { isSellStartEvent, isSellEndEvent, isPurchaseStartEvent, isPurchaseEndEvent } from './utils';
+import { isSellStartEvent, isSellEndEvent, isPurchaseStartEvent, isPurchaseEndEvent, formatDate } from './utils';
 
 const confParams = conf();
 
@@ -34,29 +34,6 @@ export function txnsToList(events, tableAddrs, proxyAddr) {
       formatValue(event),
       txDescription(event, tableAddrs, proxyAddr),
     ]);
-}
-
-function formatDate(timestamp) {
-  if (!timestamp) {
-    return '';
-  }
-
-  const date = new Date(timestamp * 1000);
-
-  return (
-    <span>
-      <FormattedDate
-        value={date}
-        year="numeric"
-        month="numeric"
-        day="2-digit"
-      />,&nbsp;
-      <FormattedTime
-        value={date}
-        hour12={false}
-      />
-    </span>
-  );
 }
 
 const cutAddress = (addr) => addr.substring(2, 8);
@@ -115,7 +92,11 @@ function txDescription(event, tableAddrs, proxyAddr) {
       />
     );
   } else if (event.address === confParams.pwrAddr) {
-    return <FormattedMessage {...messages.powerUpStatus} />;
+    return (
+      <FormattedMessage
+        {...(event.type === 'income' ? messages.powerDownPayoutStatus : messages.powerUpStatus)}
+      />
+    );
   } else if (isSellEndEvent(event)) {
     return <FormattedMessage {...messages.sellEnd} />;
   } else if (isSellStartEvent(event)) {

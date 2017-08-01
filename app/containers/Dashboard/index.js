@@ -13,6 +13,8 @@ import {
   NTZ_DECIMALS,
   ABP_DECIMALS,
 } from '../../utils/amountFormatter';
+import { waitForTx } from '../../utils/waitForTx';
+
 import { modalAdd, modalDismiss } from '../App/actions';
 import { contractEvents, accountLoaded, transferETH, proxyEvents } from '../AccountProvider/actions';
 import makeSelectAccountData, {
@@ -29,6 +31,7 @@ import {
 } from './actions';
 import messages from './messages';
 import { txnsToList } from './txnsToList';
+import { downRequestsToList } from './downRequestsToList';
 import { getActiveTab, createDashboardTxsSelector } from './selectors';
 
 import Container from '../../components/Container';
@@ -94,6 +97,10 @@ class DashboardRoot extends React.Component {
       this.watchTokenEvents(this.props.account.proxy);
       this.power.balanceOf.call(this.props.account.proxy);
     }
+
+    this.state = {
+      downRequests: null,
+    };
   }
 
   componentDidMount() {
@@ -172,12 +179,22 @@ class DashboardRoot extends React.Component {
         this.web3.eth.getBalance(proxyAddr);
       }
     });
+    this.power.downtime.call();
+    this.power.totalSupply.call();
+    this.power.allEvents({
+      toBlock: 'latest',
+    }).watch((error, event) => {
+      if (!error && event.args.from === proxyAddr) {
+        this.loadDownRequests();
+      }
+    });
+
+    this.loadDownRequests();
   }
 
   watchTokenEvents(proxyAddr) {
     this.token.floor.call();
     this.token.ceiling.call();
-    this.token.powerAddr.call();
     this.token.balanceOf.call(proxyAddr);
     this.web3.eth.getBalance(proxyAddr);
 
@@ -222,6 +239,48 @@ class DashboardRoot extends React.Component {
 
       events.stopWatching();
     });
+  }
+
+  loadDownRequests() {
+    const power = getWeb3().eth.contract(ABI_POWER_CONTRACT).at(confParams.pwrAddr);
+    const result = [];
+    const batchSize = 20;
+    let stop = false;
+    const promise = new Promise((resolve, reject) => {
+      const runBatch = (base) => {
+        // ToDo: find a bug with batch and use it
+        // const batch = getWeb3().createBatch();
+        for (let i = 0; i < batchSize; i += 1) {
+          // batch.add(
+          power.downs.call(base + i, (err, request) => { // eslint-disable-line
+            if (err) {
+              reject(err);
+              return;
+            }
+            if (request[0] !== '0x') {
+              result[base + i] = [base + i, ...request];
+            } else {
+              stop = true;
+            }
+
+            if (i + 1 === batchSize) {
+              if (stop) {
+                resolve(result);
+              } else {
+                runBatch(base + batchSize);
+              }
+            }
+          });
+        }
+        // batch.execute();
+      };
+
+      runBatch(0);
+    });
+
+    promise
+      .then((requests) => requests.filter((r) => r[1] === this.props.account.proxy))
+      .then((requests) => this.setState({ downRequests: requests }));
   }
 
   handleETHClaim(proxyAddr) {
@@ -307,9 +366,20 @@ class DashboardRoot extends React.Component {
     });
   }
 
+  handleTickClick(pos) {
+    this.power.downTick.sendTransaction(pos, (err, result) => {
+      if (result) {
+        waitForTx(getWeb3(), result).then(() => this.loadDownRequests());
+      }
+    });
+  }
+
   render() {
     const { account } = this.props;
+    const { downRequests } = this.state;
     const qrUrl = `ether:${account.proxy}`;
+    const downtime = this.power.downtime();
+    const totalSupply = this.power.totalSupply();
     const weiBalance = this.web3.eth.balance(account.proxy);
     const ethBalance = weiBalance && weiBalance.div(ETH_DECIMALS);
     const babzBalance = this.token.balanceOf(account.proxy);
@@ -348,8 +418,14 @@ class DashboardRoot extends React.Component {
             ethBalance,
             pwrBalance,
             nutzBalance,
+            totalSupply,
             listTxns,
             qrUrl,
+            downRequests: downRequestsToList(
+              downRequests,
+              downtime,
+              (pos) => this.handleTickClick(pos),
+            ),
             handleNTZSell: this.handleNTZSell,
             handleNTZPurchase: this.handleNTZPurchase,
             handleNTZTransfer: this.handleNTZTransfer,
