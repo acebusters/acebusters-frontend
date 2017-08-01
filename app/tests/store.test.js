@@ -5,6 +5,8 @@
 import { browserHistory } from 'react-router';
 import configureStore from '../store';
 
+jest.mock('../workers.js', () => []);
+
 describe('configureStore', () => {
   let store;
 

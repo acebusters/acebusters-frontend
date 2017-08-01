@@ -15,6 +15,7 @@ import { registerSaga } from './containers/RegisterPage/sagas';
 import { generateSaga } from './containers/GeneratePage/sagas';
 import { formActionSaga } from './services/reduxFormSaga';
 import { notificationsSaga } from './containers/Notifications/sagas';
+import workers from './workers';
 
 import * as storageService from './services/localStorage';
 
@@ -25,6 +26,7 @@ export default function configureStore(initialState = {}, history) {
   // 1. sagaMiddleware: Makes redux-sagas work
   // 2. routerMiddleware: Syncs the location/URL path to the state
   const middlewares = [
+    ...workers,
     sagaMiddleware,
     routerMiddleware(history),
   ];

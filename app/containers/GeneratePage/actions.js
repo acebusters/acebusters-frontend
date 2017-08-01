@@ -1,8 +1,11 @@
 import { createFormAction } from '../../services/reduxFormSaga';
-
-export const WORKER_ERROR = 'acebusters/RegisterPage/WORKER_ERROR';
-export const WALLET_EXPORTED = 'acebusters/RegisterPage/WALLET_EXPORTED';
-export const ACCOUNT_TX_HASH_RECEIVED = 'acebusters/RegisterPage/ACCOUNT_TX_HASH_RECEIVED';
+import {
+  WORKER_ERROR,
+  WORKER_PROGRESS,
+  WALLET_EXPORTED,
+  WALLET_EXPORT,
+  ACCOUNT_TX_HASH_RECEIVED,
+} from './constants';
 
 export function workerError(error) {
   return {
@@ -11,10 +14,29 @@ export function workerError(error) {
   };
 }
 
+export function workerProgress(progress) {
+  return {
+    type: WORKER_PROGRESS,
+    progress,
+  };
+}
+
 export function walletExported(data) {
   return {
     type: WALLET_EXPORTED,
     data,
+  };
+}
+
+export function walletExport(data) {
+  return {
+    type: WALLET_EXPORT,
+    meta: {
+      WebWorker: true,
+    },
+    payload: {
+      data,
+    },
   };
 }
 

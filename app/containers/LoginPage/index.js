@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
-import { Form, Field, reduxForm, SubmissionError, propTypes, change, formValueSelector } from 'redux-form/immutable';
+import { Form, Field, reduxForm, SubmissionError, propTypes } from 'redux-form/immutable';
 
 import FormField from '../../components/Form/FormField';
 import Button from '../../components/Button';
@@ -9,8 +9,8 @@ import Link from '../../components/Link';
 import Container from '../../components/Container';
 import { ErrorMessage } from '../../components/FormMessages';
 import account from '../../services/account';
-import { workerError, walletImported, login } from './actions';
-import { modalAdd, modalDismiss, setProgress } from '../App/actions';
+import { walletImport, login } from './actions';
+import { setProgress } from '../App/actions';
 import { setAuthState } from '../AccountProvider/actions';
 import { notifyAdd } from '../Notifications/actions';
 import { selectAccount } from '../AccountProvider/selectors';
@@ -48,19 +48,7 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
 
   constructor(props) {
     super(props);
-    this.handleWorkerMessage = this.handleWorkerMessage.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.state = {
-      waiting: false,
-    };
-  }
-
-  componentDidMount() {
-    window.addEventListener('message', this.handleWorkerMessage, false);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('message', this.handleWorkerMessage);
   }
 
   handleSubmit(values, dispatch) {
@@ -91,14 +79,10 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
           return data;
         })
         .then((data) => {
-          if (!this.props.isWorkerInitialized) {
-            throw new SubmissionError({ _error: 'Error: decryption worker not loaded.' });
-          }
-          this.frame.contentWindow.postMessage({
-            action: 'import',
+          this.props.walletImport({
             json: data.wallet,
             password: values.get('password'),
-          }, '*');
+          });
           // Login saga is called, we return the promise here,
           // so we can display form errors if any of the async ops fail.
           return (
@@ -110,11 +94,11 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
               .then((workerRsp) => {
                 // If worker success, ...
                 // ...tell account provider about login.
-                dispatch(setAuthState({
-                  privKey: workerRsp.data.privKey,
+                this.props.setAuthState({
+                  privKey: workerRsp.payload.hexSeed,
                   email: values.get('email'),
                   loggedIn: true,
-                }));
+                });
 
                 const { location } = this.props;
                 let nextPath = '/lobby';
@@ -132,38 +116,8 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
     );
   }
 
-  handleWorkerMessage(evt) {
-    const pathArray = this.props.workerPath.split('/');
-    const origin = `${pathArray[0]}//${pathArray[2]}`;
-    if (evt.origin !== origin) {
-      // this event came from some other iframe;
-      return;
-    }
-    if (!evt.data || evt.data.action === 'error') {
-      this.props.onWorkerError(evt);
-      return;
-    }
-    const data = evt.data;
-    if (data.action === 'loaded') {
-      // the worker js is talking
-      this.props.onWorkerInitialized();
-    } else if (data.action === 'progress') {
-      this.props.setProgress(parseInt(data.percent, 10));
-    } else if (data.action === 'imported') {
-      if (data.hexSeed === null) {
-        this.props.onWorkerError('Message Authentication Code mismatch (wrong password)');
-      } else {
-        this.props.onWalletImported({ privKey: data.hexSeed });
-      }
-    } else {
-      this.props.onWorkerError(evt);
-    }
-  }
-
   render() {
-    const workerPath = this.props.workerPath + encodeURIComponent(location.origin);
     const { error, handleSubmit, invalid, submitting } = this.props;
-
     return (
       <Container>
         <div>
@@ -183,60 +137,35 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
               Forgot password
             </Link>
           </ForgotField>
-
-          <iframe
-            src={workerPath}
-            title="login_iframe"
-            style={{ display: 'none' }}
-            onLoad={(event) => { this.frame = event.target; }}
-          />
         </div>
       </Container>
     );
   }
 }
 
-LoginPage.defaultProps = {
-  workerPath: 'http://worker.acebusters.com.s3-website-us-east-1.amazonaws.com/iframe.html?origin=',
-};
-
 LoginPage.propTypes = {
   ...propTypes,
-  workerPath: React.PropTypes.string,
-  onWorkerError: React.PropTypes.func,
-  onWorkerInitialized: React.PropTypes.func,
-  onWalletImported: React.PropTypes.func,
   location: React.PropTypes.any,
-  isWorkerInitialized: React.PropTypes.bool,
-  progress: React.PropTypes.any,
-  modalAdd: React.PropTypes.func,
-  notifyAdd: React.PropTypes.func,
   setProgress: React.PropTypes.func,
+  walletImport: React.PropTypes.func,
+  setAuthState: React.PropTypes.func,
+  notifyAdd: React.PropTypes.func,
 };
 
 
 function mapDispatchToProps(dispatch) {
   return {
-    onWorkerError: (event) => dispatch(workerError(event)),
-    onWorkerInitialized: () => dispatch(change('login', 'isWorkerInitialized', true)),
-    onWalletImported: (data) => dispatch(walletImported(data)),
-    modalAdd: (node) => dispatch(modalAdd(node)),
     notifyAdd: (notification) => dispatch(notifyAdd(notification)),
-    modalDismiss: () => dispatch(modalDismiss()),
     setProgress: (percent) => dispatch(setProgress(percent)),
+    walletImport: (data) => dispatch(walletImport(data)),
+    setAuthState: (data) => dispatch(setAuthState(data)),
   };
 }
 
 // Which props do we want to inject, given the global state?
-const selector = formValueSelector('login');
 const mapStateToProps = (state) => ({
-  initialValues: {
-    isWorkerInitialized: false,
-  },
   account: selectAccount(state),
-  isWorkerInitialized: selector(state, 'isWorkerInitialized'),
 });
-
 
 // Wrap the component to inject dispatch and state into it
 export default connect(mapStateToProps, mapDispatchToProps)(

@@ -1,5 +1,3 @@
-/* eslint no-multi-spaces: "off", key-spacing: "off" */
-
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -24,7 +22,7 @@ import { promisifyContractCall } from '../../utils/promisifyContractCall';
 import { conf, ABI_ACCOUNT_FACTORY, ABI_PROXY } from '../../app.config';
 import { sendTx } from '../../services/transactions';
 
-import { workerError, walletExported, register, accountTxHashReceived } from './actions';
+import { walletExport, register, accountTxHashReceived } from './actions';
 
 const validate = (values) => {
   const errors = {};
@@ -73,7 +71,6 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
 
   constructor(props) {
     super(props);
-    this.handleWorkerMessage = this.handleWorkerMessage.bind(this);
     this.handleSaveEntropyClick = this.handleSaveEntropyClick.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.updateEntropy = this.updateEntropy.bind(this);
@@ -83,62 +80,30 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     };
   }
 
-  componentDidMount() {
-    window.addEventListener('message', this.handleWorkerMessage, false);
-  }
-  componentWillUnmount() {
-    window.removeEventListener('message', this.handleWorkerMessage);
-  }
-
-  handleWorkerMessage(evt) {
-    const pathArray = this.props.workerPath.split('/');
-    const origin = `${pathArray[0]}//${pathArray[2]}`;
-    if (evt.origin !== origin) {
-      // this event came from some other iframe;
-      return;
-    }
-    if (!evt.data || evt.data.action === 'error') {
-      this.props.onWorkerError(evt);
-      return;
-    }
-    const data = evt.data;
-    if (data.action === 'loaded') {
-      // the worker js is talking.
-      this.props.onWorkerInitialized();
-    } else if (data.action === 'progress') {
-      this.props.onWorkerProgress(parseInt(data.percent, 10));
-    } else if (data.action === 'exported') {
-      this.props.onWalletExported({ wallet: data.json });
-    } else {
-      this.props.onWorkerError(evt);
-      throw new SubmissionError({ _error: evt });
-    }
-  }
-
   handleSaveEntropyClick() {
     this.setState({ entropySaved: true });
   }
 
-  handleCreate(workerRsp, receipt, confCode) {
-    return account.addWallet(confCode, workerRsp.data.wallet)
+  handleCreate(wallet, receipt, confCode) {
+    return account.addWallet(confCode, wallet)
       .catch(throwSubmitError)
-      .then(() => waitForAccountTxHash(workerRsp.data.wallet.address))
+      .then(() => waitForAccountTxHash(wallet.address))
       .then((txHash) => {
         this.props.onAccountTxHashReceived(txHash);
         browserHistory.push('/login');
       });
   }
 
-  async handleRecovery(workerRsp, receipt, confCode, privKey) {
+  async handleRecovery(wallet, receipt, confCode, privKey) {
     const factory = getWeb3().eth.contract(ABI_ACCOUNT_FACTORY).at(conf().accountFactory);
     const getAccount = promisifyContractCall(factory.getAccount);
-    const newSignerAddr = workerRsp.data.wallet.address;
+    const newSignerAddr = wallet.address;
 
     try {
       const backedAccount = await account.getAccount(receipt.accountId);
-      const wallet = JSON.parse(backedAccount.wallet);
+      const backendWallet = JSON.parse(backedAccount.wallet);
 
-      const acc = await getAccount(wallet.address);
+      const acc = await getAccount(backendWallet.address);
       const proxyAddr = acc[0];
       const isLocked = acc[2];
       const data = factory.handleRecovery.getData(newSignerAddr);
@@ -155,7 +120,7 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
       }
 
       await waitForTx(getWeb3(), txHash);
-      await account.resetWallet(confCode, workerRsp.data.wallet);
+      await account.resetWallet(confCode, wallet);
 
       browserHistory.push('/login');
     } catch (e) {
@@ -164,11 +129,6 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
   }
 
   handleSubmit(values, dispatch) {
-    if (!this.props.isWorkerInitialized) {
-      // The worker should have been loaded, while user typed.
-      // If not, we can not start wallet encryption ... error.
-      throw new SubmissionError({ _error: 'Error: encryption worker not loaded.' });
-    }
     let confCode = storageService.getItem('ab-confCode');
     if (!confCode) {
       throw new SubmissionError({ _error: 'Error: session token lost.' });
@@ -181,28 +141,27 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     }
 
     const entropy = JSON.parse(values.get('entropy'));
-    const seed = Buffer.from(entropy.slice(0, 32));
-    const secret = Buffer.from(entropy.slice(32));
-
     // Strating the worker here.
     // Worker will encrypt seed with password in many rounds of crypt.
-    this.frame.contentWindow.postMessage({
-      action: 'export',
-      hexSeed: seed.toString('hex'),
+    this.props.walletExport({
+      entropy,
       password: values.get('password'),
-      randomBytes: secret,
-    }, '*');
+    });
+
     // Register saga is called, we return the promise here,
     // so we can display form errors if any of the async ops fail.
     return (
       register(values, dispatch)
         .catch(throwWorkerError)
         // If worker success, ...
-        .then((workerRsp) => (
-          receipt.type === Type.RESET_CONF
-            ? this.handleRecovery(workerRsp, receipt, confCode, `0x${seed.toString('hex')}`)
-            : this.handleCreate(workerRsp, receipt, confCode)
-        ))
+        .then((workerRsp) => {
+          const wallet = JSON.parse(workerRsp.payload.json);
+          wallet.address = `0x${wallet.address}`;
+          delete wallet.id;
+          return receipt.type === Type.RESET_CONF
+            ? this.handleRecovery(wallet, receipt, confCode, workerRsp.payload.privateKey)
+            : this.handleCreate(wallet, receipt, confCode);
+        })
     );
   }
 
@@ -212,7 +171,6 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
   }
 
   render() {
-    const workerPath = this.props.workerPath + encodeURIComponent(location.origin);
     const { error, handleSubmit, submitting, entropy, invalid } = this.props;
     const { entropySaved, secretCreated } = this.state;
     return (
@@ -248,15 +206,7 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
           </div>
         }
 
-        <iframe
-          src={workerPath}
-          title="iframe_generate"
-          style={{ display: 'none' }}
-          onLoad={(event) => {
-            this.frame = event.target;
-          }}
-        />
-        { this.props.progress && submitting &&
+        { submitting &&
           <div>
             <H1>Registering please wait ...</H1>
           </div>
@@ -266,23 +216,15 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
   }
 }
 
-GeneratePage.defaultProps = {
-  workerPath: 'http://worker.acebusters.com.s3-website-us-east-1.amazonaws.com/iframe.html?origin=',
-};
-
 GeneratePage.propTypes = {
   ...propTypes,
-  workerPath: PropTypes.string,
-  onAccountTxHashReceived:PropTypes.func,
-  onWorkerError:PropTypes.func,
-  onWorkerInitialized: PropTypes.func,
-  onWorkerProgress: PropTypes.func,
-  onWalletExported: PropTypes.func,
+  walletExport: PropTypes.func,
+  onAccountTxHashReceived: PropTypes.func,
   input: PropTypes.any,
 };
 
 const throwWorkerError = (workerErr) => {
-  throw new SubmissionError({ _error: `error, Registration failed due to worker error: ${workerErr}` });
+  throw new SubmissionError({ _error: `error, Registration failed due to worker error: ${workerErr.payload.error}` });
 };
 
 const throwSubmitError = (err) => {
@@ -296,11 +238,8 @@ const throwSubmitError = (err) => {
 
 function mapDispatchToProps(dispatch) {
   return {
+    walletExport: (data) => dispatch(walletExport(data)),
     onAccountTxHashReceived: (txHash) => dispatch(accountTxHashReceived(txHash)),
-    onWorkerError: (event) => dispatch(workerError(event)),
-    onWorkerInitialized: () => dispatch(change('register', 'isWorkerInitialized', true)),
-    onWorkerProgress: (percent) => dispatch(change('register', 'workerProgress', percent)),
-    onWalletExported: (data) => dispatch(walletExported(data)),
     onEntropyUpdated: (data) => dispatch(change('register', 'entropy', data)),
   };
 }
@@ -308,11 +247,6 @@ function mapDispatchToProps(dispatch) {
 // Which props do we want to inject, given the global state?
 const selector = formValueSelector('register');
 const mapStateToProps = (state) => ({
-  initialValues: {
-    isWorkerInitialized: false,
-  },
-  progress: selector(state, 'workerProgress'),
-  isWorkerInitialized: selector(state, 'isWorkerInitialized'),
   entropy: selector(state, 'entropy'),
 });
 
