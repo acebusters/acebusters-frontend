@@ -21,6 +21,7 @@ export default defineMessages({
   nutz: {
     id: 'app.containers.Dashboard.nutz',
     defaultMessage: 'Nutz',
+  },
   ok: {
     id: 'app.containers.Dashboard.ok',
     defaultMessage: 'Ok',
