@@ -2,7 +2,7 @@ import { fromJS } from 'immutable';
 import dashboardReducer from '../reducer';
 import { contractEvent, proxyEvent, contractTxError } from '../../AccountProvider/actions';
 import { modalDismiss } from '../../App/actions';
-import { OVERVIEW } from '../actions';
+import { OVERVIEW, NTZ } from '../actions';
 
 describe('dashboard reducer tests', () => {
   it('should return the default state.', () => {
@@ -11,6 +11,7 @@ describe('dashboard reducer tests', () => {
       proxy: null,
       failedTx: null,
       events: null,
+      amountUnit: NTZ,
     });
   });
 

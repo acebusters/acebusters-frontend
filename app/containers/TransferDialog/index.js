@@ -1,19 +1,15 @@
+import React from 'react';
+import PropTypes from 'prop-types';
 import ethUtil from 'ethereumjs-util';
-import React, { PropTypes } from 'react';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
-import BigNumber from 'bignumber.js';
 
-import { Form, Field, reduxForm } from 'redux-form/immutable';
+import { reduxForm } from 'redux-form/immutable';
 
 import { makeSelectHasWeb3, makeSelectNetworkSupported } from '../../containers/AccountProvider/selectors';
-import NoWeb3Message from '../../components/Web3Alerts/NoWeb3';
-import UnsupportedNetworkMessage from '../../components/Web3Alerts/UnsupportedNetwork';
-import { ErrorMessage } from '../../components/FormMessages';
-import SubmitButton from '../../components/SubmitButton';
-import FormField from '../../components/Form/FormField';
-import AmountField from '../../components/AmountField';
-import H2 from '../../components/H2';
+
+import DefaultDialog from '../../components/TransferDialog/Default';
+import TokenDialog from '../../components/TransferDialog/TokenDialog';
 
 const isEthereumAddress = (address) => ethUtil.isValidAddress(address) || ethUtil.isValidChecksumAddress(address);
 
@@ -36,95 +32,20 @@ const warn = () => {
   return warnings;
 };
 
-class TransferDialog extends React.Component { // eslint-disable-line react/prefer-stateless-function
-  constructor(props) {
-    super(props);
-    this.handleSubmit = this.handleSubmit.bind(this);
-  }
-
-  handleSubmit(values) {
-    return this.props.handleTransfer(
-      values.get('amount'),
-      values.get('address'),
-    );
-  }
-
-  render() {
-    const {
-      error,
-      handleSubmit,
-      submitting,
-      amountUnit,
-      maxAmount,
-      minAmount,
-      hideAddress,
-      title,
-      description,
-      invalid,
-      hasWeb3,
-      networkSupported,
-    } = this.props;
-
-    return (
-      <div>
-        {title && <H2>{title}</H2>}
-        {description && <p>{description}</p>}
-        <Form onSubmit={handleSubmit(this.handleSubmit)}>
-          <AmountField
-            name="amount"
-            component={FormField}
-            label={`Amount (${amountUnit})`}
-            autoFocus
-            minAmount={minAmount}
-            maxAmount={maxAmount}
-          />
-
-          {!hideAddress &&
-            <Field
-              name="address"
-              component={FormField}
-              type="text"
-              label="Ethereum address"
-            />
-          }
-
-          {error && <ErrorMessage>{error}</ErrorMessage>}
-
-          {!hasWeb3 && <NoWeb3Message />}
-          {hasWeb3 && !networkSupported && <UnsupportedNetworkMessage />}
-
-          <SubmitButton
-            type="submit"
-            disabled={invalid || !hasWeb3 || !networkSupported}
-            submitting={submitting}
-          >
-            Submit
-          </SubmitButton>
-        </Form>
-      </div>
-    );
-  }
-}
-
-TransferDialog.propTypes = {
-  title: PropTypes.any,
-  description: PropTypes.any,
-  hasWeb3: PropTypes.bool,
-  networkSupported: PropTypes.bool,
-  submitting: PropTypes.bool,
-  invalid: PropTypes.bool,
-  hideAddress: PropTypes.bool,
-  maxAmount: PropTypes.object, // BigNumber
-  minAmount: PropTypes.object, // BigNumber
-  amountUnit: PropTypes.string,
-  handleSubmit: PropTypes.func,
-  handleTransfer: PropTypes.func,
-  error: PropTypes.any,
+const DIALOGS = {
+  token: TokenDialog,
+  default: DefaultDialog,
 };
 
-TransferDialog.defaultProps = {
-  hideAddress: false,
-  minAmount: new BigNumber(0),
+const TransferDialogContainer = (props) => {
+  const SpecifiedDialog = DIALOGS[props.type];
+  return <SpecifiedDialog name="transfer-dialog" {...props} />;
+};
+TransferDialogContainer.propTypes = {
+  type: PropTypes.string,
+};
+TransferDialogContainer.defaultProps = {
+  type: 'default',
 };
 
 const mapStateToProps = createStructuredSelector({
@@ -137,5 +58,5 @@ export default connect(mapStateToProps)(
     form: 'transfer',
     validate,
     warn,
-  })(TransferDialog)
+  })(TransferDialogContainer)
 );

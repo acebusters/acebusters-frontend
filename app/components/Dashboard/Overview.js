@@ -2,14 +2,11 @@ import React from 'react'; import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import messages from '../../containers/Dashboard/messages';
+
 import H2 from '../H2';
 import List from '../List';
 
-import { AccountIsLocked, AccountNotLocked } from './SectionReceive';
-import {
-  Pane,
-  Section,
-} from './styles';
+import { Pane, Section } from './styles';
 
 const Overview = (props) => {
   const { account, listTxns, downRequests } = props;
@@ -17,14 +14,6 @@ const Overview = (props) => {
 
   return (
     <Pane name="dashboard-overview">
-      <Section name="wallet-receive">
-        <H2>Deposit</H2>
-        {account.isLocked
-          ? <AccountIsLocked {...props} />
-          : <AccountNotLocked {...props} />
-        }
-      </Section>
-
       {!account.isLocked && downRequests && downRequests.length > 0 &&
         <Section name="power-down-requests">
           <H2><FormattedMessage {...messages.powerDownRequests} /></H2>

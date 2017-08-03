@@ -8,10 +8,17 @@ const Wrapper = styled.div`
   text-align: center;
 `;
 
+const styles = {
+  padding: '10px 40px',
+  minWidth: '200px',
+  minHeight: '50px',
+};
+
 function SubmitButton({ disabled, submitting, children, ...props }) {
   return (
     <Wrapper>
       <Button
+        style={styles}
         type="submit"
         disabled={disabled || submitting}
         {...props}

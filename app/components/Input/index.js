@@ -8,38 +8,46 @@ import {
   green,
 } from '../../variables';
 
-
 const InputStyled = styled.input`
   ${(props) => {
     if (props.touched && !props.error) {
-      return `border: 2px solid ${green}`;
+      return `border: solid 2px ${green}`;
     }
-    return 'border: 1px solid #ccc';
+    return 'border: solid 1px #ccc';
   }};
-  -webkit-box-shadow: 0 0 0px 1000px white inset !important;
   padding: 10px;
-  border: solid 1px gainsboro;
-  -webkit-transition: box-shadow 0.3s, border 0.3s;
-  -moz-transition: box-shadow 0.3s, border 0.3s;
-  -o-transition: box-shadow 0.3s, border 0.3s;
-  transition: box-shadow 0.3s, border 0.3s;
-  display: block;
   margin: 0;
-  color: black;
+  border: solid 1px gainsboro;
+  border-radius: 4px;
+  display: block;
   width: 100%;
+  appearance: none;
+  box-shadow: none;
+  color: black;
   font-family: "Open Sans", sans-serif;
   font-size: 18px;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
-  box-shadow: none;
-  -webkit-border-radius: none;
-  -moz-border-radius: none;
-  -ms-border-radius: none;
-  -o-border-radius: none;
-  border-radius: 4px;
+  transition: box-shadow 0.3s, border 0.3s;
+`;
+
+// focus on this element is handled by component state
+export const InputWithUnit = styled.input`
+  ${(props) => {
+    if (props.touched && !props.error) {
+      return `border: solid 2px ${green}`;
+    }
+    return '';
+  }};
+  padding: 10px;
+  margin: 0;
+  width: 100%;
+  color: black;
+  text-align: right;
+  font-family: "Open Sans", sans-serif;
+  font-size: 18px;
+  transition: box-shadow 0.3s, border 0.3s;
+  &:focus {
+    outline: none;
+  }
 `;
 
 export const CheckBox = styled.input`
