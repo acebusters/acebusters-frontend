@@ -35,6 +35,10 @@ const account = {
     return request('query', { email });
   },
 
+  unlock(unlockRequest) {
+    return request(`unlock/${encodeURIComponent(unlockRequest)}`, undefined, 'get');
+  },
+
   checkReferral(code) {
     return request(
       code ? `referral/${code}` : 'referral/',

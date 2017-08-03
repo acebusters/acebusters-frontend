@@ -3,7 +3,7 @@ import { Receipt } from 'poker-helper';
 import { createStructuredSelector } from 'reselect';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Form, Field, reduxForm } from 'redux-form/immutable';
+import { Form, Field, SubmissionError, reduxForm } from 'redux-form/immutable';
 
 import { makeSelectAccountData } from '../../containers/AccountProvider/selectors';
 import { getWeb3 } from '../../containers/AccountProvider/utils';
@@ -19,6 +19,8 @@ import { accountUnlocked } from '../AccountProvider/actions';
 
 import { ABI_PROXY } from '../../app.config';
 import { waitForTx } from '../../utils/waitForTx';
+import { promisifyContractCall } from '../../utils/promisifyContractCall';
+import accountService from '../../services/account';
 
 const validate = (values) => {
   const errors = {};
@@ -58,27 +60,22 @@ class UpgradeDialog extends React.Component {
     }
   }
 
-  handleSubmit() {
+  async handleSubmit() {
     const { account } = this.props;
     const proxyContract = getWeb3(true).eth.contract(ABI_PROXY).at(account.proxy);
+    const unlockTx = promisifyContractCall(proxyContract.unlock);
 
-    // ToDo: extract LOCK_PRIV addr
-    const receipt = new Receipt(proxyContract.address)
-                      .unlock(account.injected)
-                      .sign('0x94890218f2b0d04296f30aeafd13655eba4c5bbf1770273276fee52cbe3f2cb4');
-
-    return new Promise((resolve, reject) => {
-      proxyContract.unlock(
-        ...Receipt.parseToParams(receipt),
-        { from: account.injected },
-        (err, txHash) => {
-          if (err) {
-            reject(err);
-          } else {
-            waitForTx(getWeb3(), txHash).then(resolve, reject);
-          }
-        });
-    });
+    try {
+      const unlockRequest = new Receipt().unlockRequest(account.injected).sign(`0x${account.privKey}`);
+      const unlock = await accountService.unlock(unlockRequest);
+      const txHash = await unlockTx(
+        ...Receipt.parseToParams(unlock),
+          { from: account.injected },
+      );
+      await waitForTx(getWeb3(), txHash);
+    } catch (e) {
+      throw new SubmissionError(`Error: ${e.message || e}`);
+    }
   }
 
   render() {
