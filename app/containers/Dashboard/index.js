@@ -137,12 +137,9 @@ class DashboardRoot extends React.Component {
           </H2>
           <p>{nextProps.dashboardTxs.txError}</p>
           <SubmitButton
-            onClick={() => {
-              this.props.dispatch(nextProps.dashboardTxs.failedTxAction);
-              this.props.modalDismiss();
-            }}
+            onClick={() => this.props.modalDismiss()}
           >
-            <FormattedMessage {...messages.retryTransaction} />
+            <FormattedMessage {...messages.ok} />
           </SubmitButton>
         </div>
       );
@@ -445,7 +442,6 @@ DashboardRoot.propTypes = {
   accountLoaded: PropTypes.func,
   contractEvents: PropTypes.func,
   dashboardTxs: PropTypes.object,
-  dispatch: PropTypes.func,
   modalAdd: PropTypes.func,
   modalDismiss: PropTypes.func,
   privKey: PropTypes.string,

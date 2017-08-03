@@ -68,7 +68,7 @@ class ExchangeDialog extends React.Component { // eslint-disable-line react/pref
           <FormattedMessage
             {...messages.expectedAmount}
             values={{
-              amount: formatExpValue(calcExpectedAmount(round(amount, 10)).mul(decimals)),
+              amount: formatExpValue(calcExpectedAmount(round(amount, 8)).mul(decimals)),
               unit: expectedAmountUnit.toUpperCase(),
             }}
           />

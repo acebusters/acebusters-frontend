@@ -6,6 +6,10 @@
 import { defineMessages } from 'react-intl';
 
 export default defineMessages({
+  ok: {
+    id: 'app.containers.Dashboard.ok',
+    defaultMessage: 'Ok',
+  },
   overview: {
     id: 'app.containers.Dashboard.overview',
     defaultMessage: 'Overview',

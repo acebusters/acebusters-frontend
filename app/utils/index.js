@@ -5,6 +5,6 @@ export const last = (arr) => arr[arr.length - 1];
 export const not = (fn) => (...args) => !fn(...args);
 
 export function round(n, prec) {
-  const dec = prec ** 10;
+  const dec = 10 ** prec;
   return Math.round(n * dec) / dec;
 }
