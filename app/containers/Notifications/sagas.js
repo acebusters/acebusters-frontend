@@ -83,6 +83,7 @@ function* authNotification({ newAuthState }) {
 
 function* injectedWeb3Notification({ payload: { isLocked } }) {
   if (!isLocked) {
+    yield call(delay, 2000);
     const state = yield select();
     const injected = yield call([state, state.getIn], ['account', 'injected']);
     if (!injected) {
