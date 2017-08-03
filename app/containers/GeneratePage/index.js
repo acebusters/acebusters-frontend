@@ -85,10 +85,12 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
   }
 
   handleCreate(wallet, receipt, confCode) {
-    return account.addWallet(confCode, wallet)
+    return Promise.all([
+      waitForAccountTxHash(wallet.address),
+      account.addWallet(confCode, wallet),
+    ])
       .catch(throwSubmitError)
-      .then(() => waitForAccountTxHash(wallet.address))
-      .then((txHash) => {
+      .then(([txHash]) => {
         this.props.onAccountTxHashReceived(txHash);
         browserHistory.push('/login');
       });
