@@ -42,7 +42,7 @@ const TransferDialogContainer = (props) => {
   return <SpecifiedDialog name="transfer-dialog" {...props} />;
 };
 TransferDialogContainer.propTypes = {
-  type: PropTypes.string,
+  type: PropTypes.oneOf(['default', 'token']),
 };
 TransferDialogContainer.defaultProps = {
   type: 'default',
