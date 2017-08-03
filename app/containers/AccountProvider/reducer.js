@@ -1,7 +1,7 @@
 import { fromJS } from 'immutable';
-import Raven from 'raven-js';
 import {
   SET_AUTH,
+  WEB3_ERROR,
   WEB3_CONNECTED,
   WEB3_DISCONNECTED,
   WEB3_METHOD_SUCCESS,
@@ -10,92 +10,127 @@ import {
   CONTRACT_METHOD_ERROR,
   CONTRACT_TX_SEND,
   CONTRACT_TX_SUCCESS,
-  CONTRACT_TX_ERROR,
-  CONTRACT_EVENT,
+  ETH_TRANSFER_SUCCESS,
+  CONTRACT_EVENTS,
   ACCOUNT_LOADED,
+  ACCOUNT_UNLOCKED,
+  INJECT_ACCOUNT_UPDATE,
+  NETWORK_SUPPORT_UPDATE,
+  READY_STATE,
 } from './actions';
-import * as storageService from '../../services/localStorage';
-
-const isLoggedIn = () => {
-  const privKey = storageService.getItem('privKey');
-  return (privKey !== undefined && privKey.length > 32);
-};
+import { ACCOUNT_TX_HASH_RECEIVED } from '../GeneratePage/actions';
 
 // The initial application state
 const initialState = fromJS({
-  privKey: storageService.getItem('privKey'),
-  email: storageService.getItem('email'),
-  loggedIn: isLoggedIn(),
+  loggedIn: false,
+  blocky: null,
+  nickName: null,
+  signerAddr: null,
+  web3ReadyState: READY_STATE.CONNECTING,
+  onSupportedNetwork: false,
+  web3ErrMsg: null,
 });
 
 function accountProviderReducer(state = initialState, action) {
-  let newState = state;
   switch (action.type) {
     case WEB3_CONNECTED:
-      return state;
+      return state.set('web3ReadyState', READY_STATE.OPEN);
+
     case WEB3_DISCONNECTED:
-      return state;
+      return state.set('web3ReadyState', READY_STATE.CLOSED);
+
+    case WEB3_ERROR:
+      return state.set('web3ErrMsg', action.err ? (action.err.message || 'Connection Error') : null);
+
+    case ACCOUNT_UNLOCKED:
+      return state.set('isLocked', false);
+
+    case INJECT_ACCOUNT_UPDATE:
+      return state.set('injected', action.payload);
+
+    case NETWORK_SUPPORT_UPDATE:
+      return state.set('onSupportedNetwork', action.payload);
+
+    case ACCOUNT_TX_HASH_RECEIVED:
+      return state.set('proxyTxHash', action.payload);
+
     case ACCOUNT_LOADED:
-      return state.set('proxy', action.data.proxy).set('controller', action.data.controller).set('lastNonce', action.data.lastNonce);
+      return state.set('proxy', action.payload.proxy)
+        .set('isLocked', action.payload.isLocked)
+        .set('owner', action.payload.owner)
+        .set('blocky', action.payload.blocky)
+        .set('nickName', action.payload.nickName)
+        .set('signerAddr', action.payload.signer);
+
     case WEB3_METHOD_SUCCESS:
       return state.setIn(['web3', 'methods', action.key], fromJS(action.payload));
+
     case WEB3_METHOD_ERROR:
       return state;
+
     case CONTRACT_METHOD_SUCCESS:
       if (state.get(action.address)) {
         return state.setIn([action.address, 'methods', action.key], fromJS(action.payload));
       }
       return state.setIn([action.address, 'methods'], fromJS({ [action.key]: action.payload }));
+
     case CONTRACT_METHOD_ERROR:
       return state;
+
     case CONTRACT_TX_SEND:
-      return state.setIn([action.payload.dest, 'pending', action.payload.nonce, 'call'], action.payload.key);
+      // Note: CONTRACT_TX_SEND is useless at this moment, but still keep it for consistency with the relevant actions.
+      return state;
 
     case CONTRACT_TX_SUCCESS:
-      // the nonce is only increased after the call was successfull.
-      // in the account saga we use a channel, so no 2 requests are submitted
-      // at the same time and no nonce can be reused by accident.
-      return state.set('lastNonce', action.nonce)
-        .setIn([action.address, 'pending', action.nonce, 'txHash'], action.txHash);
-    case CONTRACT_TX_ERROR:
-      return state.setIn([action.address, 'pending', action.nonce, 'error'], action.error);
-    case CONTRACT_EVENT:
-      if (newState.getIn([action.event.address, 'pending'])) {
-        newState.getIn([action.event.address, 'pending']).forEach((value, key) => {
-          if (value.get('txHash') === action.event.transactionHash) {
-            newState = newState.deleteIn([action.event.address, 'pending', key]);
-          }
-        });
-      }
-      newState = newState.setIn([action.event.address, 'transactions', action.event.transactionHash, 'blockNumber'], action.event.blockNumber);
-      if (action.event.event === 'Transfer') {
-        newState = newState.setIn([action.event.address, 'transactions', action.event.transactionHash, 'from'], action.event.args.from);
-        newState = newState.setIn([action.event.address, 'transactions', action.event.transactionHash, 'to'], action.event.args.to);
-        newState = newState.setIn([action.event.address, 'transactions', action.event.transactionHash, 'value'], action.event.args.value.toString());
-      }
-      return newState;
+    case ETH_TRANSFER_SUCCESS:
+      return state;
+
+    case CONTRACT_EVENTS:
+      return action.payload.reduce(handleEvent, state);
+
     case SET_AUTH:
-      if (!action.newAuthState.loggedIn) {
-        newState = state
-          .delete('privKey')
-          .delete('email');
-        storageService.removeItem('privKey');
-        storageService.removeItem('email');
-      } else {
-        Raven.setUserContext({
-          email: action.newAuthState.email,
-        });
-        newState = state
-          .set('privKey', action.newAuthState.privKey)
-          .set('email', action.newAuthState.email);
-        storageService.setItem('privKey', action.newAuthState.privKey);
-        storageService.setItem('email', action.newAuthState.email);
-      }
-      return newState
+      return state
+        .withMutations((newState) => {
+          if (!action.newAuthState.loggedIn) {
+            return newState
+              .delete('privKey')
+              .delete('email')
+              .set('blocky', null)
+              .set('nickName', null)
+              .set('signerAddr', null);
+          }
+
+          return newState
+            .set('privKey', action.newAuthState.privKey)
+            .set('email', action.newAuthState.email);
+        })
         .set('loggedIn', action.newAuthState.loggedIn);
+
     default:
       return state;
   }
+}
+
+function addTx(event) {
+  return (state) => {
+    const tx = {
+      blockNumber: event.blockNumber,
+    };
+    if (event.event === 'Transfer') {
+      tx.from = event.args.from;
+      tx.to = event.args.to;
+      tx.value = event.args.value.toString();
+    }
+
+    return state.setIn(
+      [event.address, 'transactions', event.transactionHash],
+      fromJS(tx)
+    );
+  };
+}
+
+function handleEvent(state, event) {
+  return addTx(event)(state);
 }
 
 export default accountProviderReducer;

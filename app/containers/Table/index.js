@@ -7,17 +7,28 @@ import { createStructuredSelector } from 'reselect';
 import { browserHistory } from 'react-router';
 import Pusher from 'pusher-js';
 import Raven from 'raven-js';
+import { FormattedMessage } from 'react-intl';
+import { Receipt } from 'poker-helper';
+import * as storageService from '../../services/sessionStorage';
+
 // components and styles
+import TableDebug from '../../containers/TableDebug';
+
 import Card from '../../components/Card';
 import { BoardCardWrapper } from '../../components/Table/Board';
 import Seat from '../Seat';
 import Button from '../../components/Button';
+import { nickNameByAddress } from '../../services/nicknames';
+import messages from './messages';
+import { formatNtz } from '../../utils/amountFormatter';
+import { promisifyContractCall } from '../../utils/promisifyContractCall';
+
 // config data
 import {
   ABI_TABLE,
   ABI_TOKEN_CONTRACT,
   TIMEOUT_PERIOD,
-  tokenContractAddress,
+  conf,
 } from '../../app.config';
 
 import { modalAdd, modalDismiss } from '../App/actions';
@@ -26,12 +37,14 @@ import {
   handRequest,
   lineupReceived,
   updateReceived,
-  pendingToggle,
+  addMessage,
+  setPending,
+  setExitHand,
   sitOutToggle,
   bet,
 } from './actions';
 // selectors
-import {
+import makeSelectAccountData, {
   makeSelectPrivKey,
   makeSelectProxyAddr,
   makeSignerAddrSelector,
@@ -39,14 +52,14 @@ import {
 
 import {
   makeLastReceiptSelector,
+  makeMyStackSelector,
+  makeMyStandingUpSelector,
 } from '../Seat/selectors';
-
-import { blockNotify } from '../AccountProvider/actions';
 
 import {
   makeTableDataSelector,
   makeIsMyTurnSelector,
-  makePotSizeSelector,
+  makeAmountInTheMiddleSelector,
   makeBoardSelector,
   makeHandSelector,
   makeHandStateSelector,
@@ -64,7 +77,9 @@ import TableComponent from '../../components/Table';
 import web3Connect from '../AccountProvider/web3Connect';
 import TableService, { getHand } from '../../services/tableService';
 import JoinDialog from '../JoinDialog';
+import JoinSlides from '../JoinDialog/slides';
 import InviteDialog from '../InviteDialog';
+import RebuyDialog from '../RebuyDialog';
 
 const getTableData = (table, props) => {
   const lineup = table.getLineup.callPromise();
@@ -84,12 +99,14 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.handleLeave = this.handleLeave.bind(this);
     this.handleSitout = this.handleSitout.bind(this);
     this.handleJoin = this.handleJoin.bind(this);
+    this.handleJoinComplete = this.handleJoinComplete.bind(this);
+    this.handleRebuy = this.handleRebuy.bind(this);
     this.isTaken = this.isTaken.bind(this);
 
     this.tableAddr = props.params.tableAddr;
     this.web3 = props.web3Redux.web3;
     this.table = this.web3.eth.contract(ABI_TABLE).at(this.tableAddr);
-    this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(tokenContractAddress);
+    this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(conf().ntzAddr);
     // register event listener for table
     this.tableEvents = this.table.allEvents({ fromBlock: 'latest' });
     this.tableEvents.watch(this.watchTable);
@@ -106,12 +123,13 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       tableAddr: this.tableAddr,
       handId,
     });
+    this.tableService = new TableService(this.props.params.tableAddr, this.props.privKey);
   }
 
   componentWillReceiveProps(nextProps) {
     const handId = parseInt(this.props.params.handId, 10);
     // take care of timing out players
-    if (this.props.myPos > -1 && this.props.hand
+    if (this.props.myPos !== undefined && this.props.hand
       && this.props.hand.get('changed') < nextProps.hand.get('changed')) {
       if (this.timeOut) {
         clearTimeout(this.timeOut);
@@ -124,8 +142,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
       if (timeOut > 0) {
         this.timeOut = setTimeout(() => {
-          const table = new TableService(this.props.params.tableAddr);
-          table.timeOut().then((res) => {
+          this.tableService.timeOut().then((res) => {
             Raven.captureMessage(`timeout: ${res}`, { tags: {
               tableAddr: this.props.params.tableAddr,
               handId,
@@ -136,8 +153,8 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     }
 
     // get balance of player
-    const balance = this.token.balanceOf(this.props.proxyAddr);
-    if (!balance && nextProps.proxyAddr) {
+    this.balance = this.token.balanceOf(this.props.proxyAddr);
+    if (!this.balance && nextProps.proxyAddr) {
       this.token.balanceOf.call(nextProps.proxyAddr);
     }
 
@@ -166,6 +183,27 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
         }
       }
     }
+
+    const toggleKey = this.tableAddr + handId;
+    // display Rebuy modal if state === 'waiting' and user stack is no greater than 0
+    if (nextProps.state === 'waiting' && nextProps.myStack !== null && nextProps.myStack <= 0
+        && (nextProps.state !== this.props.state || nextProps.myStack !== this.props.myStack)
+        && !nextProps.standingUp && !storageService.getItem(`rebuyModal[${toggleKey}]`)) {
+      const balance = parseInt(this.balance.toString(), 10);
+
+      this.props.modalDismiss();
+      this.props.modalAdd((
+        <RebuyDialog
+          pos={this.props.myPos}
+          handleRebuy={this.handleRebuy}
+          handleLeave={this.handleLeave}
+          modalDismiss={this.props.modalDismiss}
+          params={this.props.params}
+          balance={balance}
+        />,
+        this.handleLeave
+      ));
+    }
   }
 
   componentWillUnmount() {
@@ -173,33 +211,107 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       clearInterval(this.timeOut);
     }
     this.channel.unbind('update', this.handleUpdate);
-    this.tableEvents.stopWatching();
+
+    // Note: with wsProvider, the request made by stopWatching will throw an error
+    try {
+      this.tableEvents.stopWatching();
+    } catch (e) {
+      this.tableEvents = null;
+    }
   }
 
-  handleUpdate(hand) {
-    this.props.updateReceived(this.tableAddr, hand);
+  handleUpdate(event) {
+    if (event.type === 'chatMessage') {
+      const msg = Receipt.parse(event.payload);
+      this.props.addMessage(msg.message, msg.tableAddr, msg.signer, msg.created);
+    } else if (event.type === 'handUpdate') {
+      this.props.updateReceived(this.tableAddr, event.payload);
+    } else if (event.type === 'joinRequest') {
+      if (event.payload.signer !== this.props.signerAddr) {
+        const data = event.payload.data.slice(2);
+        const amount = parseInt(data.slice(8, 72), 16);
+        const pos = parseInt(data.slice(136), 16) - 1;
+        this.props.setPending(
+          this.tableAddr,
+          this.props.params.handId,
+          pos,
+          { signerAddr: event.payload.signer, stackSize: amount },
+        );
+      }
+    }
+  }
+
+  handleRebuy(amount) {
+    const handId = parseInt(this.props.params.handId, 10);
+    const toggleKey = this.tableAddr + handId;
+    storageService.setItem(`rebuyModal[${toggleKey}]`, true);
+
+    const { signerAddr, myPos, account } = this.props;
+
+    const promise = promisifyContractCall(this.token.transData.sendTransaction)(
+      this.tableAddr,
+      amount,
+      `0x0${(myPos).toString(16)}${signerAddr.replace('0x', '')}`
+    );
+
+    return Promise.resolve(account.isLocked ? null : promise).then(() => {
+      this.props.modalDismiss();
+    });
   }
 
   handleJoin(pos, amount) {
-    this.token.approve.sendTransaction(this.tableAddr, amount);
-    this.table.join.sendTransaction(amount, this.props.signerAddr, pos + 1, '');
-    const statusElement = (<div>
-      <p> Request send Please wait!</p>
-      <Button onClick={this.props.modalDismiss}>OK!</Button>
-    </div>);
-    this.props.modalDismiss();
-    this.props.modalAdd(statusElement);
-    this.props.pendingToggle(this.tableAddr, this.props.params.handId, pos);
+    const { signerAddr, account } = this.props;
+
+    const promise = promisifyContractCall(this.token.transData.sendTransaction)(
+      this.tableAddr,
+      amount,
+      `0x0${(pos).toString(16)}${signerAddr.replace('0x', '')}`,
+    );
+
+    return Promise.resolve(account.isLocked ? null : promise).then(() => {
+      const slides = (
+        <div>
+          <JoinSlides />
+          <Button size="large" onClick={this.props.modalDismiss}>
+            <FormattedMessage {...messages.joinModal.buttonDismiss} />
+          </Button>
+        </div>
+      );
+
+      this.props.modalDismiss();
+      this.props.modalAdd(slides);
+      this.props.setPending(
+        this.tableAddr,
+        this.props.params.handId,
+        pos,
+        { signerAddr: this.props.signerAddr, stackSize: amount }
+      );
+    });
   }
 
   isTaken(open, myPos, pending, pos) {
+    if (!this.props.account.loggedIn) {
+      const loc = this.props.location;
+      const curUrl = `${loc.pathname}${loc.search}${loc.hash}`;
+
+      browserHistory.push(`/login?redirect=${curUrl}`);
+      return;
+    }
+
+    let balance;
+
+    if (this.balance) {
+      balance = parseInt(this.balance.toString(), 10);
+    }
+
     if (open && myPos === undefined && !pending) {
       this.props.modalAdd((
         <JoinDialog
           pos={pos}
           handleJoin={this.handleJoin}
+          modalDismiss={this.props.modalDismiss}
           params={this.props.params}
-          balance={this.balance}
+          balance={balance}
         />
       ));
     } else if (open && this.props.myPos !== undefined && !pending) {
@@ -210,20 +322,48 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   handleSitout() {
+    // Note: sitout value possibilities
+    //    sitout > 0, for enabled "play"
+    //    sitout === 0, for disabled "play"
+    //    sitout === undefined, for enabled "pause"
+    //    sitout === null, for disabled "pause"
+    // And we are only able to toggle sitout when it's enabled.
+    const sitout = this.props.sitout;
+
+    if (sitout !== undefined && sitout <= 0) return null;
+    if (this.props.sitoutAmount <= -1) return null;
+
+    // Note: if it's enabled "play" (> 0), then set it to disabled "pause" (null)
+    // otherwise it's enabled "pause", then set it to disabled "play" (0)
+    const nextSitoutState = sitout > 0 ? null : 0;
     const handId = parseInt(this.props.params.handId, 10);
-    if (this.props.sitoutAmount > -1) {
-      const sitoutAction = bet(this.props.params.tableAddr, handId, this.props.sitoutAmount, this.props.privKey, this.props.myPos, this.props.lastReceipt);
-      return sitOutToggle(sitoutAction, this.props.dispatch);
-    }
-    return null;
+
+    const sitoutAction = bet(
+      this.props.params.tableAddr,
+      handId,
+      this.props.sitoutAmount,
+      this.props.privKey,
+      this.props.myPos,
+      this.props.lastReceipt,
+      {
+        originalSitout: sitout,
+        nextSitoutState,
+      }
+    );
+    return sitOutToggle(sitoutAction, this.props.dispatch);
   }
 
   handleLeave(pos) {
+    const lineup = (this.props.lineup) ? this.props.lineup.toJS() : null;
     const handId = parseInt(this.props.params.handId, 10);
     const state = this.props.state;
     const exitHand = (state !== 'waiting') ? handId : handId - 1;
-    const table = new TableService(this.props.params.tableAddr, this.props.privKey);
-    this.props.pendingToggle(this.tableAddr, this.props.params.handId, pos);
+
+    if (!lineup) {
+      return Promise.reject('Lineup is empty');
+    }
+
+    this.props.setExitHand(this.tableAddr, this.props.params.handId, pos, exitHand);
     const statusElement = (<div>
       <p>
         Please wait until your leave request is processed!
@@ -231,13 +371,26 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       </p>
       <Button onClick={this.props.modalDismiss}>OK!</Button>
     </div>);
+
+    this.props.modalDismiss();
     this.props.modalAdd(statusElement);
-    return table.leave(exitHand).catch((err) => {
+
+    return this.tableService.leave(exitHand, lineup[pos].address).catch((err) => {
       Raven.captureException(err, { tags: {
         tableAddr: this.props.params.tableAddr,
         handId,
       } });
     });
+  }
+
+  handleJoinComplete() {
+    const lineup = (this.props.lineup) ? this.props.lineup.toJS() : null;
+    if (lineup && this.props.state !== 'waiting' && typeof lineup[this.props.myPos].sitout === 'number') {
+      const handId = parseInt(this.props.params.handId, 10);
+      const sitoutAction = bet(this.props.params.tableAddr, handId, 1, this.props.privKey, this.props.myPos);
+      sitOutToggle(sitoutAction, this.props.dispatch);
+    }
+    this.props.modalDismiss();
   }
 
 
@@ -251,34 +404,29 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     // dispatch action according to event type
     switch (result.event) {
       case 'Join': {
+        const lineupReceivedArgs = (rsp) => [
+          this.tableAddr,
+          rsp,
+          this.props.data.get('smallBlind'),
+          this.props.params.handId,
+        ];
+
         if (result.args && result.args.addr === this.props.proxyAddr) {
-          // notify backend about new block
-          this.props.blockNotify();
-          // show modal
-
-          const statusElement = (<div>
-            <h2>Join Successful!</h2>
-            <Button onClick={this.props.modalDismiss}>OK!</Button>
-          </div>);
-          this.props.modalDismiss();
-          this.props.modalAdd(statusElement);
-
-          // update lineup when join successful
-          this.table.getLineup.callPromise().then((rsp) => {
-            this.props.lineupReceived(this.tableAddr, rsp, this.props.data.get('smallBlind'));
-            for (let i = 0; i < rsp[1].length; i += 1) {
-              if (rsp[1][i] === this.props.signerAddr) {
-                this.props.pendingToggle(this.tableAddr, this.props.params.handId, i);
-                break;
-              }
-            }
-          });
-        } else {
-          // update lineup when when other players joined
-          this.table.getLineup.callPromise().then((rsp) => {
-            this.props.lineupReceived(this.tableAddr, rsp, this.props.data.get('smallBlind'));
-          });
+          // notify backend about change in lineup
+          this.tableService.lineup();
         }
+
+        // update lineup when join successful
+        this.table.getLineup.callPromise().then((rsp) => {
+          this.props.lineupReceived(...lineupReceivedArgs(rsp));
+        });
+
+        break;
+      }
+
+      case 'Leave': {
+        // notify backend about change in lineup
+        this.tableService.lineup();
         break;
       }
 
@@ -288,9 +436,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       }
 
       case 'Error': {
+        if (!result.args || result.args.addr !== this.props.proxyAddr) break;
+
         let msg = 'Ups Something went wrong';
         const errorCode = result.args.errorCode.toNumber();
-        this.props.pendingToggle(this.tableAddr, this.props.params.handId);
         if (errorCode === 1) {
           msg = 'Wrong Amount';
         }
@@ -322,7 +471,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     }
   }
 
-  renderSeats(lineup) {
+  renderSeats(lineup, changed) {
     const seats = [];
 
     if (!lineup) {
@@ -330,17 +479,17 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     }
     for (let i = 0; i < lineup.length; i += 1) {
       const sitout = lineup[i].sitout;
-      const seat = (
+      seats.push(
         <Seat
           key={i}
           pos={i}
           sitout={sitout}
           signerAddr={lineup[i].address}
           params={this.props.params}
+          changed={changed}
           isTaken={this.isTaken}
-        >
-        </Seat>);
-      seats.push(seat);
+        />
+      );
     }
     return seats;
   }
@@ -350,13 +499,12 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     const cards = this.props.board;
     const cardSize = 50;
     if (cards && cards.length > 0) {
-      for (let i = 0; i < 5; i += 1) {
-        const card = (
+      for (let i = 0; i < cards.length; i += 1) {
+        board.push(
           <BoardCardWrapper key={i}>
-            <Card key={i} cardNumber={cards[i]} size={cardSize} offset={[0, 0]}></Card>
+            <Card cardNumber={cards[i]} size={cardSize} />
           </BoardCardWrapper>
         );
-        board.push(card);
       }
     }
     return board;
@@ -364,19 +512,25 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
   render() {
     const lineup = (this.props.lineup) ? this.props.lineup.toJS() : null;
-    const seats = this.renderSeats(lineup);
+    const changed = (this.props.hand) ? this.props.hand.get('changed') : null;
+    const seats = this.renderSeats(lineup, changed);
     const board = this.renderBoard();
     let winners = [];
     if (this.props.winners && this.props.winners.length > 0) {
       winners = this.props.winners.map((winner, index) => {
         const handString = (winner.hand) ? `with ${winner.hand}` : '';
-        return (<div key={index}>`${winner.addr} won ${winner.amount} ${handString}`</div>);
+        return (<div key={index}>{nickNameByAddress(winner.addr)} won {formatNtz(winner.amount - winner.maxBet)}  NTZ {handString}</div>);
       });
     }
     const sb = (this.props.data && this.props.data.get('smallBlind')) ? this.props.data.get('smallBlind') : 0;
     const pending = (lineup && lineup[this.props.myPos]) ? lineup[this.props.myPos].pending : false;
     return (
       <div>
+        <TableDebug
+          params={this.props.params}
+          contract={this.table}
+        />
+
         { this.props.state &&
         <TableComponent
           {...this.props}
@@ -388,6 +542,8 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           sitout={this.props.sitout}
           board={board}
           seats={seats}
+          hand={this.props.hand}
+          potSize={this.props.potSize}
           onLeave={() => this.handleLeave(this.props.myPos)}
           onSitout={this.handleSitout}
         >
@@ -400,35 +556,39 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
 export function mapDispatchToProps() {
   return {
-    handRequest: (tableAddr, handId) => handRequest(tableAddr, handId),
-    lineupReceived: (tableAddr, lineup, smallBlind) => (lineupReceived(tableAddr, lineup, smallBlind)),
-    modalAdd: (node) => (modalAdd(node)),
-    modalDismiss: () => (modalDismiss()),
-    pendingToggle: (tableAddr, handId, pos) => (pendingToggle(tableAddr, handId, pos)),
-    updateReceived: (tableAddr, hand) => (updateReceived(tableAddr, hand)),
-    blockNotify: () => (blockNotify()),
+    handRequest,
+    lineupReceived,
+    modalAdd,
+    modalDismiss,
+    setPending,
+    setExitHand,
+    updateReceived,
+    addMessage,
   };
 }
 
 const mapStateToProps = createStructuredSelector({
-  state: makeHandStateSelector(),
-  hand: makeHandSelector(),
+  account: makeSelectAccountData(),
   board: makeBoardSelector(),
-  myHand: makeMyHandValueSelector(),
   data: makeTableDataSelector(),
-  sitoutAmount: makeSitoutAmountSelector(),
-  lineup: makeLineupSelector(),
+  hand: makeHandSelector(),
   isMyTurn: makeIsMyTurnSelector(),
-  potSize: makePotSizeSelector(),
-  myPos: makeMyPosSelector(),
+  lineup: makeLineupSelector(),
   latestHand: makeLatestHandSelector(),
-  signerAddr: makeSignerAddrSelector(),
-  privKey: makeSelectPrivKey(),
-  sitout: makeMySitoutSelector(),
   lastReceipt: makeLastReceiptSelector(),
-  proxyAddr: makeSelectProxyAddr(),
-  winners: makeSelectWinners(),
   missingHands: makeMissingHandSelector(),
+  myHand: makeMyHandValueSelector(),
+  myStack: makeMyStackSelector(),
+  myPos: makeMyPosSelector(),
+  potSize: makeAmountInTheMiddleSelector(),
+  privKey: makeSelectPrivKey(),
+  proxyAddr: makeSelectProxyAddr(),
+  sitoutAmount: makeSitoutAmountSelector(),
+  state: makeHandStateSelector(),
+  signerAddr: makeSignerAddrSelector(),
+  sitout: makeMySitoutSelector(),
+  winners: makeSelectWinners(),
+  standingUp: makeMyStandingUpSelector(),
 });
 
 Table.propTypes = {
@@ -436,26 +596,34 @@ Table.propTypes = {
   board: React.PropTypes.array,
   hand: React.PropTypes.object,
   myHand: React.PropTypes.object,
+  myStack: React.PropTypes.number,
   lineup: React.PropTypes.object,
-  sitout: React.PropTypes.bool,
+  sitout: React.PropTypes.any,
   params: React.PropTypes.object,
   privKey: React.PropTypes.string,
   lastReceipt: React.PropTypes.string,
+  latestHand: React.PropTypes.any,
+  missingHands: React.PropTypes.any,
   sitoutAmount: React.PropTypes.number,
+  standingUp: React.PropTypes.bool,
   proxyAddr: React.PropTypes.string,
   signerAddr: React.PropTypes.string,
   web3Redux: React.PropTypes.any,
   data: React.PropTypes.any,
   myPos: React.PropTypes.any,
+  potSize: React.PropTypes.number,
   modalAdd: React.PropTypes.func,
-  blockNotify: React.PropTypes.func,
   handRequest: React.PropTypes.func,
-  pendingToggle: React.PropTypes.func,
+  setPending: React.PropTypes.func,
+  setExitHand: React.PropTypes.func,
   modalDismiss: React.PropTypes.func,
   winners: React.PropTypes.array,
   dispatch: React.PropTypes.func,
   lineupReceived: React.PropTypes.func,
   updateReceived: React.PropTypes.func,
+  addMessage: React.PropTypes.func,
+  location: React.PropTypes.object,
+  account: React.PropTypes.object,
 };
 
 

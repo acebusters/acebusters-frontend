@@ -1,14 +1,15 @@
 import React from 'react';
 import styled from 'styled-components';
 import { createStructuredSelector } from 'reselect';
-import { browserHistory } from 'react-router';
 import Button from 'components/Button';
+import Link from 'components/Link';
 
 import web3Connect from '../AccountProvider/web3Connect';
 import { lineupReceived, updateReceived } from '../Table/actions';
 import { fetchTableState } from '../../services/tableService';
 import { makeSelectTableData, makeSelectTableLastHandId } from './selectors';
 import { ABI_TABLE } from '../../app.config';
+import { formatNtz } from '../../utils/amountFormatter';
 
 const Tr = styled.tr`
   &:nth-of-type(odd) {
@@ -36,19 +37,14 @@ const getTableData = (table, props) => {
 
 const getTableHand = (props) => fetchTableState(props.tableAddr).then((rsp) => props.updateReceived(props.tableAddr, rsp));
 
-class LobbyItem extends React.PureComponent {  // eslint-disable-line
+class LobbyItem extends React.PureComponent { // eslint-disable-line
 
   constructor(props) {
     super(props);
-    this.handleView = this.handleView.bind(this);
     this.web3 = props.web3Redux.web3;
     this.table = this.web3.eth.contract(ABI_TABLE).at(props.tableAddr);
     getTableData(this.table, props);
     getTableHand(props);
-  }
-
-  handleView() {
-    browserHistory.push(`/table/${this.props.tableAddr}/hand/${this.props.lastHandId}`);
   }
 
   render() {
@@ -62,14 +58,22 @@ class LobbyItem extends React.PureComponent {  // eslint-disable-line
         players += 1;
       }
     });
-    const ta = this.props.tableAddr.substring(2, 8);
+    const sb = this.props.data.smallBlind;
+    const bb = sb * 2;
     return (
       <Tr>
-        <Td key="ta">{ta}</Td>
-        <Td key="sb">{this.props.data.smallBlind}</Td>
+        <Td key="ta">{this.props.tableAddr.substring(2, 8)}</Td>
+        <Td key="sb">{formatNtz(sb)} NTZ / {formatNtz(bb)} NTZ</Td>
         <Td key="np">{`${players}/${this.props.data.seats.length}`}</Td>
         <Td key="lh">{this.props.lastHandId}</Td>
-        <Td key="ac"><Button onClick={this.handleView} size="medium" icon="fa fa-eye"></Button></Td>
+        <Td key="ac">
+          <Link
+            to={`/table/${this.props.tableAddr}/hand/${this.props.lastHandId}`}
+            size="medium"
+            icon="fa fa-eye"
+            component={Button}
+          />
+        </Td>
       </Tr>
     );
   }

@@ -14,7 +14,7 @@ function degrade(fn, fallback) {
   }
 }
 
-function getMethodKey({ groupName, methodName, args }) {
+export function getMethodKey({ groupName, methodName, args }) {
   return `${groupName || ''}.${methodName}(${JSON.stringify(args)})`;
 }
 
@@ -102,7 +102,7 @@ export default function web3Connect(passedMapStateToProps, passedActions) {
   }
 
   function mapDispatchToProps(dispatch) {
-    return { dispatch, ...bindActionCreators(passedActions(), dispatch) };
+    return { dispatch, ...bindActionCreators(passedActions(dispatch), dispatch) };
   }
 
   function mergeProps(stateProps, dispatchProps, ownProps) {

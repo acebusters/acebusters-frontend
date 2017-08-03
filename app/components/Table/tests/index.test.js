@@ -7,8 +7,8 @@
 
 import React from 'react';
 import { shallow } from 'enzyme';
-import Table from '../index'; // eslint-disable-line
-import { Winner } from '../../../components/Table'; // eslint-disable-line
+import Table from '../index';
+import { Winner } from '../styles';
 
 
 // secretSeed: 'rural tent tests net drip fatigue uncle action repeat couple lawn rival'

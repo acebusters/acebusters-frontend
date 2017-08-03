@@ -3,16 +3,21 @@
  */
 
 import { fromJS } from 'immutable';
-import EWT from 'ethereum-web-token';
+import { Receipt } from 'poker-helper';
+import { babz } from '../../../utils/amountFormatter';
+import { CALL } from '../actions';
 
 import {
   makeMinSelector,
   makeAmountToCallSelector,
+  makeSelectActionBarActive,
+  makeSelectActionBarVisible,
+  getActionBarMode,
+  getActionBarSliderOpen,
+  getActionBarTurnComplete,
+  getActionBarButtonActive,
+  getExecuteAction,
 } from '../selectors';
-
-import { checkABIs } from '../../../app.config';
-
-const ABI_BET = [{ name: 'bet', type: 'function', inputs: [{ type: 'uint' }, { type: 'uint' }] }];
 
 // secretSeed: 'rural tent tests net drip fatigue uncle action repeat couple lawn rival'
 const P1_ADDR = '0x6d2f2c0fa568243d2def3e999a791a6df45d816e';
@@ -39,21 +44,21 @@ describe('minSelector', () => {
         [TBL_ADDR]: {
           4: {
             state: 'flop',
-            lastRoundMaxBet: 1000,
+            lastRoundMaxBet: babz(1000).toNumber(),
             dealer: 0,
             lineup: [{
               address: P1_ADDR,
-              last: new EWT(ABI_BET).bet(1, 1000).sign(P1_KEY),
+              last: new Receipt(TBL_ADDR).bet(1, babz(1000)).sign(P1_KEY),
             }, {
               address: P2_ADDR,
-              last: new EWT(ABI_BET).bet(1, 3000).sign(P2_KEY),
+              last: new Receipt(TBL_ADDR).bet(1, babz(3000)).sign(P2_KEY),
             }, {
               address: P3_ADDR,
-              last: new EWT(ABI_BET).bet(1, 7000).sign(P3_KEY),
+              last: new Receipt(TBL_ADDR).bet(1, babz(7000)).sign(P3_KEY),
             }],
           },
           data: {
-            amounts: [30000, 50000, 20000],
+            amounts: [babz(30000).toNumber(), babz(50000).toNumber(), babz(20000).toNumber()],
             smallBlind: 500,
             lastHandNetted: 3,
           },
@@ -69,7 +74,7 @@ describe('minSelector', () => {
         tableAddr: TBL_ADDR,
       },
     };
-    expect(minSelector(mockedState, props)).toEqual(10000);
+    expect(minSelector(mockedState, props)).toEqual(babz(10000).toNumber());
   });
 
   it('should return 2 times the big blind preflop with no raise', () => {
@@ -85,18 +90,18 @@ describe('minSelector', () => {
             dealer: 0,
             lineup: [{
               address: P1_ADDR,
-              last: new EWT(ABI_BET).bet(1, 0).sign(P1_KEY),
+              last: new Receipt(TBL_ADDR).bet(1, babz(0)).sign(P1_KEY),
             }, {
               address: P2_ADDR,
-              last: new EWT(ABI_BET).bet(1, 500).sign(P2_KEY),
+              last: new Receipt(TBL_ADDR).bet(1, babz(500)).sign(P2_KEY),
             }, {
               address: P3_ADDR,
-              last: new EWT(ABI_BET).bet(1, 1000).sign(P3_KEY),
+              last: new Receipt(TBL_ADDR).bet(1, babz(1000)).sign(P3_KEY),
             }],
           },
           data: {
-            amounts: [30000, 50000, 20000],
-            smallBlind: 500,
+            amounts: [babz(30000).toNumber(), babz(50000).toNumber(), babz(20000).toNumber()],
+            smallBlind: babz(500).toNumber(),
             lastHandNetted: 3,
           },
         },
@@ -111,7 +116,7 @@ describe('minSelector', () => {
         tableAddr: TBL_ADDR,
       },
     };
-    expect(minSelector(mockedState, props)).toEqual(2000);
+    expect(minSelector(mockedState, props)).toEqual(babz(2000).toNumber());
   });
 
   it('should return BB when there was no bet or raise', () => {
@@ -123,19 +128,19 @@ describe('minSelector', () => {
         [TBL_ADDR]: {
           4: {
             state: 'flop',
-            lastRoundMaxBet: 400,
+            lastRoundMaxBet: babz(400).toNumber(),
             dealer: 0,
             lineup: [{
               address: P2_ADDR,
-              last: new EWT(ABI_BET).bet(1, 400).sign(P2_KEY),
+              last: new Receipt(TBL_ADDR).bet(1, babz(400)).sign(P2_KEY),
             }, {
               address: P3_ADDR,
-              last: new EWT(checkABIs.flop).checkFlop(1, 400).sign(P3_KEY),
+              last: new Receipt(TBL_ADDR).checkFlop(1, babz(400)).sign(P3_KEY),
             }],
           },
           data: {
-            amounts: [30000, 50000, 20000],
-            smallBlind: 50,
+            amounts: [babz(30000).toNumber(), babz(50000).toNumber(), babz(20000).toNumber()],
+            smallBlind: babz(50).toNumber(),
             lastHandNetted: 3,
           },
         },
@@ -150,7 +155,7 @@ describe('minSelector', () => {
         tableAddr: TBL_ADDR,
       },
     };
-    expect(minSelector(mockedState, props)).toEqual(100);
+    expect(minSelector(mockedState, props)).toEqual(babz(100).toNumber());
   });
 
   it('should return the stacksize when player does not have enough to bet min', () => {
@@ -162,21 +167,21 @@ describe('minSelector', () => {
         [TBL_ADDR]: {
           4: {
             state: 'flop',
-            lastRoundMaxBet: 1000,
+            lastRoundMaxBet: babz(1000).toNumber(),
             lineup: [{
               address: P1_ADDR,
-              last: new EWT(ABI_BET).bet(1, 1000).sign(P1_KEY),
+              last: new Receipt(TBL_ADDR).bet(1, babz(1000)).sign(P1_KEY),
             }, {
               address: P2_ADDR,
-              last: new EWT(ABI_BET).bet(1, 2000).sign(P2_KEY),
+              last: new Receipt(TBL_ADDR).bet(1, babz(2000)).sign(P2_KEY),
             }, {
               address: P3_ADDR,
-              last: new EWT(ABI_BET).bet(1, 1000).sign(P3_KEY),
+              last: new Receipt(TBL_ADDR).bet(1, babz(1000)).sign(P3_KEY),
             }],
           },
           data: {
-            amounts: [1421, 50000, 20000],
-            smallBlind: 500,
+            amounts: [babz(1421).toNumber(), babz(50000).toNumber(), babz(20000).toNumber()],
+            smallBlind: babz(500).toNumber(),
             lastHandNetted: 3,
           },
         },
@@ -191,7 +196,7 @@ describe('minSelector', () => {
         tableAddr: TBL_ADDR,
       },
     };
-    expect(minSelector(mockedState, props)).toEqual(421);
+    expect(minSelector(mockedState, props)).toEqual(babz(421).toNumber());
   });
 });
 
@@ -209,13 +214,13 @@ describe('amountToCall Selector', () => {
             dealer: 0,
             lineup: [{
               address: P1_ADDR,
-              last: new EWT(ABI_BET).bet(1, 0).sign(P1_KEY),
+              last: new Receipt(TBL_ADDR).bet(1, babz(0)).sign(P1_KEY),
             }, {
               address: P2_ADDR,
-              last: new EWT(ABI_BET).bet(1, 500).sign(P2_KEY),
+              last: new Receipt(TBL_ADDR).bet(1, babz(500)).sign(P2_KEY),
             }, {
               address: P3_ADDR,
-              last: new EWT(ABI_BET).bet(1, 1000).sign(P3_KEY),
+              last: new Receipt(TBL_ADDR).bet(1, babz(1000)).sign(P3_KEY),
             }, {
               address: P_EMPTY,
             }],
@@ -236,7 +241,7 @@ describe('amountToCall Selector', () => {
         tableAddr: TBL_ADDR,
       },
     };
-    expect(amountToCallSelector(mockedState, props)).toEqual(1000);
+    expect(amountToCallSelector(mockedState, props)).toEqual(babz(1000).toNumber());
   });
 
   it('should return difference between maxBet and myMaxBet', () => {
@@ -248,17 +253,17 @@ describe('amountToCall Selector', () => {
         [TBL_ADDR]: {
           4: {
             state: 'preflop',
-            lastRoundMaxBet: 1000,
+            lastRoundMaxBet: babz(1000).toNumber(),
             dealer: 0,
             lineup: [{
               address: P1_ADDR,
-              last: new EWT(ABI_BET).bet(1, 1000).sign(P1_KEY),
+              last: new Receipt(TBL_ADDR).bet(1, babz(1000)).sign(P1_KEY),
             }, {
               address: P2_ADDR,
-              last: new EWT(ABI_BET).bet(1, 1000).sign(P2_KEY),
+              last: new Receipt(TBL_ADDR).bet(1, babz(1000)).sign(P2_KEY),
             }, {
               address: P3_ADDR,
-              last: new EWT(ABI_BET).bet(1, 2500).sign(P3_KEY),
+              last: new Receipt(TBL_ADDR).bet(1, babz(2500)).sign(P3_KEY),
             }, {
               address: P_EMPTY,
             }],
@@ -279,7 +284,188 @@ describe('amountToCall Selector', () => {
         tableAddr: TBL_ADDR,
       },
     };
-    expect(amountToCallSelector(mockedState, props)).toEqual(1500);
+    expect(amountToCallSelector(mockedState, props)).toEqual(babz(1500).toNumber());
   });
 });
 
+// action specific tests
+describe('makeSelectActionBarActive', () => {
+  const mockedState = fromJS({
+    actionBar: { turnComplete: false },
+    account: { privKey: P1_KEY },
+    table: {
+      [TBL_ADDR]: {
+        4: {
+          state: 'flop',
+          lastRoundMaxBet: babz(1000).toNumber(),
+          lineup: [{
+            address: P1_ADDR,
+            last: new Receipt(TBL_ADDR).bet(1, babz(1000)).sign(P1_KEY),
+          }, {
+            address: P2_ADDR,
+            last: new Receipt(TBL_ADDR).bet(1, babz(2000)).sign(P2_KEY),
+          }, {
+            address: P3_ADDR,
+            last: new Receipt(TBL_ADDR).bet(1, babz(1000)).sign(P3_KEY),
+          }],
+        },
+        data: {
+          amounts: [babz(1421).toNumber(), babz(50000).toNumber(), babz(20000).toNumber()],
+          smallBlind: 500,
+          lastHandNetted: 3,
+        },
+      },
+    },
+  });
+  const selector = makeSelectActionBarActive();
+  const props = fromJS({
+    pos: 2,
+    isMyTurn: true,
+    params: {
+      handId: 4,
+      tableAddr: TBL_ADDR,
+    },
+  });
+  describe('if player\'s turn, correct handstate, !turnComplete', () => {
+    it('should return true', () => {
+      expect(selector(mockedState, props.toJS())).toBe(true);
+    });
+  });
+  describe('if turnComplete', () => {
+    it('should return false', () => {
+      const turnComplete = mockedState.setIn(
+        ['actionBar', 'turnComplete'],
+        true,
+      );
+      expect(selector(turnComplete, props.toJS())).toBe(false);
+    });
+  });
+  describe('if not appropriate handState', () => {
+    it('should return false', () => {
+      const handStateWaiting = mockedState.setIn(
+        ['table', TBL_ADDR, '4', 'state'],
+        'waiting',
+      );
+      expect(selector(handStateWaiting, props.toJS())).toBe(false);
+      const handStateDealing = mockedState.setIn(
+        ['table', TBL_ADDR, '4', 'state'],
+        'dealing',
+      );
+      expect(selector(handStateDealing, props.toJS())).toBe(false);
+      const handStateShowdown = mockedState.setIn(
+        ['table', TBL_ADDR, '4', 'state'],
+        'showdown',
+      );
+      expect(selector(handStateShowdown, props.toJS())).toBe(false);
+    });
+  });
+  describe('if not player\'s turn', () => {
+    it('should return false', () => {
+      const newProps = props.set('isMyTurn', false);
+      expect(selector(mockedState, newProps.toJS())).toBe(false);
+    });
+  });
+});
+
+describe('makeSelectActionBarVisible', () => {
+  const mockedState = fromJS({
+    actionBar: { turnComplete: false },
+    account: { privKey: P1_KEY },
+    table: {
+      [TBL_ADDR]: {
+        4: {
+          state: 'flop',
+          lastRoundMaxBet: babz(1000).toNumber(),
+          lineup: [{
+            address: P1_ADDR,
+            last: new Receipt(TBL_ADDR).bet(1, babz(1000)).sign(P1_KEY),
+          }, {
+            address: P2_ADDR,
+            last: new Receipt(TBL_ADDR).bet(1, babz(2000)).sign(P2_KEY),
+          }, {
+            address: P3_ADDR,
+            last: new Receipt(TBL_ADDR).bet(1, babz(1000)).sign(P3_KEY),
+          }],
+        },
+        data: {
+          amounts: [babz(1421).toNumber(), babz(50000).toNumber(), babz(20000).toNumber()],
+          smallBlind: 500,
+          lastHandNetted: 3,
+        },
+      },
+    },
+  });
+  const selector = makeSelectActionBarVisible();
+  const props = fromJS({
+    pos: 2,
+    myPos: 2,
+    isMyTurn: true,
+    params: {
+      handId: 4,
+      tableAddr: TBL_ADDR,
+    },
+  });
+  describe('if typeof myPos is \'number\'', () => {
+    it('should return true', () => {
+      expect(selector(mockedState, props.toJS())).toBe(true);
+    });
+  });
+  describe('if myPos is undefined', () => {
+    it('should return false', () => {
+      const newProps = props.set('myPos', undefined);
+      expect(selector(mockedState, newProps.toJS())).toBe(false);
+    });
+  });
+  describe('else should default', () => {
+    it('should return false', () => {
+      const newProps = props.set('myPos', 'a');
+      expect(selector(mockedState, newProps.toJS())).toBe(false);
+    });
+  });
+});
+
+describe('misc actionBar state selectors', () => {
+  const mockedState = fromJS({
+    actionBar: {
+      turnComplete: false,
+      buttonActive: false,
+      sliderOpen: true,
+      mode: CALL,
+      executeAction: true,
+    },
+  });
+  describe('getActionBarMode', () => {
+    it('should return \'mode\'', () => {
+      const selector = getActionBarMode();
+      expect(selector(mockedState)).toBe(CALL);
+    });
+  });
+
+  describe('getActionBarSliderOpen', () => {
+    it('should return \'sliderOpen\'', () => {
+      const selector = getActionBarSliderOpen();
+      expect(selector(mockedState)).toBe(true);
+    });
+  });
+
+  describe('getActionBarTurnComplete', () => {
+    it('should return \'turnComplete\'', () => {
+      const selector = getActionBarTurnComplete();
+      expect(selector(mockedState)).toBe(false);
+    });
+  });
+
+  describe('getActionBarButtonActive', () => {
+    it('should return \'buttonActive\'', () => {
+      const selector = getActionBarButtonActive();
+      expect(selector(mockedState)).toBe(false);
+    });
+  });
+
+  describe('getExecuteAction', () => {
+    it('should return \'executeAction\'', () => {
+      const selector = getExecuteAction();
+      expect(selector(mockedState)).toBe(true);
+    });
+  });
+});

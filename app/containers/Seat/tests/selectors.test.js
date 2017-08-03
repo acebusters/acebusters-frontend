@@ -1,5 +1,7 @@
 import { fromJS } from 'immutable';
-import EWT from 'ethereum-web-token';
+import { Type, Receipt } from 'poker-helper';
+
+import { babz } from '../../../utils/amountFormatter';
 
 import {
   makeLastReceiptSelector,
@@ -7,9 +9,16 @@ import {
   makeLastAmountSelector,
   makeCardsSelector,
   makeStackSelector,
+  makeShowStatusSelector,
+  makeSeatStatusSelector,
+  makeLastActionSelector,
+  makeOpenSelector,
+  makeCoordsSelector,
 } from '../selectors';
 
-import { ABI_BET, ABI_DIST, ABI_FOLD } from '../../../app.config';
+import {
+  STATUS_MSG,
+} from '../../../app.config';
 
 // secretSeed: 'rural tent tests net drip fatigue uncle action repeat couple lawn rival'
 const P1_ADDR = '0x6d2f2c0fa568243d2def3e999a791a6df45d816e';
@@ -18,6 +27,7 @@ const P1_KEY = '0x2e39143576f97f6ecd7439a0678f330d7144110cdc58b6476687cc243d7753
 // secretSeed: 'engine bargain deny liberty girl wedding plug valley pig admit kiss couch'
 const P2_ADDR = '0x1c5a1730ffc44ac21700bb85bf0ceefd12ce71d7';
 const P2_KEY = '0x99e69145c6e7f44ba04d579faac9ef4ce5e942dc02b96a9d42b5fcb03e508729';
+const EMPTY = '0x0000000000000000000000000000000000000000';
 
 const TBL_ADDR = '0x77aabb1133';
 
@@ -32,7 +42,7 @@ describe('lastReceiptSelector', () => {
               address: P1_ADDR,
             }, {
               address: P2_ADDR,
-              last: new EWT(ABI_FOLD).fold(1, 500).sign(P2_KEY),
+              last: new Receipt(TBL_ADDR).fold(1, babz(500)).sign(P2_KEY),
             }],
           },
         },
@@ -47,7 +57,7 @@ describe('lastReceiptSelector', () => {
       },
     };
     const receiptSelector = makeLastReceiptSelector();
-    expect(receiptSelector(mockedState, props)).toEqual(EWT.parse(new EWT(ABI_FOLD).fold(1, 500).sign(P2_KEY)));
+    expect(receiptSelector(mockedState, props)).toEqual(Receipt.parse(new Receipt(TBL_ADDR).fold(1, babz(500)).sign(P2_KEY)));
   });
 });
 
@@ -62,9 +72,9 @@ describe('lastAmountSelector', () => {
               address: P1_ADDR,
             }, {
               address: P2_ADDR,
-              last: new EWT(ABI_BET).bet(1, 1500).sign(P2_KEY),
+              last: new Receipt(TBL_ADDR).bet(1, babz(1500)).sign(P2_KEY),
             }],
-            lastRoundMaxBet: 1000,
+            lastRoundMaxBet: babz(1000),
           },
         },
       },
@@ -78,7 +88,140 @@ describe('lastAmountSelector', () => {
       },
     };
     const lastAmountSelector = makeLastAmountSelector();
-    expect(lastAmountSelector(mockedState, props)).toEqual(500);
+    expect(lastAmountSelector(mockedState, props)).toEqual(500000000000000);
+  });
+});
+
+describe('makeLastActionSelector', () => {
+  it('should return type of last action', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          0: {
+            state: 'flop',
+            lineup: [{
+              address: P1_ADDR,
+            }, {
+              address: P2_ADDR,
+              last: new Receipt(TBL_ADDR).bet(1, babz(1500)).sign(P2_KEY),
+            }],
+            lastRoundMaxBet: babz(1000),
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 1,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 0,
+      },
+    };
+    const lastActionSelector = makeLastActionSelector();
+    expect(lastActionSelector(mockedState, props)).toEqual(Type.BET);
+  });
+});
+
+describe('makeOpenSelector', () => {
+  it('should return false if seat is busy', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          data: {
+            seats: [],
+          },
+          0: {
+            state: 'waiting',
+            lineup: [{
+              address: P1_ADDR,
+            }, {
+              address: EMPTY,
+            }],
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 0,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 0,
+      },
+    };
+    const openSelector = makeOpenSelector();
+    expect(openSelector(mockedState, props)).toEqual(false);
+  });
+
+  it('should return true if seat is open', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          data: {
+            seats: [],
+          },
+          0: {
+            state: 'waiting',
+            lineup: [{
+              address: P1_ADDR,
+            }, {
+              address: EMPTY,
+            }],
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 1,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 0,
+      },
+    };
+    const openSelector = makeOpenSelector();
+    expect(openSelector(mockedState, props)).toEqual(true);
+  });
+});
+
+describe('makeCoordsSelector', () => {
+  it('should return coords', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          data: {
+            seats: [],
+          },
+          0: {
+            state: 'waiting',
+            lineup: [{
+              address: P1_ADDR,
+            }, {
+              address: P2_ADDR,
+            }],
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 0,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 0,
+      },
+    };
+    const propsSecond = {
+      pos: 1,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 0,
+      },
+    };
+    const coordsSelector = makeCoordsSelector();
+    expect(coordsSelector(mockedState, props)).toEqual([10, 40, 0]);
+    expect(coordsSelector(mockedState, propsSecond)).toEqual([90, 40, 0]);
   });
 });
 
@@ -93,7 +236,7 @@ describe('foldedSelector', () => {
               address: P1_ADDR,
             }, {
               address: P2_ADDR,
-              last: new EWT(ABI_FOLD).fold(1, 500).sign(P2_KEY),
+              last: new Receipt(TBL_ADDR).fold(1, babz(500)).sign(P2_KEY),
             }],
           },
         },
@@ -161,8 +304,10 @@ describe('cardSelector', () => {
             state: 'flop',
             lineup: [{
               address: P1_ADDR,
+              last: new Receipt(TBL_ADDR).sitOut(21, babz(100)).sign(P1_KEY),
             }, {
               address: P2_ADDR,
+              last: new Receipt(TBL_ADDR).sitOut(21, babz(0)).sign(P2_KEY),
               cards: [12, 21],
             }],
             holeCards: [15, 25],
@@ -196,8 +341,10 @@ describe('cardSelector', () => {
             state: 'flop',
             lineup: [{
               address: P1_ADDR,
+              last: new Receipt(TBL_ADDR).sitOut(21, babz(100)).sign(P1_KEY),
             }, {
               address: P2_ADDR,
+              last: new Receipt(TBL_ADDR).sitOut(21, babz(0)).sign(P2_KEY),
             }],
             holeCards: [15, 25],
           },
@@ -252,7 +399,7 @@ describe('stackSelector', () => {
             state: 'waiting',
             lineup: [{
               address: P1_ADDR,
-              last: new EWT(ABI_BET).bet(1, 500).sign(P1_KEY),
+              last: new Receipt(TBL_ADDR).bet(1, babz(500)).sign(P1_KEY),
             }, {
               address: P2_ADDR,
             }],
@@ -263,7 +410,7 @@ describe('stackSelector', () => {
             }, {
               address: P2_ADDR,
             }],
-            amounts: [3000, 5000],
+            amounts: [babz(3000).toNumber(), babz(5000).toNumber()],
             lastHandNetted: 3,
           },
         },
@@ -276,14 +423,15 @@ describe('stackSelector', () => {
         tableAddr: TBL_ADDR,
       },
     };
-    expect(stackSelector(mockedState, props)).toEqual(2500);
+    expect(stackSelector(mockedState, props)).toEqual(babz(2500).toNumber());
   });
 
   it('should select player\'s stack with 2 hand in state channel.', () => {
-    const dists = [];
-    dists.push(EWT.concat(P1_ADDR, 10).toString('hex')); // rake
-    dists.push(EWT.concat(P2_ADDR, 1000).toString('hex'));
-    const distRec = new EWT(ABI_DIST).distribution(4, 0, dists).sign(P1_KEY);
+    const dists = [
+      babz(10), // rake
+      babz(1000),
+    ];
+    const distRec = new Receipt(TBL_ADDR).dist(4, 0, dists).sign(P1_KEY);
 
     const mockedState = fromJS({
       table: {
@@ -294,7 +442,7 @@ describe('stackSelector', () => {
               address: P1_ADDR,
             }, {
               address: P2_ADDR,
-              last: new EWT(ABI_BET).bet(1, 500).sign(P2_KEY),
+              last: new Receipt(TBL_ADDR).bet(1, babz(500)).sign(P2_KEY),
             }],
             distribution: distRec,
           },
@@ -304,7 +452,7 @@ describe('stackSelector', () => {
               address: P1_ADDR,
             }, {
               address: P2_ADDR,
-              last: new EWT(ABI_BET).bet(1, 1200).sign(P2_KEY),
+              last: new Receipt(TBL_ADDR).bet(1, babz(1200)).sign(P2_KEY),
             }],
           },
           data: {
@@ -313,7 +461,7 @@ describe('stackSelector', () => {
             }, {
               address: P2_ADDR,
             }],
-            amounts: [3000, 5000],
+            amounts: [babz(3000).toNumber(), babz(5000).toNumber()],
             lastHandNetted: 3,
           },
         },
@@ -326,6 +474,423 @@ describe('stackSelector', () => {
         tableAddr: TBL_ADDR,
       },
     };
-    expect(stackSelector(mockedState, props)).toEqual(4300);
+    expect(stackSelector(mockedState, props)).toEqual(babz(4300).toNumber());
+  });
+});
+
+describe('makeSeatStatusSelector', () => {
+  describe('if user sits at table and seat is pending', () => {
+    it('should return sittingIn', () => {
+      const mockedState = fromJS({
+        table: {
+          [TBL_ADDR]: {
+            data: {
+              smallBlind: 50,
+            },
+            0: {
+              state: 'preflop',
+              dealer: 0,
+              lineup: [{
+                address: P1_ADDR,
+                last: new Receipt(TBL_ADDR).bet(1, babz(50)).sign(P1_KEY),
+                pending: true,
+              }, {
+                address: P2_ADDR,
+                last: new Receipt(TBL_ADDR).bet(1, babz(100)).sign(P2_KEY),
+              }],
+            },
+          },
+        },
+      });
+
+      const props = {
+        pos: 0,
+        params: {
+          tableAddr: TBL_ADDR,
+          handId: 0,
+        },
+      };
+      const statusSelector = makeSeatStatusSelector();
+      expect(statusSelector(mockedState, props))
+        .toEqual(STATUS_MSG.sittingIn);
+    });
+  });
+  describe('if player is leaving the table', () => {
+    it('should return standingUp', () => {
+      const mockedState = fromJS({
+        table: {
+          [TBL_ADDR]: {
+            data: {
+              smallBlind: 50,
+            },
+            2: {
+              state: 'preflop',
+              dealer: 0,
+              lineup: [{
+                address: P1_ADDR,
+                last: new Receipt(TBL_ADDR).bet(1, babz(50)).sign(P1_KEY),
+                exitHand: 0,
+              }, {
+                address: P2_ADDR,
+                last: new Receipt(TBL_ADDR).bet(1, babz(100)).sign(P2_KEY),
+              }],
+            },
+          },
+        },
+      });
+
+      const props = {
+        pos: 0,
+        params: {
+          tableAddr: TBL_ADDR,
+          handId: 2,
+        },
+      };
+      const statusSelector = makeSeatStatusSelector();
+      expect(statusSelector(mockedState, props))
+        .toEqual(STATUS_MSG.standingUp);
+    });
+  });
+  describe('if player is in sitout', () => {
+    it('should return sitOut', () => {
+      const mockedState = fromJS({
+        table: {
+          [TBL_ADDR]: {
+            data: {
+              smallBlind: 50,
+            },
+            0: {
+              state: 'preflop',
+              dealer: 0,
+              lineup: [{
+                address: P1_ADDR,
+                last: new Receipt(TBL_ADDR).bet(1, babz(50)).sign(P1_KEY),
+                sitout: 312431432,
+              }, {
+                address: P2_ADDR,
+                last: new Receipt(TBL_ADDR).bet(1, babz(100)).sign(P2_KEY),
+              }],
+            },
+          },
+        },
+      });
+
+      const props = {
+        pos: 0,
+        params: {
+          tableAddr: TBL_ADDR,
+          handId: 0,
+        },
+      };
+      const statusSelector = makeSeatStatusSelector();
+      expect(statusSelector(mockedState, props))
+        .toEqual(STATUS_MSG.sitOut);
+    });
+  });
+  describe('if player returns from sitout', () => {
+    it('should return sittingIn', () => {
+      const mockedState = fromJS({
+        table: {
+          [TBL_ADDR]: {
+            data: {
+              smallBlind: 50,
+            },
+            1: {
+              state: 'preflop',
+              dealer: 0,
+              lineup: [{
+                address: P1_ADDR,
+                last: new Receipt(TBL_ADDR).sitOut(1, babz(0)).sign(P1_KEY),
+              }, {
+                address: P2_ADDR,
+                last: new Receipt(TBL_ADDR).bet(1, babz(100)).sign(P2_KEY),
+              }],
+            },
+          },
+        },
+      });
+
+      const props = {
+        pos: 0,
+        params: {
+          tableAddr: TBL_ADDR,
+          handId: 1,
+        },
+      };
+      const statusSelector = makeSeatStatusSelector();
+      expect(statusSelector(mockedState, props))
+        .toEqual(STATUS_MSG.sittingIn);
+    });
+  });
+  describe('if player is sitting at table playing', () => {
+    it('should return sittingIn', () => {
+      const mockedState = fromJS({
+        table: {
+          [TBL_ADDR]: {
+            data: {
+              smallBlind: 50,
+            },
+            1: {
+              state: 'preflop',
+              dealer: 0,
+              lineup: [{
+                address: P1_ADDR,
+                last: new Receipt(TBL_ADDR).bet(1, babz(50)).sign(P1_KEY),
+              }, {
+                address: P2_ADDR,
+                last: new Receipt(TBL_ADDR).bet(1, babz(100)).sign(P2_KEY),
+              }],
+            },
+          },
+        },
+      });
+
+      const props = {
+        pos: 0,
+        params: {
+          tableAddr: TBL_ADDR,
+          handId: 1,
+        },
+      };
+      const statusSelector = makeSeatStatusSelector();
+      expect(statusSelector(mockedState, props))
+        .toEqual(STATUS_MSG.active);
+    });
+  });
+  describe('if player waiting for another player', () => {
+    it('should return waiting', () => {
+      const mockedState = fromJS({
+        table: {
+          [TBL_ADDR]: {
+            data: {
+              smallBlind: 50,
+            },
+            1: {
+              state: 'preflop',
+              dealer: 0,
+              lineup: [{
+                address: P1_ADDR,
+              }, {
+                address: P2_ADDR,
+              }],
+            },
+          },
+        },
+      });
+
+      const props = {
+        pos: 0,
+        params: {
+          tableAddr: TBL_ADDR,
+          handId: 1,
+        },
+      };
+      const statusSelector = makeSeatStatusSelector();
+      expect(statusSelector(mockedState, props))
+        .toEqual(STATUS_MSG.waiting);
+    });
+  });
+});
+
+describe('makeShowStatusSelector', () => {
+  it('should return posted SB', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          data: {
+            smallBlind: babz(50).toNumber(),
+          },
+          0: {
+            state: 'preflop',
+            dealer: 0,
+            lineup: [{
+              address: P1_ADDR,
+              last: new Receipt(TBL_ADDR).bet(0, babz(50)).sign(P1_KEY),
+            }, {
+              address: P2_ADDR,
+              last: new Receipt(TBL_ADDR).bet(0, babz(100)).sign(P2_KEY),
+            }],
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 0,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 0,
+      },
+    };
+    const statusSelector = makeShowStatusSelector();
+    expect(statusSelector(mockedState, props))
+      .toEqual(STATUS_MSG.blindSmall);
+  });
+
+  it('should return posted BB', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          data: {
+            smallBlind: babz(50).toNumber(),
+          },
+          0: {
+            state: 'preflop',
+            dealer: 0,
+            lineup: [{
+              address: P1_ADDR,
+              last: new Receipt(TBL_ADDR).bet(0, babz(50)).sign(P1_KEY),
+            }, {
+              address: P2_ADDR,
+              last: new Receipt(TBL_ADDR).bet(0, babz(100)).sign(P2_KEY),
+            }],
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 1,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 0,
+      },
+    };
+    const statusSelector = makeShowStatusSelector();
+    expect(statusSelector(mockedState, props)).toEqual(STATUS_MSG.blindBig);
+  });
+
+  it('should return check', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          data: {
+            smallBlind: 50,
+          },
+          3: {
+            state: 'flop',
+            dealer: 0,
+            lineup: [{
+              address: P1_ADDR,
+              last: new Receipt(TBL_ADDR).bet(3, babz(200)).sign(P1_KEY),
+            }, {
+              address: P2_ADDR,
+              last: new Receipt(TBL_ADDR).checkFlop(3, babz(200)).sign(P2_KEY),
+            }],
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 1,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 3,
+      },
+    };
+    const statusSelector = makeShowStatusSelector();
+    expect(statusSelector(mockedState, props)).toEqual(STATUS_MSG.check);
+  });
+
+  it('should return call', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          data: {
+            smallBlind: 50,
+          },
+          3: {
+            state: 'flop',
+            dealer: 0,
+            lineup: [{
+              address: P1_ADDR,
+              last: new Receipt(TBL_ADDR).bet(3, babz(200)).sign(P1_KEY),
+            }, {
+              address: P2_ADDR,
+              last: new Receipt(TBL_ADDR).bet(3, babz(200)).sign(P2_KEY),
+            }],
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 0,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 3,
+      },
+    };
+    const statusSelector = makeShowStatusSelector();
+    expect(statusSelector(mockedState, props)).toEqual(STATUS_MSG.call);
+  });
+
+  it('should return bet', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          data: {
+            smallBlind: 50,
+          },
+          3: {
+            state: 'flop',
+            lastRoundMaxBet: babz(100),
+            dealer: 0,
+            lineup: [{
+              address: P1_ADDR,
+              last: new Receipt(TBL_ADDR).bet(3, babz(200)).sign(P1_KEY),
+            }, {
+              address: P2_ADDR,
+              last: new Receipt(TBL_ADDR).bet(3, babz(100)).sign(P2_KEY),
+            }],
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 0,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 3,
+      },
+    };
+    const statusSelector = makeShowStatusSelector();
+    expect(statusSelector(mockedState, props)).toEqual(STATUS_MSG.bet);
+  });
+
+  it('should return raise', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          data: {
+            smallBlind: 50,
+          },
+          3: {
+            state: 'flop',
+            lastRoundMaxBet: 100,
+            dealer: 0,
+            lineup: [{
+              address: P1_ADDR,
+              last: new Receipt(TBL_ADDR).bet(3, babz(400)).sign(P1_KEY),
+            }, {
+              address: P2_ADDR,
+              last: new Receipt(TBL_ADDR).bet(3, babz(200)).sign(P2_KEY),
+            }],
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 0,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 3,
+      },
+    };
+    const statusSelector = makeShowStatusSelector();
+    expect(statusSelector(mockedState, props)).toEqual(STATUS_MSG.raise);
   });
 });

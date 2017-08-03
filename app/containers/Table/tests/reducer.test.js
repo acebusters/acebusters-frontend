@@ -1,16 +1,18 @@
-import EWT from 'ethereum-web-token';
 import BigNumber from 'bignumber.js';
 import { fromJS, is } from 'immutable';
+import { Receipt } from 'poker-helper';
 
 import tableReducer from '../reducer';
 import {
   updateReceived,
   setCards,
-  pendingToggle,
+  setPending,
+  dropPending,
   lineupReceived,
+  addMessage,
 } from '../actions';
 
-import { ABI_BET } from '../../../app.config';
+import { babz } from '../../../utils/amountFormatter';
 
 // secretSeed: 'rural tent tests net drip fatigue uncle action repeat couple lawn rival'
 const P1_ADDR = '0x6d2f2c0fa568243d2def3e999a791a6df45d816e';
@@ -32,10 +34,10 @@ describe('table reducer tests', () => {
     // set up previous state
     const lineup = [{
       address: P1_ADDR,
-      last: new EWT(ABI_BET).bet(1, 50).sign(P1_KEY),
+      last: new Receipt(tableAddr).bet(1, babz(50)).sign(P1_KEY),
     }, {
       address: P2_ADDR,
-      last: new EWT(ABI_BET).bet(1, 50).sign(P2_KEY),
+      last: new Receipt(tableAddr).bet(1, babz(50)).sign(P2_KEY),
     }];
     const before = fromJS({
       [tableAddr]: {
@@ -109,7 +111,7 @@ describe('table reducer tests', () => {
 
     const newLineup = [{
       address: P1_ADDR,
-      last: new EWT(ABI_BET).bet(1, 50).sign(P1_KEY),
+      last: new Receipt(tableAddr).bet(1, babz(50)).sign(P1_KEY),
     }, {
       address: P2_ADDR,
     }];
@@ -249,10 +251,13 @@ describe('table reducer tests', () => {
     });
 
     // execute action
-    const nextState = tableReducer(before, pendingToggle(tableAddr, 2, 0));
+    const nextState = tableReducer(
+      before,
+      setPending(tableAddr, 2, 0, {})
+    );
 
     // check state after execution
-    const after = before.setIn([tableAddr, '2', 'lineup', 0, 'pending'], true);
+    const after = before.setIn([tableAddr, '2', 'lineup', 0, 'pending'], fromJS({}));
     expect(nextState).toEqual(after);
   });
 
@@ -271,10 +276,75 @@ describe('table reducer tests', () => {
     });
 
     // execute action
-    const nextState = tableReducer(before, pendingToggle(tableAddr, 2, 0));
+    const nextState = tableReducer(
+      before,
+      dropPending(tableAddr, 2, 0)
+    );
 
     // check state after execution
     const after = before.deleteIn([tableAddr, '2', 'lineup', 0, 'pending']);
     expect(nextState).toEqual(after);
+  });
+
+  it('should add message', () => {
+    // set up previous state
+    const before = fromJS({
+      [tableAddr]: {
+        messages: [],
+      },
+    });
+
+    const date = new Date();
+
+    // execute action
+    const nextState = tableReducer(before, addMessage('hello!', tableAddr, P1_ADDR, date));
+
+    // check state after execution
+    const after = before.updateIn([tableAddr, 'messages'], (list) => list.push({
+      message: 'hello!',
+      signer: P1_ADDR,
+      created: date,
+    }));
+    expect(nextState).toEqual(after);
+  });
+
+  it('should not return old messages', () => {
+    // set up previous state
+    const lineup = [{
+      address: P1_ADDR,
+      last: new Receipt(tableAddr).bet(1, babz(50)).sign(P1_KEY),
+    }, {
+      address: P2_ADDR,
+      last: new Receipt(tableAddr).bet(1, babz(50)).sign(P2_KEY),
+    }];
+
+    const now = Date.now();
+    const min16ago = Date.now() - (60 * 16 * 1000);
+
+    const before = fromJS({
+      [tableAddr]: {
+        messages: [],
+      },
+    });
+
+    const firstMessage = tableReducer(before, addMessage('old!', tableAddr, P1_ADDR, min16ago));
+    const secondMessage = tableReducer(firstMessage, addMessage('hello!', tableAddr, P1_ADDR, now));
+
+    // execute action
+    const nextState = tableReducer(secondMessage, updateReceived(tableAddr, {
+      handId: 0,
+      dealer: 0,
+      changed: 123,
+      state: 'turn',
+      flopMaxBet: 50,
+      lineup,
+    }));
+
+    // check state after execution
+    expect(nextState.getIn([tableAddr, 'messages']).toJS()).toEqual([{
+      message: 'hello!',
+      signer: P1_ADDR,
+      created: now,
+    }]);
   });
 });

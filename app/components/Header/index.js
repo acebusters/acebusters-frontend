@@ -1,114 +1,80 @@
 import React from 'react';
-import styled from 'styled-components';
-import { browserHistory } from 'react-router';
+import PropTypes from 'prop-types';
+import onClickOutside from 'react-onclickoutside';
 
 import Navbar from './Navbar';
 import UserMenu from './UserMenu';
 import NavItem from './NavItem';
 
 import {
-  screenXsMax,
-} from '../../variables';
+  StyledHeader,
+  NavToggle,
+} from './styles';
 
-const StyledHeader = styled.header`
-  /* clearfix */
-  &:before, &:after {
-    display: table;
-    content: " ";
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-  }
-  &:after {
-    clear: both;
-  }
-  position: ${(props) => (props.fixed ? 'fixed' : 'relative')};
-  width: 100%;
-  max-height: 50px;
-  z-index: 1030;
-  /* theme */
-  ${(props) => props.theme.headerBoxShadow && `
-    -webkit-box-shadow: ${props.theme.headerBoxShadow};
-    box-shadow: ${props.theme.headerBoxShadow};
-  `}
-`;
-
-const NavToggle = styled.button`
-  position: relative;
-  float: right;
-  padding: 9px 10px;
-  margin-top: 8px;
-  margin-right: 15px;
-  margin-bottom: 8px;
-  background-color: transparent;
-  background-image: none;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  cursor: pointer;
-  @media (min-width: ${screenXsMax}) {
-    display: none;
-  }
-`;
-
-
-class Header extends React.Component { // eslint-disable-line react/prefer-stateless-function
+class Header extends React.Component {
   constructor(props) {
     super(props);
-    this.toggleCollapsedMenu = this.toggleCollapsedMenu.bind(this);
+    this.handleClickOutside = this.handleClickOutside.bind(this);
   }
 
-  toggleCollapsedMenu() {
-    const collapsed = (this.state) ? !this.state.toggleCollapsed : false;
-    this.setState({ toggleCollapsed: collapsed });
+  handleClickOutside() {
+    if (!this.props.collapsed) {
+      this.props.setCollapsed(true);
+    }
   }
 
   render() {
-    const collapsed = (this.state) ? this.state.toggleCollapsed : true;
+    const toggleCollapsedMenu = () => this.props.setCollapsed(!this.props.collapsed);
     const navButtons = this.props.loggedIn ? ([
       <NavToggle
-        onClick={this.toggleCollapsedMenu}
+        onClick={toggleCollapsedMenu}
         key="nav-toggle"
       >
         <i className="fa fa-bars fa-2"></i>
       </NavToggle>,
       <NavItem
-        onClick={() => browserHistory.push('/dashboard')}
-        collapsed={collapsed}
+        to="dashboard"
+        collapsed={this.props.collapsed}
         key="2"
         title="Dashboard"
+        location={this.props.location}
       />,
       <NavItem
-        onClick={() => browserHistory.push('/lobby')}
+        to="lobby"
         key="3"
-        collapsed={collapsed}
+        collapsed={this.props.collapsed}
         title="Lobby"
+        location={this.props.location}
       />,
       <UserMenu
-        name={`${this.props.signerAddr.substring(0, 8)}...`}
-        image={this.props.imageUrl}
-        profileAction={() => browserHistory.push('/dashboard')}
-        signOutAction={this.props.onClickLogout}
-        collapsed={collapsed}
-        signerAddr={this.props.signerAddr}
+        onLogout={this.props.onClickLogout}
+        collapsed={this.props.collapsed}
         key="4"
+        {...this.props}
       />,
     ]) : ([
       <NavItem
-        onClick={() => browserHistory.push('/register')}
+        collapseOnMobile={false}
+        to="/register"
         key="1"
         title="Register"
+        location={this.props.location}
       />,
       <NavItem
-        onClick={() => browserHistory.push('/login')}
+        collapseOnMobile={false}
+        to="/login"
         key="2"
         title="Login"
+        location={this.props.location}
       />,
     ]);
     return (
-      <StyledHeader fixed={this.props.fixed} id="header">
-        <Navbar
-          loggedIn={this.props.loggedIn}
-        >
+      <StyledHeader
+        onMouseLeave={this.handleClickOutside}
+        fixed={this.props.fixed}
+        id="header"
+      >
+        <Navbar loggedIn={this.props.loggedIn}>
           {navButtons}
         </Navbar>
       </StyledHeader>
@@ -117,11 +83,12 @@ class Header extends React.Component { // eslint-disable-line react/prefer-state
 }
 
 Header.propTypes = {
-  fixed: React.PropTypes.bool,
-  loggedIn: React.PropTypes.bool,
-  imageUrl: React.PropTypes.string,
-  signerAddr: React.PropTypes.string,
-  onClickLogout: React.PropTypes.func,
+  fixed: PropTypes.bool,
+  location: PropTypes.object,
+  loggedIn: PropTypes.bool,
+  onClickLogout: PropTypes.func,
+  setCollapsed: PropTypes.func,
+  collapsed: PropTypes.bool,
 };
 
 Header.defaultProps = {
@@ -131,4 +98,4 @@ Header.defaultProps = {
   logoSm: <span><b>A</b>B</span>,
 };
 
-export default Header;
+export default onClickOutside(Header);

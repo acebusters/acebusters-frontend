@@ -8,6 +8,7 @@
 
 import React, { PropTypes, Children } from 'react';
 import styled from 'styled-components';
+import A from '../A';
 
 import {
   baseColor,
@@ -18,64 +19,62 @@ import {
   hover,
 } from '../../variables';
 
-const Medium = styled.button`{
-  display: block;
+const SharedButton = styled.button`
+  display: inline-block;
   box-sizing: border-box;
   text-decoration: none;
-  margin: 0 auto;
-  padding: 0.1em 0.5em;
-  font-size: 10em;
   border-radius: 4px;
-  -webkit-font-smoothing: antialiased;
-  -webkit-touch-callout: none;
   user-select: none;
   cursor: pointer;
   outline: 0;
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-weight: bold;
+  color: ${white};
+
+  & + & {
+    margin-left: 10px;
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+`;
+
+const Medium = styled(SharedButton)`
+  padding: 0.1em 0.5em;
   font-size: 16px;
   background-color: ${black};
-  color: ${white};
- 
-  &:active {
-    color: ${baseColor};
-  }
-  
+
   &:hover {
     color: ${baseColor};
   }
-}`;
 
-const Large = styled.button`
-  display: block;
-  box-sizing: border-box;
-  text-decoration: none;
-  margin: 0 auto;
-  padding: 10px;
-  font-size: 10em;
-  border-radius: 4px;
-  -webkit-font-smoothing: antialiased;
-  -webkit-touch-callout: none;
-  user-select: none;
-  cursor: pointer;
-  outline: 0;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-weight: bold;
-  font-size: 24px;
-  color: ${white};
-  width: 100%;
-  background-color: ${baseColor};
   &:active {
     color: ${baseColor};
-    background-color: ${background};
   }
-  
+
+  &:disabled {
+    color: ${white};
+    opacity: 0.6;
+  }
+`;
+
+const Large = styled(SharedButton)`
+  padding: 10px;
+  font-size: 24px;
+  width: 100%;
+  background-color: ${baseColor};
+
   &:hover {
     color: ${white};
     background-color: ${hover};
   }
-  
-  
+
+  &:active {
+    color: ${baseColor};
+    background-color: ${background};
+  }
+
   &:disabled {
     color: ${background};
     background-color: ${disabled};
@@ -85,73 +84,50 @@ const Large = styled.button`
 
 const Icon = styled.i`
   padding-left: 0.5em;
-  ${(props) => {
-    if (props.content.length === 0) {
-      return 'padding-right: 0.5em;';
-    }
-    return 'padding-right: 0';
-  }}
+  padding-right: ${(props) => props.content.length === 0 ? '0.5em' : 0};
 `;
 
-const Wrapper = styled.div`
-  text-align: center;
-  width: 100%;
-`;
+const sizes = {
+  medium: Medium,
+  large: Large,
+  link: A,
+};
 
-function Button(props) {
+function Button({
+  icon = '',
+  children,
+  ...props
+}) {
   // Render an anchor tag
-  const icon = props.icon ? props.icon : '';
-  let button;
-  switch (props.size) {
-    case 'medium': {
-      button = (
-        <Medium onClick={props.onClick} type={props.type} disabled={props.disabled}>
-          {Children.toArray(props.children)}
-          { props.icon &&
-          <Icon className={icon} content={Children.toArray(props.children)}></Icon>
-          }
-        </Medium>
-      );
-      break;
-    }
+  const ButtonComponent = getButtonComponent(props);
 
-    case 'large': {
-      button = (
-        <Large onClick={props.onClick} type={props.type} disabled={props.disabled}>
-          {Children.toArray(props.children)}
-          { props.icon &&
-          <Icon className={icon} content={Children.toArray(props.children)}></Icon>
-          }
-        </Large>
-      );
-      break;
-    }
-
-    default: {
-      button = (
-        <Medium onClick={props.onClick} type={props.type} disabled={props.disabled}>
-          {Children.toArray(props.children)}
-          { props.icon &&
-          <Icon className={icon} content={Children.toArray(props.children)}></Icon>
-          }
-        </Medium>
-      );
-    }
-  }
   return (
-    <Wrapper>
-      {button}
-    </Wrapper>
+    <ButtonComponent {...props}>
+      {Children.toArray(children)}
+      {icon &&
+        <Icon className={icon} content={Children.toArray(children)}></Icon>
+      }
+    </ButtonComponent>
   );
 }
 
 Button.propTypes = {
   onClick: PropTypes.func,
   type: PropTypes.string,
-  size: PropTypes.string,
+  size: PropTypes.oneOf(['large', 'medium', 'link']),
   icon: PropTypes.string,
   disabled: PropTypes.bool,
   children: PropTypes.node,
 };
+
+function getButtonComponent({ size, href }) {
+  const component = sizes[size] || Medium;
+
+  if (href) {
+    return component.withComponent(SharedButton.withComponent('a'));
+  }
+
+  return component;
+}
 
 export default Button;

@@ -6,6 +6,8 @@ import { getAsyncInjectors } from './utils/asyncInjectors';
 import { accountSaga } from './containers/AccountProvider/sagas';
 import { tableStateSaga } from './containers/Table/sagas';
 import { selectAccount } from './containers/AccountProvider/selectors';
+import { notificationsSaga } from './containers/Notifications/sagas';
+import { actionBarSaga } from './containers/ActionBar/sagas';
 
 const errorLoading = (err) => {
   console.error('Dynamic page loading failed', err); // eslint-disable-line no-console
@@ -34,7 +36,7 @@ export default function createRoutes(store) {
     }
   };
 
-  injectSagas([accountSaga, tableStateSaga]);
+  injectSagas([accountSaga, actionBarSaga, tableStateSaga, notificationsSaga]);
 
   return [
     {
@@ -100,6 +102,9 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
+      path: '/table/:tableAddr',
+      onEnter: ({ params }, replace) => replace(`/table/${params.tableAddr}/hand/1`),
+    }, {
       path: '/login',
       name: 'login',
       getComponent(nextState, cb) {
@@ -117,12 +122,44 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: '/register',
+      path: '/register(/ref/:refCode)',
       name: 'register',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
           import('containers/RegisterPage/sagas'),
           import('containers/RegisterPage'),
+        ]);
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([sagas, component]) => {
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/reset',
+      name: 'reset',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/ResetPage'),
+        ]);
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([component]) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/generate',
+      name: 'generate',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/GeneratePage/sagas'),
+          import('containers/GeneratePage'),
         ]);
         const renderRoute = loadModule(cb);
 

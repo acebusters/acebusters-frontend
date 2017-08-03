@@ -3,20 +3,32 @@
  */
 
 import { createSelector } from 'reselect';
+import { formValueSelector } from 'redux-form/immutable';
 
-const selectGlobal = (state) => state.get('global');
+export const selectGlobal = (state) => state.get('global');
 
-const makeSelectTransferShow = () => createSelector(
+const formSelector = formValueSelector('login');
+export const selectWorkerProgress = (state) => formSelector(state, 'workerProgress');
+
+export const makeSelectTransferShow = () => createSelector(
   selectGlobal,
   (globalState) => globalState.get('transferShow')
 );
 
-const makeModalStackSelector = () => createSelector(
+export const makeSelectProgress = () => createSelector(
   selectGlobal,
-  (state) => (state && state.get('modalStack')) ? state.get('modalStack').toJS() : []
+  (globalState) => globalState.get('progress')
 );
 
-const makeSelectLocationState = () => {
+export const makeModalSelector = () => createSelector(
+  selectGlobal,
+  (state) => (state && state.get('modalStack').size > 0) ? {
+    node: state.get('modalStack').last(),
+    closeHandler: state.get('modalCloseHandlers').last(),
+  } : null
+);
+
+export const makeSelectLocationState = () => {
   let prevRoutingState;
   let prevRoutingStateJS;
 
@@ -32,9 +44,3 @@ const makeSelectLocationState = () => {
   };
 };
 
-export {
-  selectGlobal,
-  makeSelectTransferShow,
-  makeModalStackSelector,
-  makeSelectLocationState,
-};

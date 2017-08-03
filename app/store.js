@@ -8,10 +8,16 @@ import { routerMiddleware } from 'react-router-redux';
 import createSagaMiddleware from 'redux-saga';
 
 import createReducer from './reducers';
+import { setAuthState } from './containers/AccountProvider/actions';
 import { accountSaga } from './containers/AccountProvider/sagas';
 import { loginSaga } from './containers/LoginPage/sagas';
 import { registerSaga } from './containers/RegisterPage/sagas';
+import { generateSaga } from './containers/GeneratePage/sagas';
 import { formActionSaga } from './services/reduxFormSaga';
+import { notificationsSaga } from './containers/Notifications/sagas';
+import workers from './workers';
+
+import * as storageService from './services/localStorage';
 
 const sagaMiddleware = createSagaMiddleware();
 
@@ -20,6 +26,7 @@ export default function configureStore(initialState = {}, history) {
   // 1. sagaMiddleware: Makes redux-sagas work
   // 2. routerMiddleware: Syncs the location/URL path to the state
   const middlewares = [
+    ...workers,
     sagaMiddleware,
     routerMiddleware(history),
   ];
@@ -43,7 +50,14 @@ export default function configureStore(initialState = {}, history) {
     composeEnhancers(...enhancers)
   );
 
-  sagaMiddleware.run(formActionSaga, accountSaga, loginSaga, registerSaga);
+  sagaMiddleware.run(
+    formActionSaga,
+    accountSaga,
+    loginSaga,
+    generateSaga,
+    registerSaga,
+    notificationsSaga,
+  );
 
   // Extensions
   store.runSaga = sagaMiddleware.run;
@@ -62,5 +76,20 @@ export default function configureStore(initialState = {}, history) {
     });
   }
 
+  if (isLoggedIn()) {
+    store.dispatch(setAuthState({
+      loggedIn: true,
+      privKey: storageService.getItem('privKey'),
+      email: storageService.getItem('email'),
+    }));
+  } else {
+    store.dispatch(setAuthState({ loggedIn: false }));
+  }
+
   return store;
+}
+
+function isLoggedIn() {
+  const privKey = storageService.getItem('privKey');
+  return (privKey !== undefined && privKey.length > 32);
 }

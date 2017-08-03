@@ -16,8 +16,6 @@ const Content = styled.div`
   &:before, &:after {
     display: table;
     content: " ";
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
   }
   &:after {
@@ -25,8 +23,6 @@ const Content = styled.div`
   }
 
   /* shared */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   font-family: ${fontFamilyBase};
   font-weight: ${fontWeightBase};
   font-size: ${fontSizeBase};
@@ -41,13 +37,15 @@ const Content = styled.div`
   min-height: 100%;
   z-index: 800;
 
-  -webkit-transition: ${transitionSpeed} ${transitionFn}, width ${transitionSpeed} ${transitionFn};
-  -moz-transition: ${transitionSpeed} ${transitionFn}, width ${transitionSpeed} ${transitionFn};
-  -o-transition: ${transitionSpeed} ${transitionFn}, width ${transitionSpeed} ${transitionFn};
   transition: ${transitionSpeed} ${transitionFn}, width ${transitionSpeed} ${transitionFn};
 
   /* fixed layout */
-  ${(props) => (props.fixed && `padding-top: ${navbarHeight};`)};
+  padding-top: ${(props) => {
+    if (props.fixed) return navbarHeight;
+    if (props.showNavigation) return '60px';
+    return '20px';
+  }
+  }
 `;
 
 export default Content;

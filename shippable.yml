@@ -1,0 +1,29 @@
+language: node_js
+
+node_js:
+  - 7.4.0
+
+build:
+
+  # http://docs.shippable.com/ci/shippableyml/#ci
+  ci:
+    # npm mirrors can sometimes be flacky, better to use shippable_retry
+    # http://docs.shippable.com/ci/advancedOptions/retry/
+    - shippable_retry npm install
+    - npm test
+    - npm run build
+
+
+# Integrations are used to connect external resources to CI
+# http://docs.shippable.com/integrations/overview/
+integrations:
+
+  # http://docs.shippable.com/ci/shippableyml/#notifications
+  notifications:
+  # turning of email for PR builds, get notified only on failure and change in status
+  # http://docs.shippable.com/integrations/notifications/email/
+    - integrationName: email
+      type: email
+      on_success: change
+      on_failure: always
+      on_pull_request: never

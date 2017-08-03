@@ -7,10 +7,9 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { Form, Field, reduxForm } from 'redux-form/immutable';
 import { FormattedMessage } from 'react-intl';
-import Label from '../../components/Label';
-import Input from '../../components/Input';
-import Button from '../../components/Button';
-import FormGroup from '../../components/Form/FormGroup';
+import SubmitButton from '../../components/SubmitButton';
+import FormField from '../../components/Form/FormField';
+import { ErrorMessage } from '../../components/FormMessages';
 
 import messages from './messages';
 
@@ -26,16 +25,6 @@ const warn = () => {
   const warnings = {};
   return warnings;
 };
-
-/* eslint-disable react/prop-types */
-const renderField = ({ input, label, type, meta: { touched, error, warning } }) => (
-  <FormGroup>
-    <Label htmlFor={input.name}>{label}</Label>
-    <Input {...input} placeholder={label} type={type} />
-    {touched && ((error && <span>{error}</span>) || (warning && <span>{warning}</span>))}
-  </FormGroup>
-);
-/* eslint-enable react/prop-types */
 
 class InviteDialog extends React.Component { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
@@ -53,11 +42,10 @@ class InviteDialog extends React.Component { // eslint-disable-line react/prefer
       <div>
         <FormattedMessage {...messages.header} />
         <Form onSubmit={handleSubmit(this.handleSubmit)}>
-          <Field name="email" component={renderField} type="text" placeholder="e-mail" />
-          {error && <strong>{error}</strong>}
-          <div>
-            <Button type="submit" disabled={submitting}>Submit</Button>
-          </div>
+          <Field name="email" component={FormField} type="text" placeholder="e-mail" />
+          {error && <ErrorMessage>{error}</ErrorMessage>}
+
+          <SubmitButton disabled={submitting}>Submit</SubmitButton>
         </Form>
       </div>
     );

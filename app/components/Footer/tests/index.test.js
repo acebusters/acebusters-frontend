@@ -1,10 +1,7 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import { FormattedMessage } from 'react-intl';
 
-import A from 'components/A';
-import messages from '../messages';
-import Footer from '../index';
+import Footer, { A } from '../index';
 
 describe('<Footer />', () => {
   it('should render the copyright notice', () => {
@@ -12,23 +9,12 @@ describe('<Footer />', () => {
       <Footer />
     );
     expect(renderedComponent.contains(
-      <section>
-        <FormattedMessage {...messages.licenseMessage} />
-      </section>
+      <A href="http://www.acebusters.com/terms_of_use.html">Terms of Use</A>
     )).toBe(true);
   });
 
-  it('should render the credits', () => {
+  it('should render icons', () => {
     const renderedComponent = shallow(<Footer />);
-    expect(renderedComponent.contains(
-      <section>
-        <FormattedMessage
-          {...messages.authorMessage}
-          values={{
-            author: <A href="https://twitter.com/acebusters">Acebusters</A>,
-          }}
-        />
-      </section>
-    )).toBe(true);
+    expect(renderedComponent.find('.fa').length).toBe(4);
   });
 });

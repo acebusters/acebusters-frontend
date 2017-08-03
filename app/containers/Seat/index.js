@@ -8,21 +8,21 @@ import { createStructuredSelector } from 'reselect';
 import { modalAdd, modalDismiss } from '../App/actions';
 
 import {
-  pendingToggle,
-} from '../Table/actions';
-
-import {
   makeCardsSelector,
   makeLastAmountSelector,
   makeFoldedSelector,
   makeOpenSelector,
   makeSitoutSelector,
   makePendingSelector,
+  makeMyPendingSelector,
   makeAmountCoordsSelector,
+  makeLastActionSelector,
   makeCoordsSelector,
+  makeShowStatusSelector,
   makeDealerSelector,
   makeBlockySelector,
   makeStackSelector,
+  makeSeatStatusSelector,
 } from './selectors';
 
 import {
@@ -31,21 +31,31 @@ import {
   makeWhosTurnSelector,
 } from '../Table/selectors';
 
+import {
+  timeoutSeconds,
+} from '../../app.config';
+
 import SeatComponent from '../../components/Seat';
 
 class Seat extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
-
+  constructor(props) {
+    super(props);
+    this.state = { wasMostRecentAction: false };
+  }
   componentWillReceiveProps(nextProps) {
-    // Show Action;
-    this.opacity = (nextProps.lastAmount !== this.props.lastAmount) ? '1' : 0;
+    // Show Action if most recent action
+    this.setState({
+      wasMostRecentAction: nextProps.lastAmount === this.props.lastAmount,
+    });
 
     // manage timer
+    let timeLeft = timeoutSeconds;
     if (nextProps.whosTurn === nextProps.pos) {
+      // TODO: Make timeLeft count down from 100 - 0, right now is 360 - 0?
       if (!this.interval) {
         this.interval = setInterval(() => {
-          let timeLeft;
-          if (nextProps.hand && nextProps.hand.get('changed')) {
-            const deadline = nextProps.hand.get('changed') + 60;
+          if (this.props.changed) {
+            const deadline = this.props.changed + timeoutSeconds;
             timeLeft = deadline - Math.floor(Date.now() / 1000);
             if (timeLeft <= 0) {
               clearInterval(this.interval);
@@ -60,6 +70,7 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
       clearInterval(this.interval);
       this.interval = null;
     }
+    this.setState({ timeLeft });
   }
 
   componentWillUnmount() {
@@ -70,39 +81,40 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
   }
 
   render() {
-    const timeLeft = (this.state) ? this.state.timeLeft : 0;
-
+    const timeLeft = (this.state && this.props.whosTurn === this.props.pos) ? ((this.state.timeLeft * 100) / timeoutSeconds) : timeoutSeconds;
     return (
       <SeatComponent
         {...this.props}
         timeLeft={timeLeft}
-      >
-      </SeatComponent>
+        wasMostRecentAction={this.state.wasMostRecentAction}
+      />
     );
   }
 }
 
 export function mapDispatchToProps() {
   return {
-    modalAdd: (node) => (modalAdd(node)),
-    modalDismiss: () => (modalDismiss()),
-    pendingToggle: (tableAddr, handId, pos) => (pendingToggle(tableAddr, handId, pos)),
+    modalAdd,
+    modalDismiss,
   };
 }
-
 
 const mapStateToProps = createStructuredSelector({
   state: makeHandStateSelector(),
   dealer: makeDealerSelector(),
   open: makeOpenSelector(),
+  seatStatus: makeSeatStatusSelector(),
   pending: makePendingSelector(),
+  myPending: makeMyPendingSelector(),
   sitout: makeSitoutSelector(),
+  showStatus: makeShowStatusSelector(),
   coords: makeCoordsSelector(),
   amountCoords: makeAmountCoordsSelector(),
   myPos: makeMyPosSelector(),
   blocky: makeBlockySelector(),
   whosTurn: makeWhosTurnSelector(),
   lastAmount: makeLastAmountSelector(),
+  lastAction: makeLastActionSelector(),
   holeCards: makeCardsSelector(),
   folded: makeFoldedSelector(),
   stackSize: makeStackSelector(),
@@ -110,6 +122,9 @@ const mapStateToProps = createStructuredSelector({
 
 Seat.propTypes = {
   lastAmount: React.PropTypes.number,
+  changed: React.PropTypes.number,
+  whosTurn: React.PropTypes.number,
+  pos: React.PropTypes.number,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Seat);

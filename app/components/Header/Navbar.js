@@ -28,7 +28,7 @@ const StyledNavbarMenu = styled.div`
   display: block;
   float: right;
   @media (max-width: ${screenXsMax}) {
-    width: 100%;
+    width: ${(props) => props.loggedIn ? '100%' : 'auto'};
   }
 `;
 
@@ -43,17 +43,16 @@ const StyledNavbar = styled.nav`
     clear: both;
   }
   /* transitions */
-  -webkit-transition: margin-left ${transitionSpeed} ${transitionFn};
   -o-transition: margin-left ${transitionSpeed} ${transitionFn};
   transition: margin-left ${transitionSpeed} ${transitionFn};
   color: ${(props) => props.theme.navbarFontColor || '#333'};
   display: block;
   font-weight: 400;
-  position: relative;
+  position: fixed;
+  width: 100%;
   min-height: ${navbarHeight};
   z-index: 1000;
   margin-bottom: 0;
-  border: none;
   border-radius: 0;
   background-color: ${black};
 `;
@@ -62,7 +61,7 @@ const Navbar = (props) => (
   <StyledNavbar
     topNav={props.topNav}
   >
-    <StyledNavbarMenu collapsed={props.collapsed}>
+    <StyledNavbarMenu loggedIn={props.loggedIn} collapsed={props.collapsed}>
       <StyledNavbarMenuList name="navbar-menu-wrapper">
         {props.children}
       </StyledNavbarMenuList>
@@ -75,6 +74,7 @@ Navbar.propTypes = {
   children: React.PropTypes.node,
   topNav: React.PropTypes.bool,
   collapsed: React.PropTypes.bool,
+  loggedIn: React.PropTypes.bool,
 };
 
 export default Navbar;

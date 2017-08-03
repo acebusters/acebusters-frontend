@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import { fromJS } from 'immutable';
 import { PokerHelper, ReceiptCache } from 'poker-helper';
 import Solver from 'ab-pokersolver';
 import { makeSignerAddrSelector } from '../AccountProvider/selectors';
@@ -6,6 +7,9 @@ import {
   valuesShort,
   suits,
 } from '../../app.config';
+import { not } from '../../utils';
+
+import { babz } from '../../utils/amountFormatter';
 
 const rc = new ReceiptCache();
 const pokerHelper = new PokerHelper(rc);
@@ -40,6 +44,9 @@ const isSbTurnByAction = createSelector(
     if (!action.hand) {
       return false;
     }
+    if (action.hand.state !== 'waiting') {
+      return false;
+    }
     const active = pokerHelper.countActivePlayers(action.hand.lineup, action.hand.state);
     if (active <= 1) {
       return false;
@@ -65,7 +72,9 @@ const isBbTurnByAction = createSelector(
     if (!action.hand) {
       return false;
     }
-
+    if (action.hand.state !== 'dealing') {
+      return false;
+    }
     const bbPos = pokerHelper.getBbPos(action.hand.lineup, action.hand.dealer, action.hand.state);
     if (typeof bbPos === 'undefined' || bbPos < 0) {
       return false;
@@ -87,6 +96,9 @@ const is0rTurnByAction = createSelector(
     if (!action.hand || !action.hand.lineup) {
       return false;
     }
+    if (action.hand.state !== 'dealing') {
+      return false;
+    }
     const whosTurn = pokerHelper.getWhosTurn(action.hand.lineup, action.hand.dealer, action.hand.state, action.hand.sb * 2);
     if (typeof whosTurn === 'undefined' || whosTurn < 0) {
       return false;
@@ -105,7 +117,6 @@ const isShowTurnByAction = createSelector(
       return false;
     }
     const whosTurn = pokerHelper.getWhosTurn(action.hand.lineup, action.hand.dealer, action.hand.state, action.hand.sb * 2);
-
     if (typeof whosTurn === 'undefined' || whosTurn < 0) {
       return false;
     }
@@ -123,8 +134,15 @@ const hasNettingInAction = createSelector(
     if (!myAddr || !action || !action.hand || !action.hand.netting) {
       return false;
     }
-    // check already signed
-    if (action.hand.netting[myAddr]) {
+    // check if myAddr in lineup
+    let isInLineup = false;
+    for (let i = 0; i < action.hand.lineup.length; i += 1) {
+      if (myAddr === action.hand.lineup[i].address) {
+        isInLineup = true;
+      }
+    }
+    // check in lineup an not already signed
+    if (!isInLineup || action.hand.netting[myAddr]) {
       return false;
     }
     return true;
@@ -137,6 +155,25 @@ const makeTableDataSelector = () => createSelector(
 );
 
 // other selectors
+const makeMessagesSelector = () => createSelector(
+  tableStateSelector,
+  (table) => {
+    const messages = (table) ? table.get('messages') : null;
+    return messages ? messages.toJS() : messages;
+  }
+);
+
+const makePlayersCountSelector = () => createSelector(
+  [makeTableDataSelector()],
+  (data) => {
+    const ADDR_EMPTY = '0x0000000000000000000000000000000000000000';
+    if (!data || !data.get('seats')) {
+      return 0;
+    }
+    return data.get('seats').reduce((prev, current) => prev + (current.get('address') === ADDR_EMPTY ? 0 : 1), 0);
+  }
+);
+
 const makeHandSelector = () => createSelector(
   handSelector,
   (hand) => hand
@@ -162,7 +199,8 @@ const makeWhosTurnSelector = () => createSelector(
       return undefined;
     }
     try {
-      whosTurn = pokerHelper.whosTurn(hand.toJS(), sb * 2);
+      const h = hand.toJS();
+      whosTurn = pokerHelper.getWhosTurn(h.lineup, h.dealer, h.state, sb * 2);
     } catch (e) {
       return undefined;
     }
@@ -181,7 +219,7 @@ const lastAmountByAction = createSelector(
       return -1;
     }
     const receipt = rc.get(action.hand.lineup[myPos].last);
-    return receipt.values[1];
+    return receipt.amount.toNumber();
   }
 );
 
@@ -213,6 +251,25 @@ const makeLineupSelector = () => createSelector(
   }
 );
 
+function selectTable(state, props) {
+  return state.getIn(['table', props.params.tableAddr]);
+}
+
+function getHands(table) {
+  return (
+    table
+      .filter((_, key) => !isNaN(Number(key)))
+      .reduce((memo, item, handId) => memo.push(item.set('handId', Number(handId))), fromJS([]))
+      .sort((a, b) => a.get('handId') - b.get('handId'))
+      .toJS()
+  );
+}
+
+const makeHandsSelector = () => createSelector(
+  [selectTable],
+  (table) => table ? getHands(table) : []
+);
+
 const makeMyHandValueSelector = () => createSelector(
   [makeHandSelector(), makeBoardSelector()],
   (hand, board) => {
@@ -230,10 +287,30 @@ const makeMyHandValueSelector = () => createSelector(
   }
 );
 
+const selectMaxBet = (lineup, address) => {
+  let pos;
+  try {
+    pos = pokerHelper.getMyPos(lineup, address);
+  } catch (e) {
+    pos = undefined;
+  }
+
+  let maxBet;
+  if (pos !== undefined) {
+    try {
+      maxBet = pokerHelper.getMyMaxBet(lineup, address);
+    } catch (e) {
+      maxBet = undefined;
+    }
+  }
+
+  return maxBet || 0;
+};
+
 const makeSelectWinners = () => createSelector(
   [makeHandSelector(), makeBoardSelector()],
   (hand, board) => {
-    if (!hand || !hand.get) {
+    if (!hand || !hand.get || !hand.get('lineup')) {
       return null;
     }
 
@@ -248,7 +325,7 @@ const makeSelectWinners = () => createSelector(
       return null;
     }
 
-    if (!complete) {
+    if (!complete || handState === 'waiting') {
       return null;
     }
 
@@ -262,14 +339,21 @@ const makeSelectWinners = () => createSelector(
 
     if (handState !== 'showdown') {
       const lastMan = pokerHelper.nextPlayer(lineup, 0, 'active', handState);
-      return [{ addr: lineup[lastMan].address, amount: amounts[lineup[lastMan].address] }];
+      return [{
+        addr: lineup[lastMan].address,
+        amount: amounts[lineup[lastMan].address],
+        maxBet: selectMaxBet(lineup, lineup[lastMan].address),
+      }];
     }
 
     const winners = pokerHelper.getWinners(lineup, dealer, board);
     const winnersWithAmounts = [];
     winners.forEach((winner) => {
       if (amounts[winner.addr]) {
-        winnersWithAmounts.push(Object.assign({}, winner, { amount: amounts[winner.addr] }));
+        winnersWithAmounts.push(Object.assign({}, winner, {
+          amount: amounts[winner.addr],
+          maxBet: selectMaxBet(lineup, winner.addr),
+        }));
       }
     });
     return winnersWithAmounts;
@@ -278,7 +362,7 @@ const makeSelectWinners = () => createSelector(
 
 const makeMySitoutSelector = () => createSelector(
   [makeLineupSelector(), makeMyPosSelector()],
-  (lineup, myPos) => (lineup && myPos !== undefined && typeof lineup.getIn([myPos, 'sitout']) === 'number')
+  (lineup, myPos) => (lineup && myPos !== undefined && lineup.getIn([myPos, 'sitout']))
 );
 
 const makeMyPosSelector = () => createSelector(
@@ -313,7 +397,7 @@ const makeSitoutAmountSelector = () => createSelector(
 
       // comeback from sitout
       if (sitout) {
-        return 1;
+        return babz(1).toNumber();
       }
 
       // If we want to sitout during any other state we have to pay at least 1
@@ -401,24 +485,37 @@ const makeLatestHandSelector = () => createSelector(
       return null;
     }
 
-    // get progress of state channel
-    let maxHand = 2;
-    table.keySeq().forEach((k) => {
-      if (!isNaN(k)) {
-        const handId = parseInt(k, 10);
-        if (handId > maxHand) {
-          maxHand = handId;
-        }
-      }
-    });
-
-    return maxHand;
+    return Math.max(
+      ...table.keySeq().map(Number).filter(not(isNaN)).toList().push(2)
+    );
   }
+);
+
+const makeLastRoundMaxBetSelector = () => createSelector(
+  [makeHandSelector()],
+  (hand) => (hand && hand.get && hand.get('lastRoundMaxBet')) ? hand.get('lastRoundMaxBet') : 0
 );
 
 const makePotSizeSelector = () => createSelector(
   makeLineupSelector(),
   (lineup) => (lineup) ? pokerHelper.calculatePotsize(lineup.toJS()) : 0
+);
+
+const makeAmountInTheMiddleSelector = () => createSelector(
+  [makeLineupSelector(), makeLastRoundMaxBetSelector()],
+  (lineupImmu, lastRoundMaxBet) => {
+    if (!lineupImmu || !lineupImmu.toJS) {
+      return 0;
+    }
+    const lineup = lineupImmu.toJS();
+    let potSize = 0;
+    for (let i = 0; i < lineup.length; i += 1) {
+      const receipt = lineup[i].last ? rc.get(lineup[i].last) : undefined;
+      const bet = receipt ? receipt.amount.toNumber() : 0;
+      potSize += Number(bet < lastRoundMaxBet ? bet : lastRoundMaxBet);
+    }
+    return potSize;
+  }
 );
 
 export {
@@ -449,4 +546,9 @@ export {
     makeMaxBetSelector,
     makeMyMaxBetSelector,
     makeMissingHandSelector,
+    makeMessagesSelector,
+    makePlayersCountSelector,
+    makeLastRoundMaxBetSelector,
+    makeAmountInTheMiddleSelector,
+    makeHandsSelector,
 };

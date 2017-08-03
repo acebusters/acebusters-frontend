@@ -1,6 +1,11 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import styled from 'styled-components';
+import WithLoading from '../WithLoading';
 import ListItem from '../ListItem';
+
+const Wrapper = styled.div`
+  overflow-y: auto;
+`;
 
 const Table = styled.table`
   border-collapse: collapse;
@@ -28,45 +33,111 @@ const TableStyled = styled(Table)`
   }
 `;
 
+const SortButton = styled.a`
+  -webkit-user-select: none;
+  cursor: pointer;
+  color: inherit;
+
+  span {
+    text-decoration: underline;
+  }
+`;
+
 export const TableStriped = styled(TableStyled)`
   & tbody tr:nth-of-type(odd) {
     background-color: rgba(0, 0, 0, 0.05);
   }
 `;
 
-function List(props) {
-  let content = (<tr></tr>);
-  let headers = (<th></th>);
+class List extends React.Component {
+  constructor(props) {
+    super(props);
 
-  // If we have items, render them
-  if (props.items) {
-    content = props.items.map((item) => (
-      <ListItem key={item} values={item} />
-    ));
+    this.state = {
+      sortBy: null, // column index
+      sortDir: -1, // 1 — ascending, -1 — descending
+    };
   }
 
-  if (props.headers) {
-    headers = props.headers.map((header) => (
-      <th key={header} > {header} </th>
-    ));
+  sortedItems() {
+    const { items } = this.props;
+    const { sortBy, sortDir } = this.state;
+
+    if (items && sortBy) {
+      return items.sort((a, b) => (a[sortBy] - b[sortBy]) * sortDir);
+    }
+
+    return items;
   }
-  return (
-    <TableStriped>
-      <thead>
-        <tr>
-          {headers}
-        </tr>
-      </thead>
-      <tbody>
-        {content}
-      </tbody>
-    </TableStriped>
-  );
+
+  handleHeaderClick(i) {
+    this.setState(({ sortBy, sortDir }) => ({
+      sortBy: i,
+      sortDir: sortBy === i ? sortDir * -1 : sortDir,
+    }));
+  }
+
+  render() {
+    const { headers, sortableColumns = [], noDataMsg = 'No Data', columnsStyle = {} } = this.props;
+    const { sortBy, sortDir } = this.state;
+    const items = this.sortedItems();
+
+    return (
+      <Wrapper>
+        <TableStriped>
+          <thead>
+            <tr>
+              {headers && headers.map((header, i) => {
+                const sortable = sortableColumns.indexOf(i) !== -1;
+                return (
+                  <th key={i} style={columnsStyle[i]}>
+                    {!sortable && header}
+                    {sortable &&
+                      <SortButton onClick={() => this.handleHeaderClick(i)}>
+                        <span>{header}</span>
+                        {sortBy === i && sortDir === 1 && ' ▲'}
+                        {sortBy === i && sortDir === -1 && ' ▼'}
+                      </SortButton>
+                    }
+                  </th>
+                );
+              })}
+              {!headers && <th />}
+            </tr>
+          </thead>
+          {items && items.length > 0 && (
+            <tbody>
+              {items.map((item, i) => (
+                <ListItem
+                  key={i}
+                  values={item}
+                  columnsStyle={columnsStyle}
+                />
+              ))}
+            </tbody>
+          )}
+        </TableStriped>
+        <WithLoading
+          isLoading={!items}
+          styles={{}}
+        >
+          {items && items.length === 0 && (
+            <div style={{ textAlign: 'center' }}>
+              {noDataMsg}
+            </div>
+          )}
+        </WithLoading>
+      </Wrapper>
+    );
+  }
 }
 
 List.propTypes = {
-  items: React.PropTypes.any,
-  headers: React.PropTypes.any,
+  items: PropTypes.arrayOf(PropTypes.node),
+  headers: PropTypes.arrayOf(PropTypes.node),
+  sortableColumns: PropTypes.arrayOf(PropTypes.number),
+  columnsStyle: PropTypes.object,
+  noDataMsg: PropTypes.string,
 };
 
 export default List;

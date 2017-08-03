@@ -10,15 +10,71 @@ import {
   makeMyMaxBetSelector,
   makeSbSelector,
   makeHandSelector,
+  makeHandStateSelector,
 } from '../Table/selectors';
 
 import {
   makeMyStackSelector,
 } from '../Seat/selectors';
 
+const getIsMyTurn = (_, props) => props.isMyTurn;
+const getActionBarState = (state) => state.get('actionBar');
 const rc = new ReceiptCache();
 const pokerHelper = new PokerHelper(rc);
 
+/*
+ * ActionBar related selectors
+ */
+export const makeSelectActionBarActive = () => createSelector(
+  [makeHandStateSelector(), getIsMyTurn, getActionBarTurnComplete()],
+  (handState, isMyTurn, turnComplete) => {
+    if (turnComplete) return false;
+    const isAppropriateState = (
+      handState !== 'waiting' && handState !== 'dealing' && handState !== 'showdown'
+    );
+    if (isMyTurn && isAppropriateState) {
+      return true;
+    }
+    return false;
+  }
+);
+
+// show the ActionBar if the player is sitting at the table
+export const makeSelectActionBarVisible = () => createSelector(
+  (_, props) => props.myPos,
+  (myPos) => {
+    if (myPos === undefined) return false;
+    if (typeof myPos === 'number') return true;
+    return false;
+  }
+);
+
+export const getActionBarMode = () => createSelector(
+  getActionBarState,
+  (actionBar) => actionBar.get('mode'),
+);
+
+export const getActionBarSliderOpen = () => createSelector(
+  getActionBarState,
+  (actionBar) => actionBar.get('sliderOpen'),
+);
+
+export const getActionBarTurnComplete = () => createSelector(
+  getActionBarState,
+  (actionBar) => actionBar.get('turnComplete'),
+);
+
+export const getActionBarButtonActive = () => createSelector(
+  getActionBarState,
+  (actionBar) => actionBar.get('buttonActive'),
+);
+
+export const getExecuteAction = () => createSelector(
+  getActionBarState,
+  (actionBar) => actionBar.get('executeAction'),
+);
+
+// Other selectors
 const makeAmountToCallSelector = () => createSelector(
   [makeMaxBetSelector(), makeMyMaxBetSelector()],
   (maxBet, myMaxbet) => {

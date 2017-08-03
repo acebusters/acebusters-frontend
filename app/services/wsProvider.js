@@ -21,7 +21,7 @@
  */
 
 
-const _ = require('underscore');
+const _ = require('lodash');
 const errors = require('./errors');
 const WebSocket = require('websocket').w3cwebsocket;
 
@@ -76,31 +76,30 @@ const WebsocketProvider = function WebsocketProvider(path) {
  @method addDefaultEvents
  */
 WebsocketProvider.prototype.addDefaultEvents = function addDefaultEvents() {
-  const self = this;
-
-  this.connection.onerror = function onerror() {
-    self.timeout();
-  };
-
-  this.connection.onclose = function onclose(e) {
-    self.timeout();
-
-    const noteCb = self.notificationCallbacks;
-
-        // reset all requests and callbacks
-    self.reset();
-
-        // cancel subscriptions
-    noteCb.forEach((callback) => {
-      if (_.isFunction(callback)) {
-        callback(e);
-      }
-    });
-  };
-
+  this.connection.onerror = this.defaultOnError.bind(this);
+  this.connection.onclose = this.defaultOnClose.bind(this);
     // this.connection.on('timeout', function(){
     //     self.timeout();
     // });
+};
+
+WebsocketProvider.prototype.defaultOnError = function defaultOnError() {
+  this.timeout();
+};
+
+WebsocketProvider.prototype.defaultOnClose = function defaultOnClose(e) {
+  this.timeout();
+
+  const noteCb = this.notificationCallbacks;
+  // reset all requests and callbacks
+  this.reset();
+
+  // cancel subscriptions
+  noteCb.forEach((callback) => {
+    if (_.isFunction(callback)) {
+      callback(e);
+    }
+  });
 };
 
 /**
@@ -165,6 +164,8 @@ WebsocketProvider.prototype.parseResponse = function parseResponse(dataChunked) 
  @method addResponseCallback
  */
 WebsocketProvider.prototype.addResponseCallback = function addResponseCallback(payload, callback) {
+  if (!callback) return;
+
   const id = payload.id || payload[0].id;
   const method = payload.method || payload[0].method;
 
@@ -193,9 +194,20 @@ WebsocketProvider.prototype.sendAsync = function sendAsync(payload, callback) {
     // if(!this.connection.writable)
     //     this.connection.connect({path: this.path});
 
+  this.waitForConnection(() => {
+    this.connection.send(JSON.stringify(payload));
+    this.addResponseCallback(payload, callback);
+  }, 200);
+};
 
-  this.connection.send(JSON.stringify(payload));
-  this.addResponseCallback(payload, callback);
+WebsocketProvider.prototype.waitForConnection = function waitForConnection(callback, interval) {
+  if (this.connection.readyState === 1) {
+    callback();
+  } else {
+    setTimeout(() => {
+      this.waitForConnection(callback, interval);
+    }, interval);
+  }
 };
 
 /**
@@ -219,12 +231,18 @@ WebsocketProvider.prototype.on = function on(type, callback) {
       this.connection.onopen = callback;
       break;
 
-    case 'end':
-      this.connection.onclose = callback;
+    case 'close':
+      this.connection.onclose = (e) => {
+        callback(e);
+        this.defaultOnClose(e);
+      };
       break;
 
     case 'error':
-      this.connection.onerror = callback;
+      this.connection.onerror = (e) => {
+        callback(e);
+        this.defaultOnError(e);
+      };
       break;
 
     default:
@@ -311,4 +329,3 @@ WebsocketProvider.prototype.reset = function reset() {
 };
 
 module.exports = WebsocketProvider;
-

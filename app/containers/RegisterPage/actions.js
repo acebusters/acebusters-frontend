@@ -1,21 +1,10 @@
-import { createFormAction } from '../../services/reduxFormSaga';
 import {
-  WORKER_ERROR,
-  WALLET_EXPORTED,
+  REGISTER,
 } from './constants';
 
-export function workerError(error) {
+export function register(data) {
   return {
-    type: WORKER_ERROR,
-    error,
+    type: REGISTER,
+    payload: data,
   };
 }
-
-export function walletExported(data) {
-  return {
-    type: WALLET_EXPORTED,
-    data,
-  };
-}
-
-export const register = createFormAction('REGISTER');

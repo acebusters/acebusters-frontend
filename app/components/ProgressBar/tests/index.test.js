@@ -1,7 +1,6 @@
 import React from 'react';
 import { mount } from 'enzyme';
 import sinon from 'sinon';
-
 import withProgressBar from '../index';
 import ProgressBar from '../ProgressBar';
 
@@ -49,7 +48,7 @@ describe('withProgressBar()', () => {
       <HocComponent />
     );
 
-    expect(renderedComponent.state().progress).toBe(-1);
+    expect(renderedComponent.state().progress).toBe(0);
   });
 
   it('Should initially have state.loadedRoutes = current route', () => {
@@ -77,16 +76,6 @@ describe('withProgressBar()', () => {
     const inst = renderedComponent.instance();
     inst.componentWillUnmount();
     expect(inst.unsubscribeHistory).toBeFalsy();
-  });
-
-  it('Should update state.progress when called updateProgress()', () => {
-    const renderedComponent = mount(
-      <HocComponent location={{ pathname: '/' }} router={router} />
-    );
-
-    const inst = renderedComponent.instance();
-    inst.updateProgress(10);
-    expect(renderedComponent.state().progress).toBe(10);
   });
 
   it('Should start progress bar for a new route', () => {

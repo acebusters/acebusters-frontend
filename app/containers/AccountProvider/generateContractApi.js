@@ -1,6 +1,7 @@
 import { bindActionCreators } from 'redux';
 import { contractMethodCall, contractTxSend } from './actions';
 import { getWeb3 } from './sagas';
+import { last } from '../../utils';
 
 function degrade(fn, fallback) {
   try {
@@ -10,14 +11,15 @@ function degrade(fn, fallback) {
   }
 }
 
-function getMethodKey({ groupName, methodName, args }) {
+export function getMethodKey({ groupName, methodName, args }) {
   return `${groupName || ''}.${methodName}(${JSON.stringify(args)})`;
 }
 
 function generateContractInstanceApi({ abi, address, getState, dispatch }) {
   // cached version doesn't exist, create it
   const contractInstance = getWeb3().eth.contract(abi).at(address);
-  // // reduce the abi into the redux methods
+
+  // reduce the abi into the redux methods
   const api = abi.reduce((o, definition) => {
     // skip if we're not dealing with a function
     if (definition.type !== 'function') { return o; }
@@ -26,14 +28,20 @@ function generateContractInstanceApi({ abi, address, getState, dispatch }) {
     const actions = bindActionCreators({
       // dispatches action to read contract method results and write into store
       call: (...args) => contractMethodCall({
-        args, address, key: getMethodKey({ methodName, args }), method: contractInstance[methodName].call,
+        args,
+        address,
+        key: getMethodKey({ methodName, args }),
+        method: contractInstance[methodName].call,
       }),
-      // creates receipt for to invoke contract through account controller
+      // creates receipt for to invoke contract
       sendTransaction: (...args) => contractTxSend({
+        args,
+        methodName,
         key: getMethodKey({ methodName, args }),
         dest: address,
         data: contractInstance[methodName].getData(...args),
         privKey: getState().get('privKey'),
+        callback: typeof last(args) === 'function' ? last(args) : undefined,
       }),
     }, dispatch);
     // base getter

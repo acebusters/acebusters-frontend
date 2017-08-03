@@ -3,20 +3,20 @@
  */
 
 import React from 'react';
-import Grid from 'grid-styled';
+import { connect } from 'react-redux';
 import Button from 'components/Button';
 import Container from 'components/Container';
 import { TableStriped } from 'components/List';
 import H2 from 'components/H2';
 import { createStructuredSelector } from 'reselect';
-import { connect } from 'react-redux';
 import LobbyItem from '../LobbyItem';
 import { tableReceived } from '../Table/actions';
 import { makeSelectLobby } from './selectors';
 import { fetchTables } from '../../services/tableService';
+import WithLoading from '../../components/WithLoading';
 
 
-class LobbyComponent extends React.PureComponent {  // eslint-disable-line
+class LobbyComponent extends React.PureComponent { // eslint-disable-line
 
   constructor(props) {
     super(props);
@@ -33,12 +33,8 @@ class LobbyComponent extends React.PureComponent {  // eslint-disable-line
   }
 
   render() {
-    let content = [];
-    if (this.props.lobby) {
-      content = this.props.lobby.map((tableAddr, i) =>
-        <LobbyItem key={i} tableAddr={tableAddr} />
-      );
-    }
+    const { lobby } = this.props;
+
     return (
       <Container>
         <H2> Table Overview </H2>
@@ -46,24 +42,27 @@ class LobbyComponent extends React.PureComponent {  // eslint-disable-line
         <TableStriped>
           <thead>
             <tr>
-              <th key="number"> # </th>
-              <th key="blind"> Blind </th>
-              <th key="play"> Players </th>
-              <th key="hand"> Hand </th>
-              <th key="actn"> Action </th>
+              <th key="number">#</th>
+              <th key="blind">Blinds</th>
+              <th key="play">Players </th>
+              <th key="hand">Hand</th>
+              <th key="actn" />
             </tr>
           </thead>
-          <tbody>
-            {content}
-          </tbody>
+          {lobby && lobby.length > 0 && (
+            <tbody>
+              {lobby.map((tableAddr, i) =>
+                <LobbyItem key={i} tableAddr={tableAddr} />
+              )}
+            </tbody>
+          )}
         </TableStriped>
-        <Grid xs={1 / 4} >
-          <div style={{ float: 'left' }}>
-            <Button onClick={this.handleGetTables} size="medium" icon="fa fa-refresh">REFRESH</Button>
-          </div>
-        </Grid>
-        <Grid xs={3 / 4}>
-        </Grid>
+
+        <WithLoading
+          isLoading={lobby.length === 0}
+        />
+
+        <Button onClick={this.handleGetTables} size="medium" icon="fa fa-refresh">REFRESH</Button>
       </Container>
     );
   }

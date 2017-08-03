@@ -4,8 +4,7 @@
 
 import styled from 'styled-components';
 
-
-const Label = styled.div`
+const Label = styled.label`
   display: inline-block;
   max-width: 100%;
   margin-bottom: 5px;

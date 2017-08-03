@@ -1,25 +1,35 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import { ModalContainer, ModalDialog } from 'react-modal-dialog';
 import { browserHistory } from 'react-router';
-import Header from 'components/Header';
+import Footer from 'components/Footer';
 import Content from 'components/Content';
 import withProgressBar from 'components/ProgressBar';
+import { ModalContainer, ModalDialog } from 'components/Modal';
+import { ModalsTransitionGroup } from 'components/Modal/ModalsTransitionGroup';
+import Header from '../Header';
+import Notifications from '../../containers/Notifications';
 
-import { landingPageUrl } from '../../app.config';
-import makeSelectAccountData, { makeSignerAddrSelector } from '../AccountProvider/selectors';
+
 import {
+  makeSelectProgress,
   makeSelectTransferShow,
-  makeModalStackSelector,
+  makeModalSelector,
+  selectWorkerProgress,
 } from './selectors';
+
+import { selectNotifications } from '../Notifications/selectors';
+import { makeSelectLoggedIn } from '../AccountProvider/selectors';
+
 import { setAuthState } from '../AccountProvider/actions';
 import { modalDismiss } from './actions';
 
 import {
   boxedLayoutMaxWidth,
-  background,
+  backgroundBoxed,
+  backgroundTableColor,
 } from '../../variables';
 
 const StyledDashboard = styled.div`
@@ -27,25 +37,14 @@ const StyledDashboard = styled.div`
   &:before, &:after {
     display: table;
     content: " ";
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
   }
   &:after {
     clear: both;
   }
   /* theme */
-  ${(props) => {
-    if (props.params.tableAddr) {
-      return `
-              background: #000000; /* Old browsers */
-              background: -moz-linear-gradient(-45deg,  #000000 0%, #1a2d3d 93%); /* FF3.6-15 */
-              background: -webkit-linear-gradient(-45deg,  #000000 0%,#1a2d3d 93%); /* Chrome10-25,Safari5.1-6 */
-              background: linear-gradient(135deg,  #000000 0%,#1a2d3d 93%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-              filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', endColorstr='#1a2d3d',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */`;
-    }
-    return background;
-  }};
+  background: #444;
+  background-color: ${(props) => props.params.tableAddr ? backgroundTableColor : backgroundBoxed};
   min-height: 100vh;
   position: relative;
   overflow: hidden;
@@ -57,36 +56,49 @@ const StyledDashboard = styled.div`
   `)}
 `;
 
+export function App({ notifications, loggedIn, modal, ...props }) {
+  const pathname = props.location.pathname;
+  const isNotTable = pathname.indexOf('table') === -1;
+  const showNotifications = pathname.match(/table|lobby|dashboard|login/);
 
-export function App(props) {
-  const modalContent = props.modalStack[props.modalStack.length - 1];
   return (
-    <div>
-      <StyledDashboard
-        params={props.params}
-      >
-        <Header
-          loggedIn={props.account.loggedIn}
-          onClickLogout={props.handleClickLogout}
-          logoHref={props.logoHref}
-          signerAddr={props.signerAddr}
-          params={props.params}
-        />
-        <Content
-          fixed={props.fixed}
-          name="content-wrapper"
-        >
-          {React.Children.toArray(props.children)}
-        </Content>
+    <div name="app-container">
+      <StyledDashboard params={props.params} name="styled-dashboard">
+        {isNotTable &&
+          <Header
+            onClickLogout={props.handleClickLogout}
+            {...props}
+          />
+        }
+        <div>
+          {showNotifications &&
+            <Notifications isNotTable={isNotTable} />
+          }
+          <Content
+            showNavigation={!loggedIn || notifications.length > 0}
+            fixed={props.fixed}
+            name="content-wrapper"
+          >
+            {React.Children.toArray(props.children)}
+          </Content>
+        </div>
       </StyledDashboard>
 
-      { modalContent &&
-        <ModalContainer>
-          <ModalDialog onClose={props.modalDismiss} dismissOnBackgroundClick={false}>
-            { modalContent }
-          </ModalDialog>
-        </ModalContainer>
+      {isNotTable &&
+        <Footer />
       }
+
+      <ModalsTransitionGroup>
+        {modal &&
+          <ModalContainer style={{ zIndex: 7 }}>
+            <ModalDialog
+              onClose={modal.closeHandler || props.modalDismiss}
+            >
+              {modal.node}
+            </ModalDialog>
+          </ModalContainer>
+        }
+      </ModalsTransitionGroup>
     </div>
   );
 }
@@ -94,20 +106,21 @@ export function App(props) {
 App.defaultProps = {
   fixed: false,
   initialCollapse: true,
-  logoHref: landingPageUrl,
 };
 
-
 App.propTypes = {
-  children: React.PropTypes.node,
-  account: React.PropTypes.object,
-  handleClickLogout: React.PropTypes.func,
-  modalDismiss: React.PropTypes.func,
-  logoHref: React.PropTypes.string,
-  fixed: React.PropTypes.bool,
-  params: React.PropTypes.object,
-  signerAddr: React.PropTypes.string,
-  modalStack: React.PropTypes.array,
+  children: PropTypes.node,
+  handleClickLogout: PropTypes.func,
+  modalDismiss: PropTypes.func,
+  fixed: PropTypes.bool,
+  params: PropTypes.object,
+  location: PropTypes.object,
+  modal: PropTypes.shape({
+    node: PropTypes.any,
+    closeHandler: PropTypes.func,
+  }),
+  notifications: PropTypes.array,
+  loggedIn: PropTypes.bool,
 };
 
 function mapDispatchToProps(dispatch) {
@@ -120,14 +133,14 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-
 const mapStateToProps = createStructuredSelector({
-  account: makeSelectAccountData(),
-  signerAddr: makeSignerAddrSelector(),
+  workerProgress: selectWorkerProgress,
   isModalOpen: makeSelectTransferShow(),
-  modalStack: makeModalStackSelector(),
+  modal: makeModalSelector(),
+  progress: makeSelectProgress(),
+  notifications: selectNotifications(),
+  loggedIn: makeSelectLoggedIn(),
 });
 
 // Wrap the component to inject dispatch and state into it
 export default connect(mapStateToProps, mapDispatchToProps)(withProgressBar(App));
-

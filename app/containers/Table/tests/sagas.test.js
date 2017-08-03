@@ -2,7 +2,7 @@
  * Created by helge on 26.01.17.
  */
 
-import EWT from 'ethereum-web-token';
+import { Receipt } from 'poker-helper';
 import SagaTester from 'redux-saga-tester';
 import { fromJS } from 'immutable';
 import nock from 'nock';
@@ -10,18 +10,18 @@ import nock from 'nock';
 import { PLAYER1, PLAYER2, PLAYER3, PLAYER4, PLAYER_EMPTY } from './consts';
 import { updateScanner, payFlow } from '../sagas';
 import { formActionSaga } from '../../../services/reduxFormSaga';
+import { babz } from '../../../utils/amountFormatter';
 import {
   bet,
   pay,
   updateReceived,
   UPDATE_RECEIVED,
+  ADD_MESSAGE,
   RECEIPT_SET,
   BET,
   SHOW,
   NET,
 } from '../actions';
-
-import { ABI_BET, ABI_SHOW, ABI_SIT_OUT } from '../../../app.config';
 
 const tableAddr = '0x112233';
 
@@ -30,7 +30,7 @@ describe('Saga Tests', () => {
     const hand = {
       state: 'waiting',
       dealer: 0,
-      sb: 50,
+      sb: babz(50),
       handId: 1,
       lineup: [{
         address: PLAYER1.address,
@@ -48,7 +48,7 @@ describe('Saga Tests', () => {
         privKey: PLAYER2.key,
       },
       table: {
-        [tableAddr]: { data: { smallBlind: 500 } },
+        [tableAddr]: { data: { smallBlind: babz(500) } },
       },
     });
 
@@ -56,7 +56,7 @@ describe('Saga Tests', () => {
     sagaTester.start(updateScanner);
     sagaTester.dispatch(updateReceived(tableAddr, hand));
     expect(sagaTester.getLatestCalledAction().type).toEqual(BET);
-    expect(sagaTester.getLatestCalledAction().amount).toEqual(500);
+    expect(sagaTester.getLatestCalledAction().amount).toEqual(babz(500));
     expect(sagaTester.getCalledActions().length).toEqual(2);
     // do the same thing again, and make sure the request
     // is deduplicated
@@ -74,7 +74,7 @@ describe('Saga Tests', () => {
         address: PLAYER1.address,
       }, {
         address: PLAYER2.address,
-        last: new EWT(ABI_SIT_OUT).sitOut(1, 0).sign(PLAYER2.key),
+        last: new Receipt(tableAddr).sitOut(1, babz(0)).sign(PLAYER2.key),
       }],
     };
 
@@ -83,7 +83,7 @@ describe('Saga Tests', () => {
         privKey: PLAYER1.key,
       },
       table: {
-        [tableAddr]: { data: { smallBlind: 500 } },
+        [tableAddr]: { data: { smallBlind: babz(500) } },
       },
     });
 
@@ -91,7 +91,7 @@ describe('Saga Tests', () => {
     sagaTester.start(updateScanner);
     sagaTester.dispatch(updateReceived(tableAddr, hand));
     expect(sagaTester.getLatestCalledAction().type).toEqual(BET);
-    expect(sagaTester.getLatestCalledAction().amount).toEqual(500);
+    expect(sagaTester.getLatestCalledAction().amount).toEqual(babz(500));
     expect(sagaTester.getCalledActions().length).toEqual(2);
     // do the same thing again, and make sure the request
     // is deduplicated
@@ -105,12 +105,12 @@ describe('Saga Tests', () => {
       state: 'dealing',
       dealer: 0,
       handId: 1,
-      sb: 50,
+      sb: babz(50),
       lineup: [{
         address: PLAYER1.address,
       }, {
         address: PLAYER2.address,
-        last: new EWT(ABI_BET).bet(1, 500).sign(PLAYER2.key),
+        last: new Receipt(tableAddr).bet(1, babz(500)).sign(PLAYER2.key),
       }, {
         address: PLAYER3.address,
       }, {
@@ -123,7 +123,7 @@ describe('Saga Tests', () => {
         privKey: PLAYER3.key,
       },
       table: {
-        [tableAddr]: { data: { smallBlind: 500 } },
+        [tableAddr]: { data: { smallBlind: babz(500) } },
       },
     });
 
@@ -132,7 +132,7 @@ describe('Saga Tests', () => {
     sagaTester.dispatch(updateReceived(tableAddr, hand));
     expect(sagaTester.getLatestCalledAction().type).toEqual(BET);
     expect(sagaTester.getCalledActions().length).toEqual(2);
-    expect(sagaTester.getLatestCalledAction().amount).toEqual(1000);
+    expect(sagaTester.getLatestCalledAction().amount).toEqual(babz(1000).toNumber());
     // do the same thing again, and make sure the request
     // is deduplicated
     sagaTester.dispatch(updateReceived(tableAddr, hand));
@@ -145,15 +145,15 @@ describe('Saga Tests', () => {
       handId: 3,
       state: 'showdown',
       dealer: 0,
-      sb: 50,
+      sb: babz(50),
       lineup: [{
         address: PLAYER1.address,
-        last: new EWT(ABI_SHOW).show(1, 1000).sign(PLAYER1.key),
+        last: new Receipt(tableAddr).show(1, babz(1000)).sign(PLAYER1.key),
       }, {
         address: PLAYER_EMPTY.address,
       }, {
         address: PLAYER2.address,
-        last: new EWT(ABI_BET).bet(1, 1000).sign(PLAYER2.key),
+        last: new Receipt(tableAddr).bet(1, babz(1000)).sign(PLAYER2.key),
       }],
     };
 
@@ -175,7 +175,7 @@ describe('Saga Tests', () => {
     sagaTester.dispatch(updateReceived(tableAddr, hand));
     const show = sagaTester.getLatestCalledAction();
     expect(show.type).toEqual(SHOW);
-    expect(show.amount).toEqual(1000);
+    expect(show.amount).toEqual(babz(1000).toNumber());
     expect(show.holeCards).toEqual([12, 13]);
     // do the same thing again, and make sure the request
     // is deduplicated
@@ -189,15 +189,15 @@ describe('Saga Tests', () => {
       handId: 4,
       state: 'showdown',
       dealer: 0,
-      sb: 50,
+      sb: babz(50),
       lineup: [{
         address: PLAYER1.address,
-        last: new EWT(ABI_SHOW).show(1, 1000).sign(PLAYER1.key),
+        last: new Receipt(tableAddr).show(1, babz(1000)).sign(PLAYER1.key),
       }, {
         address: PLAYER_EMPTY.address,
       }, {
         address: PLAYER2.address,
-        last: new EWT(ABI_BET).bet(1, 1000).sign(PLAYER2.key),
+        last: new Receipt(tableAddr).bet(1, babz(1000)).sign(PLAYER2.key),
         sitout: 'allin',
       }],
     };
@@ -219,7 +219,7 @@ describe('Saga Tests', () => {
     await sagaTester.dispatch(updateReceived(tableAddr, hand));
     const show = sagaTester.getLatestCalledAction();
     expect(show.type).toEqual(SHOW);
-    expect(show.amount).toEqual(1000);
+    expect(show.amount).toEqual(babz(1000).toNumber());
     expect(show.holeCards).toEqual([12, 13]);
     expect(sagaTester.getCalledActions().length).toEqual(2);
   });
@@ -236,12 +236,12 @@ describe('Saga Tests', () => {
       },
       lineup: [{
         address: PLAYER1.address,
-        last: new EWT(ABI_BET).bet(1, 1000).sign(PLAYER1.key),
+        last: new Receipt(tableAddr).bet(1, babz(1000)).sign(PLAYER1.key),
       }, {
         address: PLAYER_EMPTY.address,
       }, {
         address: PLAYER2.address,
-        last: new EWT(ABI_BET).bet(1, 1000).sign(PLAYER2.key),
+        last: new Receipt(tableAddr).bet(1, babz(1000)).sign(PLAYER2.key),
       }],
     };
 
@@ -294,10 +294,22 @@ describe('Saga Tests', () => {
       .post('/')
       .reply(200, '{"cards":[12,13]}');
 
-    const sagaTester = new SagaTester({});
+    const initialState = fromJS({
+      table: {
+        [tableAddr]: {
+          data: {},
+          3: {
+            dealer: 0,
+            state: 'flop',
+            lineup: [{}, {}],
+          },
+        },
+      },
+    });
+    const sagaTester = new SagaTester({ initialState });
     sagaTester.start(formActionSaga);
     sagaTester.start(payFlow);
-    const payAction = bet(tableAddr, 3, 500, PLAYER2.key, 1, 'prevReceipt');
+    const payAction = bet(tableAddr, 3, babz(500), PLAYER2.key, 1, 'prevReceipt');
     const rsp = await pay(payAction, (action) => sagaTester.dispatch(action));
     expect(rsp).toEqual([12, 13]);
     const receipt = sagaTester.getCalledActions()[1];
@@ -315,10 +327,22 @@ describe('Saga Tests', () => {
       .post('/')
       .reply(401, '{"errorMessage":"unauthorized"}');
 
-    const sagaTester = new SagaTester({});
+    const initialState = fromJS({
+      table: {
+        [tableAddr]: {
+          data: {},
+          3: {
+            dealer: 0,
+            state: 'flop',
+            lineup: [{}, {}],
+          },
+        },
+      },
+    });
+    const sagaTester = new SagaTester({ initialState });
     sagaTester.start(formActionSaga);
     sagaTester.start(payFlow);
-    const payAction = bet(tableAddr, 3, 500, PLAYER2.key, 1, 'prevReceipt');
+    const payAction = bet(tableAddr, 3, babz(500), PLAYER2.key, 1, 'prevReceipt');
     pay(payAction, (action) => sagaTester.dispatch(action)).catch((err) => {
       expect(err).toEqual('unauthorized');
       const receiptAction = sagaTester.getCalledActions()[2];
@@ -330,5 +354,61 @@ describe('Saga Tests', () => {
       done();
     });
   });
-});
 
+  it('should add anonymous message about winner!', () => {
+    const hand = {
+      handId: 3,
+      state: 'showdown',
+      dealer: 0,
+      sb: babz(50),
+
+      lineup: [{
+        address: PLAYER1.address,
+        last: new Receipt(tableAddr).show(1, babz(1000)).sign(PLAYER1.key),
+        cards: [21, 32],
+      }, {
+        address: PLAYER2.address,
+        last: new Receipt(tableAddr).show(1, babz(1000)).sign(PLAYER2.key),
+        cards: [36, 49],
+      }],
+      cards: [8, 23, 10],
+    };
+
+    const initialState = fromJS({
+      account: {
+        privKey: PLAYER2.key,
+      },
+      table: {
+        [tableAddr]: {
+          data: {},
+          3: {
+            lineup: [{
+              address: PLAYER1.address,
+              last: new Receipt(tableAddr).bet(1, babz(1000)).sign(PLAYER1.key),
+              cards: [21, 32],
+            }, {
+              address: PLAYER2.address,
+              last: new Receipt(tableAddr).bet(1, babz(1000)).sign(PLAYER1.key),
+              cards: [36, 49],
+            }],
+            state: 'dealing',
+          },
+        },
+      },
+    });
+
+    const sagaTester = new SagaTester({ initialState });
+    sagaTester.start(updateScanner);
+    sagaTester.dispatch(updateReceived(tableAddr, hand));
+    const show = sagaTester.getLatestCalledAction();
+    expect(show.type).toEqual(ADD_MESSAGE);
+    expect(show.message).toEqual('player MARVIN won 0 NTZ ');
+    expect(show.tableAddr).toEqual(tableAddr);
+    expect(show.privKey).toEqual(null);
+    // do the same thing again, and make sure the request
+    // is deduplicated
+    sagaTester.dispatch(updateReceived(tableAddr, hand));
+    expect(sagaTester.getLatestCalledAction().type).toEqual(UPDATE_RECEIVED);
+    expect(sagaTester.getCalledActions().length).toEqual(3);
+  });
+});

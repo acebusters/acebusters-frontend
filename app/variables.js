@@ -5,12 +5,31 @@ import tinycolor from 'tinycolor2';
 // --------------------------------------------------------
 export const baseColor = '#FD5E60';
 export const black = '#080B0F';
-export const background = '#ECECEC';
-export const disabled = '#FF755C';
+export const background = '#ECECEC'; // lightgray
+export const backgroundBoxed = '#ECECEC'; // lightgray
+export const backgroundTableColor = '#353535';
+export const backgroundTable = `radial-gradient(50% 50%, #B4B3B3 50%, ${backgroundTableColor} 100%)`; // lightgray radial-gradient
+export const disabled = '#FFC7BD';
 export const gray = '#999999';
 export const green = '#A0FFB1';
 export const white = '#FFF';
 export const hover = '#C85C5C';
+export const menuClose = 'linear-gradient(0deg, #606060 0%, #808080 100%)';
+export const successBg = 'linear-gradient(0deg, #B4ED50 0%, #78D049 100%)';
+export const infoBg = 'linear-gradient(0deg, #D4D4D4 0%, #4D4D4D 100%)';
+export const infoBgInverse = 'linear-gradient(0deg, #4D4D4D 0%, #D4D4D4 100%)';
+export const warningBg = 'linear-gradient(0deg, #F7F8CB 0%, #F7F51C 100%)';
+export const dangerBg = 'linear-gradient(0deg, #FBDA61 0%, #F76B1C 100%)';
+export const activeColor = '#35C5E3'; // tealish
+export const successColor = '#305209'; // greenish
+export const infoColor = 'white'; // white
+export const warningColor = '#5E5F3B'; // yellowish
+export const dangerColor = '#63430F';  // orangish
+
+export const successBgSolid = 'lightgreen';
+export const infoBgSolid = 'white';
+export const warningBgSolid = 'lightyellow';
+export const dangerBgSolid = '#f89435'; // orangish
 
 // FONTS
 // --------------------------------------------------------
@@ -38,10 +57,11 @@ export const fontWeightBase = '400';
 export const lineHeightComputed = `${Math.floor(parseInt(fontSizeBase, 10) * lineHeightBase)}px`;
 export const gridGutterWidth = '30px';
 
-// Navbar heights
+// Navbar
 export const navbarHeight = '50px';
 export const navbarPaddingHorizontal = `${Math.floor(parseInt(gridGutterWidth, 10) / 2)}px`;
 export const navbarPaddingVertical = `${(parseInt(navbarHeight, 10) - parseInt(lineHeightComputed, 10)) / 2}px`;
+export const navbarColorCurrent = '#333';
 // Side bar and logo width
 export const sidebarWidth = '230px';
 export const sidebarMiniWidth = '50px';
@@ -54,171 +74,11 @@ export const screenHeaderCollapse = screenXsMax;
 export const linkColor = baseColor;
 export const linkHoverColor = tinycolor(linkColor).lighten(15).toString();
 
-// SIDEBAR SKINS
-// --------------------------------------------------------
-
-// Dark sidebar
-export const sidebarDarkBg = '#222d32';
-export const sidebarDarkHoverBg = tinycolor(sidebarDarkBg).darken(2).toString();
-export const sidebarDarkColor = tinycolor(sidebarDarkBg).lighten(60).toString();
-export const sidebarDarkHoverColor = '#fff';
-export const sidebarDarkSubmenuBg = tinycolor(sidebarDarkBg).lighten(5).toString();
-export const sidebarDarkSubmenuColor = tinycolor(sidebarDarkSubmenuBg).lighten(40).toString();
-export const sidebarDarkSubmenuHoverColor = '#fff';
-
-// Light sidebar
-export const sidebarLightBg = '#f9fafc';
-export const sidebarLightHoverBg = tinycolor('#f0f0f1').lighten(1.5).toString();
-export const sidebarLightColor = '#444';
-export const sidebarLightHoverColor = '#000';
-export const sidebarLightSubmenuBg = sidebarLightHoverBg;
-export const sidebarLightSubmenuColor = '#777';
-export const sidebarLightSubmenuHoverColor = '#000';
-
-// CONTROL SIDEBAR
-//--------------------------------------------------------
-export const controlSidebarWidth = sidebarWidth;
-
-// BOXES
-//--------------------------------------------------------
-export const boxBorderColor = '#f4f4f4';
-export const boxBorderRadius = '3px';
-export const boxFooterBg = '#fff';
-export const boxBoxshadow = '0 1px 1px rgba(0, 0, 0, .1)';
-export const boxPadding = '10px';
-
-// Box variants
-export const boxDefaultBorderTopColor = '#d2d6de';
-
-// BUTTONS
-//--------------------------------------------------------
-export const btnBoxshadow = 'none';
-
-// PROGRESS BARS
-//--------------------------------------------------------
-export const progressBarBorderRadius = '1px';
-export const progressBarSmBorderRadius = '1px';
-export const progressBarXsBorderRadius = '1px';
-
-// FORMS
-//--------------------------------------------------------
-export const inputRadius = '0';
-
-// BUTTONS
-//--------------------------------------------------------
-
-// Border radius for non flat buttons
-export const btnBorderRadius = '3px';
-
-// TRANSITIONS SETTINGS
-//--------------------------------------------------------
-
 // Transition global options
 export const transitionSpeed = '.3s';
 export const transitionFn = 'ease-in-out';
 
-// MIXINS
-//--------------------------------------------------------
-export const navbarVariant = (
-  color,
-  fontColor = 'rgba(255, 255, 255, 0.8)',
-  hoverColor = baseColor,
-  hoverBg = 'rgba(0, 0, 0, 0.1)',
-) => ({
-  backgroundColor: color,
-  navbarFontColor: fontColor,
-  navbarHoverColor: hoverColor,
-  navbarHoverBg: hoverBg,
-});
-
-export const logoVariant = (
-  bgColor,
-  color = '#fff',
-  borderBottomColor = 'transparent',
-  borderBottomWidth = '0',
-) => ({
-  logoBgColor: bgColor,
-  logoColor: color,
-  logoBorderBottom: `${borderBottomWidth} solid ${borderBottomColor}`,
-  logoHover: tinycolor(bgColor).darken(1).toString(),
-});
-
-export const sidebarVariant = (
-  color,
-  light = false,
-) => (
-  (!light) ?
-  {
-    sidebarBg: sidebarDarkBg,
-    userPanelColor: '#fff',
-    sidebarHeaderColor: tinycolor(sidebarDarkBg).lighten(20).toString(),
-    sidebarHeaderBg: tinycolor(sidebarDarkBg).darken(4).toString(),
-    sidebarLinkColor: sidebarDarkColor,
-    sidebarLinkBorderLeft: '3px solid transparent',
-    sidebarLinkActiveColor: sidebarDarkHoverColor,
-    sidebarLinkActiveBg: sidebarDarkHoverBg,
-    sidebarLinkActiveBorderLeftColor: color,
-    sidebarLinkHoverDec: 'none',
-    sidebarSubmenuMargin: '0 1px',
-    sidebarSubmenuBg: sidebarDarkSubmenuBg,
-    sidebarSubmenuLinkColor: sidebarDarkSubmenuColor,
-    sidebarSubmenuLinkHoverColor: sidebarDarkSubmenuHoverColor,
-    sidebarFormBorderRadius: '3px',
-    sidebarFormBorder: `1px solid ${tinycolor(sidebarDarkBg).lighten(10).toString()}`,
-    sidebarFormMargin: '10px 10px',
-    sidebarFormInputBoxShadow: 'none',
-    sidebarFormInputBg: tinycolor(sidebarDarkBg).lighten(10).toString(),
-    sidebarFormInputBorder: '1px solid transparent',
-    sidebarFormInputHeight: '35px',
-    sidebarFormInputColor: '#666',
-    sidebarFormInputBorderRadius: '2px 0 0 2px',
-    sidebarFormInputFocusBg: '#fff',
-    sidebarFormInputFocusColor: '#666',
-    sidebarFormInputFocusBorderLeftColor: '#fff',
-    sidebarFormButtonColor: '#999',
-    sidebarFormButtonBorderRadius: '0 2px 2px 0',
-  } :
-  {
-    sidebarBg: sidebarLightBg,
-    contentLeftBorder: `1px solid ${gray}`,
-    footerLeftBorder: `1px solid ${gray}`,
-    userPanelColor: sidebarLightColor,
-    sidebarHeaderColor: tinycolor(sidebarLightColor).lighten(25).toString(),
-    sidebarHeaderBg: sidebarLightBg,
-    sidebarLinkColor: sidebarLightColor,
-    sidebarLinkTransition: 'border-left-color .3s ease',
-    sidebarLinkBorderLeft: '3px solid transparent',
-    sidebarLinkFontWeight: '600',
-    sidebarLinkActiveColor: sidebarLightHoverColor,
-    sidebarLinkActiveBg: sidebarLightHoverBg,
-    sidebarLinkActiveBorderLeftColor: color,
-    sidebarLinkActiveFontWeight: '600',
-    sidebarLinkHoverDec: 'none',
-    sidebarSubmenuBg: sidebarLightSubmenuBg,
-    sidebarFormBorderRadius: '3px',
-    sidebarFormBorder: `1px solid ${gray}`,
-    sidebarFormMargin: '10px 10px',
-    sidebarFormInputBoxShadow: 'none',
-    sidebarFormInputBg: '#fff',
-    sidebarFormInputBorder: '1px solid transparent',
-    sidebarFormInputHeight: '35px',
-    sidebarFormInputColor: '#666',
-    sidebarFormInputBorderRadius: '2px 0 2px 0',
-    sidebarFormInputFocusBg: '#fff',
-    sidebarFormInputFocusColor: '#666',
-    sidebarFormInputFocusBorderLeftColor: '#fff',
-    sidebarFormButtonColor: '#999',
-    sidebarFormButtonBorderRadius: '0 2px 0 2px',
-    sidebarSubmenuLgBorderLeft: `1px solid ${gray}`,
-  }
-);
-
-export const navbarItemVariant = (
-  color,
-  dividerColor = 'rgba(255, 255, 255, 0.1)',
-  itemLinkColor = '#fff',
-) => ({
-  navbarItemDividerBg: dividerColor,
-  navbarItemLinkColor: itemLinkColor,
-  navbarItemLinkHoverBg: tinycolor(color).darken(5).toString(),
-});
+export const curtainWidth = '400px';
+export const curtainHalfWidth = '200px';
+// Max width sticking curtain
+export const curtainStickyWidth = '1168px';

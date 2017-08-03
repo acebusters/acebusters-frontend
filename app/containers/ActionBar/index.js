@@ -2,16 +2,33 @@
  * Created by helge on 24.08.16.
  */
 import React from 'react';
+import PropTypes from 'prop-types';
+import Raven from 'raven-js';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
-import Grid from 'grid-styled';
-import Slider from 'react-rangeslider';
-import 'react-rangeslider/lib/index.css';
-import Raven from 'raven-js';
 
-import SliderWrapper from '../../components/Slider';
+import { playIsPlayerTurn } from '../../sounds';
 
 import {
+  handleClickButton,
+  setActionBarTurnComplete,
+  setActionBarButtonActive,
+  updateActionBar,
+  ALL_IN,
+  BET,
+  CHECK,
+  CALL,
+  FOLD,
+} from './actions';
+
+import {
+  getExecuteAction,
+  getActionBarSliderOpen,
+  getActionBarMode,
+  getActionBarTurnComplete,
+  getActionBarButtonActive,
+  makeSelectActionBarActive,
+  makeSelectActionBarVisible,
   makeMinSelector,
   makeCallAmountSelector,
   makeAmountToCallSelector,
@@ -20,49 +37,81 @@ import {
 import { makeSelectPrivKey } from '../AccountProvider/selectors';
 
 import {
-  makeHandStateSelector,
-  makeMyMaxBetSelector,
   makeIsMyTurnSelector,
-  makeMyPosSelector,
+  makeMyMaxBetSelector,
+  makeMessagesSelector,
+  makePlayersCountSelector,
 } from '../Table/selectors';
 
 import {
   makeMyCardsSelector,
   makeMyStackSelector,
-  makeLastReceiptSelector,
 } from '../Seat/selectors';
 
-import { bet, pay, setCards } from '../Table/actions';
-import { ActionBarComponent, ActionButton } from '../../components/ActionBar';
-import TableService from '../../services/tableService';
+import { setCards, bet, pay, fold, check } from '../Table/actions';
 
-export class ActionBar extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+import ActionBar from '../../components/ActionBar';
 
+class ActionBarContainer extends React.Component {
   constructor(props) {
     super(props);
+    this.handleAllIn = this.handleAllIn.bind(this);
     this.handleBet = this.handleBet.bind(this);
     this.handleCheck = this.handleCheck.bind(this);
     this.handleCall = this.handleCall.bind(this);
-    this.handleShow = this.handleShow.bind(this);
     this.handleFold = this.handleFold.bind(this);
     this.updateAmount = this.updateAmount.bind(this);
-    this.table = new TableService(props.params.tableAddr, this.props.privKey);
     this.state = {
-      active: true,
+      amount: this.props.minRaise,
+      disabled: false,
     };
   }
 
-  componentWillReceiveProps(nextProps) {
-    const min = nextProps.minRaise;
-    const amount = (min && nextProps.myStack < min) ? nextProps.myStack : min;
-    this.setState({ amount });
-    if (nextProps.isMyTurn === true) {
-      this.setActive(true);
+  componentWillReceiveProps(nextProps) { // eslint-disable-line consistent-return
+    if (nextProps.turnComplete === true) {
+      this.props.setActionBarTurnComplete(false);
+    }
+    if (nextProps.minRaise && nextProps.minRaise !== this.props.minRaise) {
+      this.updateAmount(nextProps.minRaise);
+    }
+    const { executeAction, mode } = nextProps;
+    // after handleClickButton saga updates state to execute action
+    if (executeAction) {
+      const handId = parseInt(this.props.params.handId, 10);
+      this.resetActionBar();
+      this.disableTemporarilyAfterAction();
+      switch (mode) {
+        case ALL_IN:
+          return this.handleAllIn();
+        case BET:
+          return this.handleBet();
+        case CHECK:
+          return this.handleCheck();
+        case CALL:
+          return this.handleCall();
+        case FOLD:
+          return this.handleFold();
+        default:
+          return this.captureError(handId);
+      }
     }
   }
 
-  setActive(active) {
-    this.setState({ active });
+  componentDidUpdate(prevProps, prevState) {
+    const wasDisabled = !prevProps.active || prevState.disabled;
+    const disabled = !this.props.active || this.state.disabled;
+    // should play sound
+    if (wasDisabled && !disabled) {
+      playIsPlayerTurn();
+    }
+  }
+
+  // call this after each player action
+  disableTemporarilyAfterAction() {
+    this.setState({ disabled: true });
+    setTimeout(() => {
+      this.setState({ disabled: false });
+    }, 3000);
   }
 
   updateAmount(value) {
@@ -71,21 +120,43 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
     this.setState({ amount });
   }
 
-  handleBet() {
-    this.setActive(false);
-    const amount = this.state.amount + this.props.myMaxBet;
-    const handId = parseInt(this.props.params.handId, 10);
+  resetActionBar() {
+    this.props.updateActionBar({
+      executeAction: false,
+      mode: '',
+      buttonActive: '',
+      turnComplete: true,
+    });
+  }
 
-    const betAction = bet(this.props.params.tableAddr, handId, amount, this.props.privKey, this.props.myPos, this.props.lastReceipt);
-    return pay(betAction, this.props.dispatch).then((cards) => {
-      this.props.setCards(this.props.params.tableAddr, handId, cards);
-    }).catch((err) => {
+  captureError(handId) {
+    const self = this;
+
+    return (err) => {
       Raven.captureException(err, { tags: {
-        tableAddr: this.props.params.tableAddr,
+        tableAddr: self.props.params.tableAddr,
         handId,
       } });
-      this.setActive(true);
-    });
+      this.resetActionBar();
+    };
+  }
+
+  handleAllIn() {
+    // if player wants to raise and their stack is smaller than the minRaise amount, then bet their stack
+    const { minRaise, myStack } = this.props;
+    const amount = (myStack < minRaise) ? myStack : minRaise;
+    this.setState({ amount }, () => this.handleBet());
+  }
+
+  handleBet() {
+    const handId = parseInt(this.props.params.handId, 10);
+    const amount = this.state.amount + this.props.myMaxBet;
+    const betAction = this.props.bet(this.props.params.tableAddr, handId, amount, this.props.privKey, this.props.myPos, this.props.lastReceipt);
+    return this.props.pay(betAction, this.props.dispatch)
+    .then((cards) => {
+      this.props.setCards(this.props.params.tableAddr, handId, cards);
+    })
+    .catch(this.captureError(handId));
   }
 
   handleCall() {
@@ -96,148 +167,122 @@ export class ActionBar extends React.PureComponent { // eslint-disable-line reac
   }
 
   handleCheck() {
-    this.setActive(false);
     const amount = this.props.myMaxBet;
+    const handId = parseInt(this.props.params.handId, 10);
+    const checkStates = ['preflop', 'turn', 'river', 'flop'];
     const state = this.props.state;
-    const handId = parseInt(this.props.params.handId, 10);
-    let call;
-    switch (state) {
-      case 'preflop': {
-        call = this.table.checkPreflop(handId, amount);
-        break;
-      }
-      case 'turn': {
-        call = this.table.checkTurn(handId, amount);
-        break;
-      }
-      case 'river': {
-        call = this.table.checkRiver(handId, amount);
-        break;
-      }
-      default: {
-        call = this.table.checkFlop(handId, amount);
-      }
-    }
-    return call.catch((err) => {
-      Raven.captureException(err, { tags: {
-        tableAddr: this.props.params.tableAddr,
-        handId,
-      } });
-      this.setActive(true);
-    });
-  }
+    const checkType = checkStates.indexOf(state) !== -1 ? state : 'flop';
+    const action = this.props.check(
+      this.props.params.tableAddr,
+      handId,
+      amount,
+      this.props.privKey,
+      this.props.myPos,
+      this.props.lastReceipt,
+      checkType,
+    );
 
-  handleShow() {
-    this.setActive(false);
-    const amount = this.props.myMaxBet;
-    const cards = this.props.cards;
-    const handId = parseInt(this.props.params.handId, 10);
-    return this.table.show(handId, amount, cards).catch((err) => {
-      Raven.captureException(err, { tags: {
-        tableAddr: this.props.params.tableAddr,
-        handId,
-      } });
-    });
+    return this.props.pay(action, this.props.dispatch)
+      .then((cards) => {
+        this.props.setCards(this.props.params.tableAddr, handId, cards);
+      })
+      .catch(this.captureError(handId));
   }
 
   handleFold() {
-    this.setActive(false);
     const amount = this.props.myMaxBet;
     const handId = parseInt(this.props.params.handId, 10);
-    return this.table.fold(handId, amount).catch((err) => {
-      Raven.captureException(err, { tags: {
-        tableAddr: this.props.params.tableAddr,
-        handId,
-      } });
-      this.setActive(true);
-    });
+    const action = this.props.fold(
+      this.props.params.tableAddr,
+      handId,
+      amount,
+      this.props.privKey,
+      this.props.myPos,
+      this.props.lastReceipt
+    );
+
+    return this.props.pay(action, this.props.dispatch)
+      .then((cards) => {
+        this.props.setCards(this.props.params.tableAddr, handId, cards);
+      })
+      .catch(this.captureError(handId));
   }
 
   render() {
-    if (this.state.active
-        && this.props.isMyTurn
-        && this.props.state !== 'waiting'
-        && this.props.state !== 'dealing'
-        && this.props.state !== 'showdown') {
-      const raiseButton = (this.props.myStack > this.props.amountToCall) ? (<ActionButton size="medium" onClick={this.handleBet} text={`RAISE ${this.state.amount}`} />) : null;
-      return (
-        <ActionBarComponent>
-          <SliderWrapper>
-            { this.props.myStack > this.props.amountToCall &&
-              <Slider
-                key="betting-slider"
-                data-orientation="vertical"
-                value={this.state.amount}
-                min={this.props.minRaise}
-                max={this.props.myStack}
-                step={1}
-                onChange={this.updateAmount}
-              >
-              </Slider>
-            }
-          </SliderWrapper>
-          <Grid xs={1 / 3}>
-            { this.props.amountToCall > 0 &&
-              <div>
-                { raiseButton }
-                <ActionButton size="medium" onClick={this.handleCall} text={`CALL ${this.props.callAmount}`}>
-                </ActionButton>
-                <ActionButton size="medium" onClick={this.handleFold} text="FOLD"></ActionButton>
-              </div>
-            }
-            { this.props.amountToCall === 0 &&
-              <div>
-                <ActionButton size="medium" onClick={this.handleBet} text={`BET ${this.state.amount}`}>
-                </ActionButton>
-                <ActionButton size="medium" onClick={this.handleCheck} text="CHECK">
-                </ActionButton>
-              </div>
-            }
-          </Grid>
-        </ActionBarComponent>
-      );
-    }
-    return null;
+    return (
+      <ActionBar
+        amount={this.state.amount}
+        disabled={this.state.disabled}
+        updateAmount={this.updateAmount}
+        {...this.props}
+      />
+    );
   }
 }
+
+ActionBarContainer.propTypes = {
+  active: PropTypes.bool,
+  bet: PropTypes.func,
+  callAmount: PropTypes.number,
+  check: PropTypes.func,
+  dispatch: PropTypes.func,
+  fold: PropTypes.func,
+  lastReceipt: PropTypes.object,
+  minRaise: PropTypes.number,
+  myMaxBet: PropTypes.number,
+  myPos: PropTypes.number,
+  myStack: PropTypes.number,
+  pay: PropTypes.func,
+  params: PropTypes.object,
+  privKey: PropTypes.string,
+  setCards: PropTypes.func,
+  state: PropTypes.string,
+  setActionBarTurnComplete: PropTypes.func,
+  turnComplete: PropTypes.bool,
+  executeAction: PropTypes.bool,
+  mode: PropTypes.string,
+  updateActionBar: PropTypes.func,
+};
 
 export function mapDispatchToProps(dispatch) {
   return {
     dispatch,
     setCards: (tableAddr, handId, cards) => setCards(tableAddr, handId, cards),
+    bet: (tableAddr, handId, amount, privKey, myPos, lastReceipt) => bet(
+      tableAddr, handId, amount, privKey, myPos, lastReceipt,
+    ),
+    pay: (betAction) => pay(betAction, dispatch),
+    fold: (tableAddr, handId, amount, privKey, myPos, lastReceipt) => fold(
+      tableAddr, handId, amount, privKey, myPos, lastReceipt),
+    check: (tableAddr, handId, amount, privKey, myPos, lastReceipt, checkType
+      ) => check(
+        tableAddr, handId, amount, privKey, myPos, lastReceipt, checkType
+    ),
+    handleClickButton: (type) => dispatch(handleClickButton(type)),
+    setActionBarTurnComplete: (complete) => dispatch(setActionBarTurnComplete(complete)),
+    setActionBarButtonActive: (btn) => dispatch(setActionBarButtonActive(btn)),
+    updateActionBar: (payload) => dispatch(updateActionBar(payload)),
   };
 }
 
-
 const mapStateToProps = createStructuredSelector({
-  privKey: makeSelectPrivKey(),
-  myMaxBet: makeMyMaxBetSelector(),
-  isMyTurn: makeIsMyTurnSelector(),
+  active: makeSelectActionBarActive(),
   amountToCall: makeAmountToCallSelector(),
   callAmount: makeCallAmountSelector(),
-  minRaise: makeMinSelector(),
-  myStack: makeMyStackSelector(),
-  myPos: makeMyPosSelector(),
-  lastReceipt: makeLastReceiptSelector(),
   cards: makeMyCardsSelector(),
-  state: makeHandStateSelector(),
+  buttonActive: getActionBarButtonActive(),
+  isMyTurn: makeIsMyTurnSelector(),
+  playerCount: makePlayersCountSelector(),
+  privKey: makeSelectPrivKey(),
+  messages: makeMessagesSelector(),
+  mode: getActionBarMode(),
+  minRaise: makeMinSelector(),
+  myMaxBet: makeMyMaxBetSelector(),
+  myStack: makeMyStackSelector(),
+  sliderOpen: getActionBarSliderOpen(),
+  turnComplete: getActionBarTurnComplete(),
+  visible: makeSelectActionBarVisible(),
+  executeAction: getExecuteAction(),
 });
 
-ActionBar.propTypes = {
-  params: React.PropTypes.object,
-  privKey: React.PropTypes.string,
-  lastReceipt: React.PropTypes.string,
-  myPos: React.PropTypes.number,
-  myMaxBet: React.PropTypes.number,
-  isMyTurn: React.PropTypes.bool,
-  minRaise: React.PropTypes.number,
-  amountToCall: React.PropTypes.number,
-  myStack: React.PropTypes.number,
-  callAmount: React.PropTypes.number,
-  state: React.PropTypes.string,
-  cards: React.PropTypes.array,
-  dispatch: React.PropTypes.func,
-  setCards: React.PropTypes.func,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(ActionBar);
+export default connect(mapStateToProps, mapDispatchToProps)(ActionBarContainer);

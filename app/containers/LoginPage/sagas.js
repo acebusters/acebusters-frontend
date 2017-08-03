@@ -1,10 +1,26 @@
-import { take, put, race } from 'redux-saga/effects';
+import { take, put, race, fork } from 'redux-saga/effects';
 
-import { WORKER_ERROR, WALLET_IMPORTED } from './constants';
+import {
+  WORKER_ERROR,
+  WALLET_IMPORTED,
+  WORKER_PROGRESS,
+} from './constants';
+
 import { login } from './actions';
+
+import { setProgress } from '../App/actions';
+
+function* progress() {
+  while (true) { //eslint-disable-line
+    const action = yield take(WORKER_PROGRESS);
+    yield put(setProgress(action.payload.progress));
+  }
+}
 
 // The root saga is what is sent to Redux's middleware.
 export function* loginSaga() {
+  yield fork(progress);
+
   while (true) { // eslint-disable-line no-constant-condition
     // We expect successful decryption or error from worker.
     const worker = yield race({
