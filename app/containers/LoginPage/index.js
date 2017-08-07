@@ -78,9 +78,9 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
 
           return data;
         })
-        .then((data) => {
+        .then((wallet) => {
           this.props.walletImport({
-            json: data.wallet,
+            json: wallet,
             password: values.get('password'),
           });
           // Login saga is called, we return the promise here,
@@ -89,7 +89,11 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
             login(values, dispatch)
               .catch((workerErr) => {
                 // If worker failed, ...
-                throw new SubmissionError({ _error: `Error: login failed due to worker error: ${workerErr}` });
+                if (workerErr.payload && workerErr.payload.error === 'invalid password') {
+                  throw new SubmissionError({ password: 'Invalid password' });
+                } else {
+                  throw new SubmissionError({ _error: `Error: login failed due to worker error: ${workerErr}` });
+                }
               })
               .then((workerRsp) => {
                 // If worker success, ...
