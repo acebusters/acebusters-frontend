@@ -1,4 +1,5 @@
-import { take, put, call } from 'redux-saga/effects';
+import { delay } from 'redux-saga';
+import { take, put, call, fork, cancel } from 'redux-saga/effects';
 import { startSubmit, stopSubmit, startAsyncValidation, stopAsyncValidation, change, touch } from 'redux-form/immutable';
 import { CHANGE, INITIALIZE } from 'redux-form/lib/actionTypes';
 import { push } from 'react-router-redux';
@@ -41,6 +42,8 @@ export function* registerSaga() {
 }
 
 function* validateRefCode(value) {
+  yield call(delay, 200);
+
   if (value.length === 8) {
     yield put(startAsyncValidation('register'));
 
@@ -56,11 +59,13 @@ function* validateRefCode(value) {
           { referral: message },
         )
       );
+      yield put(touch('register', 'referral'));
     }
   }
 }
 
 export function* refCodeValidationSaga() {
+  let task;
   while (true) { // eslint-disable-line no-constant-condition
     const { payload: value = '' } = yield take((action) => (
       action.type === CHANGE &&
@@ -68,7 +73,11 @@ export function* refCodeValidationSaga() {
       action.meta.field === 'referral'
     ));
 
-    yield call(validateRefCode, value);
+    if (task) {
+      yield cancel(task);
+    }
+
+    task = yield fork(validateRefCode, value);
   }
 }
 
@@ -100,7 +109,6 @@ function* initalRefCodeValidationSaga() {
   const refCode = payload.get('referral') || '';
   if (refCode.length > 0) {
     yield call(validateRefCode, refCode);
-    yield put(touch('register', 'referral'));
   }
 }
 
