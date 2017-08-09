@@ -32,7 +32,7 @@ export function walletExport(data) {
   return {
     type: WALLET_EXPORT,
     meta: {
-      WebWorker: true,
+      WebWorker: 'generate',
     },
     payload: {
       data,

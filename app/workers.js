@@ -1,12 +1,7 @@
-import createWorkerMiddleware from 'redux-worker-middleware';
+/* eslint-disable global-require */
+import createWorkerMiddleware from './worker-middleware';
 
-const LoginWorker = require('worker-loader!../app/containers/LoginPage/worker.js');
-const loginWorker = new LoginWorker();
-
-const GenerateWorker = require('worker-loader!../app/containers/GeneratePage/worker.js');
-const generateWorker = new GenerateWorker();
-
-const loginWorkerMiddleware = createWorkerMiddleware(loginWorker);
-const generateWorkerMiddleware = createWorkerMiddleware(generateWorker);
-
-export default [loginWorkerMiddleware, generateWorkerMiddleware];
+export default [
+  createWorkerMiddleware('login', () => require('worker-loader!../app/containers/LoginPage/worker.js')),
+  createWorkerMiddleware('generate', () => require('worker-loader!../app/containers/GeneratePage/worker.js')),
+];

@@ -266,7 +266,6 @@
     "redux-form-saga": "^0.1.0",
     "redux-immutable": "3.0.8",
     "redux-saga": "^0.14.2",
-    "redux-worker-middleware": "^1.0.0",
     "reselect": "2.5.4",
     "sanitize.css": "4.1.0",
     "styled-components": "^2.1.0",
