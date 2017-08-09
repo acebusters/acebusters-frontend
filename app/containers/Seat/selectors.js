@@ -101,7 +101,13 @@ const makeCardsSelector = () => createSelector(
     // Note: no players should have cards shown on table if it's still waiting
     // and show his cards only if he is an active player
     // except in showdown, when cards should always be shown
-    if (state === 'waiting' || (state !== 'showdown' && !pokerHelper.isActivePlayer(lineup, pos, hand.get('state')))) {
+    let isActivePlayer;
+    try {
+      isActivePlayer = pokerHelper.isActivePlayer(lineup, pos, hand.get('state'));
+    } catch (e) {
+      isActivePlayer = null;
+    }
+    if (state === 'waiting' || (state !== 'showdown' && !isActivePlayer)) {
       return [null, null];
     }
 
@@ -131,6 +137,16 @@ const makeMyPendingSelector = () => createSelector(
       return lineup.toJS().some((l) => l.pending && l.pending.signerAddr === signerAddr);
     }
     return false;
+  }
+);
+
+const makeMyPendingSeatSelector = () => createSelector(
+  [makeLineupSelector(), makeSignerAddrSelector()],
+  (lineup, signerAddr) => {
+    if (lineup && lineup.toJS) {
+      return lineup.toJS().findIndex((l) => l.pending && l.pending.signerAddr === signerAddr);
+    }
+    return -1;
   }
 );
 
@@ -353,6 +369,7 @@ export {
   makeDealerSelector,
   makePendingSelector,
   makeMyPendingSelector,
+  makeMyPendingSeatSelector,
   makeOpenSelector,
   makeCoordsSelector,
   makeAmountCoordsSelector,

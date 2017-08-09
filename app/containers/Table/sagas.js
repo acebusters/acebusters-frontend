@@ -24,6 +24,7 @@ import {
   NET,
   HAND_REQUEST,
   UPDATE_RECEIVED,
+  LINEUP_RECEIVED,
   SEND_MESSAGE,
 } from './actions';
 
@@ -34,6 +35,8 @@ import {
 
 import {
   makeMyCardsSelector,
+  makeMyPendingSeatSelector,
+  makeLastReceiptSelector,
 } from '../Seat/selectors';
 import {
   lastAmountByAction,
@@ -47,6 +50,9 @@ import {
   makeLineupSelector,
   makeHandSelector,
   makeSelectWinners,
+  makeMyPosSelector,
+  makeSitoutAmountSelector,
+  makeMySitoutSelector,
 } from './selectors';
 
 import TableService, { getHand } from '../../services/tableService';
@@ -231,6 +237,46 @@ function* performShow(action) {
   }
 }
 
+export function* lineupScanner(dispatch, action) {
+  if (!action.handId) {
+    return;
+  }
+
+  if (action.myPendingSeat === -1) {
+    return;
+  }
+
+  const params = { params: { tableAddr: action.tableAddr, handId: action.handId } };
+  const state = yield select();
+  const myPendingSeat = makeMyPendingSeatSelector()(state, params);
+  const myPos = makeMyPosSelector()(state, params);
+
+  if (myPendingSeat === -1 && myPos === action.myPendingSeat) {
+    const hand = makeHandSelector()(state, params).toJS();
+    if (hand.state !== 'waiting' && hand.state !== 'dealing') {
+      const privKey = makeSelectPrivKey()(state, params);
+      const sitoutAmount = makeSitoutAmountSelector()(state, params);
+      const lastReceipt = makeLastReceiptSelector()(state, params);
+      const sitout = makeMySitoutSelector()(state, params);
+      const handId = parseInt(action.handId, 10);
+      const nextSitoutState = sitout > 0 ? null : 0;
+      const sitoutAction = bet(
+        action.tableAddr,
+        handId,
+        sitoutAmount,
+        privKey,
+        myPos,
+        lastReceipt,
+        {
+          originalSitout: sitout,
+          nextSitoutState,
+        }
+      );
+      yield sitOutToggle(sitoutAction, dispatch);
+    }
+  }
+}
+
 export function* updateScanner() {
   const privKeySelector = makeSelectPrivKey();
   const myAddrSelector = makeSignerAddrSelector();
@@ -318,7 +364,7 @@ export function* updateScanner() {
   }
 }
 
-export function* tableStateSaga() {
+export function* tableStateSaga(dispatch) {
   yield takeEvery(SEND_MESSAGE, sendMessage);
   yield takeEvery(BET, performBet);
   yield takeEvery(SHOW, performShow);
@@ -327,4 +373,5 @@ export function* tableStateSaga() {
   yield fork(sitoutFlow);
   yield fork(updateScanner);
   yield fork(payFlow);
+  yield takeEvery(LINEUP_RECEIVED, lineupScanner, dispatch);
 }

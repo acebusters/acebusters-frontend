@@ -79,8 +79,8 @@ export function updateReceived(tableAddr, hand) {
   return { type: UPDATE_RECEIVED, tableAddr, hand };
 }
 
-export function lineupReceived(tableAddr, lineup, smallBlind, handId) {
-  return { type: LINEUP_RECEIVED, tableAddr, lineup, smallBlind, handId };
+export function lineupReceived(tableAddr, lineup, smallBlind, handId, myPendingSeat) {
+  return { type: LINEUP_RECEIVED, tableAddr, lineup, smallBlind, handId, myPendingSeat };
 }
 
 export function nextHand(tableAddr, handId) {
