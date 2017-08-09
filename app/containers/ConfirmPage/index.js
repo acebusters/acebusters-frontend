@@ -28,16 +28,13 @@ const validate = (values) => {
   if (!values.get('confCode')) {
     errors.confCode = 'Required';
   } else {
-    let receipt;
-    const confCode = decodeURIComponent(values.get('confCode'));
     try {
-      receipt = Receipt.parse(confCode);
+      const receipt = Receipt.parse(values.get('confCode'));
+      if (receipt.type !== Type.CREATE_CONF && receipt.type !== Type.RESET_CONF) {
+        errors.confCode = `Invalid receipt type: ${receipt.type}`;
+      }
     } catch (err) {
       errors.confCode = `Invalid confirmation code: ${err.message}`;
-    }
-    if (receipt && receipt.type !== Type.CREATE_CONF &&
-      receipt.type !== Type.RESET_CONF) {
-      errors.confCode = `Invalid receipt type: ${receipt.type}`;
     }
   }
   return errors;
@@ -214,7 +211,7 @@ function mapDispatchToProps(dispatch) {
 
 const mapStateToProps = (state, ownProps) => ({
   initialValues: {
-    confCode: ownProps.params.confCode,
+    confCode: ownProps.params.confCode && decodeURIComponent(ownProps.params.confCode),
   },
   hasWeb3: makeSelectHasWeb3()(state, ownProps),
   isNetworkSupported: makeSelectNetworkSupported()(state, ownProps),
