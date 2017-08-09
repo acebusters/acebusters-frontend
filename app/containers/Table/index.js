@@ -189,20 +189,20 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     if (nextProps.state === 'waiting' && nextProps.myStack !== null && nextProps.myStack <= 0
         && (nextProps.state !== this.props.state || nextProps.myStack !== this.props.myStack)
         && !nextProps.standingUp && !storageService.getItem(`rebuyModal[${toggleKey}]`)) {
-      const balance = parseInt(this.balance.toString(), 10);
+      const balance = this.balance;
 
       this.props.modalDismiss();
-      this.props.modalAdd((
+      this.props.modalAdd(
         <RebuyDialog
           pos={this.props.myPos}
           handleRebuy={this.handleRebuy}
           handleLeave={this.handleLeave}
           modalDismiss={this.props.modalDismiss}
           params={this.props.params}
-          balance={balance}
+          balance={balance && Number(balance.toString())}
         />,
         this.handleLeave
-      ));
+      );
     }
   }
 
