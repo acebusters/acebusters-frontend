@@ -335,7 +335,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
     // Note: if it's enabled "play" (> 0), then set it to disabled "pause" (null)
     // otherwise it's enabled "pause", then set it to disabled "play" (0)
-    const nextSitoutState = sitout > 0 ? null : 0;
     const handId = parseInt(this.props.params.handId, 10);
 
     const sitoutAction = bet(
@@ -345,10 +344,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       this.props.privKey,
       this.props.myPos,
       this.props.lastReceipt,
-      {
-        originalSitout: sitout,
-        nextSitoutState,
-      }
     );
     return sitOutToggle(sitoutAction, this.props.dispatch);
   }

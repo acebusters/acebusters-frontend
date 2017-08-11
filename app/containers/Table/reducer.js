@@ -125,26 +125,6 @@ export default function tableReducer(state = initialState, action) {
       return state.setIn([action.tableAddr, handIdStr, 'lineup', action.pos, 'last'], action.receipt);
     }
 
-    case TableActions.PRE_TOGGLE_SITOUT: {
-      return state.setIn([
-        action.tableAddr,
-        action.handId.toString(),
-        'lineup',
-        action.pos,
-        'sitout',
-      ], action.sitout);
-    }
-
-    case TableActions.sitOutToggle.FAILURE: {
-      return state.setIn([
-        action.tableAddr,
-        action.handId.toString(),
-        'lineup',
-        action.pos,
-        'sitout',
-      ], action.sitout);
-    }
-
     case TableActions.UPDATE_RECEIVED: {
       const table = state.get(action.tableAddr);
 

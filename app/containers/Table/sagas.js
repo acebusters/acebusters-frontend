@@ -16,7 +16,6 @@ import {
   receiptSet,
   pay,
   sitOutToggle,
-  preToggleSitout,
   BET,
   FOLD,
   CHECK,
@@ -52,7 +51,6 @@ import {
   makeSelectWinners,
   makeMyPosSelector,
   makeSitoutAmountSelector,
-  makeMySitoutSelector,
 } from './selectors';
 
 import TableService, { getHand } from '../../services/tableService';
@@ -191,16 +189,6 @@ function* sitoutFlow() {
   while (true) { //eslint-disable-line
     const req = yield take(sitOutToggle.REQUEST);
     const action = req.payload;
-
-    // Note: fake sitout first, if the request fails, roll back to the old one.
-    const pre = preToggleSitout({
-      tableAddr: action.tableAddr,
-      handId: action.handId,
-      pos: action.pos,
-      sitout: action.nextSitoutState,
-    });
-    yield put(pre);
-
     try {
       const table = new TableService(action.tableAddr, action.privKey);
       const receipt = yield table.sitOut(action.handId, action.amount);
@@ -211,15 +199,6 @@ function* sitoutFlow() {
           tableAddr: action.tableAddr,
           handId: action.handId,
         },
-      });
-
-      yield put({
-        type: sitOutToggle.FAILURE,
-        payload: err,
-        tableAddr: action.tableAddr,
-        handId: action.handId,
-        pos: action.pos,
-        sitout: action.originalSitout,
       });
     }
   }
@@ -257,9 +236,7 @@ export function* lineupScanner(dispatch, action) {
       const privKey = makeSelectPrivKey()(state, params);
       const sitoutAmount = makeSitoutAmountSelector()(state, params);
       const lastReceipt = makeLastReceiptSelector()(state, params);
-      const sitout = makeMySitoutSelector()(state, params);
       const handId = parseInt(action.handId, 10);
-      const nextSitoutState = sitout > 0 ? null : 0;
       const sitoutAction = bet(
         action.tableAddr,
         handId,
@@ -267,10 +244,6 @@ export function* lineupScanner(dispatch, action) {
         privKey,
         myPos,
         lastReceipt,
-        {
-          originalSitout: sitout,
-          nextSitoutState,
-        }
       );
       yield sitOutToggle(sitoutAction, dispatch);
     }

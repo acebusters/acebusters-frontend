@@ -9,7 +9,6 @@ export const UPDATE_RECEIVED = 'acebusters/Table/UPDATE_RECEIVED';
 export const LINEUP_RECEIVED = 'acebusters/Table/LINEUP_RECEIVED';
 export const LEAVE_REQUEST = 'acebusters/Table/LEAVE_REQUEST';
 export const JOIN_TABLE = 'acebusters/Table/JOIN_TABLE';
-export const PRE_TOGGLE_SITOUT = 'acebusters/Table/PRE_TOGGLE_SITOUT';
 export const BET = 'acebusters/Table/BET';
 export const FOLD = 'acebusters/Table/FOLD';
 export const CHECK = 'acebusters/Table/CHECK';
@@ -31,12 +30,8 @@ export const pay = createFormAction('PAY');
 
 export const sitOutToggle = createFormAction('SITOUT_TOGGLE');
 
-export function preToggleSitout(payload) {
-  return { type: PRE_TOGGLE_SITOUT, ...payload };
-}
-
-export function bet(tableAddr, handId, amount, privKey, pos, prevReceipt, extra = {}) {
-  return { type: BET, tableAddr, handId, amount, privKey, pos, prevReceipt, ...extra };
+export function bet(tableAddr, handId, amount, privKey, pos, prevReceipt) {
+  return { type: BET, tableAddr, handId, amount, privKey, pos, prevReceipt };
 }
 
 export function fold(tableAddr, handId, amount, privKey, pos, prevReceipt) {
