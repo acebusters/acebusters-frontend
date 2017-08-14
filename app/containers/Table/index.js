@@ -255,6 +255,8 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       `0x0${(myPos).toString(16)}${signerAddr.replace('0x', '')}`
     );
 
+    storageService.removeItem(`rebuyModal[${toggleKey}]`);
+
     return Promise.resolve(account.isLocked ? null : promise).then(() => {
       this.props.modalDismiss();
     });
@@ -368,6 +370,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       <Button onClick={this.props.modalDismiss}>OK!</Button>
     </div>);
 
+    storageService.removeItem(`rebuyModal[${this.tableAddr + handId}]`);
     this.props.modalDismiss();
     this.props.modalAdd(statusElement);
 
