@@ -28,7 +28,10 @@ const Wallet = (props) => {
   return (
     <Pane name="dashboard-wallet">
 
-      <Section name="wallet-receive">
+      <Section
+        style={{ alignSelf: 'center', maxWidth: 480 }}
+        name="wallet-receive"
+      >
         <H2><ModeIcon className="fa fa-inbox" />Deposit</H2>
         {account.isLocked ?
           <AccountIsLocked {...props} />

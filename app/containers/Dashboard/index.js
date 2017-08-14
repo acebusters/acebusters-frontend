@@ -15,7 +15,12 @@ import {
 } from '../../utils/amountFormatter';
 import { waitForTx } from '../../utils/waitForTx';
 import { notifyCreate } from '../Notifications/actions';
-import { TRANSFER_NTZ, TRANSFER_ETH } from '../Notifications/constants';
+import {
+  TRANSFER_NTZ,
+  TRANSFER_ETH,
+  SELL_NTZ,
+  PURCHASE_NTZ,
+} from '../Notifications/constants';
 
 import { modalAdd, modalDismiss } from '../App/actions';
 import { contractEvents, accountLoaded, transferETH, proxyEvents } from '../AccountProvider/actions';
@@ -321,6 +326,7 @@ class DashboardRoot extends React.Component {
   }
 
   handleNTZSell(amount) {
+    this.props.notifyCreate(SELL_NTZ);
     return this.handleTxSubmit((callback) => {
       this.token.transfer.sendTransaction(
         confParams.ntzAddr,
@@ -332,6 +338,7 @@ class DashboardRoot extends React.Component {
   }
 
   handleNTZPurchase(amount) {
+    this.props.notifyCreate(PURCHASE_NTZ);
     return this.handleTxSubmit((callback) => {
       this.props.transferETH({
         dest: confParams.ntzAddr,
@@ -427,6 +434,7 @@ class DashboardRoot extends React.Component {
             totalSupply,
             listTxns,
             qrUrl,
+            messages,
             downRequests: downRequestsToList(
               downRequests,
               downtime,

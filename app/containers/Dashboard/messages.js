@@ -84,11 +84,11 @@ export default defineMessages({
   },
   sellTitle: {
     id: 'app.containers.Dashboard.sellTitle',
-    defaultMessage: 'Sell NTZ',
+    defaultMessage: 'Exchange NTZ for ETH',
   },
   purchaseTitle: {
     id: 'app.containers.Dashboard.purchaseTitle',
-    defaultMessage: 'Purchase NTZ',
+    defaultMessage: 'Exchange ETH for NTZ',
   },
   tableJoin: {
     id: 'app.containers.Dashboard.tableJoin',
