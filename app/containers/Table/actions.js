@@ -7,6 +7,9 @@ export const RESIZE_TABLE = 'acebusters/Table/RESIZE_TABLE';
 export const TABLE_RECEIVED = 'acebusters/Table/TABLE_RECEIVED';
 export const UPDATE_RECEIVED = 'acebusters/Table/UPDATE_RECEIVED';
 export const LINEUP_RECEIVED = 'acebusters/Table/LINEUP_RECEIVED';
+export const RESERVATION_RECEIVED = 'acebusters/Table/RESERVATION_RECEIVED';
+export const SEAT_RESERVED = 'acebusters/Table/SEAT_RESERVED';
+export const SEATS_RELEASED = 'acebusters/Table/SEATS_RELEASED';
 export const LEAVE_REQUEST = 'acebusters/Table/LEAVE_REQUEST';
 export const JOIN_TABLE = 'acebusters/Table/JOIN_TABLE';
 export const BET = 'acebusters/Table/BET';
@@ -58,7 +61,7 @@ export function tableReceived(tableAddr) {
   return { type: TABLE_RECEIVED, tableAddr };
 }
 
-export function setPending(tableAddr, handId, pos, data = {}) {
+export function setPending(tableAddr, handId, pos, data) {
   return { type: PENDING_SET, payload: { tableAddr, handId, pos, data } };
 }
 
@@ -76,6 +79,18 @@ export function updateReceived(tableAddr, hand) {
 
 export function lineupReceived(tableAddr, lineup, smallBlind, handId, myPendingSeat) {
   return { type: LINEUP_RECEIVED, tableAddr, lineup, smallBlind, handId, myPendingSeat };
+}
+
+export function reservationReceived(tableAddr, reservation) {
+  return { type: RESERVATION_RECEIVED, payload: reservation, meta: { tableAddr } };
+}
+
+export function seatReserved(tableAddr, seatData) {
+  return { type: SEAT_RESERVED, payload: seatData, meta: { tableAddr } };
+}
+
+export function seatsReleased(tableAddr, seatsData) {
+  return { type: SEATS_RELEASED, payload: seatsData, meta: { tableAddr } };
 }
 
 export function nextHand(tableAddr, handId) {

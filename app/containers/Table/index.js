@@ -36,6 +36,9 @@ import { modalAdd, modalDismiss } from '../App/actions';
 import {
   handRequest,
   lineupReceived,
+  seatReserved,
+  seatsReleased,
+  reservationReceived,
   updateReceived,
   addMessage,
   setPending,
@@ -78,18 +81,21 @@ import {
 import TableComponent from '../../components/Table';
 import web3Connect from '../AccountProvider/web3Connect';
 import TableService, { getHand } from '../../services/tableService';
+import * as reservationService from '../../services/reservationService';
 import JoinDialog from '../JoinDialog';
 import JoinSlides from '../JoinDialog/slides';
 import InviteDialog from '../InviteDialog';
 import RebuyDialog from '../RebuyDialog';
 
-const getTableData = (table, props) => {
-  const lineup = table.getLineup.callPromise();
-  const sb = table.smallBlind.callPromise();
-  return Promise.all([lineup, sb]).then((rsp) => {
-    props.lineupReceived(table.address, rsp[0], rsp[1]);
-    return Promise.resolve();
-  });
+const getTableData = async (table, props) => {
+  const [lineup, sb, reservation] = await Promise.all([
+    table.getLineup.callPromise(),
+    table.smallBlind.callPromise(),
+    reservationService.lineup(table.address),
+  ]);
+
+  props.lineupReceived(table.address, lineup, sb);
+  props.reservationReceived(table.address, reservation);
 };
 
 export class Table extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -227,18 +233,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       this.props.addMessage(msg.message, msg.tableAddr, msg.signer, msg.created);
     } else if (event.type === 'handUpdate') {
       this.props.updateReceived(this.tableAddr, event.payload);
-    } else if (event.type === 'joinRequest') {
-      if (event.payload.signer !== this.props.signerAddr) {
-        const data = event.payload.data.slice(2);
-        const amount = parseInt(data.slice(8, 72), 16);
-        const pos = parseInt(data.slice(136), 16) - 1;
-        this.props.setPending(
-          this.tableAddr,
-          this.props.params.handId,
-          pos,
-          { signerAddr: event.payload.signer, stackSize: amount },
-        );
-      }
+    } else if (event.type === 'seatReserve') {
+      this.props.seatReserved(this.tableAddr, event.payload);
+    } else if (event.type === 'seatsRelease') {
+      this.props.seatsReleased(this.tableAddr, event.payload);
     }
   }
 
@@ -262,7 +260,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     });
   }
 
-  handleJoin(pos, amount) {
+  async handleJoin(pos, amount) {
     const { signerAddr, account } = this.props;
 
     const promise = promisifyContractCall(this.token.transData.sendTransaction)(
@@ -271,25 +269,42 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       `0x0${(pos).toString(16)}${signerAddr.replace('0x', '')}`,
     );
 
-    return Promise.resolve(account.isLocked ? null : promise).then(() => {
-      const slides = (
-        <div>
-          <JoinSlides />
-          <Button size="large" onClick={this.props.modalDismiss}>
-            <FormattedMessage {...messages.joinModal.buttonDismiss} />
-          </Button>
-        </div>
-      );
-
-      this.props.modalDismiss();
-      this.props.modalAdd(slides);
-      this.props.setPending(
+    const reserveSeat = async () => {
+      const txHash = await promise;
+      reservationService.reserve(
         this.tableAddr,
-        this.props.params.handId,
         pos,
-        { signerAddr: this.props.signerAddr, stackSize: amount }
+        this.props.signerAddr,
+        txHash,
+        amount.toString(),
       );
-    });
+    };
+
+    if (!account.isLocked) {
+      await reserveSeat();
+    }
+
+    const slides = (
+      <div>
+        <JoinSlides />
+        <Button size="large" onClick={this.props.modalDismiss}>
+          <FormattedMessage {...messages.joinModal.buttonDismiss} />
+        </Button>
+      </div>
+    );
+
+    this.props.modalDismiss();
+    this.props.modalAdd(slides);
+    this.props.setPending(
+      this.tableAddr,
+      this.props.params.handId,
+      pos,
+      { signerAddr: this.props.signerAddr, stackSize: amount }
+    );
+
+    if (account.isLocked) {
+      await reserveSeat();
+    }
   }
 
   isTaken(open, myPos, pending, pos) {
@@ -547,12 +562,15 @@ export function mapDispatchToProps() {
   return {
     handRequest,
     lineupReceived,
+    reservationReceived,
+    seatsReleased,
     modalAdd,
     modalDismiss,
     setPending,
     setExitHand,
     updateReceived,
     addMessage,
+    seatReserved,
   };
 }
 
@@ -611,6 +629,9 @@ Table.propTypes = {
   winners: React.PropTypes.array,
   dispatch: React.PropTypes.func,
   lineupReceived: React.PropTypes.func,
+  reservationReceived: React.PropTypes.func, // eslint-disable-line react/no-unused-prop-types
+  seatReserved: React.PropTypes.func,
+  seatsReleased: React.PropTypes.func,
   updateReceived: React.PropTypes.func,
   addMessage: React.PropTypes.func,
   location: React.PropTypes.object,

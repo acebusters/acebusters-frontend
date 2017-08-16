@@ -1,5 +1,7 @@
-import fetch from 'isomorphic-fetch';
 import { conf } from '../app.config';
+import { requestApi } from './api';
+
+const request = requestApi(conf().accountUrl);
 
 /* eslint-disable */
 function uuid(a) {
@@ -7,85 +9,54 @@ function uuid(a) {
 };
 /* eslint-enable */
 
-
-function request(path, body, method = 'post') {
-  const options = {
-    method,
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: body && JSON.stringify(body),
-  };
-
-  return fetch(`${conf().accountUrl}/${path}`, options)
-    .then((rsp) => {
-      if (rsp.status >= 200 && rsp.status < 300) {
-        return rsp.json();
-      }
-
-      return Promise.reject(rsp.status);
-    })
-    .catch((error) => Promise.reject(error));
+export function login(email) {
+  return request('post', 'query', { email });
 }
 
-const account = {
+export function unlock(unlockRequest) {
+  return request('get', `unlock/${encodeURIComponent(unlockRequest)}`);
+}
 
-  login(email) {
-    return request('query', { email });
-  },
+export function checkReferral(code) {
+  return request('get', code ? `referral/${encodeURIComponent(code)}` : 'referral/');
+}
 
-  unlock(unlockRequest) {
-    return request(`unlock/${encodeURIComponent(unlockRequest)}`, undefined, 'get');
-  },
+export function register(email, recapResponse, origin, refCode) {
+  const accountId = uuid();
+  return request('post', `account/${accountId}`, {
+    email,
+    recapResponse,
+    origin,
+    refCode,
+  });
+}
 
-  checkReferral(code) {
-    return request(
-      code ? `referral/${encodeURIComponent(code)}` : 'referral/',
-      undefined,
-      'get'
-    );
-  },
+export function getAccount(accountId) {
+  return request('get', `account/${accountId}`);
+}
 
-  register(email, recapResponse, origin, refCode) {
-    const accountId = uuid();
-    return request(`account/${accountId}`, {
-      email,
-      recapResponse,
-      origin,
-      refCode,
-    });
-  },
+export function confirm(sessionReceipt) {
+  return request('post', 'confirm', { sessionReceipt });
+}
 
-  getAccount(accountId) {
-    return request(`account/${accountId}`, undefined, 'get');
-  },
+export function addWallet(sessionReceipt, wallet) {
+  return request('post', 'wallet', {
+    sessionReceipt,
+    wallet: JSON.stringify(wallet),
+  });
+}
 
-  confirm(sessionReceipt) {
-    return request('confirm', { sessionReceipt });
-  },
+export function reset(email, recapResponse, origin) {
+  return request('post', 'reset', {
+    email,
+    recapResponse,
+    origin,
+  });
+}
 
-  addWallet(sessionReceipt, wallet) {
-    return request('wallet', {
-      sessionReceipt,
-      wallet: JSON.stringify(wallet),
-    });
-  },
-
-  reset(email, recapResponse, origin) {
-    return request('reset', {
-      email,
-      recapResponse,
-      origin,
-    });
-  },
-
-  resetWallet(sessionReceipt, wallet) {
-    return request('wallet', {
-      sessionReceipt,
-      wallet: JSON.stringify(wallet),
-    }, 'put');
-  },
-};
-
-export default account;
+export function resetWallet(sessionReceipt, wallet) {
+  return request('put', 'wallet', {
+    sessionReceipt,
+    wallet: JSON.stringify(wallet),
+  });
+}

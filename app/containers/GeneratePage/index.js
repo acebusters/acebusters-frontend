@@ -14,7 +14,7 @@ import H1 from '../../components/H1';
 import MouseEntropy from '../../components/MouseEntropy';
 import { ErrorMessage } from '../../components/FormMessages';
 
-import account from '../../services/account';
+import * as accountService from '../../services/account';
 import * as storageService from '../../services/localStorage';
 import { getWeb3 } from '../../containers/AccountProvider/utils';
 import { waitForTx } from '../../utils/waitForTx';
@@ -62,11 +62,6 @@ function waitForAccountTxHash(signerAddr) {
   });
 }
 
-const requests = {
-  [Type.CREATE_CONF]: account.addWallet,
-  [Type.RESET_CONF]: account.resetWallet,
-};
-
 export class GeneratePage extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   constructor(props) {
@@ -87,7 +82,7 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
   handleCreate(wallet, receipt, confCode) {
     return Promise.all([
       waitForAccountTxHash(wallet.address),
-      account.addWallet(confCode, wallet),
+      accountService.addWallet(confCode, wallet),
     ])
       .catch(throwSubmitError)
       .then(([txHash]) => {
@@ -102,7 +97,7 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     const newSignerAddr = wallet.address;
 
     try {
-      const backedAccount = await account.getAccount(receipt.accountId);
+      const backedAccount = await accountService.getAccount(receipt.accountId);
       const backendWallet = JSON.parse(backedAccount.wallet);
 
       const acc = await getAccount(backendWallet.address);
@@ -122,7 +117,7 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
       }
 
       await waitForTx(getWeb3(), txHash);
-      await account.resetWallet(confCode, wallet);
+      await accountService.resetWallet(confCode, wallet);
 
       browserHistory.push('/login');
     } catch (e) {
@@ -137,8 +132,7 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     }
     confCode = decodeURIComponent(confCode);
     const receipt = Receipt.parse(confCode);
-    const request = requests[receipt.type];
-    if (!request) {
+    if (receipt.type !== Type.CREATE_CONF && receipt.type !== Type.RESET_CONF) {
       throw new SubmissionError({ _error: `Error: unknown session type ${receipt.type}.` });
     }
 
@@ -231,7 +225,7 @@ const throwWorkerError = (workerErr) => {
 
 const throwSubmitError = (err) => {
   // If store account failed...
-  if (err === 409) {
+  if (err.status && err.status === 409) {
     throw new SubmissionError({ email: 'Email taken.', _error: 'Registration failed!' });
   } else {
     throw new SubmissionError({ _error: `Registration failed with error code ${err}` });

@@ -61,7 +61,7 @@ export function* contractTransactionSendSaga() {
       if (isLocked) {
         const owner = yield call([state, state.getIn], ['account', 'owner']);
         const forwardReceipt = new Receipt(owner).forward(0, dest, 0, data).sign(privKey);
-        const value = yield sendTx(forwardReceipt);
+        const value = yield call(sendTx, forwardReceipt);
         txHash = value.txHash;
       } else {
         // two yields to wait for returned promise

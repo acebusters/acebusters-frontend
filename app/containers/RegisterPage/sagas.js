@@ -3,7 +3,7 @@ import { take, put, call, fork, cancel } from 'redux-saga/effects';
 import { startSubmit, stopSubmit, startAsyncValidation, stopAsyncValidation, change, touch } from 'redux-form/immutable';
 import { CHANGE, INITIALIZE } from 'redux-form/lib/actionTypes';
 import { push } from 'react-router-redux';
-import account from '../../services/account';
+import * as accountService from '../../services/account';
 import { setProgress } from '../App/actions';
 import { conf } from '../../app.config';
 
@@ -18,7 +18,7 @@ export function* registerSaga() {
 
     try {
       yield call(
-        account.register,
+        accountService.register,
         payload.email,
         payload.captchaResponse,
         payload.origin,
@@ -28,7 +28,7 @@ export function* registerSaga() {
       yield put(push('/confirm'));
     } catch (err) {
       const errors = {};
-      if (err === 409) {
+      if (err.status && err.status === 409) {
         errors.email = 'Email taken.';
         errors._error = 'Registration failed!'; // eslint-disable-line no-underscore-dangle
       } else {
@@ -48,10 +48,10 @@ function* validateRefCode(value) {
     yield put(startAsyncValidation('register'));
 
     try {
-      yield call(account.checkReferral, value);
+      yield call(accountService.checkReferral, value);
       yield put(stopAsyncValidation('register'));
     } catch (err) {
-      const message = yield call(refCodeErrorByCode, err);
+      const message = yield call(refCodeErrorByCode, err.status);
 
       yield put(
         stopAsyncValidation(
@@ -84,7 +84,7 @@ export function* refCodeValidationSaga() {
 export function* defaultRefCodeChecking() {
   const { defaultRefCode } = yield call(conf);
   try {
-    const response = yield call(account.checkReferral, defaultRefCode);
+    const response = yield call(accountService.checkReferral, defaultRefCode);
     if (response.defaultRef) {
       yield put(change('register', 'defaultRef', defaultRefCode));
     }

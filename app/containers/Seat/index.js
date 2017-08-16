@@ -23,6 +23,7 @@ import {
   makeBlockySelector,
   makeStackSelector,
   makeSeatStatusSelector,
+  makeReservedSelector,
 } from './selectors';
 
 import {
@@ -105,6 +106,7 @@ const mapStateToProps = createStructuredSelector({
   open: makeOpenSelector(),
   seatStatus: makeSeatStatusSelector(),
   pending: makePendingSelector(),
+  reserved: makeReservedSelector(),
   myPending: makeMyPendingSelector(),
   sitout: makeSitoutSelector(),
   showStatus: makeShowStatusSelector(),

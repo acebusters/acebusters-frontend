@@ -14,6 +14,7 @@ import {
   makeLastActionSelector,
   makeOpenSelector,
   makeCoordsSelector,
+  makeReservedSelector,
 } from '../selectors';
 
 import {
@@ -89,6 +90,31 @@ describe('lastAmountSelector', () => {
     };
     const lastAmountSelector = makeLastAmountSelector();
     expect(lastAmountSelector(mockedState, props)).toEqual(500000000000000);
+  });
+});
+
+describe('reservedSeatSelector', () => {
+  it('should select reservation for the seat', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          reservation: {
+            0: { signerAddr: '0x000' },
+            1: { signerAddr: '0x001' },
+            2: { signerAddr: '0x002' },
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 1,
+      params: {
+        tableAddr: TBL_ADDR,
+        handId: 0,
+      },
+    };
+    expect(makeReservedSelector()(mockedState, props)).toEqual({ signerAddr: '0x001' });
   });
 });
 

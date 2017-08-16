@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 import Seat from './Seat';
 import ButtonJoinSeat from './ButtonJoinSeat';
 import ButtonOpenSeat from './ButtonOpenSeat';
+import { STATUS_MSG } from '../../app.config';
 
 const SeatComponent = (props) => {
   const {
@@ -16,12 +17,25 @@ const SeatComponent = (props) => {
     pos,
     pending,
     myPending,
+    reserved,
   } = props;
   if (open) {
-    if ((myPos === undefined && !myPending) || pending) {
+    if ((myPos === undefined && !myPending) || pending || reserved) {
       if (pending) {
         return (
           <Seat {...props} {...pending} />
+        );
+      }
+
+      if (reserved) {
+        return (
+          <Seat
+            {...props}
+            seatStatus={STATUS_MSG.sittingIn}
+            signerAddr={reserved.signerAddr}
+            blocky={reserved.blocky}
+            stackSize={Number(reserved.amount)}
+          />
         );
       }
 
@@ -45,6 +59,7 @@ SeatComponent.propTypes = {
   pos: PropTypes.number,
   pending: PropTypes.any,
   myPending: PropTypes.any,
+  reserved: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]),
 };
 
 export default SeatComponent;

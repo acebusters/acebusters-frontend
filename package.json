@@ -195,6 +195,7 @@
     },
     "collectCoverageFrom": [
       "app/containers/Table/*.{js,jsx}",
+      "!app/containers/Table/messages.js",
       "!app/**/*.test.{js,jsx}",
       "!app/*/RbGenerated*/*.{js,jsx}",
       "!app/app.js",
