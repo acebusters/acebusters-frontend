@@ -46,7 +46,9 @@ function importWallet(payload) {
       });
     })
     .catch((reason) => {
-      console.dir(reason);
+      if (process.env.NODE_ENV === 'development') {
+        console.dir(reason);
+      }
       progress(0);
       postMessage({
         type: WORKER_ERROR,

@@ -67,7 +67,7 @@ export function conf() {
     ntzAddr: '0x179237e4e955369a69bd26499e3b89f6df9e5d7b',
     pwrAddr: '0xff2aae8ac40d291b70b5f011c5eacb37f17eb9e4',
     accountFactory: '0x12a023f15ef0a1763f2a6736cc88a1ef9f0556f1',
-    tableFactory: '0xb1dc3d1025ea0613b3a839b33e66e6384f3e9c07',
+    tableFactory: '0xbeb2f096f9438a4723b541db402d2dbf6bd86b17',
     sentryDSN: 'https://8c3e021848b247ddaf627c8040f94e07@sentry.io/153017',
     gaProperty: 'UA-XXXXX-Y',
   };

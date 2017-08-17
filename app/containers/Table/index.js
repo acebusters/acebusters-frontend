@@ -52,8 +52,10 @@ import makeSelectAccountData, {
 
 import {
   makeLastReceiptSelector,
+  makeMyLastReceiptSelector,
   makeMyStackSelector,
   makeMyStandingUpSelector,
+  makeMyPendingSeatSelector,
 } from '../Seat/selectors';
 
 import {
@@ -99,7 +101,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.handleLeave = this.handleLeave.bind(this);
     this.handleSitout = this.handleSitout.bind(this);
     this.handleJoin = this.handleJoin.bind(this);
-    this.handleJoinComplete = this.handleJoinComplete.bind(this);
     this.handleRebuy = this.handleRebuy.bind(this);
     this.isTaken = this.isTaken.bind(this);
 
@@ -189,20 +190,20 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     if (nextProps.state === 'waiting' && nextProps.myStack !== null && nextProps.myStack <= 0
         && (nextProps.state !== this.props.state || nextProps.myStack !== this.props.myStack)
         && !nextProps.standingUp && !storageService.getItem(`rebuyModal[${toggleKey}]`)) {
-      const balance = parseInt(this.balance.toString(), 10);
+      const balance = this.balance;
 
       this.props.modalDismiss();
-      this.props.modalAdd((
+      this.props.modalAdd(
         <RebuyDialog
           pos={this.props.myPos}
           handleRebuy={this.handleRebuy}
           handleLeave={this.handleLeave}
           modalDismiss={this.props.modalDismiss}
           params={this.props.params}
-          balance={balance}
+          balance={balance && Number(balance.toString())}
         />,
         this.handleLeave
-      ));
+      );
     }
   }
 
@@ -253,6 +254,8 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       amount,
       `0x0${(myPos).toString(16)}${signerAddr.replace('0x', '')}`
     );
+
+    storageService.removeItem(`rebuyModal[${toggleKey}]`);
 
     return Promise.resolve(account.isLocked ? null : promise).then(() => {
       this.props.modalDismiss();
@@ -335,7 +338,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
     // Note: if it's enabled "play" (> 0), then set it to disabled "pause" (null)
     // otherwise it's enabled "pause", then set it to disabled "play" (0)
-    const nextSitoutState = sitout > 0 ? null : 0;
     const handId = parseInt(this.props.params.handId, 10);
 
     const sitoutAction = bet(
@@ -345,10 +347,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       this.props.privKey,
       this.props.myPos,
       this.props.lastReceipt,
-      {
-        originalSitout: sitout,
-        nextSitoutState,
-      }
     );
     return sitOutToggle(sitoutAction, this.props.dispatch);
   }
@@ -372,6 +370,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       <Button onClick={this.props.modalDismiss}>OK!</Button>
     </div>);
 
+    storageService.removeItem(`rebuyModal[${this.tableAddr + handId}]`);
     this.props.modalDismiss();
     this.props.modalAdd(statusElement);
 
@@ -382,17 +381,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       } });
     });
   }
-
-  handleJoinComplete() {
-    const lineup = (this.props.lineup) ? this.props.lineup.toJS() : null;
-    if (lineup && this.props.state !== 'waiting' && typeof lineup[this.props.myPos].sitout === 'number') {
-      const handId = parseInt(this.props.params.handId, 10);
-      const sitoutAction = bet(this.props.params.tableAddr, handId, 1, this.props.privKey, this.props.myPos);
-      sitOutToggle(sitoutAction, this.props.dispatch);
-    }
-    this.props.modalDismiss();
-  }
-
 
   watchTable(error, result) {
     if (error) {
@@ -409,6 +397,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           rsp,
           this.props.data.get('smallBlind'),
           this.props.params.handId,
+          this.props.myPendingSeat,
         ];
 
         if (result.args && result.args.addr === this.props.proxyAddr) {
@@ -576,6 +565,7 @@ const mapStateToProps = createStructuredSelector({
   lineup: makeLineupSelector(),
   latestHand: makeLatestHandSelector(),
   lastReceipt: makeLastReceiptSelector(),
+  myLastReceipt: makeMyLastReceiptSelector(),
   missingHands: makeMissingHandSelector(),
   myHand: makeMyHandValueSelector(),
   myStack: makeMyStackSelector(),
@@ -589,6 +579,7 @@ const mapStateToProps = createStructuredSelector({
   sitout: makeMySitoutSelector(),
   winners: makeSelectWinners(),
   standingUp: makeMyStandingUpSelector(),
+  myPendingSeat: makeMyPendingSeatSelector(),
 });
 
 Table.propTypes = {
@@ -624,6 +615,7 @@ Table.propTypes = {
   addMessage: React.PropTypes.func,
   location: React.PropTypes.object,
   account: React.PropTypes.object,
+  myPendingSeat: React.PropTypes.number,
 };
 
 

@@ -39,9 +39,16 @@ const posSelector = (state, props) => {
   return -1;
 };
 
+const lastReceiptSelector = (hand, pos) => (hand && pos > -1 && hand.getIn && hand.getIn(['lineup', pos])) ? rc.get(hand.getIn(['lineup', pos, 'last'])) : undefined;
+
 const makeLastReceiptSelector = () => createSelector(
     [makeHandSelector(), posSelector],
-    (hand, pos) => (hand && pos > -1 && hand.getIn && hand.getIn(['lineup', pos])) ? rc.get(hand.getIn(['lineup', pos, 'last'])) : undefined
+    lastReceiptSelector
+);
+
+const makeMyLastReceiptSelector = () => createSelector(
+    [makeHandSelector(), makeMyPosSelector()],
+    lastReceiptSelector
 );
 
 const seatSelector = (hand, pos) => (hand && pos > -1 && hand.getIn && hand.getIn(['lineup', pos])) ? hand.getIn(['lineup', pos]) : undefined;
@@ -131,6 +138,16 @@ const makeMyPendingSelector = () => createSelector(
       return lineup.toJS().some((l) => l.pending && l.pending.signerAddr === signerAddr);
     }
     return false;
+  }
+);
+
+const makeMyPendingSeatSelector = () => createSelector(
+  [makeLineupSelector(), makeSignerAddrSelector()],
+  (lineup, signerAddr) => {
+    if (lineup && lineup.toJS) {
+      return lineup.toJS().findIndex((l) => l.pending && l.pending.signerAddr === signerAddr);
+    }
+    return -1;
   }
 );
 
@@ -348,11 +365,13 @@ export {
   posSelector,
   makeSeatSelector,
   makeLastReceiptSelector,
+  makeMyLastReceiptSelector,
   makeSitoutSelector,
   makeLastAmountSelector,
   makeDealerSelector,
   makePendingSelector,
   makeMyPendingSelector,
+  makeMyPendingSeatSelector,
   makeOpenSelector,
   makeCoordsSelector,
   makeAmountCoordsSelector,

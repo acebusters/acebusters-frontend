@@ -25,6 +25,10 @@ const ButtonContainer = styled.div`
   & > * {
     flex: 1;
   }
+
+  & > * + * {
+    margin-left: 10px;
+  }
 `;
 
 /* eslint-disable react/prop-types */
@@ -110,7 +114,7 @@ export class RebuyDialog extends React.Component {
         {hasWeb3 && !networkSupported && <UnsupportedNetworkMessage />}
 
         <ButtonContainer>
-          <SubmitButton onClick={this.handleLeave}>
+          <SubmitButton onClick={this.handleLeave} type="button">
             <FormattedMessage {...messages.leave} />
           </SubmitButton>
 
@@ -131,7 +135,7 @@ const mapStateToProps = createStructuredSelector({
   sb: makeSbSelector(),
   hasWeb3: makeSelectHasWeb3(),
   networkSupported: makeSelectNetworkSupported(),
-  valueSelector: (state) => valueSelector(state, 'amount'),
+  amount: (state) => valueSelector(state, 'amount'),
   initialValues: (state, props) => ({
     amount: makeSbSelector()(state, props) * 40,
   }),

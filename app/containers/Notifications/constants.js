@@ -1,5 +1,10 @@
+import React from 'react';
+import Link from '../../components/Link';
+
 export const TRANSFER_NTZ = 'transfer_ntz';
 export const TRANSFER_ETH = 'transfer_eth';
+export const SELL_NTZ = 'sell_ntz';
+export const PURCHASE_NTZ = 'pruchase_ntz';
 
 /**
  * type Notification = {
@@ -13,6 +18,27 @@ export const TRANSFER_ETH = 'transfer_eth';
  *  type: 'success' | 'info' | 'warning' | 'danger';
  * }
  */
+
+export const notLoggedIn = {
+  txId: 'AUTH_NOT_LOGGED_IN',
+  notifyType: 'AUTH_NOT_LOGGED_IN',
+  category: 'Visitor Mode',
+  details: <span>Please <Link to="/login">login</Link> or <Link to="/register">signup</Link> to join a game</span>,
+  removing: false,
+  dismissable: false,
+  date: new Date(),
+  type: 'info',
+};
+
+export const firstLogin = {
+  txId: 'LOGGING_IN',
+  category: 'Logging in',
+  details: 'First time it may take awhile',
+  removing: false,
+  dismissable: true,
+  date: new Date(),
+  type: 'info',
+};
 
 export const loggedInSuccess = {
   txId: 'AUTH_LOGGED_IN',
@@ -51,6 +77,28 @@ export const transferSuccess = {
   // txId: temp, so no txId
   notifyType: 'TX_TRANSFER_SUCCESS',
   category: 'Transfer Success',
+  details: null,
+  removing: false,
+  dismissable: true,
+  date: new Date(),
+  type: 'success',
+};
+
+export const exchangePending = {
+  // txId: null,
+  notifyType: 'TX_EXCHANGE_PENDING',
+  category: 'Exchange Pending',
+  details: null,
+  removing: false,
+  dismissable: false,
+  date: new Date(),
+  type: 'info',
+};
+
+export const exchangeSuccess = {
+  // txId: temp, so no txId
+  notifyType: 'TX_EXCHANGE_SUCCESS',
+  category: 'Exchange Success',
   details: null,
   removing: false,
   dismissable: true,

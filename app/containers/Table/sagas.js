@@ -16,7 +16,6 @@ import {
   receiptSet,
   pay,
   sitOutToggle,
-  preToggleSitout,
   BET,
   FOLD,
   CHECK,
@@ -24,6 +23,7 @@ import {
   NET,
   HAND_REQUEST,
   UPDATE_RECEIVED,
+  LINEUP_RECEIVED,
   SEND_MESSAGE,
 } from './actions';
 
@@ -34,6 +34,8 @@ import {
 
 import {
   makeMyCardsSelector,
+  makeMyPendingSeatSelector,
+  makeLastReceiptSelector,
 } from '../Seat/selectors';
 import {
   lastAmountByAction,
@@ -47,6 +49,8 @@ import {
   makeLineupSelector,
   makeHandSelector,
   makeSelectWinners,
+  makeMyPosSelector,
+  makeSitoutAmountSelector,
 } from './selectors';
 
 import TableService, { getHand } from '../../services/tableService';
@@ -185,16 +189,6 @@ function* sitoutFlow() {
   while (true) { //eslint-disable-line
     const req = yield take(sitOutToggle.REQUEST);
     const action = req.payload;
-
-    // Note: fake sitout first, if the request fails, roll back to the old one.
-    const pre = preToggleSitout({
-      tableAddr: action.tableAddr,
-      handId: action.handId,
-      pos: action.pos,
-      sitout: action.nextSitoutState,
-    });
-    yield put(pre);
-
     try {
       const table = new TableService(action.tableAddr, action.privKey);
       const receipt = yield table.sitOut(action.handId, action.amount);
@@ -205,15 +199,6 @@ function* sitoutFlow() {
           tableAddr: action.tableAddr,
           handId: action.handId,
         },
-      });
-
-      yield put({
-        type: sitOutToggle.FAILURE,
-        payload: err,
-        tableAddr: action.tableAddr,
-        handId: action.handId,
-        pos: action.pos,
-        sitout: action.originalSitout,
       });
     }
   }
@@ -228,6 +213,40 @@ function* performShow(action) {
       tableAddr: action.tableAddr,
       handId: action.handId,
     } });
+  }
+}
+
+export function* lineupScanner(dispatch, action) {
+  if (!action.handId) {
+    return;
+  }
+
+  if (action.myPendingSeat === -1) {
+    return;
+  }
+
+  const params = { params: { tableAddr: action.tableAddr, handId: action.handId } };
+  const state = yield select();
+  const myPendingSeat = makeMyPendingSeatSelector()(state, params);
+  const myPos = makeMyPosSelector()(state, params);
+
+  if (myPendingSeat === -1 && myPos === action.myPendingSeat) {
+    const hand = makeHandSelector()(state, params).toJS();
+    if (hand.state !== 'waiting' && hand.state !== 'dealing') {
+      const privKey = makeSelectPrivKey()(state, params);
+      const sitoutAmount = makeSitoutAmountSelector()(state, params);
+      const lastReceipt = makeLastReceiptSelector()(state, params);
+      const handId = parseInt(action.handId, 10);
+      const sitoutAction = bet(
+        action.tableAddr,
+        handId,
+        sitoutAmount,
+        privKey,
+        myPos,
+        lastReceipt,
+      );
+      yield sitOutToggle(sitoutAction, dispatch);
+    }
   }
 }
 
@@ -318,7 +337,7 @@ export function* updateScanner() {
   }
 }
 
-export function* tableStateSaga() {
+export function* tableStateSaga(dispatch) {
   yield takeEvery(SEND_MESSAGE, sendMessage);
   yield takeEvery(BET, performBet);
   yield takeEvery(SHOW, performShow);
@@ -327,4 +346,5 @@ export function* tableStateSaga() {
   yield fork(sitoutFlow);
   yield fork(updateScanner);
   yield fork(payFlow);
+  yield takeEvery(LINEUP_RECEIVED, lineupScanner, dispatch);
 }

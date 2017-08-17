@@ -31,7 +31,7 @@ export function walletImport(data) {
   return {
     type: WALLET_IMPORT,
     meta: {
-      WebWorker: true,
+      WebWorker: 'login',
     },
     payload: {
       data,

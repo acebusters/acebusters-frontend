@@ -11,13 +11,13 @@ import {
 const InputStyled = styled.input`
   ${(props) => {
     if (props.touched && !props.error) {
-      return `border: solid 2px ${green}`;
+      return `border: 2px solid ${green}`;
     }
-    return 'border: solid 1px #ccc';
+    return 'border: 1px solid #ccc';
   }};
   padding: 10px;
   margin: 0;
-  border: solid 1px gainsboro;
+  border: 1px solid gainsboro;
   border-radius: 4px;
   display: block;
   width: 100%;
@@ -33,7 +33,7 @@ const InputStyled = styled.input`
 export const InputWithUnit = styled.input`
   ${(props) => {
     if (props.touched && !props.error) {
-      return `border: solid 2px ${green}`;
+      return `border: 2px solid ${green}`;
     }
     return '';
   }};

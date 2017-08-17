@@ -41,7 +41,7 @@ const account = {
 
   checkReferral(code) {
     return request(
-      code ? `referral/${code}` : 'referral/',
+      code ? `referral/${encodeURIComponent(code)}` : 'referral/',
       undefined,
       'get'
     );
