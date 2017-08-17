@@ -157,7 +157,7 @@ function* tableNotifications(sendAction) {
             yield* removeNotification({ txId: tableAddr });
             yield* createTempNotification({
               txId: tableAddr,
-              category: isRebuy ? 'Successful rebuy' : 'You are joined table',
+              category: isRebuy ? 'Successful Rebuy' : 'Table Joined',
               details: 'Good luck!',
               dismissable: true,
               date: new Date(),
