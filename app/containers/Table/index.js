@@ -3,6 +3,7 @@
  */
 // react + redux
 import React from 'react';
+import styled from 'styled-components';
 import { createStructuredSelector } from 'reselect';
 import { browserHistory } from 'react-router';
 import Pusher from 'pusher-js';
@@ -13,11 +14,13 @@ import * as storageService from '../../services/sessionStorage';
 
 // components and styles
 import TableDebug from '../../containers/TableDebug';
+import NotFoundPage from '../../containers/NotFoundPage';
 
 import Card from '../../components/Card';
 import { BoardCardWrapper } from '../../components/Table/Board';
 import Seat from '../Seat';
 import Button from '../../components/Button';
+import WithLoading from '../../components/WithLoading';
 import { nickNameByAddress } from '../../services/nicknames';
 import messages from './messages';
 import { formatNtz } from '../../utils/amountFormatter';
@@ -80,21 +83,35 @@ import {
 
 import TableComponent from '../../components/Table';
 import web3Connect from '../AccountProvider/web3Connect';
-import TableService, { getHand } from '../../services/tableService';
+import TableService, { getHand, fetchTableState } from '../../services/tableService';
 import * as reservationService from '../../services/reservationService';
 import JoinDialog from '../JoinDialog';
 import JoinSlides from '../JoinDialog/slides';
 import InviteDialog from '../InviteDialog';
 import RebuyDialog from '../RebuyDialog';
 
+const SpinnerWrapper = styled.div`
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  transform: translate(-50%, -50%)
+`;
+
 const getTableData = async (table, props) => {
-  const [lineup, sb, reservation] = await Promise.all([
-    table.getLineup.callPromise(),
+  const lineup = await table.getLineup.callPromise();
+
+  if (lineup[1].length === 0) {
+    throw new Error('Table doesn\'t exists');
+  }
+
+  const [sb, reservation, tableState] = await Promise.all([
     table.smallBlind.callPromise(),
     reservationService.lineup(table.address),
+    fetchTableState(table.address),
   ]);
 
   props.lineupReceived(table.address, lineup, sb);
+  props.updateReceived(table.address, tableState);
   props.reservationReceived(table.address, reservation);
 };
 
@@ -121,20 +138,20 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     // getting table data from oracle
     this.pusher = new Pusher('d4832b88a2a81f296f53', { cluster: 'eu', encrypted: true });
     this.channel = this.pusher.subscribe(this.tableAddr);
-    getTableData(this.table, props).then(() => {
-      this.props.handRequest(this.tableAddr, props.params.handId); // get initial state
-      this.channel.bind('update', this.handleUpdate); // bind to future state updates
-    });
-    const handId = parseInt(this.props.params.handId, 10);
-    Raven.setTagsContext({
-      tableAddr: this.tableAddr,
-      handId,
-    });
     this.tableService = new TableService(this.props.params.tableAddr, this.props.privKey);
+
+    this.state = {
+      notFound: false,
+    };
+    getTableData(this.table, this.props)
+      .then(
+        () => this.channel.bind('update', this.handleUpdate), // bind to future state updates
+        () => this.setState({ notFound: true }),
+      );
   }
 
   componentWillReceiveProps(nextProps) {
-    const handId = parseInt(this.props.params.handId, 10);
+    const handId = this.props.latestHand;
     // take care of timing out players
     if (this.props.myPos !== undefined && this.props.hand
       && this.props.hand.get('changed') < nextProps.hand.get('changed')) {
@@ -167,16 +184,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
     // show winner and forward browser to url of next hand
     this.pushed = (this.pushed) ? this.pushed : {};
-    if (nextProps.latestHand) {
-      const nextHandStr = nextProps.latestHand.toString();
-      if (nextProps.latestHand > handId && !this.pushed[nextHandStr]) {
-        this.pushed[nextHandStr] = true;
-        setTimeout(() => {
-          browserHistory.push(`/table/${this.tableAddr}/hand/${nextHandStr}`);
-        }, 2000);
-      }
-    }
-
 
     // fetch hands that we might need for stack calculation
     if (nextProps.missingHands && nextProps.missingHands.length > 0) {
@@ -220,11 +227,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.channel.unbind('update', this.handleUpdate);
 
     // Note: with wsProvider, the request made by stopWatching will throw an error
-    try {
-      this.tableEvents.stopWatching();
-    } catch (e) {
-      this.tableEvents = null;
-    }
+    // Note: passed callback prevents exception, but it should work even without callback
+    // need to fix wsProvider
+    this.tableEvents.stopWatching(() => null);
+    this.tableEvents = null;
   }
 
   handleUpdate(event) {
@@ -241,7 +247,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   handleRebuy(amount) {
-    const handId = parseInt(this.props.params.handId, 10);
+    const handId = this.props.latestHand;
     const toggleKey = this.tableAddr + handId;
     storageService.setItem(`rebuyModal[${toggleKey}]`, true);
 
@@ -353,7 +359,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
     // Note: if it's enabled "play" (> 0), then set it to disabled "pause" (null)
     // otherwise it's enabled "pause", then set it to disabled "play" (0)
-    const handId = parseInt(this.props.params.handId, 10);
+    const handId = this.props.latestHand;
 
     const sitoutAction = bet(
       this.props.params.tableAddr,
@@ -368,7 +374,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
   handleLeave(pos) {
     const lineup = (this.props.lineup) ? this.props.lineup.toJS() : null;
-    const handId = parseInt(this.props.params.handId, 10);
+    const handId = this.props.latestHand;
     const state = this.props.state;
     const exitHand = (state !== 'waiting') ? handId : handId - 1;
 
@@ -376,7 +382,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       return Promise.reject('Lineup is empty');
     }
 
-    this.props.setExitHand(this.tableAddr, this.props.params.handId, pos, exitHand);
+    this.props.setExitHand(this.tableAddr, this.props.latestHand, pos, exitHand);
     const statusElement = (<div>
       <p>
         Please wait until your leave request is processed!
@@ -411,7 +417,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           this.tableAddr,
           rsp,
           this.props.data.get('smallBlind'),
-          this.props.params.handId,
+          this.props.latestHand,
           this.props.myPendingSeat,
         ];
 
@@ -515,6 +521,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   render() {
+    if (this.state.notFound) {
+      return <NotFoundPage />;
+    }
+
     const lineup = (this.props.lineup) ? this.props.lineup.toJS() : null;
     const changed = (this.props.hand) ? this.props.hand.get('changed') : null;
     const seats = this.renderSeats(lineup, changed);
@@ -535,23 +545,36 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           contract={this.table}
         />
 
-        { this.props.state &&
-        <TableComponent
-          {...this.props}
-          id="table"
-          sb={sb}
-          winners={winners}
-          myHand={this.props.myHand}
-          pending={pending}
-          sitout={this.props.sitout}
-          board={board}
-          seats={seats}
-          hand={this.props.hand}
-          potSize={this.props.potSize}
-          onLeave={() => this.handleLeave(this.props.myPos)}
-          onSitout={this.handleSitout}
-        >
-        </TableComponent> }
+        {!this.props.state &&
+          <SpinnerWrapper>
+            <WithLoading
+              loadingSize="30px"
+              type="inline"
+              styles={{
+                spinner: { color: '#FFF' },
+              }}
+              isLoading
+            />
+          </SpinnerWrapper>
+        }
+
+        {this.props.state &&
+          <TableComponent
+            {...this.props}
+            id="table"
+            sb={sb}
+            winners={winners}
+            myHand={this.props.myHand}
+            pending={pending}
+            sitout={this.props.sitout}
+            board={board}
+            seats={seats}
+            hand={this.props.hand}
+            potSize={this.props.potSize}
+            onLeave={() => this.handleLeave(this.props.myPos)}
+            onSitout={this.handleSitout}
+          />
+        }
       </div>
     );
   }
@@ -622,7 +645,6 @@ Table.propTypes = {
   myPos: React.PropTypes.any,
   potSize: React.PropTypes.number,
   modalAdd: React.PropTypes.func,
-  handRequest: React.PropTypes.func,
   setPending: React.PropTypes.func,
   setExitHand: React.PropTypes.func,
   modalDismiss: React.PropTypes.func,

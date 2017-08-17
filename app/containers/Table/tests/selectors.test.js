@@ -149,7 +149,7 @@ describe('latestHandSelect', () => {
           data: {},
         },
       },
-    }), PROPS)).toEqual(2);
+    }), PROPS)).toEqual(null);
   });
 });
 

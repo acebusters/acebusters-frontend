@@ -85,7 +85,7 @@ export default function createRoutes(store) {
         },
       }],
     }, {
-      path: '/table/:tableAddr/hand/:handId',
+      path: '/table/:tableAddr',
       name: 'table',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
@@ -101,9 +101,6 @@ export default function createRoutes(store) {
 
         importModules.catch(errorLoading);
       },
-    }, {
-      path: '/table/:tableAddr',
-      onEnter: ({ params }, replace) => replace(`/table/${params.tableAddr}/hand/1`),
     }, {
       path: '/login',
       name: 'login',

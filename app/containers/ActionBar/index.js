@@ -41,6 +41,7 @@ import {
   makeMyMaxBetSelector,
   makeMessagesSelector,
   makePlayersCountSelector,
+  makeLatestHandSelector,
 } from '../Table/selectors';
 
 import {
@@ -77,7 +78,7 @@ class ActionBarContainer extends React.Component {
     const { executeAction, mode } = nextProps;
     // after handleClickButton saga updates state to execute action
     if (executeAction) {
-      const handId = parseInt(this.props.params.handId, 10);
+      const handId = this.props.latestHand;
       this.disableTemporarilyAfterAction();
       this.resetActionBar();
       switch (mode) {
@@ -150,7 +151,7 @@ class ActionBarContainer extends React.Component {
   }
 
   handleBet() {
-    const handId = parseInt(this.props.params.handId, 10);
+    const handId = this.props.latestHand;
     const amount = this.state.amount + this.props.myMaxBet;
     const betAction = this.props.bet(this.props.params.tableAddr, handId, amount, this.props.privKey, this.props.myPos, this.props.lastReceipt);
     return this.props.pay(betAction, this.props.dispatch)
@@ -169,7 +170,7 @@ class ActionBarContainer extends React.Component {
 
   handleCheck() {
     const amount = this.props.myMaxBet;
-    const handId = parseInt(this.props.params.handId, 10);
+    const handId = this.props.latestHand;
     const checkStates = ['preflop', 'turn', 'river', 'flop'];
     const state = this.props.state;
     const checkType = checkStates.indexOf(state) !== -1 ? state : 'flop';
@@ -192,7 +193,7 @@ class ActionBarContainer extends React.Component {
 
   handleFold() {
     const amount = this.props.myMaxBet;
-    const handId = parseInt(this.props.params.handId, 10);
+    const handId = this.props.latestHand;
     const action = this.props.fold(
       this.props.params.tableAddr,
       handId,
@@ -230,6 +231,7 @@ ActionBarContainer.propTypes = {
   fold: PropTypes.func,
   lastReceipt: PropTypes.object,
   minRaise: PropTypes.number,
+  latestHand: PropTypes.number,
   myMaxBet: PropTypes.number,
   myPos: PropTypes.number,
   myStack: PropTypes.number,
@@ -284,6 +286,7 @@ const mapStateToProps = createStructuredSelector({
   turnComplete: getActionBarTurnComplete(),
   visible: makeSelectActionBarVisible(),
   executeAction: getExecuteAction(),
+  latestHand: makeLatestHandSelector(),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ActionBarContainer);
