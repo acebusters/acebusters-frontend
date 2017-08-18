@@ -14,7 +14,6 @@ const AmountField = ({
 
   return (
     <Field
-      type="number"
       normalize={maxAmount && limitAmount}
       {...props}
     />

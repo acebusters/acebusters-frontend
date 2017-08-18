@@ -31,3 +31,8 @@ export const getAmountUnit = () => createSelector(
   selectDashboard,
   (dashboard) => dashboard.get('amountUnit'),
 );
+
+export const getInvestType = () => createSelector(
+  selectDashboard,
+  (dashboard) => dashboard.get('investType'),
+);

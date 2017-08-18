@@ -38,6 +38,10 @@ export default defineMessages({
     id: 'app.containers.Dashboard.exchange',
     defaultMessage: 'Exchange',
   },
+  invest: {
+    id: 'app.containers.Dashboard.invest',
+    defaultMessage: 'Invest',
+  },
   header: {
     id: 'app.containers.Dashboard.header',
     defaultMessage: 'Account Dashboard',
@@ -74,6 +78,10 @@ export default defineMessages({
     id: 'app.containers.Dashboard.powerUpTitle',
     defaultMessage: 'Power Up',
   },
+  powerUpDescr: {
+    id: 'app.containers.Dashboard.powerUpDescr',
+    defaultMessage: 'Power Up will convert NTZ to ABP immediately so you can invest in the Acebuster\'s economy.',
+  },
   powerDownTitle: {
     id: 'app.containers.Dashboard.powerDownTitle',
     defaultMessage: 'Power Down',
@@ -81,6 +89,10 @@ export default defineMessages({
   powerDownDescr: {
     id: 'app.containers.Dashboard.powerDownDescr',
     defaultMessage: 'Power Down will convert ABP back to NTZ over a period of 3 month.<br />Minimal power down amount: {min} ABP',
+  },
+  powerDownPrereq: {
+    id: 'app.containers.Dashboard.powerDownPrereq',
+    defaultMessage: 'To Power Down, first Power Up and purchase ABP',
   },
   sellTitle: {
     id: 'app.containers.Dashboard.sellTitle',
@@ -141,5 +153,9 @@ export default defineMessages({
   powerDownPayoutStatus: {
     id: 'app.containers.Dashboard.powerDownPayoutStatus',
     defaultMessage: 'Power Down Payout',
+  },
+  upgradeAccount: {
+    id: 'app.containers.Dashboard.upgradeAccount',
+    defaultMessage: 'Upgrade to Shark account',
   },
 });

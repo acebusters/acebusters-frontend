@@ -34,14 +34,19 @@ import {
   OVERVIEW,
   WALLET,
   EXCHANGE,
+  INVEST,
+  POWERUP,
+  POWERDOWN,
   setActiveTab,
   setAmountUnit,
+  setInvestType,
 } from './actions';
 import messages from './messages';
 import { txnsToList } from './txnsToList';
 import {
   getActiveTab,
   getAmountUnit,
+  getInvestType,
   createDashboardTxsSelector,
 } from './selectors';
 import { downRequestsToList } from './downRequestsToList';
@@ -51,6 +56,7 @@ import H2 from '../../components/H2';
 import Overview from '../../components/Dashboard/Overview';
 import Wallet from '../../components/Dashboard/Wallet';
 import Exchange from '../../components/Dashboard/Exchange';
+import Invest from '../../components/Dashboard/Invest';
 import SubmitButton from '../../components/SubmitButton';
 import Balances from '../../components/Dashboard/Balances';
 
@@ -68,6 +74,7 @@ const PANES = {
   [OVERVIEW]: Overview,
   [WALLET]: Wallet,
   [EXCHANGE]: Exchange,
+  [INVEST]: Invest,
 };
 
 const TABS = [
@@ -85,6 +92,11 @@ const TABS = [
     name: EXCHANGE,
     title: <FormattedMessage {...messages[EXCHANGE]} />,
     icon: 'fa-exchange',
+  },
+  {
+    name: INVEST,
+    title: <FormattedMessage {...messages[INVEST]} />,
+    icon: 'fa-line-chart',
   },
 ];
 
@@ -360,6 +372,7 @@ class DashboardRoot extends React.Component {
   }
 
   handlePowerUp(amount) {
+    this.props.notifyCreate(POWERUP);
     return this.handleTxSubmit((callback) => {
       this.token.transfer.sendTransaction(
         confParams.pwrAddr,
@@ -370,6 +383,7 @@ class DashboardRoot extends React.Component {
   }
 
   handlePowerDown(amount) {
+    this.props.notifyCreate(POWERDOWN);
     return this.handleTxSubmit((callback) => {
       this.power.transfer.sendTransaction(
         confParams.ntzAddr,
@@ -469,8 +483,9 @@ DashboardRoot.propTypes = {
 };
 
 const mapDispatchToProps = (dispatch) => ({
-  setActiveTab: (whichTab) => dispatch(setActiveTab(whichTab)),
-  setAmountUnit: (unit) => dispatch(setAmountUnit(unit)),
+  setInvestType,
+  setActiveTab,
+  setAmountUnit,
   notifyCreate: (type, props) => dispatch(notifyCreate(type, props)),
   modalAdd,
   modalDismiss,
@@ -489,6 +504,7 @@ const mapStateToProps = createStructuredSelector({
   signerAddr: makeSignerAddrSelector(),
   privKey: makeSelectPrivKey(),
   amountUnit: getAmountUnit(),
+  investType: getInvestType(),
 });
 
 export default web3Connect(

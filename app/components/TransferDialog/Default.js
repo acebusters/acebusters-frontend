@@ -21,7 +21,7 @@ class DefaultDialog extends React.Component { // eslint-disable-line react/prefe
     return this.props.handleTransfer(
       values.get('amount'),
       values.get('address'),
-    );
+    ).then(() => this.props.reset());
   }
 
   render() {
@@ -94,6 +94,7 @@ DefaultDialog.propTypes = {
   handleSubmit: PropTypes.func,
   handleTransfer: PropTypes.func,
   error: PropTypes.any,
+  reset: PropTypes.func,
 };
 
 DefaultDialog.defaultProps = {

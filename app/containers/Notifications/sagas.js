@@ -31,10 +31,9 @@ import {
   CONTRACT_TX_ERROR,
   CONTRACT_EVENTS,
 } from '../AccountProvider/actions';
-
-import { makeLatestHandSelector } from '../Table/selectors';
-
 import { getWeb3 } from '../AccountProvider/utils';
+import { POWERUP } from '../Dashboard/actions';
+import { makeLatestHandSelector } from '../Table/selectors';
 
 import {
   TRANSFER_ETH,
@@ -74,10 +73,19 @@ function* createNotification(action) {
     yield* transferPendingNtz();
   }
   if (action.notifyType === SELL_NTZ) {
-    yield* exchangeSellPending();
+    const pendMethod = 'transfer';
+    const successEvent = 'Sell';
+    const details = 'NTZ for ETH';
+    yield* exchangeSellPending(pendMethod, successEvent, details);
   }
   if (action.notifyType === PURCHASE_NTZ) {
     yield* exchangePurPending();
+  }
+  if (action.notifyType === POWERUP) {
+    const pendMethod = 'transfer';
+    const successEvent = 'Transfer';
+    const details = 'NTZ for ABP';
+    yield* exchangeSellPending(pendMethod, successEvent, details);
   }
   // throw error?
 }
@@ -207,31 +215,31 @@ function* visitorModeNotification({ payload: { pathname = '' } }) {
   }
 }
 
-function* exchangeSellPending() {
+function* exchangeSellPending(pendMethod, successEvent, details) {
   let finished;
   while (!finished) {
     const { payload: { methodName, txHash } } = yield take(CONTRACT_TX_SUCCESS);
-    if (methodName === 'transfer') {
+    if (methodName === pendMethod) {
       const note = exchangePending;
       note.txId = txHash;
-      note.details = 'NTZ for ETH';
+      note.details = details;
       yield* createPersistNotification(note);
       finished = true;
-      yield* exchangeSellSuccess();
+      yield* exchangeSellSuccess(successEvent, details);
     }
   }
 }
 
-function* exchangeSellSuccess() {
+function* exchangeSellSuccess(successEvent, details) {
   // remove pending and create success notification
   let finished;
   while (!finished) {
     const { payload } = yield take(CONTRACT_EVENTS);
     const { transactionHash, event } = payload[0];
-    if (event === 'Sell') {
+    if (event === successEvent) {
       yield* removeNotification({ txId: transactionHash });
       const note2 = exchangeSuccess;
-      note2.details = 'NTZ for ETH';
+      note2.details = details;
       yield* createTempNotification(note2);
       finished = true;
     }
