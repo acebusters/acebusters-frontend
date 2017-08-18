@@ -45,7 +45,7 @@ export function conf() {
       oracleUrl: 'https://v83iq1161a.execute-api.eu-west-1.amazonaws.com/v0',
       txUrl: 'https://h5fb9klhzc.execute-api.eu-west-1.amazonaws.com/v0',
       accountUrl: 'https://vps13t4f7e.execute-api.eu-west-1.amazonaws.com/v0',
-      reservationUrl: '',
+      reservationUrl: 'https://uiw0k5puaf.execute-api.eu-west-1.amazonaws.com/v0',
       ntzAddr: '0x8895dc6374f3198ac298857bc4a85ac225a87c6c',
       pwrAddr: '0x4a7ec091d4a28f8b2e6ed687bad330c2c8fe9846',
       accountFactory: '0x46a7e61dedd2abad8caf98d4da1205f830f62815',
