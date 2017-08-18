@@ -206,7 +206,7 @@ class DashboardRoot extends React.Component {
       toBlock: 'latest',
     }).watch((error, event) => {
       if (!error && event.args.from === proxyAddr) {
-        this.loadDownRequests();
+        this.props.contractEvents([event], proxyAddr);
       }
     });
 
