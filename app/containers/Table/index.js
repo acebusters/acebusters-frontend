@@ -230,7 +230,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     // Note: passed callback prevents exception, but it should work even without callback
     // need to fix wsProvider
     this.tableEvents.stopWatching(() => null);
-    this.tableEvents = null;
   }
 
   handleUpdate(event) {

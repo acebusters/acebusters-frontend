@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { createStructuredSelector } from 'reselect';
 import { FormattedMessage } from 'react-intl';
-import ethUtil from 'ethereumjs-util';
 import BigNumber from 'bignumber.js';
 
 import web3Connect from '../AccountProvider/web3Connect';
@@ -63,7 +62,7 @@ import Balances from '../../components/Dashboard/Balances';
 import PanesRoot from '../../components/Dashboard/PanesRoot';
 import Tabs from '../../components/Dashboard/Tabs';
 
-import { ABI_TOKEN_CONTRACT, ABI_POWER_CONTRACT, ABI_ACCOUNT_FACTORY, ABI_PROXY, ABI_TABLE_FACTORY, conf } from '../../app.config';
+import { ABI_TOKEN_CONTRACT, ABI_POWER_CONTRACT, ABI_PROXY, ABI_TABLE_FACTORY, conf } from '../../app.config';
 
 const confParams = conf();
 
@@ -127,12 +126,6 @@ class DashboardRoot extends React.Component {
     };
   }
 
-  componentDidMount() {
-    if (this.props.account && this.props.account.proxy === '0x') {
-      this.watchAccountCreated();
-    }
-  }
-
   componentWillReceiveProps(nextProps) {
     const { account } = this.props;
     const { account: nextAccount } = nextProps;
@@ -167,13 +160,6 @@ class DashboardRoot extends React.Component {
           </SubmitButton>
         </div>
       );
-    }
-
-    // Note: listen to AccountFactory's AccountCreated Event if proxy address is not ready
-    if (nextProps.account && this.props
-        && nextProps.account.proxy !== this.props.account.proxy
-        && nextProps.account.proxy === '0x') {
-      this.watchAccountCreated();
     }
   }
 
@@ -242,23 +228,6 @@ class DashboardRoot extends React.Component {
           this.handleETHClaim(proxyAddr);
         }
       }
-    });
-  }
-
-  watchAccountCreated() {
-    const web3 = getWeb3();
-    const privKey = this.props.privKey;
-    const privKeyBuffer = new Buffer(privKey.replace('0x', ''), 'hex');
-    const signer = `0x${ethUtil.privateToAddress(privKeyBuffer).toString('hex')}`;
-    const accountFactory = web3.eth.contract(ABI_ACCOUNT_FACTORY).at(confParams.accountFactory);
-    const events = accountFactory.AccountCreated({ signer }, { fromBlock: 'latest' });
-
-    events.watch((err, ev) => {  // eslint-disable-line no-unused-vars
-      accountFactory.getAccount.call(signer, (e, [proxy, owner, isLocked]) => {
-        this.props.accountLoaded({ proxy, owner, isLocked });
-      });
-
-      events.stopWatching();
     });
   }
 
@@ -470,12 +439,10 @@ class DashboardRoot extends React.Component {
 DashboardRoot.propTypes = {
   activeTab: PropTypes.string,
   account: PropTypes.object,
-  accountLoaded: PropTypes.func,
   contractEvents: PropTypes.func,
   dashboardTxs: PropTypes.object,
   modalAdd: PropTypes.func,
   modalDismiss: PropTypes.func,
-  privKey: PropTypes.string,
   proxyEvents: PropTypes.func,
   transferETH: PropTypes.func,
   web3Redux: PropTypes.any,
