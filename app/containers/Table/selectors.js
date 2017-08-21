@@ -19,7 +19,7 @@ const tableStateSelector = (state, props) => (state && props) ? state.getIn(['ta
 
 const handSelector = (state, props) => {
   if (state && props) {
-    const handId = props.params.handId || makeLatestHandSelector()(state, props);
+    const handId = props.latestHand || makeLatestHandSelector()(state, props);
     if (handId !== null) {
       return state.getIn(['table', props.params.tableAddr, String(handId)]);
     }

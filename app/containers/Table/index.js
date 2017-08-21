@@ -152,11 +152,18 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
   componentWillReceiveProps(nextProps) {
     const handId = this.props.latestHand;
-    // take care of timing out players
-    if (this.props.myPos !== undefined && this.props.hand
-      && this.props.hand.get('changed') < nextProps.hand.get('changed')) {
+    const { isMyTurn } = nextProps;
+    // # if player <out of turn>: send usual <timeout>
+    if (
+      !isMyTurn &&
+      this.props.myPos !== undefined &&
+      this.props.hand &&
+      this.props.hand.get('changed') < nextProps.hand.get('changed')
+    ) {
+      // take care of timing out players
       if (this.timeOut) {
         clearTimeout(this.timeOut);
+        this.timeOut = null;
       }
 
       let passed = Math.floor(Date.now() / 1000) - nextProps.hand.get('changed');
@@ -173,6 +180,11 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
             } });
           });
         }, timeOut);
+      }
+    } else if (isMyTurn) { // # if player <in turn>: somebody else send <timeout>
+      if (this.timeOut) {
+        clearTimeout(this.timeOut);
+        this.timeOut = null;
       }
     }
 
@@ -222,7 +234,8 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
   componentWillUnmount() {
     if (this.timeOut) {
-      clearInterval(this.timeOut);
+      clearTimeout(this.timeOut);
+      this.timeOut = null;
     }
     this.channel.unbind('update', this.handleUpdate);
 
@@ -302,7 +315,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.props.modalAdd(slides);
     this.props.setPending(
       this.tableAddr,
-      this.props.params.handId,
+      this.props.latestHand,
       pos,
       { signerAddr: this.props.signerAddr, stackSize: amount }
     );
@@ -626,6 +639,7 @@ Table.propTypes = {
   state: React.PropTypes.string,
   board: React.PropTypes.array,
   hand: React.PropTypes.object,
+  isMyTurn: React.PropTypes.bool,
   myHand: React.PropTypes.object,
   myStack: React.PropTypes.number,
   lineup: React.PropTypes.object,
