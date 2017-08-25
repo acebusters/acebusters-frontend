@@ -417,8 +417,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
   watchTable(error, result) {
     if (error) {
-      const errorElement = (<p>{error}/</p>);
-      this.props.modalAdd(errorElement);
+      Raven.captureException(error, { tags: {
+        tableAddr: this.props.params.tableAddr,
+        handId: this.props.latestHand,
+      } });
       return;
     }
 
