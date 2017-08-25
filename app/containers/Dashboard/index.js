@@ -175,6 +175,13 @@ class DashboardRoot extends React.Component {
         addEventsDate(eventList.filter(isUserEvent(proxyAddr)))
           .then((events) => this.props.proxyEvents(events, proxyAddr));
       });
+      this.power.allEvents({
+        fromBlock: blockNumber - LOOK_BEHIND_PERIOD,
+        toBlock: 'latest',
+      }).get((error, eventList) => {
+        addEventsDate(eventList.filter(isUserEvent(proxyAddr)))
+          .then((events) => this.props.contractEvents(events, proxyAddr));
+      });
     });
 
     this.proxy.allEvents({

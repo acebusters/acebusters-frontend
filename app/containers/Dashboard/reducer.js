@@ -208,6 +208,10 @@ function addProxyContractEvent(state, event) {
 
 function addNutzContractEvent(state, event) {
   if (event.event === 'Transfer') {
+    if (event.address === conf().pwrAddr) {
+      return state;
+    }
+
     const isIncome = event.args.to === state.get('proxy');
     return state.setIn(
       ['events', event.transactionHash],
