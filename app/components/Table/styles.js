@@ -64,10 +64,11 @@ export const HandBox = styled.div`
 
 export const PokerTable = styled.div`
   position: absolute;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
   background-image: ${backgroundTable};
-  top: -20%;
+  top: 48vh;
   left: 50%;
   width: 100%;
-  padding: 20%;
+  margin-top: -75px;
+  padding: 200px 20%;
 `;

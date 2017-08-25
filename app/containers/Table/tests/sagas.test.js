@@ -344,7 +344,7 @@ describe('Saga Tests', () => {
     sagaTester.start(payFlow);
     const payAction = bet(tableAddr, 3, babz(500), PLAYER2.key, 1, 'prevReceipt');
     pay(payAction, (action) => sagaTester.dispatch(action)).catch((err) => {
-      expect(err).toEqual('unauthorized');
+      expect(err.response.status).toEqual(401);
       const receiptAction = sagaTester.getCalledActions()[2];
       expect(receiptAction.type).toEqual(RECEIPT_SET);
       expect(receiptAction.receipt).toEqual('prevReceipt');

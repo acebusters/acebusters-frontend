@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { createStructuredSelector } from 'reselect';
 import { FormattedMessage } from 'react-intl';
-import ethUtil from 'ethereumjs-util';
 import BigNumber from 'bignumber.js';
 
 import web3Connect from '../AccountProvider/web3Connect';
@@ -34,14 +33,19 @@ import {
   OVERVIEW,
   WALLET,
   EXCHANGE,
+  INVEST,
+  POWERUP,
+  POWERDOWN,
   setActiveTab,
   setAmountUnit,
+  setInvestType,
 } from './actions';
 import messages from './messages';
 import { txnsToList } from './txnsToList';
 import {
   getActiveTab,
   getAmountUnit,
+  getInvestType,
   createDashboardTxsSelector,
 } from './selectors';
 import { downRequestsToList } from './downRequestsToList';
@@ -51,13 +55,14 @@ import H2 from '../../components/H2';
 import Overview from '../../components/Dashboard/Overview';
 import Wallet from '../../components/Dashboard/Wallet';
 import Exchange from '../../components/Dashboard/Exchange';
+import Invest from '../../components/Dashboard/Invest';
 import SubmitButton from '../../components/SubmitButton';
 import Balances from '../../components/Dashboard/Balances';
 
 import PanesRoot from '../../components/Dashboard/PanesRoot';
 import Tabs from '../../components/Dashboard/Tabs';
 
-import { ABI_TOKEN_CONTRACT, ABI_POWER_CONTRACT, ABI_ACCOUNT_FACTORY, ABI_PROXY, ABI_TABLE_FACTORY, conf } from '../../app.config';
+import { ABI_TOKEN_CONTRACT, ABI_POWER_CONTRACT, ABI_PROXY, ABI_TABLE_FACTORY, conf } from '../../app.config';
 
 const confParams = conf();
 
@@ -68,6 +73,7 @@ const PANES = {
   [OVERVIEW]: Overview,
   [WALLET]: Wallet,
   [EXCHANGE]: Exchange,
+  [INVEST]: Invest,
 };
 
 const TABS = [
@@ -85,6 +91,11 @@ const TABS = [
     name: EXCHANGE,
     title: <FormattedMessage {...messages[EXCHANGE]} />,
     icon: 'fa-exchange',
+  },
+  {
+    name: INVEST,
+    title: <FormattedMessage {...messages[INVEST]} />,
+    icon: 'fa-line-chart',
   },
 ];
 
@@ -113,12 +124,6 @@ class DashboardRoot extends React.Component {
     this.state = {
       downRequests: null,
     };
-  }
-
-  componentDidMount() {
-    if (this.props.account && this.props.account.proxy === '0x') {
-      this.watchAccountCreated();
-    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -156,13 +161,6 @@ class DashboardRoot extends React.Component {
         </div>
       );
     }
-
-    // Note: listen to AccountFactory's AccountCreated Event if proxy address is not ready
-    if (nextProps.account && this.props
-        && nextProps.account.proxy !== this.props.account.proxy
-        && nextProps.account.proxy === '0x') {
-      this.watchAccountCreated();
-    }
   }
 
   watchProxyEvents(proxyAddr) {
@@ -194,7 +192,7 @@ class DashboardRoot extends React.Component {
       toBlock: 'latest',
     }).watch((error, event) => {
       if (!error && event.args.from === proxyAddr) {
-        this.loadDownRequests();
+        this.props.contractEvents([event], proxyAddr);
       }
     });
 
@@ -230,23 +228,6 @@ class DashboardRoot extends React.Component {
           this.handleETHClaim(proxyAddr);
         }
       }
-    });
-  }
-
-  watchAccountCreated() {
-    const web3 = getWeb3();
-    const privKey = this.props.privKey;
-    const privKeyBuffer = new Buffer(privKey.replace('0x', ''), 'hex');
-    const signer = `0x${ethUtil.privateToAddress(privKeyBuffer).toString('hex')}`;
-    const accountFactory = web3.eth.contract(ABI_ACCOUNT_FACTORY).at(confParams.accountFactory);
-    const events = accountFactory.AccountCreated({ signer }, { fromBlock: 'latest' });
-
-    events.watch((err, ev) => {  // eslint-disable-line no-unused-vars
-      accountFactory.getAccount.call(signer, (e, [proxy, owner, isLocked]) => {
-        this.props.accountLoaded({ proxy, owner, isLocked });
-      });
-
-      events.stopWatching();
     });
   }
 
@@ -360,6 +341,7 @@ class DashboardRoot extends React.Component {
   }
 
   handlePowerUp(amount) {
+    this.props.notifyCreate(POWERUP);
     return this.handleTxSubmit((callback) => {
       this.token.transfer.sendTransaction(
         confParams.pwrAddr,
@@ -370,6 +352,7 @@ class DashboardRoot extends React.Component {
   }
 
   handlePowerDown(amount) {
+    this.props.notifyCreate(POWERDOWN);
     return this.handleTxSubmit((callback) => {
       this.power.transfer.sendTransaction(
         confParams.ntzAddr,
@@ -456,12 +439,10 @@ class DashboardRoot extends React.Component {
 DashboardRoot.propTypes = {
   activeTab: PropTypes.string,
   account: PropTypes.object,
-  accountLoaded: PropTypes.func,
   contractEvents: PropTypes.func,
   dashboardTxs: PropTypes.object,
   modalAdd: PropTypes.func,
   modalDismiss: PropTypes.func,
-  privKey: PropTypes.string,
   proxyEvents: PropTypes.func,
   transferETH: PropTypes.func,
   web3Redux: PropTypes.any,
@@ -469,8 +450,9 @@ DashboardRoot.propTypes = {
 };
 
 const mapDispatchToProps = (dispatch) => ({
-  setActiveTab: (whichTab) => dispatch(setActiveTab(whichTab)),
-  setAmountUnit: (unit) => dispatch(setAmountUnit(unit)),
+  setInvestType,
+  setActiveTab,
+  setAmountUnit,
   notifyCreate: (type, props) => dispatch(notifyCreate(type, props)),
   modalAdd,
   modalDismiss,
@@ -489,6 +471,7 @@ const mapStateToProps = createStructuredSelector({
   signerAddr: makeSignerAddrSelector(),
   privKey: makeSelectPrivKey(),
   amountUnit: getAmountUnit(),
+  investType: getInvestType(),
 });
 
 export default web3Connect(

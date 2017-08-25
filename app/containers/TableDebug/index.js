@@ -8,7 +8,7 @@ import { getWeb3 } from '../../containers/AccountProvider/utils';
 
 import { ABI_TABLE } from '../../app.config';
 
-import { makeHandsSelector } from '../Table/selectors';
+import { makeHandsSelector, makeLatestHandSelector } from '../Table/selectors';
 
 import { loadContractData } from './loadContractData';
 import { parseLastReceiptAmount, parseDistributionReceipt, renderNtz } from './utils';
@@ -276,7 +276,7 @@ class TableDebug extends React.Component {
 
   render() {
     const { visible, expanded, contractData } = this.state;
-    const { hands } = this.props;
+    const { hands, latestHand } = this.props;
 
     if (!visible) {
       return null;
@@ -287,6 +287,7 @@ class TableDebug extends React.Component {
         <button onClick={this.handleExpandedToggle}>
           {expanded ? 'close' : 'open debug pane' }
         </button>
+        Hand: {latestHand}
         {expanded &&
           <div>
             <button onClick={this.handleRefresh}>
@@ -306,10 +307,12 @@ class TableDebug extends React.Component {
 TableDebug.propTypes = {
   contract: PropTypes.object.isRequired,
   hands: PropTypes.array.isRequired,
+  latestHand: PropTypes.number,
 };
 
 const mapStateToProps = createStructuredSelector({
   hands: makeHandsSelector(),
+  latestHand: makeLatestHandSelector(),
 });
 
 export default connect(mapStateToProps)(TableDebug);

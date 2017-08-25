@@ -48,12 +48,36 @@ export default function tableReducer(state = initialState, action) {
       return newState;
     }
 
-    case TableActions.TABLE_RECEIVED: {
-      if (!state.get(action.tableAddr)) {
-        return state.set(action.tableAddr, Map({}));
-      }
-      return state;
-    }
+    case TableActions.TABLE_RECEIVED:
+      return state.set(action.tableAddr, state.get(action.tableAddr) || Map({
+        reservation: Map({}),
+      }));
+
+    case TableActions.RESERVATION_RECEIVED:
+      return state.setIn(
+        [action.meta.tableAddr, 'reservation'],
+        fromJS(action.payload).map((item) => item.set(
+          'blocky',
+          createBlocky(item.get('signerAddr'))
+        )).toMap()
+      );
+
+    case TableActions.SEAT_RESERVED:
+      return (
+        state
+          .setIn([action.meta.tableAddr, 'reservation', String(action.payload.pos)], fromJS(action.payload))
+          .setIn(
+            [action.meta.tableAddr, 'reservation', String(action.payload.pos), 'blocky'],
+            createBlocky(action.payload.signerAddr)
+          )
+      );
+
+    case TableActions.SEATS_RELEASED:
+      return action.payload.reduce((st, item) => st.deleteIn([
+        action.meta.tableAddr,
+        'reservation',
+        String(item.pos),
+      ]), state);
 
     case TableActions.LINEUP_RECEIVED: {
       let lineup = List([]);
@@ -71,7 +95,7 @@ export default function tableReducer(state = initialState, action) {
       // The 2nd case will provide a handId, and we'll use it to update lineup data in 'hand'
       if (action.handId) {
         const table = state.get(action.tableAddr);
-        let hand = table.get(action.handId);
+        let hand = table.get(String(action.handId));
 
         for (let j = 0; j < action.lineup.length; j += 1) {
           if (hand.getIn(['lineup', j, 'address']) !== action.lineup[1][j]) {
@@ -94,13 +118,13 @@ export default function tableReducer(state = initialState, action) {
     }
 
     case TableActions.EXIT_HAND_SET: {
-      const handIdStr = action.handId.toString();
+      const handIdStr = String(action.handId);
       return state.setIn([action.tableAddr, handIdStr, 'lineup', action.pos, 'exitHand'], action.exitHand);
     }
 
     case TableActions.PENDING_SET: {
       const { payload: { handId, tableAddr, pos, data = {} } } = action;
-      const path = [tableAddr, handId.toString(), 'lineup', pos, 'pending'];
+      const path = [tableAddr, String(handId), 'lineup', pos, 'pending'];
 
       if (data.signerAddr) {
         data.blocky = createBlocky(data.signerAddr);
@@ -129,7 +153,7 @@ export default function tableReducer(state = initialState, action) {
       const table = state.get(action.tableAddr);
 
       // if we did not have the fetched hand, we create it in the state
-      const handIdStr = action.hand.handId.toString();
+      const handIdStr = String(action.hand.handId);
       if (!table || table.get(handIdStr) === undefined) {
         let hand = Map({
           dealer: action.hand.dealer,

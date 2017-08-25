@@ -1,17 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import { browserHistory } from 'react-router';
+
 import Footer from 'components/Footer';
 import Content from 'components/Content';
 import withProgressBar from 'components/ProgressBar';
 import { ModalContainer, ModalDialog } from 'components/Modal';
 import { ModalsTransitionGroup } from 'components/Modal/ModalsTransitionGroup';
-import Header from '../Header';
-import Notifications from '../../containers/Notifications';
+import Notifications from 'containers/Notifications';
 
+import { selectNotifications } from '../Notifications/selectors';
+import { makeSelectLoggedIn } from '../AccountProvider/selectors';
+import Header from '../Header';
+import { setAuthState } from '../AccountProvider/actions';
 
 import {
   makeSelectProgress,
@@ -19,42 +22,8 @@ import {
   makeModalSelector,
   selectWorkerProgress,
 } from './selectors';
-
-import { selectNotifications } from '../Notifications/selectors';
-import { makeSelectLoggedIn } from '../AccountProvider/selectors';
-
-import { setAuthState } from '../AccountProvider/actions';
 import { modalDismiss } from './actions';
-
-import {
-  boxedLayoutMaxWidth,
-  backgroundBoxed,
-  backgroundTableColor,
-} from '../../variables';
-
-const StyledDashboard = styled.div`
-  /* clearfix */
-  &:before, &:after {
-    display: table;
-    content: " ";
-    box-sizing: border-box;
-  }
-  &:after {
-    clear: both;
-  }
-  /* theme */
-  background: #444;
-  background-color: ${(props) => props.params.tableAddr ? backgroundTableColor : backgroundBoxed};
-  min-height: 100vh;
-  position: relative;
-  overflow: hidden;
-  ${(props) => (props.boxed && `
-    max-width: ${boxedLayoutMaxWidth};
-    margin: 0 auto;
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
-    position: relative;
-  `)}
-`;
+import { StyledDashboard } from './styles';
 
 export function App({ notifications, loggedIn, modal, ...props }) {
   const pathname = props.location.pathname;
@@ -65,28 +34,25 @@ export function App({ notifications, loggedIn, modal, ...props }) {
     <div name="app-container">
       <StyledDashboard params={props.params} name="styled-dashboard">
         {isNotTable &&
-          <Header
-            onClickLogout={props.handleClickLogout}
-            {...props}
-          />
+          <Header onClickLogout={props.handleClickLogout} {...props} />
         }
-        <div>
-          {showNotifications &&
-            <Notifications isNotTable={isNotTable} />
-          }
-          <Content
-            showNavigation={!loggedIn || notifications.length > 0}
-            fixed={props.fixed}
-            name="content-wrapper"
-          >
-            {React.Children.toArray(props.children)}
-          </Content>
-        </div>
+
+        {showNotifications &&
+          <Notifications isNotTable={isNotTable} />
+        }
+
+        <Content
+          isTable={!isNotTable}
+          shiftForNotification={notifications.length > 0}
+          fixed={props.fixed}
+          name="content-wrapper"
+        >
+          {React.Children.toArray(props.children)}
+        </Content>
+
       </StyledDashboard>
 
-      {isNotTable &&
-        <Footer />
-      }
+      {isNotTable && <Footer />}
 
       <ModalsTransitionGroup>
         {modal &&

@@ -9,6 +9,7 @@ import {
   makeHandsSelector,
   makeSitoutAmountSelector,
   makeLatestHandSelector,
+  makeReservationSelector,
 } from '../selectors';
 
 import { PLAYER1, PLAYER2, PLAYER3, PLAYER4, PLAYER_EMPTY } from './consts';
@@ -33,6 +34,27 @@ describe('tableStateSelector', () => {
       },
     });
     expect(tableStateSelector(mockedState, PROPS)).toEqual(tableState);
+  });
+});
+
+describe('reservationSelector', () => {
+  it('should select the reservation data for table', () => {
+    const tableState = fromJS({
+      0: {
+        signerAddr: '0x000',
+      },
+      1: {
+        signerAddr: '0x000',
+      },
+    });
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          reservation: tableState,
+        },
+      },
+    });
+    expect(makeReservationSelector()(mockedState, PROPS)).toEqual(tableState);
   });
 });
 
@@ -127,7 +149,7 @@ describe('latestHandSelect', () => {
           data: {},
         },
       },
-    }), PROPS)).toEqual(2);
+    }), PROPS)).toEqual(null);
   });
 });
 

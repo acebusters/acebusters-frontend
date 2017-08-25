@@ -7,6 +7,7 @@ import { createSelector } from 'reselect';
 import {
   makeHandSelector,
   makeLineupSelector,
+  makeReservationSelector,
   makeMyPosSelector,
   tableStateSelector,
   makeWhosTurnSelector,
@@ -129,6 +130,11 @@ const makeSitoutSelector = () => createSelector(
 const makePendingSelector = () => createSelector(
   [makeLineupSelector(), posSelector],
   (lineup, pos) => (lineup && pos > -1 && lineup.toJS()[pos]) ? lineup.toJS()[pos].pending : false
+);
+
+const makeReservedSelector = () => createSelector(
+  [makeReservationSelector(), posSelector],
+  (reservation, pos) => reservation.has(String(pos)) ? reservation.get(String(pos)).toJS() : false,
 );
 
 const makeMyPendingSelector = () => createSelector(
@@ -370,6 +376,7 @@ export {
   makeLastAmountSelector,
   makeDealerSelector,
   makePendingSelector,
+  makeReservedSelector,
   makeMyPendingSelector,
   makeMyPendingSeatSelector,
   makeOpenSelector,

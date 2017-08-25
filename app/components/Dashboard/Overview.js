@@ -6,7 +6,7 @@ import messages from '../../containers/Dashboard/messages';
 import H2 from '../H2';
 import List from '../List';
 
-import { Pane, Section } from './styles';
+import { Pane, SectionOverview } from './styles';
 
 const Overview = (props) => {
   const { account, listTxns, downRequests } = props;
@@ -15,7 +15,7 @@ const Overview = (props) => {
   return (
     <Pane name="dashboard-overview">
       {!account.isLocked && downRequests && downRequests.length > 0 &&
-        <Section name="power-down-requests">
+        <SectionOverview name="power-down-requests">
           <H2><FormattedMessage {...messages.powerDownRequests} /></H2>
           <List
             items={downRequests}
@@ -34,10 +34,10 @@ const Overview = (props) => {
             }}
             noDataMsg="No Requests Yet"
           />
-        </Section>
+        </SectionOverview>
       }
 
-      <Section name="transaction-history">
+      <SectionOverview name="transaction-history">
         <H2><FormattedMessage {...messages.included} /></H2>
         <List
           items={listTxns}
@@ -59,7 +59,7 @@ const Overview = (props) => {
           }}
           noDataMsg="No Transactions Yet"
         />
-      </Section>
+      </SectionOverview>
     </Pane>
   );
 };

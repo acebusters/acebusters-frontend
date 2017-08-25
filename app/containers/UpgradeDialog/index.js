@@ -20,7 +20,7 @@ import { accountUnlocked } from '../AccountProvider/actions';
 import { ABI_PROXY } from '../../app.config';
 import { waitForTx } from '../../utils/waitForTx';
 import { promisifyContractCall } from '../../utils/promisifyContractCall';
-import accountService from '../../services/account';
+import * as accountService from '../../services/account';
 
 const validate = (values) => {
   const errors = {};

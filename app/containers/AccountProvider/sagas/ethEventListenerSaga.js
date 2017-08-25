@@ -8,13 +8,13 @@ const ethEvent = (contract) => eventChannel((emitter) => {
   events.watch((error, results) => {
     if (error) {
       emitter(END);
-      events.stopWatching();
+      events.stopWatching(() => null);
       return;
     }
     emitter(results);
   });
   return () => {
-    events.stopWatching();
+    events.stopWatching(() => null);
   };
 });
 

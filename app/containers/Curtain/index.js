@@ -1,4 +1,5 @@
 import React from 'react';
+import { FormattedHTMLMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
@@ -16,11 +17,12 @@ import {
   makeMessagesSelector,
   makePlayersCountSelector,
   makeMyPosSelector,
+  makeLatestHandSelector,
 } from '../../containers/Table/selectors';
-
 import { makeSelectPrivKey } from '../../containers/AccountProvider/selectors';
-
 import { sendMessage } from '../../containers/Table/actions';
+
+import messages from './messages';
 
 class Curtain extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -40,19 +42,27 @@ class Curtain extends React.PureComponent { // eslint-disable-line react/prefer-
   }
 
   render() {
-    const isTakePartOfAGame = this.props.myPos != null;
-    const ta = this.props.params.tableAddr.substring(2, 8);
-    const chatPlaceholder = `table <${ta}> in state ${this.props.state} has ${this.props.playerCount || 'no'} player${this.props.playerCount === 1 ? '' : 's'}.`;
-    const isOpen = this.state.isOpen;
+    const { isOpen } = this.state;
+    const { myPos, state, playerCount, params: { tableAddr }, messages: chatMessages, handId } = this.props;
     return (
       <CurtainWrapper isOpen={isOpen}>
         <CurtainToggler onClick={this.toggle} isOpen={isOpen} />
         <CurtainHeader />
         <Chat
           onAddMessage={this.sendMessage}
-          messages={this.props.messages}
-          readonly={!isTakePartOfAGame}
-          placeholder={chatPlaceholder}
+          messages={chatMessages}
+          readonly={!(myPos != null)}
+          placeholder={
+            <FormattedHTMLMessage
+              {...messages.placeholder}
+              values={{
+                tableAddr: tableAddr.substring(2, 8),
+                handId,
+                state,
+                playerCount,
+              }}
+            />
+          }
         />
       </CurtainWrapper>
     );
@@ -69,6 +79,7 @@ export function mapDispatchToProps(dispatch) {
 const mapStateToProps = createStructuredSelector({
   privKey: makeSelectPrivKey(),
   state: makeHandStateSelector(),
+  handId: makeLatestHandSelector(),
   messages: makeMessagesSelector(),
   playerCount: makePlayersCountSelector(),
   myPos: makeMyPosSelector(),
@@ -80,6 +91,7 @@ Curtain.propTypes = {
   myPos: PropTypes.number,
   sendMessage: PropTypes.func,
   messages: PropTypes.array,
+  handId: PropTypes.number,
   playerCount: PropTypes.number,
   params: PropTypes.object,
 };

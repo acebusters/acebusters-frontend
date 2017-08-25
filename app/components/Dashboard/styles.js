@@ -15,11 +15,19 @@ export const Pane = styled.div`
 `;
 
 export const Section = styled.div`
+  display: flex;
+  flex-direction: column;
   padding-bottom: 20px;
+  width: 480px;
+  align-self: center;
 
   & + & {
     border-top: 1px solid #ccc;
   }
+`;
+
+export const SectionOverview = styled(Section)`
+  width: 100%;
 `;
 
 // Wallet
@@ -142,6 +150,15 @@ export const TabButton = styled(Button)`
     background-color: white;
     border-bottom: 2px solid ${baseColor};
     color: black;
+  }
+`;
+
+export const TabButtonDisabled = styled(TabButton)`
+  &:hover {
+    cursor: not-allowed;
+    color: ${gray};
+    background-color: inherit;
+    border-bottom: inherit;
   }
 `;
 

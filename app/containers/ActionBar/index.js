@@ -7,6 +7,8 @@ import Raven from 'raven-js';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
 
+import { TIMEOUT_PERIOD } from '../../app.config';
+
 import { playIsPlayerTurn } from '../../sounds';
 
 import {
@@ -32,6 +34,7 @@ import {
   makeMinSelector,
   makeCallAmountSelector,
   makeAmountToCallSelector,
+  makeCanICheckSelector,
 } from './selectors';
 
 import { makeSelectPrivKey } from '../AccountProvider/selectors';
@@ -41,6 +44,7 @@ import {
   makeMyMaxBetSelector,
   makeMessagesSelector,
   makePlayersCountSelector,
+  makeLatestHandSelector,
 } from '../Table/selectors';
 
 import {
@@ -68,6 +72,25 @@ class ActionBarContainer extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) { // eslint-disable-line consistent-return
+    const handId = this.props.latestHand;
+    const { isMyTurn, canICheck } = nextProps;
+    // # if player <in turn> can <check>: send <check> by timeout
+    if (isMyTurn && canICheck) {
+      if (this.checkTimeOut) {
+        clearTimeout(this.checkTimeOut);
+        this.checkTimeOut = null;
+      }
+
+      let passed = Math.floor(Date.now() / 1000) - nextProps.hand.get('changed');
+      passed = (passed > TIMEOUT_PERIOD) ? TIMEOUT_PERIOD : passed;
+      // autoCheckTimeOut should be earlier than usual timeout, so -1.5 sec
+      const autoCheckTimeOut = ((TIMEOUT_PERIOD * 1000) - (passed * 1000)) - 1500;
+
+      if (autoCheckTimeOut > 0) {
+        this.checkTimeOut = setTimeout(() => this.handleCheck(nextProps), autoCheckTimeOut);
+      }
+    }
+
     if (nextProps.turnComplete === true) {
       this.props.setActionBarTurnComplete(false);
     }
@@ -77,16 +100,15 @@ class ActionBarContainer extends React.Component {
     const { executeAction, mode } = nextProps;
     // after handleClickButton saga updates state to execute action
     if (executeAction) {
-      const handId = parseInt(this.props.params.handId, 10);
-      this.resetActionBar();
       this.disableTemporarilyAfterAction();
+      this.resetActionBar();
       switch (mode) {
         case ALL_IN:
           return this.handleAllIn();
         case BET:
           return this.handleBet();
         case CHECK:
-          return this.handleCheck();
+          return this.handleCheck(this.props);
         case CALL:
           return this.handleCall();
         case FOLD:
@@ -106,6 +128,13 @@ class ActionBarContainer extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    if (this.checkTimeOut) {
+      clearTimeout(this.checkTimeOut);
+      this.checkTimeOut = null;
+    }
+  }
+
   // call this after each player action
   disableTemporarilyAfterAction() {
     this.setState({ disabled: true });
@@ -121,6 +150,7 @@ class ActionBarContainer extends React.Component {
   }
 
   resetActionBar() {
+    this.setState({ amount: this.props.minRaise });
     this.props.updateActionBar({
       executeAction: false,
       mode: '',
@@ -149,7 +179,7 @@ class ActionBarContainer extends React.Component {
   }
 
   handleBet() {
-    const handId = parseInt(this.props.params.handId, 10);
+    const handId = this.props.latestHand;
     const amount = this.state.amount + this.props.myMaxBet;
     const betAction = this.props.bet(this.props.params.tableAddr, handId, amount, this.props.privKey, this.props.myPos, this.props.lastReceipt);
     return this.props.pay(betAction, this.props.dispatch)
@@ -166,32 +196,32 @@ class ActionBarContainer extends React.Component {
     });
   }
 
-  handleCheck() {
-    const amount = this.props.myMaxBet;
-    const handId = parseInt(this.props.params.handId, 10);
+  handleCheck(props) {
+    const amount = props.myMaxBet;
+    const handId = props.latestHand;
     const checkStates = ['preflop', 'turn', 'river', 'flop'];
-    const state = this.props.state;
+    const state = props.state;
     const checkType = checkStates.indexOf(state) !== -1 ? state : 'flop';
-    const action = this.props.check(
-      this.props.params.tableAddr,
+    const action = props.check(
+      props.params.tableAddr,
       handId,
       amount,
-      this.props.privKey,
-      this.props.myPos,
-      this.props.lastReceipt,
+      props.privKey,
+      props.myPos,
+      props.lastReceipt,
       checkType,
     );
 
-    return this.props.pay(action, this.props.dispatch)
+    return props.pay(action, props.dispatch)
       .then((cards) => {
-        this.props.setCards(this.props.params.tableAddr, handId, cards);
+        props.setCards(props.params.tableAddr, handId, cards);
       })
       .catch(this.captureError(handId));
   }
 
   handleFold() {
     const amount = this.props.myMaxBet;
-    const handId = parseInt(this.props.params.handId, 10);
+    const handId = this.props.latestHand;
     const action = this.props.fold(
       this.props.params.tableAddr,
       handId,
@@ -224,11 +254,11 @@ ActionBarContainer.propTypes = {
   active: PropTypes.bool,
   bet: PropTypes.func,
   callAmount: PropTypes.number,
-  check: PropTypes.func,
   dispatch: PropTypes.func,
   fold: PropTypes.func,
   lastReceipt: PropTypes.object,
   minRaise: PropTypes.number,
+  latestHand: PropTypes.number,
   myMaxBet: PropTypes.number,
   myPos: PropTypes.number,
   myStack: PropTypes.number,
@@ -236,28 +266,24 @@ ActionBarContainer.propTypes = {
   params: PropTypes.object,
   privKey: PropTypes.string,
   setCards: PropTypes.func,
-  state: PropTypes.string,
   setActionBarTurnComplete: PropTypes.func,
   turnComplete: PropTypes.bool,
   executeAction: PropTypes.bool,
   mode: PropTypes.string,
   updateActionBar: PropTypes.func,
+  canICheck: PropTypes.bool,
+  isMyTurn: React.PropTypes.bool,
+  hand: React.PropTypes.object,
 };
 
 export function mapDispatchToProps(dispatch) {
   return {
     dispatch,
-    setCards: (tableAddr, handId, cards) => setCards(tableAddr, handId, cards),
-    bet: (tableAddr, handId, amount, privKey, myPos, lastReceipt) => bet(
-      tableAddr, handId, amount, privKey, myPos, lastReceipt,
-    ),
+    setCards,
+    bet,
     pay: (betAction) => pay(betAction, dispatch),
-    fold: (tableAddr, handId, amount, privKey, myPos, lastReceipt) => fold(
-      tableAddr, handId, amount, privKey, myPos, lastReceipt),
-    check: (tableAddr, handId, amount, privKey, myPos, lastReceipt, checkType
-      ) => check(
-        tableAddr, handId, amount, privKey, myPos, lastReceipt, checkType
-    ),
+    fold,
+    check,
     handleClickButton: (type) => dispatch(handleClickButton(type)),
     setActionBarTurnComplete: (complete) => dispatch(setActionBarTurnComplete(complete)),
     setActionBarButtonActive: (btn) => dispatch(setActionBarButtonActive(btn)),
@@ -283,6 +309,8 @@ const mapStateToProps = createStructuredSelector({
   turnComplete: getActionBarTurnComplete(),
   visible: makeSelectActionBarVisible(),
   executeAction: getExecuteAction(),
+  latestHand: makeLatestHandSelector(),
+  canICheck: makeCanICheckSelector(),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ActionBarContainer);

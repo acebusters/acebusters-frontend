@@ -14,6 +14,7 @@ import {
   makeLastActionSelector,
   makeOpenSelector,
   makeCoordsSelector,
+  makeReservedSelector,
 } from '../selectors';
 
 import {
@@ -53,7 +54,6 @@ describe('lastReceiptSelector', () => {
       pos: 1,
       params: {
         tableAddr: TBL_ADDR,
-        handId: 0,
       },
     };
     const receiptSelector = makeLastReceiptSelector();
@@ -84,11 +84,34 @@ describe('lastAmountSelector', () => {
       pos: 1,
       params: {
         tableAddr: TBL_ADDR,
-        handId: 0,
       },
     };
     const lastAmountSelector = makeLastAmountSelector();
     expect(lastAmountSelector(mockedState, props)).toEqual(500000000000000);
+  });
+});
+
+describe('reservedSeatSelector', () => {
+  it('should select reservation for the seat', () => {
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: {
+          reservation: {
+            0: { signerAddr: '0x000' },
+            1: { signerAddr: '0x001' },
+            2: { signerAddr: '0x002' },
+          },
+        },
+      },
+    });
+
+    const props = {
+      pos: 1,
+      params: {
+        tableAddr: TBL_ADDR,
+      },
+    };
+    expect(makeReservedSelector()(mockedState, props)).toEqual({ signerAddr: '0x001' });
   });
 });
 
@@ -115,7 +138,6 @@ describe('makeLastActionSelector', () => {
       pos: 1,
       params: {
         tableAddr: TBL_ADDR,
-        handId: 0,
       },
     };
     const lastActionSelector = makeLastActionSelector();
@@ -147,7 +169,6 @@ describe('makeOpenSelector', () => {
       pos: 0,
       params: {
         tableAddr: TBL_ADDR,
-        handId: 0,
       },
     };
     const openSelector = makeOpenSelector();
@@ -177,7 +198,6 @@ describe('makeOpenSelector', () => {
       pos: 1,
       params: {
         tableAddr: TBL_ADDR,
-        handId: 0,
       },
     };
     const openSelector = makeOpenSelector();
@@ -209,14 +229,12 @@ describe('makeCoordsSelector', () => {
       pos: 0,
       params: {
         tableAddr: TBL_ADDR,
-        handId: 0,
       },
     };
     const propsSecond = {
       pos: 1,
       params: {
         tableAddr: TBL_ADDR,
-        handId: 0,
       },
     };
     const coordsSelector = makeCoordsSelector();
@@ -247,7 +265,6 @@ describe('foldedSelector', () => {
       pos: 1,
       params: {
         tableAddr: TBL_ADDR,
-        handId: 0,
       },
     };
     const foldedSelector = makeFoldedSelector();
@@ -283,7 +300,6 @@ describe('cardSelector', () => {
       pos: 0,
       params: {
         tableAddr: TBL_ADDR,
-        handId: 0,
       },
     };
     const cardSelector = makeCardsSelector();
@@ -320,7 +336,6 @@ describe('cardSelector', () => {
       pos: 1,
       params: {
         tableAddr: TBL_ADDR,
-        handId: 0,
       },
     };
     const cardSelector = makeCardsSelector();
@@ -356,7 +371,6 @@ describe('cardSelector', () => {
       pos: 1,
       params: {
         tableAddr: TBL_ADDR,
-        handId: 0,
       },
     };
     const cardSelector = makeCardsSelector();
@@ -507,7 +521,6 @@ describe('makeSeatStatusSelector', () => {
         pos: 0,
         params: {
           tableAddr: TBL_ADDR,
-          handId: 0,
         },
       };
       const statusSelector = makeSeatStatusSelector();
@@ -543,7 +556,6 @@ describe('makeSeatStatusSelector', () => {
         pos: 0,
         params: {
           tableAddr: TBL_ADDR,
-          handId: 2,
         },
       };
       const statusSelector = makeSeatStatusSelector();
@@ -579,7 +591,6 @@ describe('makeSeatStatusSelector', () => {
         pos: 0,
         params: {
           tableAddr: TBL_ADDR,
-          handId: 0,
         },
       };
       const statusSelector = makeSeatStatusSelector();
@@ -614,7 +625,6 @@ describe('makeSeatStatusSelector', () => {
         pos: 0,
         params: {
           tableAddr: TBL_ADDR,
-          handId: 1,
         },
       };
       const statusSelector = makeSeatStatusSelector();
@@ -649,7 +659,6 @@ describe('makeSeatStatusSelector', () => {
         pos: 0,
         params: {
           tableAddr: TBL_ADDR,
-          handId: 1,
         },
       };
       const statusSelector = makeSeatStatusSelector();
@@ -682,7 +691,6 @@ describe('makeSeatStatusSelector', () => {
         pos: 0,
         params: {
           tableAddr: TBL_ADDR,
-          handId: 1,
         },
       };
       const statusSelector = makeSeatStatusSelector();
@@ -719,7 +727,6 @@ describe('makeShowStatusSelector', () => {
       pos: 0,
       params: {
         tableAddr: TBL_ADDR,
-        handId: 0,
       },
     };
     const statusSelector = makeShowStatusSelector();
@@ -753,7 +760,6 @@ describe('makeShowStatusSelector', () => {
       pos: 1,
       params: {
         tableAddr: TBL_ADDR,
-        handId: 0,
       },
     };
     const statusSelector = makeShowStatusSelector();
@@ -786,7 +792,6 @@ describe('makeShowStatusSelector', () => {
       pos: 1,
       params: {
         tableAddr: TBL_ADDR,
-        handId: 3,
       },
     };
     const statusSelector = makeShowStatusSelector();
@@ -819,7 +824,6 @@ describe('makeShowStatusSelector', () => {
       pos: 0,
       params: {
         tableAddr: TBL_ADDR,
-        handId: 3,
       },
     };
     const statusSelector = makeShowStatusSelector();
@@ -853,7 +857,6 @@ describe('makeShowStatusSelector', () => {
       pos: 0,
       params: {
         tableAddr: TBL_ADDR,
-        handId: 3,
       },
     };
     const statusSelector = makeShowStatusSelector();
@@ -887,7 +890,6 @@ describe('makeShowStatusSelector', () => {
       pos: 0,
       params: {
         tableAddr: TBL_ADDR,
-        handId: 3,
       },
     };
     const statusSelector = makeShowStatusSelector();

@@ -1,29 +1,8 @@
 import { conf } from '../app.config';
+import { requestApi } from './api';
 
-const confParams = conf();
+const request = requestApi(conf().txUrl);
 
 export function sendTx(forwardReceipt, resetConfReceipt) {
-  return new Promise((resolve, reject) => {
-    fetch(`${confParams.txUrl}/forward`, {
-      method: 'post',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ forwardReceipt, resetConfReceipt }),
-    }).then((rsp) => {
-      rsp.json().then((response) => {
-        if (rsp.status >= 200 && rsp.status < 300) {
-          resolve(response);
-        } else {
-          reject({
-            status: rsp.status,
-            message: response,
-          });
-        }
-      });
-    }).catch((error) => {
-      reject(error);
-    });
-  });
+  return request('post', 'forward', { forwardReceipt, resetConfReceipt });
 }

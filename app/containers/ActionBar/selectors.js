@@ -11,6 +11,7 @@ import {
   makeSbSelector,
   makeHandSelector,
   makeHandStateSelector,
+  makeIsMyTurnSelector,
 } from '../Table/selectors';
 
 import {
@@ -122,8 +123,17 @@ const makeCallAmountSelector = () => createSelector(
   (amountToCall, stack) => (amountToCall > stack) ? stack : amountToCall
 );
 
+const makeCanICheckSelector = () => createSelector(
+  [makeIsMyTurnSelector(), makeHandStateSelector(), makeAmountToCallSelector(), makeMyStackSelector()],
+  (isMyTurn, state, amountToCall, myStack) =>
+  isMyTurn &&
+  state !== 'waiting' && state !== 'dealing' && state !== 'showdown' &&
+  amountToCall <= myStack && amountToCall === 0
+);
+
 export {
   makeAmountToCallSelector,
   makeMinSelector,
   makeCallAmountSelector,
+  makeCanICheckSelector,
 };

@@ -19,8 +19,8 @@ const ControlBetRaise = (props) => {
   } = props;
   const allIn = myStack <= amountToCall || myStack <= minRaise;
   const text = () => {
-    if (amountToCall === 0) return 'Bet';
     if (amount === myStack) return 'All-In';
+    if (amountToCall === 0) return 'Bet';
     if (myStack > amountToCall) return 'Raise';
     return 'Bet';
   };

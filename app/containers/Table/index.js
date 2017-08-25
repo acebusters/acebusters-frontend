@@ -3,6 +3,7 @@
  */
 // react + redux
 import React from 'react';
+import styled from 'styled-components';
 import { createStructuredSelector } from 'reselect';
 import { browserHistory } from 'react-router';
 import Pusher from 'pusher-js';
@@ -13,11 +14,13 @@ import * as storageService from '../../services/sessionStorage';
 
 // components and styles
 import TableDebug from '../../containers/TableDebug';
+import NotFoundPage from '../../containers/NotFoundPage';
 
 import Card from '../../components/Card';
 import { BoardCardWrapper } from '../../components/Table/Board';
 import Seat from '../Seat';
 import Button from '../../components/Button';
+import WithLoading from '../../components/WithLoading';
 import { nickNameByAddress } from '../../services/nicknames';
 import messages from './messages';
 import { formatNtz } from '../../utils/amountFormatter';
@@ -36,6 +39,9 @@ import { modalAdd, modalDismiss } from '../App/actions';
 import {
   handRequest,
   lineupReceived,
+  seatReserved,
+  seatsReleased,
+  reservationReceived,
   updateReceived,
   addMessage,
   setPending,
@@ -77,19 +83,36 @@ import {
 
 import TableComponent from '../../components/Table';
 import web3Connect from '../AccountProvider/web3Connect';
-import TableService, { getHand } from '../../services/tableService';
+import TableService, { getHand, fetchTableState } from '../../services/tableService';
+import * as reservationService from '../../services/reservationService';
 import JoinDialog from '../JoinDialog';
 import JoinSlides from '../JoinDialog/slides';
 import InviteDialog from '../InviteDialog';
 import RebuyDialog from '../RebuyDialog';
 
-const getTableData = (table, props) => {
-  const lineup = table.getLineup.callPromise();
-  const sb = table.smallBlind.callPromise();
-  return Promise.all([lineup, sb]).then((rsp) => {
-    props.lineupReceived(table.address, rsp[0], rsp[1]);
-    return Promise.resolve();
-  });
+const SpinnerWrapper = styled.div`
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  transform: translate(-50%, -50%)
+`;
+
+const getTableData = async (table, props) => {
+  const lineup = await table.getLineup.callPromise();
+
+  if (lineup[1].length === 0) {
+    throw new Error('Table doesn\'t exists');
+  }
+
+  const [sb, reservation, tableState] = await Promise.all([
+    table.smallBlind.callPromise(),
+    reservationService.lineup(table.address),
+    fetchTableState(table.address),
+  ]);
+
+  props.lineupReceived(table.address, lineup, sb);
+  props.updateReceived(table.address, tableState);
+  props.reservationReceived(table.address, reservation);
 };
 
 export class Table extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -115,25 +138,32 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     // getting table data from oracle
     this.pusher = new Pusher('d4832b88a2a81f296f53', { cluster: 'eu', encrypted: true });
     this.channel = this.pusher.subscribe(this.tableAddr);
-    getTableData(this.table, props).then(() => {
-      this.props.handRequest(this.tableAddr, props.params.handId); // get initial state
-      this.channel.bind('update', this.handleUpdate); // bind to future state updates
-    });
-    const handId = parseInt(this.props.params.handId, 10);
-    Raven.setTagsContext({
-      tableAddr: this.tableAddr,
-      handId,
-    });
     this.tableService = new TableService(this.props.params.tableAddr, this.props.privKey);
+
+    this.state = {
+      notFound: false,
+    };
+    getTableData(this.table, this.props)
+      .then(
+        () => this.channel.bind('update', this.handleUpdate), // bind to future state updates
+        () => this.setState({ notFound: true }),
+      );
   }
 
   componentWillReceiveProps(nextProps) {
-    const handId = parseInt(this.props.params.handId, 10);
-    // take care of timing out players
-    if (this.props.myPos !== undefined && this.props.hand
-      && this.props.hand.get('changed') < nextProps.hand.get('changed')) {
+    const handId = this.props.latestHand;
+    const { isMyTurn } = nextProps;
+    // # if player <out of turn>: send usual <timeout>
+    if (
+      !isMyTurn &&
+      this.props.myPos !== undefined &&
+      this.props.hand &&
+      this.props.hand.get('changed') < nextProps.hand.get('changed')
+    ) {
+      // take care of timing out players
       if (this.timeOut) {
         clearTimeout(this.timeOut);
+        this.timeOut = null;
       }
 
       let passed = Math.floor(Date.now() / 1000) - nextProps.hand.get('changed');
@@ -151,6 +181,11 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           });
         }, timeOut);
       }
+    } else if (isMyTurn) { // # if player <in turn>: somebody else send <timeout>
+      if (this.timeOut) {
+        clearTimeout(this.timeOut);
+        this.timeOut = null;
+      }
     }
 
     // get balance of player
@@ -161,16 +196,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
     // show winner and forward browser to url of next hand
     this.pushed = (this.pushed) ? this.pushed : {};
-    if (nextProps.latestHand) {
-      const nextHandStr = nextProps.latestHand.toString();
-      if (nextProps.latestHand > handId && !this.pushed[nextHandStr]) {
-        this.pushed[nextHandStr] = true;
-        setTimeout(() => {
-          browserHistory.push(`/table/${this.tableAddr}/hand/${nextHandStr}`);
-        }, 2000);
-      }
-    }
-
 
     // fetch hands that we might need for stack calculation
     if (nextProps.missingHands && nextProps.missingHands.length > 0) {
@@ -209,16 +234,15 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
   componentWillUnmount() {
     if (this.timeOut) {
-      clearInterval(this.timeOut);
+      clearTimeout(this.timeOut);
+      this.timeOut = null;
     }
     this.channel.unbind('update', this.handleUpdate);
 
     // Note: with wsProvider, the request made by stopWatching will throw an error
-    try {
-      this.tableEvents.stopWatching();
-    } catch (e) {
-      this.tableEvents = null;
-    }
+    // Note: passed callback prevents exception, but it should work even without callback
+    // need to fix wsProvider
+    this.tableEvents.stopWatching(() => null);
   }
 
   handleUpdate(event) {
@@ -227,23 +251,15 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       this.props.addMessage(msg.message, msg.tableAddr, msg.signer, msg.created);
     } else if (event.type === 'handUpdate') {
       this.props.updateReceived(this.tableAddr, event.payload);
-    } else if (event.type === 'joinRequest') {
-      if (event.payload.signer !== this.props.signerAddr) {
-        const data = event.payload.data.slice(2);
-        const amount = parseInt(data.slice(8, 72), 16);
-        const pos = parseInt(data.slice(136), 16) - 1;
-        this.props.setPending(
-          this.tableAddr,
-          this.props.params.handId,
-          pos,
-          { signerAddr: event.payload.signer, stackSize: amount },
-        );
-      }
+    } else if (event.type === 'seatReserve') {
+      this.props.seatReserved(this.tableAddr, event.payload);
+    } else if (event.type === 'seatsRelease') {
+      this.props.seatsReleased(this.tableAddr, event.payload);
     }
   }
 
   handleRebuy(amount) {
-    const handId = parseInt(this.props.params.handId, 10);
+    const handId = this.props.latestHand;
     const toggleKey = this.tableAddr + handId;
     storageService.setItem(`rebuyModal[${toggleKey}]`, true);
 
@@ -262,7 +278,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     });
   }
 
-  handleJoin(pos, amount) {
+  async handleJoin(pos, amount) {
     const { signerAddr, account } = this.props;
 
     const promise = promisifyContractCall(this.token.transData.sendTransaction)(
@@ -271,25 +287,42 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       `0x0${(pos).toString(16)}${signerAddr.replace('0x', '')}`,
     );
 
-    return Promise.resolve(account.isLocked ? null : promise).then(() => {
-      const slides = (
-        <div>
-          <JoinSlides />
-          <Button size="large" onClick={this.props.modalDismiss}>
-            <FormattedMessage {...messages.joinModal.buttonDismiss} />
-          </Button>
-        </div>
-      );
-
-      this.props.modalDismiss();
-      this.props.modalAdd(slides);
-      this.props.setPending(
+    const reserveSeat = async () => {
+      const txHash = await promise;
+      reservationService.reserve(
         this.tableAddr,
-        this.props.params.handId,
         pos,
-        { signerAddr: this.props.signerAddr, stackSize: amount }
+        this.props.signerAddr,
+        txHash,
+        amount.toString(),
       );
-    });
+    };
+
+    if (!account.isLocked) {
+      await reserveSeat();
+    }
+
+    const slides = (
+      <div>
+        <JoinSlides />
+        <Button size="large" onClick={this.props.modalDismiss}>
+          <FormattedMessage {...messages.joinModal.buttonDismiss} />
+        </Button>
+      </div>
+    );
+
+    this.props.modalDismiss();
+    this.props.modalAdd(slides);
+    this.props.setPending(
+      this.tableAddr,
+      this.props.latestHand,
+      pos,
+      { signerAddr: this.props.signerAddr, stackSize: amount }
+    );
+
+    if (account.isLocked) {
+      await reserveSeat();
+    }
   }
 
   isTaken(open, myPos, pending, pos) {
@@ -338,7 +371,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
     // Note: if it's enabled "play" (> 0), then set it to disabled "pause" (null)
     // otherwise it's enabled "pause", then set it to disabled "play" (0)
-    const handId = parseInt(this.props.params.handId, 10);
+    const handId = this.props.latestHand;
 
     const sitoutAction = bet(
       this.props.params.tableAddr,
@@ -353,7 +386,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
   handleLeave(pos) {
     const lineup = (this.props.lineup) ? this.props.lineup.toJS() : null;
-    const handId = parseInt(this.props.params.handId, 10);
+    const handId = this.props.latestHand;
     const state = this.props.state;
     const exitHand = (state !== 'waiting') ? handId : handId - 1;
 
@@ -361,7 +394,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       return Promise.reject('Lineup is empty');
     }
 
-    this.props.setExitHand(this.tableAddr, this.props.params.handId, pos, exitHand);
+    this.props.setExitHand(this.tableAddr, this.props.latestHand, pos, exitHand);
     const statusElement = (<div>
       <p>
         Please wait until your leave request is processed!
@@ -396,7 +429,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           this.tableAddr,
           rsp,
           this.props.data.get('smallBlind'),
-          this.props.params.handId,
+          this.props.latestHand,
           this.props.myPendingSeat,
         ];
 
@@ -500,6 +533,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   render() {
+    if (this.state.notFound) {
+      return <NotFoundPage />;
+    }
+
     const lineup = (this.props.lineup) ? this.props.lineup.toJS() : null;
     const changed = (this.props.hand) ? this.props.hand.get('changed') : null;
     const seats = this.renderSeats(lineup, changed);
@@ -520,23 +557,36 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           contract={this.table}
         />
 
-        { this.props.state &&
-        <TableComponent
-          {...this.props}
-          id="table"
-          sb={sb}
-          winners={winners}
-          myHand={this.props.myHand}
-          pending={pending}
-          sitout={this.props.sitout}
-          board={board}
-          seats={seats}
-          hand={this.props.hand}
-          potSize={this.props.potSize}
-          onLeave={() => this.handleLeave(this.props.myPos)}
-          onSitout={this.handleSitout}
-        >
-        </TableComponent> }
+        {!this.props.state &&
+          <SpinnerWrapper>
+            <WithLoading
+              loadingSize="30px"
+              type="inline"
+              styles={{
+                spinner: { color: '#FFF' },
+              }}
+              isLoading
+            />
+          </SpinnerWrapper>
+        }
+
+        {this.props.state &&
+          <TableComponent
+            {...this.props}
+            id="table"
+            sb={sb}
+            winners={winners}
+            myHand={this.props.myHand}
+            pending={pending}
+            sitout={this.props.sitout}
+            board={board}
+            seats={seats}
+            hand={this.props.hand}
+            potSize={this.props.potSize}
+            onLeave={() => this.handleLeave(this.props.myPos)}
+            onSitout={this.handleSitout}
+          />
+        }
       </div>
     );
   }
@@ -547,12 +597,15 @@ export function mapDispatchToProps() {
   return {
     handRequest,
     lineupReceived,
+    reservationReceived,
+    seatsReleased,
     modalAdd,
     modalDismiss,
     setPending,
     setExitHand,
     updateReceived,
     addMessage,
+    seatReserved,
   };
 }
 
@@ -586,6 +639,7 @@ Table.propTypes = {
   state: React.PropTypes.string,
   board: React.PropTypes.array,
   hand: React.PropTypes.object,
+  isMyTurn: React.PropTypes.bool,
   myHand: React.PropTypes.object,
   myStack: React.PropTypes.number,
   lineup: React.PropTypes.object,
@@ -604,13 +658,15 @@ Table.propTypes = {
   myPos: React.PropTypes.any,
   potSize: React.PropTypes.number,
   modalAdd: React.PropTypes.func,
-  handRequest: React.PropTypes.func,
   setPending: React.PropTypes.func,
   setExitHand: React.PropTypes.func,
   modalDismiss: React.PropTypes.func,
   winners: React.PropTypes.array,
   dispatch: React.PropTypes.func,
   lineupReceived: React.PropTypes.func,
+  reservationReceived: React.PropTypes.func, // eslint-disable-line react/no-unused-prop-types
+  seatReserved: React.PropTypes.func,
+  seatsReleased: React.PropTypes.func,
   updateReceived: React.PropTypes.func,
   addMessage: React.PropTypes.func,
   location: React.PropTypes.object,

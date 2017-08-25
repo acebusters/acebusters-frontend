@@ -14,8 +14,10 @@ import { MODAL_DISMISS } from '../App/actions';
 import {
   SET_ACTIVE_TAB,
   SET_AMOUNT_UNIT,
+  SET_INVEST_TYPE,
   OVERVIEW,
   NTZ,
+  POWERUP,
 } from './actions';
 
 import { composeReducers } from '../../utils/composeReducers';
@@ -42,6 +44,7 @@ const initialState = fromJS({
   events: null,
   activeTab: OVERVIEW,
   amountUnit: NTZ,
+  investType: POWERUP,
 });
 
 function formatTxErrorMessage(error) {
@@ -61,6 +64,9 @@ function dashboardReducer(state = initialState, action) {
 
     case SET_AMOUNT_UNIT:
       return state.set('amountUnit', action.unit);
+
+    case SET_INVEST_TYPE:
+      return state.set('investType', action.which);
 
     case ACCOUNT_LOADED:
       return state.set('proxy', action.payload.proxy);

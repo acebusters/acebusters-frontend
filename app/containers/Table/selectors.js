@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { fromJS } from 'immutable';
+import { fromJS, Map } from 'immutable';
 import { PokerHelper, ReceiptCache } from 'poker-helper';
 import Solver from 'ab-pokersolver';
 import { makeSignerAddrSelector } from '../AccountProvider/selectors';
@@ -17,7 +17,16 @@ const pokerHelper = new PokerHelper(rc);
 // direct selectors to state
 const tableStateSelector = (state, props) => (state && props) ? state.getIn(['table', props.params.tableAddr]) : null;
 
-const handSelector = (state, props) => (state && props) ? state.getIn(['table', props.params.tableAddr, props.params.handId.toString()]) : null;
+const handSelector = (state, props) => {
+  if (state && props) {
+    const handId = props.latestHand || makeLatestHandSelector()(state, props);
+    if (handId !== null) {
+      return state.getIn(['table', props.params.tableAddr, String(handId)]);
+    }
+  }
+
+  return null;
+};
 
 const actionSelector = (action) => action;
 
@@ -231,6 +240,17 @@ const makeHandStateSelector = () => createSelector(
 const makeBoardSelector = () => createSelector(
   makeHandSelector(),
   (hand) => (hand && hand.get('cards')) ? hand.get('cards').toJS() : []
+);
+
+const makeReservationSelector = () => createSelector(
+  [tableStateSelector],
+  (table) => {
+    if (!table || !table.has('reservation')) {
+      return Map();
+    }
+
+    return table.get('reservation');
+  }
 );
 
 const makeLineupSelector = () => createSelector(
@@ -481,13 +501,12 @@ const makeMissingHandSelector = () => createSelector(
 const makeLatestHandSelector = () => createSelector(
   [tableStateSelector],
   (table) => {
-    if (!table) {
-      return null;
+    const hands = table && table.keySeq().map(Number).filter(not(isNaN)).toList();
+    if (hands && hands.size > 0) {
+      return Math.max(...hands);
     }
 
-    return Math.max(
-      ...table.keySeq().map(Number).filter(not(isNaN)).toList().push(2)
-    );
+    return null;
   }
 );
 
@@ -531,6 +550,7 @@ export {
     makeTableDataSelector,
     makeSbSelector,
     makeLineupSelector,
+    makeReservationSelector,
     makeMySitoutSelector,
     makeSelectWinners,
     makeSitoutSelector,

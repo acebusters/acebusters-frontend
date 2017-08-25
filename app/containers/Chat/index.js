@@ -36,7 +36,7 @@ Chat.propTypes = {
   messages: PropTypes.array,
   onAddMessage: PropTypes.func,
   readonly: PropTypes.bool,
-  placeholder: PropTypes.string,
+  placeholder: PropTypes.any,
 };
 
 export default Chat;

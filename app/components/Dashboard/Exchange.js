@@ -1,17 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage, FormattedHTMLMessage } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import BigNumber from 'bignumber.js';
 
-import { ABP_DECIMALS } from '../../utils/amountFormatter';
 
 import ExchangeDialog from '../../containers/ExchangeDialog';
-import TransferDialog from '../../containers/TransferDialog';
 import { ETH, NTZ } from '../../containers/Dashboard/actions';
 
-import H2 from '../H2';
-
-import { Pane, Section, ExchangeContainer, DBButton } from './styles';
+import { Pane, Section, ExchangeContainer } from './styles';
 
 const Exchange = (props) => {
   const {
@@ -28,12 +24,7 @@ const Exchange = (props) => {
     floor,
     handleNTZSell,
     handleNTZPurchase,
-    handlePowerUp,
-    handlePowerDown,
-    modalAdd,
-    pwrBalance,
     weiBalance,
-    totalSupply,
   } = props;
   return (
     <Pane name="dashboard-exchange" >
@@ -71,56 +62,6 @@ const Exchange = (props) => {
           }
         </ExchangeContainer>
       </Section>
-
-      <Section>
-        <H2>Acebuster Power (ABP/NTZ)</H2>
-        <ExchangeContainer>
-          {babzBalance &&
-            <DBButton
-              onClick={() => modalAdd(
-                <TransferDialog
-                  handleTransfer={handlePowerUp}
-                  maxAmount={nutzBalance}
-                  hideAddress
-                  title={<FormattedMessage {...messages.powerUpTitle} />}
-                  amountUnit="NTZ"
-                />
-              )}
-              size="medium"
-              disabled={account.isLocked}
-            >
-              Power Up
-            </DBButton>
-          }
-
-          {pwrBalance && totalSupply &&
-            <DBButton
-              onClick={() => modalAdd(
-                <TransferDialog
-                  title={<FormattedMessage {...messages.powerDownTitle} />}
-                  description={
-                    <FormattedHTMLMessage
-                      {...messages.powerDownDescr}
-                      values={{
-                        min: totalSupply.div(10000).div(ABP_DECIMALS).ceil().toNumber(),
-                      }}
-                    />
-                  }
-                  handleTransfer={handlePowerDown}
-                  maxAmount={pwrBalance.div(ABP_DECIMALS)}
-                  minAmount={totalSupply.div(10000).div(ABP_DECIMALS).ceil()}
-                  hideAddress
-                  amountUnit="ABP"
-                />
-              )}
-              size="medium"
-              disabled={account.isLocked}
-            >
-              Power Down
-            </DBButton>
-          }
-        </ExchangeContainer>
-      </Section>
     </Pane>
   );
 };
@@ -129,7 +70,6 @@ Exchange.propTypes = {
   amountUnit: PropTypes.oneOf([ETH, NTZ]),
   account: PropTypes.object,
   babzBalance: PropTypes.object,
-  totalSupply: PropTypes.object,
   ethBalance: PropTypes.object,
   calcETHAmount: PropTypes.func,
   calcNTZAmount: PropTypes.func,
@@ -139,10 +79,6 @@ Exchange.propTypes = {
   floor: PropTypes.object,
   handleNTZSell: PropTypes.func,
   handleNTZPurchase: PropTypes.func,
-  handlePowerDown: PropTypes.func,
-  handlePowerUp: PropTypes.func,
-  modalAdd: PropTypes.func,
-  pwrBalance: PropTypes.object,
   weiBalance: PropTypes.object,
 };
 
