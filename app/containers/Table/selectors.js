@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 import { fromJS, Map } from 'immutable';
-import { PokerHelper, ReceiptCache } from 'poker-helper';
+import { PokerHelper, ReceiptCache, Type } from 'poker-helper';
 import Solver from 'ab-pokersolver';
 import { makeSignerAddrSelector } from '../AccountProvider/selectors';
 import {
@@ -407,11 +407,15 @@ const makeSitoutSelector = () => createSelector(
 );
 
 const makeSitoutAmountSelector = () => createSelector(
-  [makeSitoutSelector(), makeSbSelector(), makeHandStateSelector(), makeMyMaxBetSelector()],
-  (sitout, sb, state, myMaxBet) => {
+  [makeSitoutSelector(), makeSbSelector(), makeHandStateSelector(), makeMyMaxBetSelector(), makeMyLastReceiptSelector()],
+  (sitout, sb, state, myMaxBet, myLastReceipt) => {
     if (sb && state && typeof myMaxBet !== 'undefined') {
       // in waiting we can always toggle with 0
-      if (state === 'waiting') {
+      if (state === 'waiting' || state === 'dealing') {
+        if (myLastReceipt && myLastReceipt.type === Type.SIT_OUT) {
+          return myLastReceipt.amount.toNumber() + babz(1).toNumber();
+        }
+
         return 0;
       }
 
@@ -537,6 +541,11 @@ const makeAmountInTheMiddleSelector = () => createSelector(
   }
 );
 
+const makeMyLastReceiptSelector = () => createSelector(
+  [makeHandSelector(), makeMyPosSelector()],
+  (hand, pos) => (hand && pos > -1 && hand.getIn && hand.getIn(['lineup', pos])) ? rc.get(hand.getIn(['lineup', pos, 'last'])) : undefined
+);
+
 export {
     tableStateSelector,
     actionSelector,
@@ -571,4 +580,5 @@ export {
     makeLastRoundMaxBetSelector,
     makeAmountInTheMiddleSelector,
     makeHandsSelector,
+    makeMyLastReceiptSelector,
 };

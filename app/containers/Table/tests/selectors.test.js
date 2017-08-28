@@ -619,7 +619,7 @@ describe('sitout Selector', () => {
             smallBlind: 50,
           },
           2: {
-            state: 'dealing',
+            state: 'flop',
             lineup: [{
               address: PLAYER1.address,
               last: new Receipt(TBL_ADDR).bet(1, babz(100)).sign(PLAYER1.key),

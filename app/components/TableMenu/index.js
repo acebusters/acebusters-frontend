@@ -26,7 +26,7 @@ class TableMenu extends React.Component {
   }
   render() {
     const {
-      loggedIn, open, myPos, sitout, handleClickLogout, onLeave, onSitout, standingUp, myLastReceipt,
+      loggedIn, open, myPos, sitout, handleClickLogout, onLeave, onSitout, standingUp, myLastReceipt, state,
     } = this.props;
     const menuClose = [
       // Note: sitout value possibilities
@@ -41,8 +41,14 @@ class TableMenu extends React.Component {
         title: (typeof sitout === 'number') ? 'Sit-In' : 'Sit-Out',
         onClick: onSitout,
         disabled: myPos === undefined || sitout === 0 || sitout === null || standingUp ||
-                  // player can't sit-in in the hand he sit-out
-                  (typeof sitout === 'number' && sitout > 0 && myLastReceipt),
+                  // player can't sit-in in the hand he sit-out after game started
+                  (
+                    typeof sitout === 'number' &&
+                    sitout > 0 &&
+                    myLastReceipt &&
+                    state !== 'waiting' &&
+                    state !== 'dealing'
+                  ),
       },
       {
         name: 'standup',
@@ -151,6 +157,7 @@ TableMenu.propTypes = {
   open: PropTypes.bool,
   standingUp: PropTypes.bool,
   myLastReceipt: PropTypes.object,
+  state: PropTypes.string,
 };
 
 export default onClickOutside(TableMenu);

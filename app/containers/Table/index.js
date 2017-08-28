@@ -58,7 +58,6 @@ import makeSelectAccountData, {
 
 import {
   makeLastReceiptSelector,
-  makeMyLastReceiptSelector,
   makeMyStackSelector,
   makeMyStandingUpSelector,
   makeMyPendingSeatSelector,
@@ -79,6 +78,7 @@ import {
   makeMySitoutSelector,
   makeLatestHandSelector,
   makeSelectWinners,
+  makeMyLastReceiptSelector,
 } from './selectors';
 
 import TableComponent from '../../components/Table';
@@ -364,10 +364,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     //    sitout === undefined, for enabled "pause"
     //    sitout === null, for disabled "pause"
     // And we are only able to toggle sitout when it's enabled.
-    const sitout = this.props.sitout;
+    const { sitout, sitoutAmount } = this.props;
 
     if (sitout !== undefined && sitout <= 0) return null;
-    if (this.props.sitoutAmount <= -1) return null;
+    if (sitoutAmount <= -1) return null;
 
     // Note: if it's enabled "play" (> 0), then set it to disabled "pause" (null)
     // otherwise it's enabled "pause", then set it to disabled "play" (0)
@@ -376,7 +376,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     const sitoutAction = bet(
       this.props.params.tableAddr,
       handId,
-      this.props.sitoutAmount,
+      sitoutAmount,
       this.props.privKey,
       this.props.myPos,
       this.props.lastReceipt,
