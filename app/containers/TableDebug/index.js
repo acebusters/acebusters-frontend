@@ -1,7 +1,6 @@
 import React from 'react';
 import { createStructuredSelector } from 'reselect';
 import * as PropTypes from 'prop-types';
-import styled from 'styled-components';
 import { connect } from 'react-redux';
 import { FormattedDate, FormattedTime } from 'react-intl';
 import { getWeb3 } from '../../containers/AccountProvider/utils';
@@ -11,66 +10,9 @@ import { ABI_TABLE } from '../../app.config';
 import { makeHandsSelector, makeLatestHandSelector } from '../Table/selectors';
 
 import { loadContractData } from './loadContractData';
+import { requestStat } from './requestStat';
 import { parseLastReceiptAmount, parseDistributionReceipt, renderNtz } from './utils';
-
-const Wrapper = styled.div`
-  position: fixed;
-  z-index: 1000;
-  top: 0;
-  left: 0;
-  
-  overflow: auto;
-  width: 80%;
-  max-height: 100vh;
-  padding: 10px;
-
-  opacity: 0.4;
-
-  color: #000;
-  background-color: #FFF;
-
-  &:hover {
-    opacity: 1;
-  }
-`;
-
-const Columns = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-`;
-
-const Column = styled.div`
-  flex: 1;
-  margin-right: 30px;
-`;
-
-const Table = styled.table`
-  th, td {
-    text-align: left;
-  }
-
-  th {
-    padding: 0 10px;
-  }
-
-  td {
-    padding: 5px 10px;
-    white-space: nowrap;
-  }
-
-  tbody tr:nth-child(odd) {
-    background-color: rgba(0, 0, 0, 0.1);
-  }
-
-  tbody td:nth-child(2n + 1):not(:last-child),
-  tbody th {
-    border-right: 1px solid #ccc;
-  }
-
-  tfoot tr:first-child {
-    border-top: 1px solid #ccc;
-  }
-`;
+import { Wrapper, Column, Columns, Table } from './styles';
 
 window.enableTableDebug = () => null;
 window.disableTableDebug = () => null;
@@ -85,6 +27,7 @@ class TableDebug extends React.Component {
     this.state = {
       data: null,
       contractData: null,
+      gasStat: null,
       visible,
       expanded: false,
     };
@@ -99,12 +42,12 @@ class TableDebug extends React.Component {
       this.setState({ visible: true, expanded: true });
       localStorage.setItem('table_debug_enabled', true);
       this.handleRefresh();
-      events.watch(() => this.handleRefresh());
+      events.watch(() => this.refreshContractData());
     };
 
     if (visible) {
       this.handleRefresh();
-      events.watch(() => this.handleRefresh());
+      events.watch(() => this.refreshContractData());
     }
 
     window.disableTableDebug = () => {
@@ -124,8 +67,19 @@ class TableDebug extends React.Component {
   }
 
   handleRefresh() {
+    this.refreshContractData();
+    this.refreshGasStat();
+  }
+
+  refreshContractData() {
     loadContractData(this.table).then((contractData) => {
       this.setState({ contractData });
+    });
+  }
+
+  refreshGasStat() {
+    requestStat().then((gasStat) => {
+      this.setState({ gasStat });
     });
   }
 
@@ -274,8 +228,46 @@ class TableDebug extends React.Component {
     );
   }
 
+  renderGasStat(stat) {
+    if (!stat) {
+      return null;
+    }
+
+    return (
+      <div>
+        <h2>Gas usage</h2>
+        <Table>
+          <thead>
+            <tr>
+              <th>Table</th>
+              <th>Hands count</th>
+              <th>gas/hand (ETH)</th>
+              <th>gas/hand/player (ETH)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.keys(stat).map((tableAddr) => (
+              <tr key={tableAddr}>
+                <td
+                  style={{
+                    fontWeight: this.table.address === tableAddr ? 'bold' : 'normal',
+                  }}
+                >
+                  {tableAddr.slice(2, 8)}
+                </td>
+                <td>{stat[tableAddr].handsCount}</td>
+                <td>{stat[tableAddr].hand}</td>
+                <td>{stat[tableAddr].player}</td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </div>
+    );
+  }
+
   render() {
-    const { visible, expanded, contractData } = this.state;
+    const { visible, expanded, contractData, gasStat } = this.state;
     const { hands, latestHand } = this.props;
 
     if (!visible) {
@@ -296,6 +288,8 @@ class TableDebug extends React.Component {
             <hr />
 
             {this.renderData(hands, contractData)}
+
+            {this.renderGasStat(gasStat)}
           </div>
         }
       </Wrapper>
