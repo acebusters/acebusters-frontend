@@ -6,7 +6,7 @@
 
 import React from 'react';
 import styled from 'styled-components';
-import { chipValues } from '../../app.config';
+import { chipValues, seatChipColor } from '../../app.config';
 import { white } from '../../variables';
 import { formatNtz } from '../../utils/amountFormatter';
 
@@ -94,13 +94,18 @@ function Pot(props) {
 
   return (
     <Wrapper name="stack-wrapper" top={props.top} left={props.left}>
-      {chipStacks.map((stack, i) => (
-        <ChipStack index={i} key={i}>
-          {range(0, stack.count).map((j) => (
-            <Chip color={stack.color} index={j} key={j} />
-          ))}
+      {!props.short ?
+        chipStacks.map((stack, i) => (
+          <ChipStack index={i} key={i}>
+            {range(0, stack.count).map((j) => (
+              <Chip color={stack.color} index={j} key={j} />
+            ))}
+          </ChipStack>
+        )) :
+        <ChipStack index={0} key={0}>
+          <Chip color={seatChipColor} index={0} key={0} />
         </ChipStack>
-      ))}
+      }
       <Amount>{ formatNtz(props.potSize) }</Amount>
     </Wrapper>
   );
@@ -110,6 +115,7 @@ Pot.propTypes = {
   potSize: React.PropTypes.number,
   top: React.PropTypes.string,
   left: React.PropTypes.string,
+  short: React.PropTypes.bool,
 };
 
 export default Pot;

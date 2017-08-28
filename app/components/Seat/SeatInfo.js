@@ -36,6 +36,7 @@ const SeatInfo = ({
             potSize={lastAmount}
             left={`${amountCoords[0]}em`}
             top={`${amountCoords[1]}em `}
+            short
           />
         }
       </ChipButtonContainer>

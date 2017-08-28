@@ -36,7 +36,7 @@ const TableComponent = (props) => (
         <PokerTable>
           <img src={tableImage} alt="" />
           { props.potSize > 0 &&
-            <Pot className="pot" potSize={props.potSize} top="55%" left="50%" />
+            <Pot className="pot" potSize={props.potSize} top="58%" left="50%" />
           }
 
           { props.seats }

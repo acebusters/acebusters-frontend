@@ -171,17 +171,24 @@ export const ABI_TABLE_FACTORY = [{ constant: false, inputs: [{ name: '_newOwner
 
 export const TIMEOUT_PERIOD = 60;
 
+function bn(num) {
+  return num * 1000000000000;
+}
+
 // chip values and colors
 export const chipValues = [
-  [50000000000000000, '#f056c5'],
-  [10000000000000000, '#e7e401'],
-  [5000000000000000, '#774ac1'],
-  [1000000000000000, '#ac2a2a'],
-  [500000000000000, '#328eee'],
-  [100000000000000, '#745f2a'],
-  [10000000000000, '#FF0080'],
-  [1000000000000, '#FFFFFF'],
+  [bn(25000), '#53353f'],
+  [bn(5000), '#f056c5'],
+  [bn(1000), '#e7e401'],
+  [bn(500), '#774ac1'],
+  [bn(100), '#000000'],
+  [bn(50), '#328eee'],
+  [bn(25), '#027707'],
+  [bn(5), '#d48b30'],
+  [bn(1), '#FFFFFF'],
 ];
+
+export const seatChipColor = '#E01E40';
 
 export const SEAT_COORDS = [
   [10, 40, 0],

@@ -11,6 +11,7 @@ export const Board = styled.div`
   left: 50%;
   min-width: 255px;
   transform: translate(-50%, -50%);
+  z-index: 1001;
 `;
 
 export const BoardCardWrapper = styled.div`
