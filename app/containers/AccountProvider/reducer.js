@@ -18,7 +18,7 @@ import {
   NETWORK_SUPPORT_UPDATE,
   READY_STATE,
 } from './actions';
-import { ACCOUNT_TX_HASH_RECEIVED } from '../GeneratePage/actions';
+import { ACCOUNT_TX_HASH_RECEIVED } from '../GeneratePage/constants';
 
 // The initial application state
 const initialState = fromJS({
