@@ -1,4 +1,5 @@
 import { takeLatest, fork, takeEvery } from 'redux-saga/effects';
+
 import { WEB3_CONNECT, WEB3_METHOD_CALL, CONTRACT_METHOD_CALL, SET_AUTH } from '../actions';
 
 import { injectedWeb3ListenerSaga } from './injectedWeb3ListenerSaga';
@@ -9,6 +10,7 @@ import { unsupportedNetworkDetectSaga } from './unsupportedNetworkDetectSaga';
 import { updateLoggedInStatusSaga } from './updateLoggedInStatusSaga';
 import { web3MethodCallSaga, contractMethodCallSaga } from './web3CallsSagas';
 import { transferETHSaga, contractTransactionSendSaga } from './txSagas';
+import intercomSaga from './intercomSagas';
 
 export { getWeb3 } from '../utils';
 
@@ -24,6 +26,7 @@ export function* accountSaga() {
   yield fork(contractTransactionSendSaga);
   yield fork(injectedWeb3ListenerSaga);
   yield fork(unsupportedNetworkDetectSaga);
+  yield fork(intercomSaga);
 }
 
 export default [

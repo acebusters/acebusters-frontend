@@ -31,6 +31,7 @@ export function conf() {
       tableFactory: '',
       sentryDSN: 'https://8c3e021848b247ddaf627c8040f94e07@sentry.io/153017',
       gaProperty: 'UA-98848213-1',
+      intercomAppId: '',
     };
   }
 
@@ -54,6 +55,7 @@ export function conf() {
       tableFactory: '0x9020237ffcc244a2d4bb202663494e0c0a3f9672',
       sentryDSN: 'https://8c3e021848b247ddaf627c8040f94e07@sentry.io/153017',
       gaProperty: 'UA-98848213-1',
+      intercomAppId: '',
     };
   }
 
@@ -76,6 +78,7 @@ export function conf() {
     tableFactory: '0xbeb2f096f9438a4723b541db402d2dbf6bd86b17',
     sentryDSN: 'https://8c3e021848b247ddaf627c8040f94e07@sentry.io/153017',
     gaProperty: 'UA-XXXXX-Y',
+    intercomAppId: 'z9xn3a6h',
   };
 }
 

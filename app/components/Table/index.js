@@ -10,7 +10,6 @@ import ActionBar from '../../containers/ActionBar';
 import tableImage from './tableBG.svg';
 import Pot from '../Pot';
 import Curtain from '../../containers/Curtain';
-import FeedbackButton from '../../containers/FeedbackButton';
 
 import {
   TableContainer,
@@ -60,8 +59,6 @@ const TableComponent = (props) => (
       <ActionBar className="action-bar" {...props} sb={props.sb}></ActionBar>
 
     </TableContainer>
-
-    <FeedbackButton />
 
   </div>
 );
