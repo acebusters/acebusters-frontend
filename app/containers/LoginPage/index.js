@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
 import { Form, Field, reduxForm, SubmissionError, propTypes } from 'redux-form/immutable';
+import * as storageService from '../../services/localStorage';
 
 import FormField from '../../components/Form/FormField';
 import Button from '../../components/Button';
@@ -52,6 +53,26 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
   }
 
   handleSubmit(values, dispatch) {
+    const maxAttemptCount = 3;
+    const threshold = 1000 * 60 * 5;
+    const now = Date.now();
+    const lastLoginAttempt = parseInt(storageService.getItem('_l') || 0, 10);
+    let counter = parseInt(storageService.getItem('_c') || 1, 10);
+
+    storageService.setItem('_l', now);
+
+    if (lastLoginAttempt) {
+      if (now - lastLoginAttempt > threshold) {
+        counter = 1;
+      }
+
+      storageService.setItem('_c', counter + 1);
+
+      if (counter >= maxAttemptCount) {
+        throw new SubmissionError({ _error: 'Too many requests from your IP address. Please try later' });
+      }
+    }
+
     return (
       accountService.login(values.get('email'))
         .catch((err) => {
@@ -75,6 +96,9 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
           return data;
         })
         .then((wallet) => {
+          storageService.removeItem('_c');
+          storageService.removeItem('_l');
+
           this.props.walletImport({
             json: wallet,
             password: values.get('password'),
