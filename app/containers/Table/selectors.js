@@ -546,6 +546,11 @@ const makeMyLastReceiptSelector = () => createSelector(
   (hand, pos) => (hand && pos > -1 && hand.getIn && hand.getIn(['lineup', pos])) ? rc.get(hand.getIn(['lineup', pos, 'last'])) : undefined
 );
 
+const makeSitoutInProgressSelector = () => createSelector(
+  [makeHandSelector()],
+  (hand) => (hand && hand.get) ? hand.get('sitoutInProgress') : undefined
+);
+
 export {
     tableStateSelector,
     actionSelector,
@@ -581,4 +586,5 @@ export {
     makeAmountInTheMiddleSelector,
     makeHandsSelector,
     makeMyLastReceiptSelector,
+    makeSitoutInProgressSelector,
 };

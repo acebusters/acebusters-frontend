@@ -26,7 +26,8 @@ class TableMenu extends React.Component {
   }
   render() {
     const {
-      loggedIn, open, myPos, sitout, handleClickLogout, onLeave, onSitout, standingUp, myLastReceipt, state,
+      loggedIn, open, myPos, sitout, handleClickLogout, onLeave, onSitout,
+      standingUp, myLastReceipt, state, sitoutInProgress,
     } = this.props;
     const menuClose = [
       // Note: sitout value possibilities
@@ -40,7 +41,8 @@ class TableMenu extends React.Component {
         icon: (typeof sitout === 'number') ? 'fa fa-play' : 'fa fa-pause',
         title: (typeof sitout === 'number') ? 'Sit-In' : 'Sit-Out',
         onClick: onSitout,
-        disabled: myPos === undefined || sitout === 0 || sitout === null || standingUp ||
+        disabled: myPos === undefined || sitout === 0 || sitout === null ||
+                  standingUp || sitoutInProgress !== undefined ||
                   // player can't sit-in in the hand he sit-out after game started
                   (
                     typeof sitout === 'number' &&
@@ -55,7 +57,7 @@ class TableMenu extends React.Component {
         icon: 'fa fa-external-link',
         title: 'Stand-Up',
         onClick: onLeave,
-        disabled: myPos === undefined || standingUp,
+        disabled: myPos === undefined || standingUp || sitoutInProgress !== undefined,
         /* TODO add seatStatus to UI redux state and
           mapStateToProps in TableMenu container to be used here */
         // disabled: myPos === undefined ||
@@ -158,6 +160,7 @@ TableMenu.propTypes = {
   standingUp: PropTypes.bool,
   myLastReceipt: PropTypes.object,
   state: PropTypes.string,
+  sitoutInProgress: PropTypes.number,
 };
 
 export default onClickOutside(TableMenu);
