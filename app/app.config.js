@@ -74,7 +74,7 @@ export function conf() {
     accountUrl: 'https://hsqkzjp3m8.execute-api.eu-west-1.amazonaws.com/v0',
     reservationUrl: 'https://6er5q4s7b0.execute-api.eu-west-1.amazonaws.com/v0',
     gasStatUrl: 'https://4by2hfw9mg.execute-api.eu-west-1.amazonaws.com/v0',
-    ntzAddr: '0x43dc8adf76bef236a3adb9073462fedda133cbe2',
+    ntzAddr: '0x889802a69b2c408819f028331443bcf8711ea6d8',
     pwrAddr: '0x5059721ecc85868ac07224d0ba40043d2541f0d6',
     pullAddr: '0xefe5522bb845f5479cd373ca82ac60a582a6731b',
     accountFactory: '0x12a023f15ef0a1763f2a6736cc88a1ef9f0556f1',
