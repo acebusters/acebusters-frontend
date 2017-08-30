@@ -4,6 +4,7 @@ import Link from '../../components/Link';
 export const TRANSFER_NTZ = 'transfer_ntz';
 export const TRANSFER_ETH = 'transfer_eth';
 export const SELL_NTZ = 'sell_ntz';
+export const ETH_PAYOUT = 'eth_payout';
 export const PURCHASE_NTZ = 'pruchase_ntz';
 
 /**
@@ -100,6 +101,28 @@ export const exchangeSuccess = {
   notifyType: 'TX_EXCHANGE_SUCCESS',
   category: 'Exchange Success',
   details: null,
+  removing: false,
+  dismissable: true,
+  date: new Date(),
+  type: 'success',
+};
+
+export const ethPayoutPending = {
+  // txId: null,
+  notifyType: 'TX_ETH_PAYOUT_PENDING',
+  category: 'ETH Pay-Out',
+  details: 'Processing ETH Pay-Out',
+  removing: false,
+  dismissable: false,
+  date: new Date(),
+  type: 'info',
+};
+
+export const ethPayoutSuccess = {
+  // txId: temp, so no txId
+  notifyType: 'TX_ETH_PAYOUT_SUCCESS',
+  category: 'ETH Pay-Out',
+  details: 'ETH Pay-Out completed successfuly',
   removing: false,
   dismissable: true,
   date: new Date(),

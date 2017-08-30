@@ -10,7 +10,6 @@ import {
   CONTRACT_METHOD_ERROR,
   CONTRACT_TX_SEND,
   CONTRACT_TX_SUCCESS,
-  ETH_TRANSFER_SUCCESS,
   CONTRACT_EVENTS,
   ACCOUNT_LOADED,
   ACCOUNT_UNLOCKED,
@@ -82,7 +81,6 @@ function accountProviderReducer(state = initialState, action) {
       return state;
 
     case CONTRACT_TX_SUCCESS:
-    case ETH_TRANSFER_SUCCESS:
       return state;
 
     case CONTRACT_EVENTS:

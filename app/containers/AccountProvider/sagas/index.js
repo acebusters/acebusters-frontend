@@ -9,7 +9,7 @@ import { web3ConnectSaga } from './web3ConnectSaga';
 import { unsupportedNetworkDetectSaga } from './unsupportedNetworkDetectSaga';
 import { updateLoggedInStatusSaga } from './updateLoggedInStatusSaga';
 import { web3MethodCallSaga, contractMethodCallSaga } from './web3CallsSagas';
-import { transferETHSaga, contractTransactionSendSaga } from './txSagas';
+import { contractTransactionSendSaga } from './txSagas';
 import intercomSaga from './intercomSagas';
 
 export { getWeb3 } from '../utils';
@@ -21,7 +21,6 @@ export function* accountSaga() {
   yield takeEvery(CONTRACT_METHOD_CALL, contractMethodCallSaga);
   yield takeEvery(SET_AUTH, updateLoggedInStatusSaga);
   yield fork(websocketSaga);
-  yield fork(transferETHSaga);
   yield fork(accountLoginSaga);
   yield fork(contractTransactionSendSaga);
   yield fork(injectedWeb3ListenerSaga);

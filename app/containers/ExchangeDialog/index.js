@@ -1,5 +1,6 @@
 import { connect } from 'react-redux';
 import { reduxForm, formValueSelector } from 'redux-form/immutable';
+import { stopSubmit } from 'redux-form';
 
 import ExchangeDialog from '../../components/ExchangeDialog';
 import messages from './messages';
@@ -32,10 +33,16 @@ const mapStateToProps = (state) => ({
   networkSupported: makeSelectNetworkSupported()(state),
 });
 
-export default connect(mapStateToProps)(
-  reduxForm({
-    form: 'exchange',
-    validate,
-    warn,
-  })(ExchangeDialog)
+function mapDispatchToProps(dispatch) {
+  return {
+    stopSubmit: (errors) => dispatch(stopSubmit('exchange', errors)),
+  };
+}
+
+export default reduxForm({
+  form: 'exchange',
+  validate,
+  warn,
+})(
+  connect(mapStateToProps, mapDispatchToProps)(ExchangeDialog)
 );

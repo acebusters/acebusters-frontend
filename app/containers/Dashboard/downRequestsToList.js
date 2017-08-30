@@ -2,7 +2,7 @@ import React from 'react';
 
 import { formatAbp } from '../../utils/amountFormatter';
 import { formatDate } from './utils';
-import Button from '../../components/Button';
+import TimedButton from '../../components/TimedButton';
 
 export function downRequestsToList(
   downRequests,
@@ -14,11 +14,12 @@ export function downRequestsToList(
     `${formatAbp(r[2].sub(r[3]))} ABP`,
     formatDate(r[4].toNumber()),
     <PayoutDate request={r} downtime={downtime} />,
-    <TickButton
-      request={r}
-      downtime={downtime}
+    <TimedButton
+      until={nextPayout(r, downtime)}
       onClick={() => onTickClick(r[0])}
-    />,
+    >
+      Execute Pay-Out
+    </TimedButton>,
   ]);
 }
 
@@ -51,29 +52,6 @@ class PayoutDate extends React.Component {
       <span>
         {formatDate(nextPayout(request, downtime))}
       </span>
-    );
-  }
-}
-
-class TickButton extends React.Component {
-  constructor(props) {
-    super(props);
-    this.interval = setInterval(() => {
-      this.forceUpdate();
-    }, 60000);
-  }
-  componentWillUnmount() {
-    clearInterval(this.interval);
-  }
-  render() {
-    const { request, downtime, onClick } = this.props;
-    return (
-      <Button
-        disabled={nextPayout(request, downtime) > Date.now() / 1000}
-        onClick={onClick}
-      >
-        Execute Pay-Out
-      </Button>
     );
   }
 }

@@ -54,6 +54,10 @@ export default defineMessages({
     id: 'app.containers.Dashboard.powerDownRequests',
     defaultMessage: 'Power Down Requests',
   },
+  ethPayout: {
+    id: 'app.containers.Dashboard.ethPayout',
+    defaultMessage: 'ETH Payout',
+  },
   transactionErrorTitle: {
     id: 'app.containers.Dashboard.transactionErrorTitle',
     defaultMessage: 'Transaction error',
@@ -110,13 +114,13 @@ export default defineMessages({
     id: 'app.containers.Dashboard.tableLeave',
     defaultMessage: 'Table leave',
   },
-  sellStart: {
-    id: 'app.containers.Dashboard.sellStart',
-    defaultMessage: 'Sell start',
+  sellStatus: {
+    id: 'app.containers.Dashboard.sellStatus',
+    defaultMessage: 'Sell',
   },
-  sellEnd: {
-    id: 'app.containers.Dashboard.sellEnd',
-    defaultMessage: 'Sell end',
+  ethPayoutStatus: {
+    id: 'app.containers.Dashboard.ethPayoutStatus',
+    defaultMessage: 'ETH Pay-out',
   },
   purchaseStart: {
     id: 'app.containers.Dashboard.purchaseStart',
@@ -126,17 +130,13 @@ export default defineMessages({
     id: 'app.containers.Dashboard.purchaseEnd',
     defaultMessage: 'Purchase end',
   },
-  nutzContract: {
-    id: 'app.containers.Dashboard.nutzContract',
-    defaultMessage: 'Nutz contract',
-  },
-  powerContract: {
-    id: 'app.containers.Dashboard.powerContract',
-    defaultMessage: 'Power contract',
+  acebusters: {
+    id: 'app.containers.Dashboard.acebusters',
+    defaultMessage: 'Acebusters',
   },
   me: {
     id: 'app.containers.Dashboard.me',
-    defaultMessage: 'Nutz contract',
+    defaultMessage: 'Me',
   },
   tableAddress: {
     id: 'app.containers.Dashboard.tableAddress',

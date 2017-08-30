@@ -3,6 +3,8 @@ import { contractMethodCall, contractTxSend } from './actions';
 import { getWeb3 } from './sagas';
 import { last } from '../../utils';
 
+import { ABI_PROXY } from '../../app.config';
+
 function degrade(fn, fallback) {
   try {
     return fn();
@@ -13,6 +15,10 @@ function degrade(fn, fallback) {
 
 export function getMethodKey({ groupName, methodName, args }) {
   return `${groupName || ''}.${methodName}(${JSON.stringify(args)})`;
+}
+
+function isForward(methodName, contractInstance) {
+  return methodName === 'forward' && contractInstance.abi === ABI_PROXY;
 }
 
 function generateContractInstanceApi({ abi, address, getState, dispatch }) {
@@ -39,7 +45,11 @@ function generateContractInstanceApi({ abi, address, getState, dispatch }) {
         methodName,
         key: getMethodKey({ methodName, args }),
         dest: address,
-        data: contractInstance[methodName].getData(...args),
+        data: (
+          !isForward(methodName, contractInstance)
+            ? contractInstance[methodName].getData(...args)
+            : ''
+        ),
         privKey: getState().get('privKey'),
         callback: typeof last(args) === 'function' ? last(args) : undefined,
       }),
