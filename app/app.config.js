@@ -12,7 +12,7 @@ export function conf() {
     sub = window.location.host.split('.')[0];
   }
   // ### PRODUCTION ENVIRONMENT CONFIG
-  if (sub === 'app') {
+  if (sub === 'dapp') {
     return {
       recaptchaKey: '',
       defaultRefCode: DEFAULT_REF_CODE,
@@ -37,12 +37,12 @@ export function conf() {
   }
 
   // ### STAGING ENVIRONMENT CONFIG
-  if (sub === 'beta') {
+  if (sub === 'staging') {
     return {
       recaptchaKey: '6LcE0RQUAAAAAEf6UWFsHEPedPBmRPAQiaSiWynN',
       defaultRefCode: DEFAULT_REF_CODE,
       etherscanUrl: 'https://rinkeby.etherscan.io/',
-      gethUrl: 'ws://rinkeby.acebusters.com:8546',
+      gethUrl: 'wss://rinkeby3.acebusters.com:443',
       firstBlockHash: '0x6341fd3daf94b748c72ced5a5b26028f2474f5f00d824504e4fa37a75767e177',
       networkName: 'Rinkeby Testnet',
       oracleUrl: 'https://v83iq1161a.execute-api.eu-west-1.amazonaws.com/v0',
@@ -66,7 +66,7 @@ export function conf() {
     recaptchaKey: '6LcE0RQUAAAAAEf6UWFsHEPedPBmRPAQiaSiWynN',
     defaultRefCode: DEFAULT_REF_CODE,
     etherscanUrl: 'https://rinkeby.etherscan.io/',
-    gethUrl: 'ws://rinkeby.acebusters.com:8546',
+    gethUrl: 'wss://rinkeby3.acebusters.com:443',
     firstBlockHash: '0x6341fd3daf94b748c72ced5a5b26028f2474f5f00d824504e4fa37a75767e177',
     networkName: 'Rinkeby Testnet',
     oracleUrl: 'https://evm4rumeob.execute-api.eu-west-1.amazonaws.com/v0',
