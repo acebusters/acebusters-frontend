@@ -377,8 +377,7 @@ class DashboardRoot extends React.Component {
   handlePowerUp(amount) {
     this.props.notifyCreate(POWERUP);
     return this.handleTxSubmit((callback) => {
-      this.token.transfer.sendTransaction(
-        confParams.pwrAddr,
+      this.token.powerUp.sendTransaction(
         new BigNumber(amount).mul(NTZ_DECIMALS),
         callback
       );
@@ -389,7 +388,7 @@ class DashboardRoot extends React.Component {
     this.props.notifyCreate(POWERDOWN);
     return this.handleTxSubmit((callback) => {
       this.power.transfer.sendTransaction(
-        confParams.ntzAddr,
+        0,
         new BigNumber(amount).mul(ABP_DECIMALS),
         callback
       );
