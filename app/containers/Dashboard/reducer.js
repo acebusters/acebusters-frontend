@@ -122,7 +122,11 @@ function setProxy(state, proxy) {
 }
 
 function completePending(state, event) {
-  return state.deleteIn(['events', event.transactionHash]);
+  if (state.getIn(['events', event.transactionHash, 'pending'])) {
+    return state.deleteIn(['events', event.transactionHash]);
+  }
+
+  return state;
 }
 
 function addPending(state, { methodName, args, txHash, address }) {
@@ -198,7 +202,7 @@ function addPending(state, { methodName, args, txHash, address }) {
 }
 
 function hasConflict(state, event) {
-  return state.hasIn(['events', event.transactionHash]) && !state.getIn(['events', event.transactionHash, 'pending']);
+  return state.hasIn(['events', event.transactionHash]);
 }
 
 function addProxyContractEvent(state, event) {

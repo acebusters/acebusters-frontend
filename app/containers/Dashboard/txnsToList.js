@@ -20,7 +20,13 @@ export function txnsToList(events, tableAddrs, proxyAddr) {
   }
 
   const [pending, completed] = partition(
-    events.sort((a, b) => b.blockNumber - a.blockNumber),
+    events.sort((a, b) => {
+      if ((b.blockNumber - a.blockNumber) === 0) {
+        return (b.unit === 'eth' ? 0 : 1) - (a.unit === 'eth' ? 0 : 1);
+      }
+
+      return b.blockNumber - a.blockNumber;
+    }),
     (event) => event.pending,
   );
   return pending.concat(completed)
