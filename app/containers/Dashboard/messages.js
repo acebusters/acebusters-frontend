@@ -6,6 +6,22 @@
 import { defineMessages } from 'react-intl';
 
 export default defineMessages({
+  amountRequired: {
+    id: 'app.containers.Dashboard.amountRequired',
+    defaultMessage: 'The amount field cannot be empty',
+  },
+  amountTooLow: {
+    id: 'app.containers.Dashboard.amountTooLow',
+    defaultMessage: 'The amount must be greater than {minAmount}',
+  },
+  amountTooHigh: {
+    id: 'app.containers.Dashboard.amountTooHigh',
+    defaultMessage: 'The amount must be less than or equal to {maxAmount}',
+  },
+  amountZero: {
+    id: 'app.containers.Dashboard.amountZero',
+    defaultMessage: 'The amount must be greater than 0',
+  },
   send: {
     id: 'app.containers.Dashboard.send',
     defaultMessage: 'Send',
@@ -68,7 +84,7 @@ export default defineMessages({
   },
   ethAlert: {
     id: 'app.containers.Dashboard.ethAlert',
-    defaultMessage: 'Never send real ether to this address. It is a Rinkeby Testnet Address. Only send Rinkaby TestEther to this Address. Otherwise your Ether will be lost',
+    defaultMessage: 'Never send real ether to this address. It is a Rinkeby Testnet Address. Only send Rinkeby TestEther to this Address. Otherwise your Ether will be lost',
   },
   ntzTransferTitle: {
     id: 'app.containers.Dashboard.ntzTransferTitle',
@@ -78,6 +94,10 @@ export default defineMessages({
     id: 'app.containers.Dashboard.ethTransferTitle',
     defaultMessage: 'Transfer ETH',
   },
+  powerUpAmountLabel: {
+    id: 'app.containers.Dashboard.powerUpAmountLabel',
+    defaultMessage: 'Amount NTZ',
+  },
   powerUpTitle: {
     id: 'app.containers.Dashboard.powerUpTitle',
     defaultMessage: 'Power Up',
@@ -86,13 +106,17 @@ export default defineMessages({
     id: 'app.containers.Dashboard.powerUpDescr',
     defaultMessage: 'Power Up will convert NTZ to ABP immediately so you can invest in the Acebuster\'s economy.',
   },
+  powerDownAmountLabel: {
+    id: 'app.containers.Dashboard.powerDownAmountLabel',
+    defaultMessage: 'Amount ABP',
+  },
   powerDownTitle: {
     id: 'app.containers.Dashboard.powerDownTitle',
     defaultMessage: 'Power Down',
   },
   powerDownDescr: {
     id: 'app.containers.Dashboard.powerDownDescr',
-    defaultMessage: 'Power Down will convert ABP back to NTZ over a period of 3 month.<br />Minimal power down amount: {min} ABP',
+    defaultMessage: 'Power Down will convert ABP back to NTZ over a period of 3 months.<br />Minimum Power Down amount: {min} ABP',
   },
   powerDownPrereq: {
     id: 'app.containers.Dashboard.powerDownPrereq',

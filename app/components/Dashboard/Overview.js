@@ -15,6 +15,7 @@ import { Pane, SectionOverview } from './styles';
 const Overview = (props) => {
   const { account, listTxns, downRequests, ethAllowance, ethPayoutDate, ethPayoutPending, handleETHPayout } = props;
   const requestColumnStyle = { width: 20, textAlign: 'left', whiteSpace: 'nowrap' };
+  const ethAmount = formatEth(ethAllowance);
 
   return (
     <Pane name="dashboard-overview">
@@ -27,11 +28,11 @@ const Overview = (props) => {
         >
           <H2><FormattedMessage {...messages.ethPayout} /></H2>
           <p style={{ fontSize: 18, margin: '-5px 0 10px' }}>
-            {formatEth(ethAllowance)} ETH
+            {ethAmount} ETH
           </p>
           <TimedButton
             until={ethPayoutDate.toNumber()}
-            onClick={handleETHPayout}
+            onClick={() => handleETHPayout(ethAmount)}
             disabled={ethPayoutPending}
           >
             Execute Pay-out

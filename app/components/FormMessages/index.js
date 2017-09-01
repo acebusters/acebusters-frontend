@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import {
@@ -35,7 +36,7 @@ export function ErrorMessage(props) {
 }
 
 ErrorMessage.propTypes = {
-  error: React.PropTypes.string,
+  error: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
 };
 
 export function WarningMessage(props) {
@@ -49,4 +50,3 @@ export function WarningMessage(props) {
 WarningMessage.propTypes = {
   warning: React.PropTypes.string,
 };
-

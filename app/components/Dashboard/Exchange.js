@@ -42,6 +42,7 @@ const Exchange = (props) => {
                   : nutzBalance,
                 nutzBalance
               )}
+              placeholder="0"
               {...props}
             />
           }
@@ -57,6 +58,7 @@ const Exchange = (props) => {
                   : ethBalance,
                 ethBalance
               )}
+              placeholder="0.00"
               {...props}
             />
           }

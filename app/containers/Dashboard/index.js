@@ -287,8 +287,8 @@ class DashboardRoot extends React.Component {
       .then((requests) => this.setState({ downRequests: requests }));
   }
 
-  async handleETHPayout() {
-    this.props.notifyCreate(ETH_PAYOUT);
+  async handleETHPayout(amount) {
+    this.props.notifyCreate(ETH_PAYOUT, { amount });
     this.pullPayment.withdraw.sendTransaction({ from: this.proxy.address });
   }
 
@@ -306,7 +306,7 @@ class DashboardRoot extends React.Component {
   }
 
   handleNTZTransfer(amount, to) {
-    this.props.notifyCreate(TRANSFER_NTZ);
+    this.props.notifyCreate(TRANSFER_NTZ, { amount });
     return this.handleTxSubmit((callback) => {
       this.token.transfer.sendTransaction(
         to,
@@ -317,7 +317,7 @@ class DashboardRoot extends React.Component {
   }
 
   async handleNTZSell(amount) {
-    this.props.notifyCreate(SELL_NTZ);
+    this.props.notifyCreate(SELL_NTZ, { amount });
 
     const floor = await this.token.floor.callPromise();
 
@@ -339,7 +339,7 @@ class DashboardRoot extends React.Component {
   }
 
   async handleNTZPurchase(amount) {
-    this.props.notifyCreate(PURCHASE_NTZ);
+    this.props.notifyCreate(PURCHASE_NTZ, { amount });
 
     const ceiling = await this.token.ceiling.callPromise();
 
@@ -363,7 +363,7 @@ class DashboardRoot extends React.Component {
   }
 
   handleETHTransfer(amount, dest) {
-    this.props.notifyCreate(TRANSFER_ETH);
+    this.props.notifyCreate(TRANSFER_ETH, { amount });
     return this.handleTxSubmit((callback) => {
       this.proxy.forward.sendTransaction(
         dest,
@@ -375,7 +375,7 @@ class DashboardRoot extends React.Component {
   }
 
   handlePowerUp(amount) {
-    this.props.notifyCreate(POWERUP);
+    this.props.notifyCreate(POWERUP, { amount });
     return this.handleTxSubmit((callback) => {
       this.token.powerUp.sendTransaction(
         new BigNumber(amount).mul(NTZ_DECIMALS),
@@ -385,7 +385,7 @@ class DashboardRoot extends React.Component {
   }
 
   handlePowerDown(amount) {
-    this.props.notifyCreate(POWERDOWN);
+    this.props.notifyCreate(POWERDOWN, { amount });
     return this.handleTxSubmit((callback) => {
       this.power.transfer.sendTransaction(
         0,
@@ -418,9 +418,8 @@ class DashboardRoot extends React.Component {
     const floor = this.token.floor();
     const ceiling = this.token.ceiling();
     const tables = this.tableFactory.getTables();
-    const calcETHAmount = (ntz) => new BigNumber(ntz).div(floor);
-    const calcNTZAmount = (eth) => ceiling.mul(eth);
-
+    const calcETHAmount = (ntz) => new BigNumber(ntz.toString()).div(floor);
+    const calcNTZAmount = (eth) => ceiling.mul(eth.toString());
     const listTxns = txnsToList(
       this.props.dashboardTxs.dashboardEvents,
       tables,

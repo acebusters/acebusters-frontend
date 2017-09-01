@@ -20,6 +20,7 @@ const Notification = ({
   removing,
   type,
   txId,
+  infoIcon,
 }) => (
   <Container
     name="notification-container"
@@ -37,7 +38,7 @@ const Notification = ({
           </ButtonWrapper>
           :
           <ButtonWrapper>
-            <Icon className="fa fa-info-circle" />
+            {infoIcon && infoIcon}
           </ButtonWrapper>
         }
       </IconWrapper>
@@ -45,13 +46,11 @@ const Notification = ({
   </Container>
 );
 Notification.propTypes = {
-  category: PropTypes.string,
-  details: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.node,
-  ]),
+  category: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+  details: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   dismissable: PropTypes.bool,
   isNotTable: PropTypes.bool,
+  infoIcon: PropTypes.node,
   notifyRemove: PropTypes.func,
   removing: PropTypes.bool,
   type: PropTypes.string,
@@ -62,6 +61,7 @@ Notification.defaultProps = {
   details: '',
   dismissable: true,
   isNotTable: false,
+  infoIcon: null,
   removing: false,
   type: 'danger',
   txId: '',

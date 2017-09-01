@@ -9,7 +9,6 @@ import { ErrorMessage } from '../FormMessages';
 import SubmitButton from '../SubmitButton';
 import FormField from '../Form/FormField';
 import TokenAmountField from '../Form/TokenAmountField';
-import AmountField from '../AmountField';
 
 class TokenDialog extends React.Component { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
@@ -24,7 +23,6 @@ class TokenDialog extends React.Component { // eslint-disable-line react/prefer-
     ).then(() => this.props.reset());
   }
 
-
   render() {
     const {
       error,
@@ -35,11 +33,14 @@ class TokenDialog extends React.Component { // eslint-disable-line react/prefer-
       invalid,
       hasWeb3,
       networkSupported,
+      normalizer,
+      placeholder,
     } = this.props;
     return (
       <div style={{ maxWidth: 480 }}>
         <Form onSubmit={handleSubmit(this.handleSubmit)}>
-          <AmountField
+          <Field
+            normalize={normalizer}
             name="amount"
             component={TokenAmountField}
             label="Amount"
@@ -51,6 +52,7 @@ class TokenDialog extends React.Component { // eslint-disable-line react/prefer-
             amountUnit={this.props.amountUnit}
             setAmountUnit={this.props.setAmountUnit}
             reset={this.props.reset}
+            placeholder={placeholder}
           />
 
           <Field
@@ -92,6 +94,8 @@ TokenDialog.propTypes = {
   amountUnit: PropTypes.string,
   setAmountUnit: PropTypes.func,
   reset: PropTypes.func,
+  normalizer: PropTypes.func,
+  placeholder: PropTypes.string,
 };
 TokenDialog.defaultProps = {
   minAmount: new BigNumber(0),

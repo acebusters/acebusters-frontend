@@ -2,15 +2,11 @@ import React from 'react';
 import { LOCATION_CHANGE } from 'react-router-redux';
 import { put, takeEvery, take, select, call } from 'redux-saga/effects';
 import { delay } from 'redux-saga';
+import { FormattedMessage } from 'react-intl';
 
 import * as storageService from '../../services/sessionStorage';
 
 import WithLoading from '../../components/WithLoading';
-
-import {
-  formatNtz,
-  formatEth,
-} from '../../utils/amountFormatter';
 
 import {
   NOTIFY_CREATE,
@@ -19,6 +15,7 @@ import {
   notifyDelete,
   notifyRemoving,
 } from './actions';
+import msgs from './messages';
 
 import {
   SET_AUTH,
@@ -31,7 +28,7 @@ import {
   CONTRACT_EVENTS,
 } from '../AccountProvider/actions';
 import { getWeb3 } from '../AccountProvider/utils';
-import { POWERUP } from '../Dashboard/actions';
+import { POWERUP, POWERDOWN } from '../Dashboard/actions';
 import { makeLatestHandSelector } from '../Table/selectors';
 
 import {
@@ -44,12 +41,9 @@ import {
   noWeb3Danger,
   firstLogin,
   notLoggedIn,
-  transferPending,
-  transferSuccess,
-  exchangePending,
-  exchangeSuccess,
-  ethPayoutPending,
-  ethPayoutSuccess,
+  InfoIcon,
+  txPending,
+  txSuccess,
 } from './constants';
 
 import { waitForTx } from '../../utils/waitForTx';
@@ -68,32 +62,106 @@ function* createPersistNotification(note) {
   yield put(notifyAdd(note));
 }
 
-function* createNotification(action) {
-  if (action.notifyType === TRANSFER_ETH) {
-    yield* transferPendingEth();
+function* createNotification({ notifyProps, notifyType }) {
+  const { amount } = notifyProps;
+  if (notifyType === TRANSFER_ETH) {
+    const pendingMsg = {
+      ...txPending,
+      category: <FormattedMessage {...msgs.transferPending} />,
+      details: <FormattedMessage values={{ amount }} {...msgs.transferEthPend} />,
+    };
+    const successMsg = {
+      ...txSuccess,
+      category: <FormattedMessage {...msgs.transferSuccess} />,
+      details: <FormattedMessage values={{ amount }} {...msgs.transferEthSuccess} />,
+    };
+    yield* transferPendingEth(pendingMsg);
+    yield* transferSuccessEth('Withdrawal', successMsg);
   }
-  if (action.notifyType === ETH_PAYOUT) {
-    yield* transferPendingEthPayout();
+  if (notifyType === TRANSFER_NTZ) {
+    const pendingMsg = {
+      ...txPending,
+      category: <FormattedMessage {...msgs.transferPending} />,
+      details: <FormattedMessage values={{ amount }} {...msgs.transferNtzPend} />,
+    };
+    const successMsg = {
+      ...txSuccess,
+      category: <FormattedMessage {...msgs.transferSuccess} />,
+      details: <FormattedMessage values={{ amount }} {...msgs.transferNtzSuccess} />,
+    };
+    yield* exchangeSellPending('transfer', pendingMsg);
+    yield* exchangeSellSuccess('Transfer', successMsg);
   }
-  if (action.notifyType === TRANSFER_NTZ) {
-    yield* transferPendingNtz();
+  if (notifyType === PURCHASE_NTZ) {
+    const pendingMsg = {
+      ...txPending,
+      category: <FormattedMessage {...msgs.exchangePending} />,
+      details: <FormattedMessage {...msgs.exchangeEthToNtz} />,
+    };
+    const successMsg = {
+      ...txSuccess,
+      category: <FormattedMessage {...msgs.exchangeSuccess} />,
+      details: <FormattedMessage {...msgs.exchangeEthToNtz} />,
+    };
+    yield* exchangeSellPending('purchase', pendingMsg);
+    yield* exchangePurSuccess('Withdrawal', successMsg);
   }
-  if (action.notifyType === SELL_NTZ) {
-    const pendMethod = 'sell';
-    const successEvent = 'Sell';
-    const details = 'NTZ for ETH';
-    yield* exchangeSellPending(pendMethod, successEvent, details);
+  if (notifyType === SELL_NTZ) {
+    const pendingMsg = {
+      ...txPending,
+      category: <FormattedMessage {...msgs.exchangePending} />,
+      details: <FormattedMessage {...msgs.exchangeNtzToEth} />,
+    };
+    const successMsg = {
+      ...txSuccess,
+      category: <FormattedMessage {...msgs.exchangeSuccess} />,
+      details: <FormattedMessage {...msgs.exchangeNtzToEth} />,
+    };
+    yield* exchangeSellPending('sell', pendingMsg);
+    yield* exchangeSellSuccess('Sell', successMsg);
   }
-  if (action.notifyType === PURCHASE_NTZ) {
-    yield* exchangePurPending();
+  if (notifyType === ETH_PAYOUT) {
+    const pendingMsg = {
+      ...txPending,
+      category: <FormattedMessage {...msgs.payoutPending} />,
+      details: <FormattedMessage values={{ amount }} {...msgs.ethPayout} />,
+    };
+    const successMsg = {
+      ...txSuccess,
+      category: <FormattedMessage {...msgs.payoutSuccess} />,
+      details: <FormattedMessage values={{ amount }} {...msgs.ethPayout} />,
+    };
+    yield* transferPendingEthPayout('withdraw', pendingMsg);
+    yield* transferSuccessEth('Deposit', successMsg);
   }
-  if (action.notifyType === POWERUP) {
-    const pendMethod = 'transfer';
-    const successEvent = 'Transfer';
-    const details = 'NTZ for ABP';
-    yield* exchangeSellPending(pendMethod, successEvent, details);
+  if (notifyType === POWERUP) {
+    const pendingMsg = {
+      ...txPending,
+      category: <FormattedMessage {...msgs.exchangePending} />,
+      details: <FormattedMessage {...msgs.exchangeNtzToAbp} />,
+    };
+    const successMsg = {
+      ...txSuccess,
+      category: <FormattedMessage {...msgs.exchangeSuccess} />,
+      details: <FormattedMessage {...msgs.exchangeNtzToAbp} />,
+    };
+    yield* exchangeSellPending('powerUp', pendingMsg);
+    yield* exchangeSellSuccess('Transfer', successMsg);
   }
-  // throw error?
+  if (notifyType === POWERDOWN) {
+    const pendingMsg = {
+      ...txPending,
+      category: <FormattedMessage {...msgs.exchangePending} />,
+      details: <FormattedMessage {...msgs.exchangeAbpToNtz} />,
+    };
+    const successMsg = {
+      ...txSuccess,
+      category: <FormattedMessage {...msgs.exchangeSuccess} />,
+      details: <FormattedMessage {...msgs.exchangeAbpToNtz} />,
+    };
+    yield* exchangeSellPending('transfer', pendingMsg);
+    yield* exchangeSellSuccess('Transfer', successMsg);
+  }
 }
 
 function* removeNotification({ txId }) {
@@ -221,139 +289,77 @@ function* visitorModeNotification({ payload: { pathname = '' } }) {
   }
 }
 
-function* exchangeSellPending(pendMethod, successEvent, details) {
+function* exchangeSellPending(pendMethod, pendingMsg) {
   while (true) { // eslint-disable-line no-constant-condition
     const { payload: { methodName, txHash } } = yield take(CONTRACT_TX_SUCCESS);
     if (methodName === pendMethod) {
       yield* createPersistNotification({
-        ...exchangePending,
+        ...pendingMsg,
         txId: txHash,
-        details,
+        infoIcon: <InfoIcon transactionHash={txHash} />,
       });
-      yield* exchangeSellSuccess(successEvent, details);
       break;
     }
   }
 }
 
-function* exchangeSellSuccess(successEvent, details) {
+function* exchangeSellSuccess(successEvent, successMsg) {
   // remove pending and create success notification
   while (true) { // eslint-disable-line no-constant-condition
     const { payload } = yield take(CONTRACT_EVENTS);
     const { transactionHash, event } = payload[0];
     if (event === successEvent) {
       yield* removeNotification({ txId: transactionHash });
-      yield* createTempNotification({ ...exchangeSuccess, details });
+      yield* createTempNotification(successMsg);
       break;
     }
   }
 }
 
-function* transferPendingNtz() {
-  while (true) { // eslint-disable-line no-constant-condition
-    const { payload: { args, txHash, methodName } } = yield take(CONTRACT_TX_SUCCESS);
-    if (methodName === 'transfer') {
-      yield* createPersistNotification({
-        ...transferPending,
-        txId: txHash,
-        details: `Sending ${formatNtz(args[1])} NTZ`,
-      });
-      yield* transferSuccessNtz();
-      break;
-    }
-  }
-}
-
-function* transferSuccessNtz() {
-  while (true) { // eslint-disable-line no-constant-condition
-    const { payload } = yield take(CONTRACT_EVENTS);
-    const { args, transactionHash, event } = payload[0];
-    if (event === 'Transfer') {
-      yield* removeNotification({ txId: transactionHash });
-      yield* createTempNotification({
-        ...transferSuccess,
-        details: `Sent ${formatNtz(args.value)} NTZ`,
-      });
-      break;
-    }
-  }
-}
-
-function* exchangePurPending() {
-  const { payload: { txHash, methodName } } = yield take(CONTRACT_TX_SUCCESS);
-  if (methodName === 'purchase') {
-    yield* createPersistNotification({
-      ...exchangePending,
-      txId: txHash,
-      details: 'ETH for NTZ',
-    });
-    yield* exchangePurSuccess();
-  }
-}
-
-function* exchangePurSuccess() {
+function* exchangePurSuccess(successEvent, successMsg) {
+  // remove pending and create success notification
   while (true) { // eslint-disable-line no-constant-condition
     const { payload } = yield take(PROXY_EVENTS);
     const { transactionHash, event } = payload[0];
-    if (event === 'Withdrawal') {
+    if (event === successEvent) {
       yield* removeNotification({ txId: transactionHash });
-
-      yield* createTempNotification({
-        ...exchangeSuccess,
-        details: 'ETH for NTZ',
-      });
+      yield* createTempNotification(successMsg);
       break;
     }
   }
 }
 
-function* transferPendingEthPayout() {
-  const { payload: { txHash, methodName, address } } = yield take(CONTRACT_TX_SUCCESS);
-  if (methodName === 'withdraw' && address === conf().pullAddr) {
-    yield* createPersistNotification({
-      ...ethPayoutPending,
-      txId: txHash,
-    });
-    yield* transferSuccessEthPayout();
-  }
-}
-
-function* transferSuccessEthPayout() {
-  while (true) { // eslint-disable-line no-constant-condition
-    const { payload } = yield take(PROXY_EVENTS);
-    const { transactionHash, event } = payload[0];
-    if (event === 'Deposit') {
-      yield* removeNotification({ txId: transactionHash });
-      yield* createTempNotification(ethPayoutSuccess);
-      break;
-    }
-  }
-}
-
-function* transferPendingEth() {
+function* transferPendingEth(msg) {
   const { payload: { txHash, args, methodName } } = yield take(CONTRACT_TX_SUCCESS);
   if (methodName === 'forward' && args[2] === '') { // transfer eth
     yield* createPersistNotification({
-      ...transferPending,
+      ...msg,
       txId: txHash,
-      details: `Sending ${formatEth(args[1])} ETH`,
+      infoIcon: <InfoIcon transactionHash={txHash} />,
     });
-    yield* transferSuccessEth();
   }
 }
 
-function* transferSuccessEth() {
+function* transferSuccessEth(method, msg) {
   while (true) { // eslint-disable-line no-constant-condition
     const { payload } = yield take(PROXY_EVENTS);
-    const { args, transactionHash, event } = payload[0];
-    if (event === 'Withdrawal') {
+    const { transactionHash, event } = payload[0];
+    if (event === method) {
       yield* removeNotification({ txId: transactionHash });
-      yield* createTempNotification({
-        ...transferSuccess,
-        details: `Sent ${formatEth(args.value)} ETH`,
-      });
+      yield* createTempNotification(msg);
       break;
     }
+  }
+}
+
+function* transferPendingEthPayout(method, msg) {
+  const { payload: { txHash, methodName, address } } = yield take(CONTRACT_TX_SUCCESS);
+  if (methodName === method && address === conf().pullAddr) {
+    yield* createPersistNotification({
+      ...msg,
+      txId: txHash,
+      infoIcon: <InfoIcon transactionHash={txHash} />,
+    });
   }
 }
 
