@@ -9,7 +9,7 @@ import {
   CONTRACT_METHOD_SUCCESS,
   CONTRACT_METHOD_ERROR,
   CONTRACT_TX_SEND,
-  CONTRACT_TX_SUCCESS,
+  CONTRACT_TX_SENDED,
   CONTRACT_EVENTS,
   ACCOUNT_LOADED,
   ACCOUNT_UNLOCKED,
@@ -80,7 +80,7 @@ function accountProviderReducer(state = initialState, action) {
       // Note: CONTRACT_TX_SEND is useless at this moment, but still keep it for consistency with the relevant actions.
       return state;
 
-    case CONTRACT_TX_SUCCESS:
+    case CONTRACT_TX_SENDED:
       return state;
 
     case CONTRACT_EVENTS:

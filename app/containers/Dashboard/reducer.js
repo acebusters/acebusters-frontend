@@ -4,7 +4,7 @@ import {
   ACCOUNT_LOADED,
   CONTRACT_EVENTS,
   PROXY_EVENTS,
-  CONTRACT_TX_SUCCESS,
+  CONTRACT_TX_SENDED,
   CONTRACT_TX_ERROR,
 } from '../AccountProvider/actions';
 
@@ -71,7 +71,7 @@ function dashboardReducer(state = initialState, action) {
     case ACCOUNT_LOADED:
       return state.set('proxy', action.payload.proxy);
 
-    case CONTRACT_TX_SUCCESS:
+    case CONTRACT_TX_SENDED:
       return addPending(
         initEvents(state),
         payload
