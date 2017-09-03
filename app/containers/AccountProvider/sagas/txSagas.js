@@ -3,6 +3,7 @@ import { Receipt } from 'poker-helper';
 import BigNumber from 'bignumber.js';
 import { ABI_PROXY } from '../../../app.config';
 import { last } from '../../../utils';
+import { promisifyContractCall } from '../../../utils/promisifyContractCall';
 import { sendTx } from '../../../services/transactions';
 
 import { getWeb3 } from '../utils';
@@ -16,58 +17,33 @@ function getTxArgs({ data, dest, args, methodName }) {
   return isForward ? args.slice(0, 3) : [dest, options.value || new BigNumber(0), data];
 }
 
-function* contractTransactionSecureSend(action) {
-  const { proxy: proxyAddr, injected: injectedAddr } = yield select(makeSelectAccountData());
-  const web3 = yield call(getWeb3, true);
-  const proxy = web3.eth.contract(ABI_PROXY).at(proxyAddr);
+function* contractTransactionSend(action) {
+  const { proxy: proxyAddr, injected: injectedAddr, isLocked, owner } = yield select(makeSelectAccountData());
   const txArgs = yield call(getTxArgs, action.payload);
 
-  return new Promise((resolve, reject) => {
-    proxy.forward.estimateGas(
-      ...txArgs,
-      { from: injectedAddr },
-      (gasErr, gas) => {
-        if (gasErr) {
-          reject(gasErr);
-        } else {
-          proxy.forward(
-            ...txArgs,
-            { from: injectedAddr, gas: Math.round(gas * 1.9) },
-            (forwardErr, result) => {
-              if (forwardErr) {
-                reject(forwardErr);
-              } else {
-                resolve(result);
-              }
-            }
-          );
-        }
-      }
-    );
-  });
+  if (isLocked) {
+    const forwardReceipt = new Receipt(owner).forward(0, ...txArgs).sign(action.payload.privKey);
+    const value = yield call(sendTx, forwardReceipt);
+    return value.txHash;
+  }
+
+  const web3 = yield call(getWeb3, true);
+  const proxy = web3.eth.contract(ABI_PROXY).at(proxyAddr);
+  const estimateGas = yield call(promisifyContractCall, proxy.forward.estimateGas);
+  const sendTransaction = yield call(promisifyContractCall, proxy.forward.sendTransaction);
+  const gas = yield call(estimateGas, ...txArgs, { from: injectedAddr });
+
+  return yield call(sendTransaction, ...txArgs, { from: injectedAddr, gas: Math.round(gas * 1.9) });
 }
 
 export function* contractTransactionSendSaga() {
   const txChan = yield actionChannel(CONTRACT_TX_SEND);
   while (true) { // eslint-disable-line no-constant-condition
     const action = yield take(txChan);
-    const { dest, key, privKey, callback = (() => null), args, methodName } = action.payload;
-
-    const state = yield select();
-    const isLocked = yield call([state, state.getIn], ['account', 'isLocked']);
+    const { dest, key, callback = (() => null), args, methodName } = action.payload;
 
     try {
-      let txHash;
-      if (isLocked) {
-        const txArgs = yield call(getTxArgs, action.payload);
-        const owner = yield call([state, state.getIn], ['account', 'owner']);
-        const forwardReceipt = new Receipt(owner).forward(0, ...txArgs).sign(privKey);
-        const value = yield call(sendTx, forwardReceipt);
-        txHash = value.txHash;
-      } else {
-        // two yields to wait for returned promise
-        txHash = yield yield call(contractTransactionSecureSend, action);
-      }
+      const txHash = yield yield call(contractTransactionSend, action);
       yield call(callback, null, txHash);
       yield put(contractTxSuccess({ address: dest, txHash, key, args, methodName }));
     } catch (err) {

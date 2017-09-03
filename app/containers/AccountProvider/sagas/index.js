@@ -10,7 +10,6 @@ import { unsupportedNetworkDetectSaga } from './unsupportedNetworkDetectSaga';
 import { updateLoggedInStatusSaga } from './updateLoggedInStatusSaga';
 import { web3MethodCallSaga, contractMethodCallSaga } from './web3CallsSagas';
 import { contractTransactionSendSaga } from './txSagas';
-import intercomSaga from './intercomSagas';
 
 export { getWeb3 } from '../utils';
 
@@ -25,7 +24,6 @@ export function* accountSaga() {
   yield fork(contractTransactionSendSaga);
   yield fork(injectedWeb3ListenerSaga);
   yield fork(unsupportedNetworkDetectSaga);
-  yield fork(intercomSaga);
 }
 
 export default [

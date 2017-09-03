@@ -195,6 +195,8 @@
     },
     "collectCoverageFrom": [
       "app/containers/Table/*.{js,jsx}",
+      "app/containers/Table/sagas/*.{js,jsx}",
+      "!app/containers/Table/index.js",
       "!app/containers/Table/messages.js",
       "!app/containers/index.js",
       "!app/**/*.test.{js,jsx}",
@@ -205,10 +207,10 @@
     ],
     "coverageThreshold": {
       "global": {
-        "statements": 41,
-        "branches": 42,
-        "functions": 44,
-        "lines": 61
+        "statements": 52,
+        "branches": 55,
+        "functions": 67,
+        "lines": 66
       }
     },
     "moduleDirectories": [

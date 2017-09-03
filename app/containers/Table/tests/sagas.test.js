@@ -2,13 +2,14 @@
  * Created by helge on 26.01.17.
  */
 
-import { Receipt } from 'poker-helper';
+import { Receipt, PokerHelper } from 'poker-helper';
 import SagaTester from 'redux-saga-tester';
 import { fromJS } from 'immutable';
 import nock from 'nock';
 
 import { PLAYER1, PLAYER2, PLAYER3, PLAYER4, PLAYER_EMPTY } from './consts';
-import { updateScanner, payFlow } from '../sagas';
+import { updateScanner } from '../sagas/updateScannerSaga';
+import { payFlow } from '../sagas/payFlowSaga';
 import { formActionSaga } from '../../../services/reduxFormSaga';
 import { babz } from '../../../utils/amountFormatter';
 import {
@@ -53,7 +54,7 @@ describe('Saga Tests', () => {
     });
 
     const sagaTester = new SagaTester({ initialState });
-    sagaTester.start(updateScanner);
+    sagaTester.start(updateScanner, new PokerHelper());
     sagaTester.dispatch(updateReceived(tableAddr, hand));
     expect(sagaTester.getLatestCalledAction().type).toEqual(BET);
     expect(sagaTester.getLatestCalledAction().amount).toEqual(babz(500));
@@ -88,7 +89,7 @@ describe('Saga Tests', () => {
     });
 
     const sagaTester = new SagaTester({ initialState });
-    sagaTester.start(updateScanner);
+    sagaTester.start(updateScanner, new PokerHelper());
     sagaTester.dispatch(updateReceived(tableAddr, hand));
     expect(sagaTester.getLatestCalledAction().type).toEqual(BET);
     expect(sagaTester.getLatestCalledAction().amount).toEqual(babz(500));
@@ -128,7 +129,7 @@ describe('Saga Tests', () => {
     });
 
     const sagaTester = new SagaTester({ initialState });
-    sagaTester.start(updateScanner);
+    sagaTester.start(updateScanner, new PokerHelper());
     sagaTester.dispatch(updateReceived(tableAddr, hand));
     expect(sagaTester.getLatestCalledAction().type).toEqual(BET);
     expect(sagaTester.getCalledActions().length).toEqual(2);
@@ -171,7 +172,7 @@ describe('Saga Tests', () => {
     });
 
     const sagaTester = new SagaTester({ initialState });
-    sagaTester.start(updateScanner);
+    sagaTester.start(updateScanner, new PokerHelper());
     sagaTester.dispatch(updateReceived(tableAddr, hand));
     const show = sagaTester.getLatestCalledAction();
     expect(show.type).toEqual(SHOW);
@@ -215,7 +216,7 @@ describe('Saga Tests', () => {
     });
 
     const sagaTester = new SagaTester({ initialState });
-    sagaTester.start(updateScanner);
+    sagaTester.start(updateScanner, new PokerHelper());
     await sagaTester.dispatch(updateReceived(tableAddr, hand));
     const show = sagaTester.getLatestCalledAction();
     expect(show.type).toEqual(SHOW);
@@ -252,7 +253,7 @@ describe('Saga Tests', () => {
     });
 
     const sagaTester = new SagaTester({ initialState });
-    sagaTester.start(updateScanner);
+    sagaTester.start(updateScanner, new PokerHelper());
     sagaTester.dispatch(updateReceived(tableAddr, hand));
     expect(sagaTester.getLatestCalledAction().type).toEqual(NET);
     expect(sagaTester.getLatestCalledAction().balances).toEqual('0x1234');
@@ -282,7 +283,7 @@ describe('Saga Tests', () => {
     });
 
     const sagaTester = new SagaTester({ initialState });
-    sagaTester.start(updateScanner);
+    sagaTester.start(updateScanner, new PokerHelper());
     sagaTester.dispatch(updateReceived(tableAddr, hand));
     expect(sagaTester.getCalledActions().length).toEqual(1);
   });
@@ -308,7 +309,7 @@ describe('Saga Tests', () => {
     });
     const sagaTester = new SagaTester({ initialState });
     sagaTester.start(formActionSaga);
-    sagaTester.start(payFlow);
+    sagaTester.start(payFlow, new PokerHelper());
     const payAction = bet(tableAddr, 3, babz(500), PLAYER2.key, 1, 'prevReceipt');
     const rsp = await pay(payAction, (action) => sagaTester.dispatch(action));
     expect(rsp).toEqual([12, 13]);
@@ -341,7 +342,7 @@ describe('Saga Tests', () => {
     });
     const sagaTester = new SagaTester({ initialState });
     sagaTester.start(formActionSaga);
-    sagaTester.start(payFlow);
+    sagaTester.start(payFlow, new PokerHelper());
     const payAction = bet(tableAddr, 3, babz(500), PLAYER2.key, 1, 'prevReceipt');
     pay(payAction, (action) => sagaTester.dispatch(action)).catch((err) => {
       expect(err.response.status).toEqual(401);
@@ -398,7 +399,7 @@ describe('Saga Tests', () => {
     });
 
     const sagaTester = new SagaTester({ initialState });
-    sagaTester.start(updateScanner);
+    sagaTester.start(updateScanner, new PokerHelper());
     sagaTester.dispatch(updateReceived(tableAddr, hand));
     const show = sagaTester.getLatestCalledAction();
     expect(show.type).toEqual(ADD_MESSAGE);
