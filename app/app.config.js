@@ -32,6 +32,7 @@ export function conf() {
       tableFactory: '0x9508817ad157c1fdc2c9fafc2090a6bfe443c912',
       sentryDSN: 'https://8c3e021848b247ddaf627c8040f94e07@sentry.io/153017',
       gaProperty: 'UA-98848213-1',
+      changellyMerchantId: '',
       intercomAppId: 'z9xn3a6h',
     };
   }
@@ -58,6 +59,7 @@ export function conf() {
       sentryDSN: 'https://8c3e021848b247ddaf627c8040f94e07@sentry.io/153017',
       gaProperty: 'UA-98848213-1',
       intercomAppId: '',
+      changellyMerchantId: '',
     };
   }
 
@@ -82,6 +84,7 @@ export function conf() {
     sentryDSN: 'https://8c3e021848b247ddaf627c8040f94e07@sentry.io/153017',
     gaProperty: 'UA-XXXXX-Y',
     intercomAppId: 'z9xn3a6h',
+    changellyMerchantId: '1b495d1ecc26',
   };
 }
 
