@@ -27,3 +27,9 @@ export function formatAmount(decimals, amount, dp) {
 export const formatNtz = (amount, dp = 0) => formatAmount(NTZ_DECIMALS, amount, dp);
 export const formatAbp = formatAmount.bind(null, ABP_DECIMALS);
 export const formatEth = formatAmount.bind(null, ETH_DECIMALS);
+
+// only allow digits and one dot
+export const normalizerFloat = (value) => {
+  if (value === '.') return '0.';
+  return value.replace(',', '.').replace(/[^0-9.]/g, '').replace(/\./, 'x').replace(/\./g, '').replace(/x/, '.');
+};

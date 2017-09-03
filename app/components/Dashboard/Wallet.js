@@ -17,17 +17,14 @@ import { AccountIsLocked, AccountNotLocked } from './SectionReceive';
 const Wallet = (props) => {
   const {
     account,
-    // babzBalance,
     ethBalance,
     nutzBalance,
     handleNTZTransfer,
     handleETHTransfer,
     amountUnit,
-    // weiBalance,
   } = props;
   return (
     <Pane name="dashboard-wallet">
-
       <Section
         style={{ alignSelf: 'center', maxWidth: 480 }}
         name="wallet-receive"
@@ -48,6 +45,7 @@ const Wallet = (props) => {
               handleTransfer={handleETHTransfer}
               maxAmount={ethBalance}
               type="token"
+              placeholder="0.00"
               {...props}
             />
           :
@@ -55,6 +53,7 @@ const Wallet = (props) => {
               handleTransfer={handleNTZTransfer}
               maxAmount={nutzBalance}
               type="token"
+              placeholder="0"
               {...props}
             />
           }
@@ -67,13 +66,11 @@ const Wallet = (props) => {
 
 Wallet.propTypes = {
   account: PropTypes.object,
-  // babzBalance: PropTypes.object,
   ethBalance: PropTypes.object,
   nutzBalance: PropTypes.object,
   handleNTZTransfer: PropTypes.func,
   handleETHTransfer: PropTypes.func,
   amountUnit: PropTypes.string,
-  // weiBalance: PropTypes.object,
 };
 
 export default Wallet;
