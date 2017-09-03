@@ -24,6 +24,8 @@ function* contractTransactionSend(action) {
   if (isLocked) {
     const forwardReceipt = new Receipt(owner).forward(0, ...txArgs).sign(action.payload.privKey);
     const value = yield call(sendTx, forwardReceipt);
+    // TODO: get tx Hash from pusher
+    value.txHash = '0x1122334455667788990011223344556677889900112233445566778899001122';
     return value.txHash;
   }
 
