@@ -12,6 +12,9 @@ export function* updateIntercomUser(action) {
     window.Intercom('update', {
       email: account.email,
       user_id: action.payload.signer,
+      proxy: action.payload.proxy,
+      fish: action.payload.isLocked,
+      nickname: action.payload.nickName,
     });
   }
 }
