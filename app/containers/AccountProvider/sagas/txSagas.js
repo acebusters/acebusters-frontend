@@ -9,6 +9,7 @@ import { sendTx } from '../../../services/transactions';
 import { getWeb3 } from '../utils';
 
 import { CONTRACT_TX_SEND, contractTxSended, contractTxError } from '../actions';
+import { FISH_TX_HASH } from '../../Table/actions';
 import { makeSelectAccountData } from '../selectors';
 
 function getTxArgs({ data, dest, args, methodName }) {
@@ -23,10 +24,9 @@ function* contractTransactionSend(action) {
 
   if (isLocked) {
     const forwardReceipt = new Receipt(owner).forward(0, ...txArgs).sign(action.payload.privKey);
-    const value = yield call(sendTx, forwardReceipt);
-    // TODO: get tx Hash from pusher
-    value.txHash = '0x1122334455667788990011223344556677889900112233445566778899001122';
-    return value.txHash;
+    yield call(sendTx, forwardReceipt);
+    const { txHash } = yield take(FISH_TX_HASH);
+    return txHash;
   }
 
   const web3 = yield call(getWeb3, true);
