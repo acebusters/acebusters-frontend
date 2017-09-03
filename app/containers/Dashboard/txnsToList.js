@@ -6,11 +6,11 @@ import BigNumber from 'bignumber.js';
 import A from '../../components/A';
 import WithLoading from '../../components/WithLoading';
 import { conf } from '../../app.config';
-import { formatEth, formatNtz } from '../../utils/amountFormatter';
+import { formatEth, formatNtz, formatAbp } from '../../utils/amountFormatter';
 
 import { Icon, TypeIcon, typeIcons } from './styles';
 import messages from './messages';
-import { isSellEvent, isETHPayoutEvent, isPurchaseStartEvent, isPurchaseEndEvent, formatDate } from './utils';
+import { isSellEvent, isETHPayoutEvent, isPurchaseStartEvent, isPurchaseEndEvent, isPowerUpEvent, formatDate } from './utils';
 
 const confParams = conf();
 
@@ -65,13 +65,19 @@ function formatTxAddress(address, tableAddrs, proxyAddr) {
   return cutAddress(address);
 }
 
+const formatters = {
+  abp: formatAbp,
+  ntz: formatNtz,
+  eth: formatEth,
+};
+
 function formatValue(event) {
   if (event.value === undefined) {
     return '';
   }
 
   const sign = event.type === 'income' ? '' : '−';
-  const formatFn = event.unit === 'ntz' ? formatNtz : formatEth;
+  const formatFn = formatters[event.unit];
   const number = formatFn(new BigNumber(event.value));
   return `${sign}${number.toString()} ${event.unit.toUpperCase()}`;
 }
@@ -97,6 +103,8 @@ function txDescription(event, tableAddrs, proxyAddr) {
         {...(event.type === 'income' ? messages.tableLeave : messages.tableJoin)}
       />
     );
+  } else if (isPowerUpEvent(event)) {
+    return 'Power Up';
   } else if (event.address === confParams.pwrAddr) {
     return (
       <FormattedMessage

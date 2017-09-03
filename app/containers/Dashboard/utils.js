@@ -27,6 +27,10 @@ export function isPurchaseStartEvent(event) {
   return event.address === confParams.ntzAddr && event.unit === 'eth';
 }
 
+export function isPowerUpEvent(event) {
+  return event.address === confParams.pwrAddr && event.unit === 'abp' && event.type === 'income';
+}
+
 export function formatDate(timestamp) {
   if (!timestamp) {
     return '';

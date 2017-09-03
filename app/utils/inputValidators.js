@@ -4,13 +4,14 @@ import BigNumber from 'bignumber.js';
 
 export const validateFloat = (messages, errors, amount, minAmount, maxAmount) => {
   const floatErrors = errors;
+  const stringMinAmount = new BigNumber(String((minAmount || 0)));
   const stringMaxAmount = new BigNumber(maxAmount.toString());
   const stringAmount = amount ? new BigNumber(amount) : '0';
 
   if (!amount) {
     floatErrors.amount = <FormattedMessage {...messages.amountRequired} />;
   }
-  if (amount <= minAmount) {
+  if (stringMinAmount.gt(stringAmount)) {
     floatErrors.amount = <FormattedMessage {...messages.amountTooLow} values={{ minAmount }} />;
   }
   if (amount === '0') {

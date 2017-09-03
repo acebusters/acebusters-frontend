@@ -129,6 +129,7 @@ class DashboardRoot extends React.Component {
     if (this.props.account.proxy) {
       this.watchProxyEvents(this.props.account.proxy);
       this.watchTokenEvents(this.props.account.proxy);
+      this.watchPowerEvents(this.props.account.proxy);
       this.power.balanceOf.call(this.props.account.proxy);
       this.pullPayment.paymentOf.call(this.props.account.proxy);
     }
@@ -145,6 +146,7 @@ class DashboardRoot extends React.Component {
     if (account.proxy === undefined && nextAccount.proxy) {
       this.watchProxyEvents(nextAccount.proxy);
       this.watchTokenEvents(nextAccount.proxy);
+      this.watchPowerEvents(nextAccount.proxy);
       this.power.balanceOf.call(nextAccount.proxy);
 
       this.pullPayment.paymentOf.call(nextAccount.proxy);
@@ -178,13 +180,6 @@ class DashboardRoot extends React.Component {
         addEventsDate(eventList.filter(isUserEvent(proxyAddr)))
           .then((events) => this.props.proxyEvents(events, proxyAddr));
       });
-      this.power.allEvents({
-        fromBlock: blockNumber - LOOK_BEHIND_PERIOD,
-        toBlock: 'latest',
-      }).get((error, eventList) => {
-        addEventsDate(eventList.filter(isUserEvent(proxyAddr)))
-          .then((events) => this.props.contractEvents(events, proxyAddr));
-      });
     });
 
     this.proxy.allEvents({
@@ -201,17 +196,28 @@ class DashboardRoot extends React.Component {
       }
     });
 
+    this.loadDownRequests();
+  }
+
+  watchPowerEvents(proxyAddr) {
+    this.web3.eth.getBlockNumber((err, blockNumber) => {
+      this.power.allEvents({
+        fromBlock: blockNumber - LOOK_BEHIND_PERIOD,
+        toBlock: 'latest',
+      }).get((error, eventList) => {
+        addEventsDate(eventList.filter(isUserEvent(proxyAddr)))
+          .then((events) => this.props.contractEvents(events, proxyAddr));
+      });
+    });
+
     this.power.downtime.call();
     this.power.totalSupply.call();
     this.power.allEvents({
       toBlock: 'latest',
     }).watch((error, event) => {
-      if (!error && event.args.from === proxyAddr) {
-        this.props.contractEvents([event], proxyAddr);
-      }
+      addEventsDate([event])
+        .then((events) => this.props.contractEvents(events, proxyAddr));
     });
-
-    this.loadDownRequests();
   }
 
   watchTokenEvents(proxyAddr) {
