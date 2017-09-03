@@ -11,7 +11,6 @@ import { updateLoggedInStatusSaga } from './updateLoggedInStatusSaga';
 import { web3MethodCallSaga, contractMethodCallSaga } from './web3CallsSagas';
 import { contractTransactionSendSaga } from './txSagas';
 import { txMonitoringSaga } from './txMonitoringSaga';
-import intercomSaga from './intercomSagas';
 
 export { getWeb3 } from '../utils';
 
