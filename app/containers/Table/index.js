@@ -133,7 +133,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.tableEvents.watch(this.watchTable);
 
     // getting table data from oracle
-    this.pusher = new Pusher('d4832b88a2a81f296f53', { cluster: 'eu', encrypted: true });
+    this.pusher = new Pusher(conf().pusherApiKey, { cluster: 'eu', encrypted: true });
     this.channel = this.pusher.subscribe(this.tableAddr);
     this.tableService = new TableService(this.props.params.tableAddr, this.props.privKey);
 

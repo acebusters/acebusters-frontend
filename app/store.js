@@ -9,6 +9,7 @@ import createSagaMiddleware from 'redux-saga';
 
 import createReducer from './reducers';
 import { setAuthState } from './containers/AccountProvider/actions';
+import { formActionSaga } from './services/reduxFormSaga';
 import workers from './workers';
 
 import * as storageService from './services/localStorage';
@@ -42,6 +43,10 @@ export default function configureStore(initialState = {}, history) {
     createReducer(),
     fromJS(initialState),
     composeEnhancers(...enhancers)
+  );
+
+  sagaMiddleware.run(
+    formActionSaga,
   );
 
   // Extensions

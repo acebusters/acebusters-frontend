@@ -24,7 +24,6 @@ export const RECEIPT_SET = 'acebusters/Table/RECEIPT_SET';
 export const ADD_MESSAGE = 'acebusters/Chat/ADD_MESSAGE';
 export const SEND_MESSAGE = 'acebusters/Chat/SEND_MESSAGE';
 
-
 export function setCards(tableAddr, handId, cards) {
   return { type: SET_CARDS, tableAddr, handId, cards };
 }

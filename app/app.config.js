@@ -21,7 +21,6 @@ export function conf() {
       firstBlockHash: '0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3',
       networkName: 'Ethereum Main Net',
       oracleUrl: 'https://lzckarzxxa.execute-api.eu-west-1.amazonaws.com/v0',
-      txUrl: 'https://6k08mujn1d.execute-api.eu-west-1.amazonaws.com/v0',
       accountUrl: 'https://k7j57cmm86.execute-api.eu-west-1.amazonaws.com/v0',
       reservationUrl: 'https://6j6m8132w7.execute-api.eu-west-1.amazonaws.com/v0',
       gasStatUrl: '',
@@ -32,8 +31,9 @@ export function conf() {
       tableFactory: '0x9508817ad157c1fdc2c9fafc2090a6bfe443c912',
       sentryDSN: 'https://8c3e021848b247ddaf627c8040f94e07@sentry.io/153017',
       gaProperty: 'UA-98848213-1',
-      changellyMerchantId: '',
       intercomAppId: 'z9xn3a6h',
+      changellyMerchantId: '',
+      pusherApiKey: 'd4832b88a2a81f296f53',
     };
   }
 
@@ -47,7 +47,6 @@ export function conf() {
       firstBlockHash: '0x6341fd3daf94b748c72ced5a5b26028f2474f5f00d824504e4fa37a75767e177',
       networkName: 'Rinkeby Testnet',
       oracleUrl: 'https://v83iq1161a.execute-api.eu-west-1.amazonaws.com/v0',
-      txUrl: 'https://h5fb9klhzc.execute-api.eu-west-1.amazonaws.com/v0',
       accountUrl: 'https://vps13t4f7e.execute-api.eu-west-1.amazonaws.com/v0',
       reservationUrl: 'https://uiw0k5puaf.execute-api.eu-west-1.amazonaws.com/v0',
       gasStatUrl: 'https://l70xam4hh9.execute-api.eu-west-1.amazonaws.com/v0',
@@ -60,6 +59,7 @@ export function conf() {
       gaProperty: 'UA-98848213-1',
       intercomAppId: '',
       changellyMerchantId: '',
+      pusherApiKey: 'd4832b88a2a81f296f53',
     };
   }
 
@@ -72,7 +72,6 @@ export function conf() {
     firstBlockHash: '0x6341fd3daf94b748c72ced5a5b26028f2474f5f00d824504e4fa37a75767e177',
     networkName: 'Rinkeby Testnet',
     oracleUrl: 'https://evm4rumeob.execute-api.eu-west-1.amazonaws.com/v0',
-    txUrl: 'https://khengvfg6c.execute-api.eu-west-1.amazonaws.com/v0',
     accountUrl: 'https://hsqkzjp3m8.execute-api.eu-west-1.amazonaws.com/v0',
     reservationUrl: 'https://6er5q4s7b0.execute-api.eu-west-1.amazonaws.com/v0',
     gasStatUrl: 'https://4by2hfw9mg.execute-api.eu-west-1.amazonaws.com/v0',
@@ -85,6 +84,7 @@ export function conf() {
     gaProperty: 'UA-XXXXX-Y',
     intercomAppId: 'z9xn3a6h',
     changellyMerchantId: '1b495d1ecc26',
+    pusherApiKey: 'd4832b88a2a81f296f53',
   };
 }
 
