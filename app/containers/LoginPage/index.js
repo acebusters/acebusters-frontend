@@ -96,9 +96,6 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
           return data;
         })
         .then((wallet) => {
-          storageService.removeItem('_c');
-          storageService.removeItem('_l');
-
           this.props.walletImport({
             json: wallet,
             password: values.get('password'),
@@ -116,6 +113,9 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
                 }
               })
               .then((workerRsp) => {
+                storageService.removeItem('_c');
+                storageService.removeItem('_l');
+
                 // If worker success, ...
                 // ...tell account provider about login.
                 this.props.setAuthState({
