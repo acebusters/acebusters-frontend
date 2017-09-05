@@ -6,6 +6,9 @@
 
 const DEFAULT_REF_CODE = '00000000';
 
+export const MAIN_NET_GENESIS_BLOCK = '0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3';
+export const RINKEBY_GENESIS_BLOCK = '0x6341fd3daf94b748c72ced5a5b26028f2474f5f00d824504e4fa37a75767e177';
+
 export function conf() {
   let sub = '';
   if (window && window.location && window.location.host) {
@@ -18,7 +21,7 @@ export function conf() {
       defaultRefCode: DEFAULT_REF_CODE,
       etherscanUrl: 'https://etherscan.io/',
       gethUrl: 'wss://mainnet.acebusters.com:443',
-      firstBlockHash: '0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3',
+      firstBlockHash: MAIN_NET_GENESIS_BLOCK,
       networkName: 'Ethereum Main Net',
       oracleUrl: 'https://lzckarzxxa.execute-api.eu-west-1.amazonaws.com/v0',
       accountUrl: 'https://k7j57cmm86.execute-api.eu-west-1.amazonaws.com/v0',
@@ -44,7 +47,7 @@ export function conf() {
       defaultRefCode: DEFAULT_REF_CODE,
       etherscanUrl: 'https://rinkeby.etherscan.io/',
       gethUrl: 'wss://rinkeby3.acebusters.com:443',
-      firstBlockHash: '0x6341fd3daf94b748c72ced5a5b26028f2474f5f00d824504e4fa37a75767e177',
+      firstBlockHash: RINKEBY_GENESIS_BLOCK,
       networkName: 'Rinkeby Testnet',
       oracleUrl: 'https://v83iq1161a.execute-api.eu-west-1.amazonaws.com/v0',
       accountUrl: 'https://vps13t4f7e.execute-api.eu-west-1.amazonaws.com/v0',
@@ -69,7 +72,7 @@ export function conf() {
     defaultRefCode: DEFAULT_REF_CODE,
     etherscanUrl: 'https://rinkeby.etherscan.io/',
     gethUrl: 'wss://rinkeby3.acebusters.com:443',
-    firstBlockHash: '0x6341fd3daf94b748c72ced5a5b26028f2474f5f00d824504e4fa37a75767e177',
+    firstBlockHash: RINKEBY_GENESIS_BLOCK,
     networkName: 'Rinkeby Testnet',
     oracleUrl: 'https://evm4rumeob.execute-api.eu-west-1.amazonaws.com/v0',
     accountUrl: 'https://hsqkzjp3m8.execute-api.eu-west-1.amazonaws.com/v0',

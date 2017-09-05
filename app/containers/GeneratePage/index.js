@@ -97,8 +97,8 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     const newSignerAddr = wallet.address;
 
     try {
-      const backedAccount = await accountService.getAccount(receipt.accountId);
-      const backendWallet = JSON.parse(backedAccount.wallet);
+      const backendAccount = await accountService.getAccount(receipt.accountId);
+      const backendWallet = JSON.parse(backendAccount.wallet);
 
       const acc = await getAccount(backendWallet.address);
       const proxyAddr = acc[0];
