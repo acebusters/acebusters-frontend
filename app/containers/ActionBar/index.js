@@ -65,6 +65,7 @@ class ActionBarContainer extends React.Component {
     this.handleCall = this.handleCall.bind(this);
     this.handleFold = this.handleFold.bind(this);
     this.updateAmount = this.updateAmount.bind(this);
+    this.handleClickButton = this.handleClickButton.bind(this);
     this.state = {
       amount: this.props.minRaise,
       disabled: false,
@@ -137,8 +138,12 @@ class ActionBarContainer extends React.Component {
 
   // call this after each player action
   disableTemporarilyAfterAction() {
+    if (this.disabledTimeout) {
+      clearTimeout(this.disabledTimeout);
+      this.disabledTimeout = null;
+    }
     this.setState({ disabled: true });
-    setTimeout(() => {
+    this.disabledTimeout = setTimeout(() => {
       this.setState({ disabled: false });
     }, 3000);
   }
@@ -238,12 +243,20 @@ class ActionBarContainer extends React.Component {
       .catch(this.captureError(handId));
   }
 
+  handleClickButton(type) {
+    if (type !== 'bet-set') {
+      this.disableTemporarilyAfterAction();
+    }
+    this.props.dispatch(handleClickButton(type));
+  }
+
   render() {
     return (
       <ActionBar
         amount={this.state.amount}
         disabled={this.state.disabled}
         updateAmount={this.updateAmount}
+        handleClickButton={this.handleClickButton}
         {...this.props}
       />
     );
@@ -284,7 +297,6 @@ export function mapDispatchToProps(dispatch) {
     pay: (betAction) => pay(betAction, dispatch),
     fold,
     check,
-    handleClickButton: (type) => dispatch(handleClickButton(type)),
     setActionBarTurnComplete: (complete) => dispatch(setActionBarTurnComplete(complete)),
     setActionBarButtonActive: (btn) => dispatch(setActionBarButtonActive(btn)),
     updateActionBar: (payload) => dispatch(updateActionBar(payload)),
