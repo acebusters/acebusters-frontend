@@ -91,33 +91,36 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
       });
   }
 
-  async handleRecovery(wallet, receipt, confCode, privKey) {
+  async recoveryTx(wallet, receipt, confCode, privKey) {
     const factory = getWeb3().eth.contract(ABI_ACCOUNT_FACTORY).at(conf().accountFactory);
-    const getAccount = promisifyContractCall(factory.getAccount);
     const newSignerAddr = wallet.address;
+    const acc = await promisifyContractCall(factory.getAccount)(receipt.oldSignerAddr);
+    const proxyAddr = acc[0];
+    const isLocked = acc[2];
+    const data = factory.handleRecovery.getData(newSignerAddr);
 
+    if (isLocked) {
+      const forwardReceipt = new Receipt(proxyAddr).forward(0, factory.address, 0, data).sign(privKey);
+      const [txHash] = await Promise.all([
+        waitForAccountTxHash(receipt.oldSignerAddr),
+        await sendTx(forwardReceipt, confCode),
+      ]);
+
+      return txHash;
+    }
+
+    const proxy = getWeb3(true).eth.contract(ABI_PROXY).at(proxyAddr);
+    return promisifyContractCall(proxy.forward.sendTransaction)(
+      factory.address,
+      0,
+      data,
+      { from: window.web3.eth.accounts[0] }
+    );
+  }
+
+  async handleRecovery(wallet, receipt, confCode, privKey) {
     try {
-      const backendAccount = await accountService.getAccount(receipt.accountId);
-      const backendWallet = JSON.parse(backendAccount.wallet);
-
-      const acc = await getAccount(backendWallet.address);
-      const proxyAddr = acc[0];
-      const isLocked = acc[2];
-      const data = factory.handleRecovery.getData(newSignerAddr);
-
-      let txHash;
-      if (isLocked) {
-        const forwardReceipt = new Receipt(proxyAddr).forward(0, factory.address, 0, data).sign(privKey);
-        [txHash] = await Promise.all([
-          waitForAccountTxHash(wallet.address),
-          await sendTx(forwardReceipt, confCode),
-        ]);
-      } else {
-        const proxy = getWeb3(true).eth.contract(ABI_PROXY).at(proxyAddr);
-        const forward = promisifyContractCall(proxy.forward.sendTransaction);
-        txHash = await forward(factory.address, 0, data, { from: window.web3.eth.accounts[0] });
-      }
-
+      const txHash = await this.recoveryTx(wallet, receipt, confCode, privKey);
       await waitForTx(getWeb3(), txHash);
       await accountService.resetWallet(confCode, wallet);
 
