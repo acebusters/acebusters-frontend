@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { ETH } from '../../containers/Dashboard/actions';
+import { ETH, NTZ } from '../../containers/Dashboard/actions';
 import TransferDialog from '../../containers/TransferDialog';
 
 import H2 from '../H2';
@@ -17,14 +17,14 @@ import { AccountIsLocked, AccountNotLocked } from './SectionReceive';
 function Wallet(props) {
   const {
     account,
-    // babzBalance,
     ethBalance,
     nutzBalance,
     handleNTZTransfer,
     handleETHTransfer,
     amountUnit,
-    // weiBalance,
   } = props;
+
+  const AccComponent = account.isLocked ? AccountIsLocked : AccountNotLocked;
 
   return (
     <Pane name="dashboard-wallet">
@@ -33,17 +33,13 @@ function Wallet(props) {
         name="wallet-receive"
       >
         <H2><ModeIcon className="fa fa-inbox" />Deposit</H2>
-        {account.isLocked ?
-          <AccountIsLocked {...props} />
-          :
-          <AccountNotLocked {...props} />
-        }
+        <AccComponent {...props} />
       </Section>
 
       <Section name="wallet-send">
         <H2><ModeIcon className="fa fa-send" />Transfer</H2>
         <SendContainer>
-          {amountUnit === ETH ?
+          {amountUnit === ETH && ethBalance &&
             <TransferDialog
               handleTransfer={handleETHTransfer}
               maxAmount={ethBalance}
@@ -51,7 +47,8 @@ function Wallet(props) {
               placeholder="0.00"
               {...props}
             />
-            :
+          }
+          {amountUnit === NTZ && nutzBalance &&
             <TransferDialog
               handleTransfer={handleNTZTransfer}
               maxAmount={nutzBalance}

@@ -130,6 +130,14 @@ export default defineMessages({
     id: 'app.containers.Dashboard.purchaseTitle',
     defaultMessage: 'Exchange ETH for NTZ',
   },
+  floorPrice: {
+    id: 'app.containers.Dashboard.floorPrice',
+    defaultMessage: '{amount} NTZ for 1 ETH',
+  },
+  ceilingPrice: {
+    id: 'app.containers.Dashboard.ceilingPrice',
+    defaultMessage: '1 ETH for {amount} NTZ',
+  },
   tableJoin: {
     id: 'app.containers.Dashboard.tableJoin',
     defaultMessage: 'Table join',
