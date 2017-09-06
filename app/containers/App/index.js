@@ -11,6 +11,9 @@ import { ModalContainer, ModalDialog } from 'components/Modal';
 import { ModalsTransitionGroup } from 'components/Modal/ModalsTransitionGroup';
 import Notifications from 'containers/Notifications';
 
+import GoogleTagManager from 'containers/GTM';
+import { conf } from '../../app.config';
+
 import { selectNotifications } from '../Notifications/selectors';
 import { makeSelectLoggedIn } from '../AccountProvider/selectors';
 import Header from '../Header';
@@ -32,6 +35,7 @@ export function App({ notifications, loggedIn, modal, ...props }) {
 
   return (
     <div name="app-container">
+      <GoogleTagManager gtmId={conf().gtmId} />
       <StyledDashboard params={props.params} name="styled-dashboard">
         {isNotTable &&
           <Header onClickLogout={props.handleClickLogout} {...props} />
