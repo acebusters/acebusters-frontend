@@ -35,6 +35,10 @@ export function getAccount(accountId) {
   return request('get', `account/${accountId}`);
 }
 
+export function getRefs(accountId) {
+  return request('get', `refs/${accountId}`);
+}
+
 export function confirm(sessionReceipt) {
   return request('post', 'confirm', { sessionReceipt });
 }

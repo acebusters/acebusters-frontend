@@ -95,7 +95,7 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
 
           return data;
         })
-        .then((wallet) => {
+        .then(({ wallet, id }) => {
           this.props.walletImport({
             json: wallet,
             password: values.get('password'),
@@ -121,6 +121,7 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
                 this.props.setAuthState({
                   privKey: workerRsp.payload.hexSeed,
                   email: values.get('email'),
+                  accountId: id,
                   loggedIn: true,
                 });
 

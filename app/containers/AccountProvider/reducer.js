@@ -100,6 +100,7 @@ function accountProviderReducer(state = initialState, action) {
 
           return newState
             .set('privKey', action.newAuthState.privKey)
+            .set('accountId', action.newAuthState.accountId)
             .set('email', action.newAuthState.email);
         })
         .set('loggedIn', action.newAuthState.loggedIn);
