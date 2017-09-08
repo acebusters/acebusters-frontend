@@ -53,7 +53,7 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
   }
 
   handleSubmit(values, dispatch) {
-    const maxAttemptCount = 3;
+    const maxAttemptCount = 7;
     const threshold = 1000 * 60 * 5;
     const now = Date.now();
     const lastLoginAttempt = parseInt(storageService.getItem('_l') || 0, 10);
