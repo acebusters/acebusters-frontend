@@ -62,6 +62,9 @@ function waitForAccountTxHash(signerAddr) {
   });
 }
 
+const totalBits = 768;
+const bitsToBytes = (bits) => bits / 8;
+
 export class GeneratePage extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   constructor(props) {
@@ -73,6 +76,15 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
       secretCreated: false,
       entropySaved: false, // not actually saved, just a UI device
     };
+  }
+
+  componentDidMount() {
+    const crypto = window.crypto || window.msCrypto;
+    if (crypto.getRandomValues) {
+      const raw = Array.from(crypto.getRandomValues(new Uint8Array(bitsToBytes(totalBits))));
+      this.updateEntropy({ raw });
+      this.handleSaveEntropyClick();
+    }
   }
 
   handleSaveEntropyClick() {
@@ -181,7 +193,7 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
           <div>
             <H1>Create Randomness for Secret</H1>
             <Form onSubmit={handleSubmit(this.handleSaveEntropyClick)}>
-              <MouseEntropy totalBits={768} width="100%" height="200px" onFinish={this.updateEntropy} sampleRate={0} />
+              <MouseEntropy totalBits={totalBits} width="100%" height="200px" onFinish={this.updateEntropy} sampleRate={0} />
               <Field name="entropy" type="hidden" component={FormField} label="" value={entropy} />
               {error && <ErrorMessage error={error} />}
               <Button
