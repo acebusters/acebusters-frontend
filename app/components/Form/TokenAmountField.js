@@ -64,19 +64,25 @@ class TokenAmountField extends React.Component {
       type,
       amountUnit,
       setAmountUnit,
+      maxAmount,
       meta: { touched, error, warning },
     } = this.props;
+    const balanceZero = maxAmount.toString() === '0';
     return (
       <FormGroup>
         <Label htmlFor={input.name}>{label}</Label>
         <ControlWrapper>
-          <FieldGroup focus={this.state.amountFocus}>
+          <FieldGroup
+            focus={this.state.amountFocus}
+            disabled={balanceZero}
+          >
             <InputWithUnit
               {...input}
               {...this.props}
               onFocus={this.handleAmountFocus}
               type={type}
               id={input.name}
+              disabled={balanceZero}
             />
             <Unit name="unit">{amountUnit}</Unit>
           </FieldGroup>
@@ -105,6 +111,7 @@ TokenAmountField.propTypes = {
   amountUnit: PropTypes.string,
   setAmountUnit: PropTypes.func,
   reset: PropTypes.func.isRequired,
+  maxAmount: PropTypes.object,
 };
 
 export default TokenAmountField;

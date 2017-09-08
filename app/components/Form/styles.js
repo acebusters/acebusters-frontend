@@ -15,6 +15,12 @@ export const FieldGroup = styled.div`
   border: solid 1px gainsboro;
   border-radius: 4px;
   outline: ${(props) => props.focus ? '-webkit-focus-ring-color auto 5px' : 'none'};
+  ${(props) => props.disabled ?
+    `background-color: #e6e6e6;
+    cursor: not-allowed;`
+    :
+    ''
+  };
 `;
 
 export const Unit = styled.span`
