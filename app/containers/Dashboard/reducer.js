@@ -1,4 +1,4 @@
-import { fromJS } from 'immutable';
+import { fromJS, is } from 'immutable';
 
 import {
   ACCOUNT_LOADED,
@@ -201,69 +201,67 @@ function addPending(state, { methodName, args, txHash, address }) {
   return state;
 }
 
-function hasConflict(state, event) {
-  return state.hasIn(['events', event.transactionHash]);
+function hasConflict(state, newEvent) {
+  const event = state.getIn(['events', newEvent.get('transactionHash')]);
+  return event && !is(event, newEvent);
 }
 
 function addProxyContractEvent(state, event) {
-  const path = hasConflict(state, event) ? ['events', `${event.transactionHash}-${event.event}`] : ['events', event.transactionHash];
   const isDeposit = event.event === 'Deposit';
-  return state.setIn(
-    path,
-    makeDashboardEvent(event, {
-      address: isDeposit ? event.args.sender : event.args.to,
-      unit: 'eth',
-      type: isDeposit ? 'income' : 'outcome',
-    }),
-  );
+  const dashboardEvent = makeDashboardEvent(event, {
+    address: isDeposit ? event.args.sender : event.args.to,
+    unit: 'eth',
+    type: isDeposit ? 'income' : 'outcome',
+  });
+  const path = hasConflict(state, dashboardEvent) ? ['events', `${event.transactionHash}-${event.event}`] : ['events', event.transactionHash];
+
+  return state.setIn(path, dashboardEvent);
 }
 
-function addNutzContractEvent(state, event) {
-  const path = hasConflict(state, event) ? ['events', `${event.transactionHash}-${event.event}`] : ['events', event.transactionHash];
+function transformNutzContractEvent(state, event) {
   if (event.event === 'Transfer') {
     const isIncome = event.args.to === state.get('proxy');
 
     if (event.address === conf().pwrAddr) {
       if (isIncome) { // power up
-        return state.setIn(
-          path,
-          makeDashboardEvent(event, {
-            address: conf().pwrAddr,
-            unit: 'abp',
-            type: 'income',
-          }),
-        );
+        return makeDashboardEvent(event, {
+          address: conf().pwrAddr,
+          unit: 'abp',
+          type: 'income',
+        });
       }
 
       return state;
     }
 
-    return state.setIn(
-      path,
-      makeDashboardEvent(event, {
-        address: isIncome ? event.args.from : event.args.to,
-        unit: 'ntz',
-        type: isIncome ? 'income' : 'outcome',
-      }),
-    );
+    return makeDashboardEvent(event, {
+      address: isIncome ? event.args.from : event.args.to,
+      unit: 'ntz',
+      type: isIncome ? 'income' : 'outcome',
+    });
   } else if (event.event === 'Sell') {
-    return state.setIn(
-      path,
-      makeDashboardEvent(event, {
-        address: confParams.ntzAddr,
-        unit: 'ntz',
-        type: 'outcome',
-      }),
-    );
+    return makeDashboardEvent(event, {
+      address: confParams.ntzAddr,
+      unit: 'ntz',
+      type: 'outcome',
+    });
   } else if (event.event === 'Purchase') {
-    return state.setIn(
-      path,
-      makeDashboardEvent(event, {
-        address: event.args.purchaser,
-        unit: 'ntz',
-        type: 'income',
-      }),
-    );
+    return makeDashboardEvent(event, {
+      address: event.args.purchaser,
+      unit: 'ntz',
+      type: 'income',
+    });
+  }
+
+  return null;
+}
+
+function addNutzContractEvent(state, event) {
+  const dashboardEvent = transformNutzContractEvent(state, event);
+
+  if (dashboardEvent) {
+    const path = hasConflict(state, dashboardEvent) ? ['events', `${event.transactionHash}-${event.event}`] : ['events', event.transactionHash];
+    return state.setIn(path, dashboardEvent);
   }
 
   return state;
