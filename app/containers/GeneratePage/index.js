@@ -188,7 +188,6 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     const { entropySaved, secretCreated } = this.state;
     return (
       <Container>
-
         {!entropySaved ?
           <div>
             <H1>Create Randomness for Secret</H1>

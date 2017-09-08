@@ -36,7 +36,6 @@ export function conf() {
       gaProperty: 'UA-98848213-1',
       gtmId: 'GTM-T7SBXCK',
       intercomAppId: 'z9xn3a6h',
-      changellyMerchantId: '1b495d1ecc26',
       pusherApiKey: 'd4832b88a2a81f296f53',
     };
   }
@@ -63,7 +62,6 @@ export function conf() {
       gaProperty: 'UA-98848213-1',
       gtmId: 'GTM-T7SBXCK',
       intercomAppId: 'm6zcmwwq',
-      changellyMerchantId: '',
       pusherApiKey: 'd4832b88a2a81f296f53',
     };
   }
@@ -89,7 +87,6 @@ export function conf() {
     gaProperty: 'UA-XXXXX-Y',
     gtmId: 'GTM-XXXX',
     intercomAppId: 'm6zcmwwq',
-    changellyMerchantId: '',
     pusherApiKey: 'd4832b88a2a81f296f53',
   };
 }

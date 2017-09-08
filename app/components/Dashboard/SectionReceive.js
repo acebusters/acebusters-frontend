@@ -17,11 +17,6 @@ import {
   ReceiveSection,
 } from './styles';
 
-function handleChangellyClick(e) {
-  e.preventDefault();
-  window.open(e.currentTarget.href, 'Changelly', 'width=600,height=470,toolbar=0,menubar=0,location=0,status=1,scrollbars=1,resizable=0,left=0,top=0');
-}
-
 export const AccountIsLocked = (props) => {
   const {
     ETH_FISH_LIMIT,
@@ -61,13 +56,6 @@ export const AccountIsLocked = (props) => {
           <Alert theme="success">
             <Address style={{ width: 180 }}>{account.proxy}</Address>
           </Alert>
-
-          <a
-            onClick={handleChangellyClick}
-            href={`https://changelly.com/widget/v1?auth=email&from=BTC&to=ETH&merchant_id=${conf().changellyMerchantId}&address=${account.proxy}&amount=1&ref_id=${conf().changellyMerchantId}&color=cf0000`}
-          >
-            <img src="https://changelly.com/pay_button.png" alt="Changelly" />
-          </a>
         </WithLoading>
       </ReceiveWrapper>
 
@@ -135,12 +123,6 @@ export const AccountNotLocked = ({
           <FormattedMessage {...messages.ethAlert} />
         </Alert>
       }
-      <a
-        onClick={handleChangellyClick}
-        href={`https://changelly.com/widget/v1?auth=email&from=BTC&to=ETH&merchant_id=${conf().changellyMerchantId}&address=${account.proxy}&amount=1&ref_id=${conf().changellyMerchantId}&color=cf0000`}
-      >
-        <img src="https://changelly.com/pay_button.png" alt="Changelly" />
-      </a>
     </ReceiveWrapper>
   </ReceiveSection>
 );
