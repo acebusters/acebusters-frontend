@@ -1,7 +1,13 @@
+import { promisifyContractCall } from './promisifyContractCall';
+
 export function waitForTx(web3, txHash) {
+  const getTransaction = promisifyContractCall(web3.eth.getTransaction);
+  let transaction;
+
   return new Promise((resolve, reject) => {
     const filter = web3.eth.filter('latest');
-    web3.eth.getTransaction(txHash, (txError, transaction) => {
+    getTransaction(txHash).then((_transaction) => {
+      transaction = _transaction;
       const checkReceipt = () => {
         web3.eth.getTransactionReceipt(txHash, (receipErr, receipt) => {
           if (receipt) {
@@ -15,25 +21,27 @@ export function waitForTx(web3, txHash) {
         });
       };
 
-      if (txError) {
-        reject(txError);
-      } else {
+      if (transaction) {
         // maybe tx already mined and watch wouldn't catch it, so we need to check receipt
         checkReceipt();
+      }
 
-        filter.watch((err, blockHash) => {
-          if (err) {
-            reject(err);
-            filter.stopWatching(() => null);
-          }
+      filter.watch(async (err, blockHash) => {
+        if (err) {
+          reject(err);
+          filter.stopWatching(() => null);
+        }
 
+        transaction = transaction || await getTransaction(txHash);
+
+        if (transaction) {
           web3.eth.getBlock(blockHash, true, (blockErr, block) => {
             if (!blockErr && block.transactions.some((tx) => tx.hash === txHash)) {
               checkReceipt();
             }
           });
-        });
-      }
+        }
+      });
     });
   });
 }
