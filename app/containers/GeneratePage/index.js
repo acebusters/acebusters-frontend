@@ -133,8 +133,8 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
   async handleRecovery(wallet, receipt, confCode, privKey) {
     try {
       const txHash = await this.recoveryTx(wallet, receipt, confCode, privKey);
-      await waitForTx(getWeb3(), txHash);
       await accountService.resetWallet(confCode, wallet);
+      await waitForTx(getWeb3(), txHash);
 
       browserHistory.push('/login');
     } catch (e) {
