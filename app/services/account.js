@@ -43,10 +43,11 @@ export function confirm(sessionReceipt) {
   return request('post', 'confirm', { sessionReceipt });
 }
 
-export function addWallet(sessionReceipt, wallet) {
+export function addWallet(sessionReceipt, wallet, txHash) {
   return request('post', 'wallet', {
     sessionReceipt,
     wallet: JSON.stringify(wallet),
+    txHash,
   });
 }
 

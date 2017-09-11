@@ -16,6 +16,7 @@ import { ErrorMessage } from '../../components/FormMessages';
 
 import * as accountService from '../../services/account';
 import * as storageService from '../../services/localStorage';
+import { makeSelectInjected, makeSelectNetworkSupported } from '../../containers/AccountProvider/selectors';
 import { getWeb3 } from '../../containers/AccountProvider/utils';
 import { waitForTx } from '../../utils/waitForTx';
 import { promisifyContractCall } from '../../utils/promisifyContractCall';
@@ -91,15 +92,37 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     this.setState({ entropySaved: true });
   }
 
-  handleCreate(wallet, receipt, confCode) {
+  createTx(wallet, receipt, confCode) {
+    const { injectedAccount, networkSupported } = this.props;
+    if (injectedAccount && networkSupported) {
+      const web3 = getWeb3(true);
+      const factory = web3.eth.contract(ABI_ACCOUNT_FACTORY).at(conf().accountFactory);
+      const create = promisifyContractCall(factory.create.sendTransaction);
+      return (
+        create(wallet.address, 0, { from: injectedAccount })
+          .then((txHash) => accountService.addWallet(confCode, wallet, txHash).then(() => txHash))
+      );
+    }
+
     return Promise.all([
       waitForAccountTxHash(wallet.address),
       accountService.addWallet(confCode, wallet),
-    ])
-      .catch(throwSubmitError)
-      .then(([txHash]) => {
-        this.props.onAccountTxHashReceived(txHash);
-        browserHistory.push('/login');
+    ]).then(([txHash]) => txHash);
+  }
+
+  handleCreate(wallet, receipt, confCode) {
+    return this.createTx(wallet, receipt, confCode)
+      .catch((err) => {
+        if (err.message.indexOf('Error: MetaMask Tx Signature') === -1) {
+          throwSubmitError(err);
+        }
+        return Promise.resolve();
+      })
+      .then((txHash) => {
+        if (txHash) {
+          this.props.onAccountTxHashReceived(txHash);
+          browserHistory.push('/login');
+        }
       });
   }
 
@@ -260,6 +283,8 @@ function mapDispatchToProps(dispatch) {
 const selector = formValueSelector('register');
 const mapStateToProps = (state) => ({
   entropy: selector(state, 'entropy'),
+  injectedAccount: makeSelectInjected()(state),
+  networkSupported: makeSelectNetworkSupported()(state),
 });
 
 // Wrap the component to inject dispatch and state into it
