@@ -8,7 +8,7 @@ import { nickNameByAddress } from '../../../services/nicknames';
 import { ABI_ACCOUNT_FACTORY, conf } from '../../../app.config';
 import { indentity } from '../../../utils';
 import { modalAdd } from '../../../containers/App/actions';
-import { promisifyContractCall } from '../../../utils/promisifyContractCall';
+import { promisifyWeb3Call } from '../../../utils/promisifyWeb3Call';
 
 import { getWeb3 } from '../utils';
 import { SET_AUTH, WEB3_CONNECTED, accountLoaded } from '../actions';
@@ -18,7 +18,7 @@ import { ethEventListenerSaga } from './ethEventListenerSaga';
 const getAccount = (web3, signer) => {
   const factoryContract = web3.eth.contract(ABI_ACCOUNT_FACTORY).at(conf().accountFactory);
   return (
-    promisifyContractCall(factoryContract.getAccount.call)(signer)
+    promisifyWeb3Call(factoryContract.getAccount.call)(signer)
       .then(
         indentity,
         () => Promise.reject('login error')

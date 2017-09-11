@@ -19,7 +19,7 @@ import * as storageService from '../../services/localStorage';
 import { makeSelectInjected, makeSelectNetworkSupported } from '../../containers/AccountProvider/selectors';
 import { getWeb3 } from '../../containers/AccountProvider/utils';
 import { waitForTx } from '../../utils/waitForTx';
-import { promisifyContractCall } from '../../utils/promisifyContractCall';
+import { promisifyWeb3Call } from '../../utils/promisifyWeb3Call';
 import { conf, ABI_ACCOUNT_FACTORY, ABI_PROXY } from '../../app.config';
 import { sendTx } from '../../services/transactions';
 
@@ -97,7 +97,7 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     if (injectedAccount && networkSupported) {
       const web3 = getWeb3(true);
       const factory = web3.eth.contract(ABI_ACCOUNT_FACTORY).at(conf().accountFactory);
-      const create = promisifyContractCall(factory.create.sendTransaction);
+      const create = promisifyWeb3Call(factory.create.sendTransaction);
       return (
         create(wallet.address, 0, { from: injectedAccount })
           .then((txHash) => accountService.addWallet(confCode, wallet, txHash).then(() => txHash))
@@ -129,7 +129,7 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
   async recoveryTx(wallet, receipt, confCode, privKey) {
     const factory = getWeb3().eth.contract(ABI_ACCOUNT_FACTORY).at(conf().accountFactory);
     const newSignerAddr = wallet.address;
-    const acc = await promisifyContractCall(factory.getAccount)(receipt.oldSignerAddr);
+    const acc = await promisifyWeb3Call(factory.getAccount)(receipt.oldSignerAddr);
     const proxyAddr = acc[0];
     const isLocked = acc[2];
     const data = factory.handleRecovery.getData(newSignerAddr);
@@ -145,7 +145,7 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     }
 
     const proxy = getWeb3(true).eth.contract(ABI_PROXY).at(proxyAddr);
-    return promisifyContractCall(proxy.forward.sendTransaction)(
+    return promisifyWeb3Call(proxy.forward.sendTransaction)(
       factory.address,
       0,
       data,

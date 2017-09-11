@@ -1,6 +1,6 @@
 import { delay } from 'redux-saga';
 import { call, put } from 'redux-saga/effects';
-import { promisifyContractCall } from '../../../utils/promisifyContractCall';
+import { promisifyWeb3Call } from '../../../utils/promisifyWeb3Call';
 import { waitForTx } from '../../../utils/waitForTx';
 import { getWeb3 } from '../utils';
 import { contractTxNotExists, contractTxFailed, contractTxMined } from '../actions';
@@ -10,7 +10,7 @@ const TX_CHECK_DELAY = 500;
 
 function* getTransaction(txHash) {
   const web3 = yield call(getWeb3);
-  const getTx = promisifyContractCall(web3.eth.getTransaction);
+  const getTx = promisifyWeb3Call(web3.eth.getTransaction);
 
   try {
     for (let i = 0; i <= Math.ceil(TX_TIMEOUT / TX_CHECK_DELAY); i += 1) {

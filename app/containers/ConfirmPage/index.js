@@ -18,7 +18,7 @@ import NoWeb3Message from '../../components/Web3Alerts/NoWeb3';
 import UnsupportedNetworkMessage from '../../components/Web3Alerts/UnsupportedNetwork';
 import { getWeb3 } from '../../containers/AccountProvider/utils';
 import { makeSelectHasWeb3, makeSelectNetworkSupported } from '../../containers/AccountProvider/selectors';
-import { promisifyContractCall } from '../../utils/promisifyContractCall';
+import { promisifyWeb3Call } from '../../utils/promisifyWeb3Call';
 import { ABI_ACCOUNT_FACTORY, conf } from '../../app.config';
 
 import messages from './messages';
@@ -112,7 +112,7 @@ export class ConfirmPage extends React.PureComponent { // eslint-disable-line re
       });
 
       const factory = getWeb3().eth.contract(ABI_ACCOUNT_FACTORY).at(conf().accountFactory);
-      const getAccount = promisifyContractCall(factory.getAccount);
+      const getAccount = promisifyWeb3Call(factory.getAccount);
 
       if (receipt.type === Type.RESET_CONF) {
         getAccount(receipt.oldSignerAddr).then((acc) => this.setState({ isLocked: acc[2] }));

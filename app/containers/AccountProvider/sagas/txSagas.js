@@ -5,7 +5,7 @@ import { Receipt } from 'poker-helper';
 import BigNumber from 'bignumber.js';
 import { conf, ABI_PROXY } from '../../../app.config';
 import { last } from '../../../utils';
-import { promisifyContractCall } from '../../../utils/promisifyContractCall';
+import { promisifyWeb3Call } from '../../../utils/promisifyWeb3Call';
 import { sendTx } from '../../../services/transactions';
 
 import { getWeb3 } from '../utils';
@@ -34,8 +34,8 @@ function* contractTransactionSend(action) {
 
   const web3 = yield call(getWeb3, true);
   const proxy = web3.eth.contract(ABI_PROXY).at(proxyAddr);
-  const estimateGas = yield call(promisifyContractCall, proxy.forward.estimateGas);
-  const sendTransaction = yield call(promisifyContractCall, proxy.forward.sendTransaction);
+  const estimateGas = yield call(promisifyWeb3Call, proxy.forward.estimateGas);
+  const sendTransaction = yield call(promisifyWeb3Call, proxy.forward.sendTransaction);
   const gas = yield call(estimateGas, ...txArgs, { from: injectedAddr });
 
   return yield call(sendTransaction, ...txArgs, { from: injectedAddr, gas: Math.round(gas * 1.9) });

@@ -2,7 +2,7 @@ import { Receipt } from 'poker-helper';
 
 import { getWeb3 } from '../containers/AccountProvider/sagas';
 import { bn } from '../utils/amountFormatter';
-import { promisifyContractCall } from '../utils/promisifyContractCall';
+import { promisifyWeb3Call } from '../utils/promisifyWeb3Call';
 import { conf, ABI_TABLE_FACTORY } from '../app.config';
 
 import { requestApi } from './api';
@@ -139,7 +139,7 @@ export function getHand(tableAddr, handId) {
 
 export function fetchTables() {
   const tableFactoryContract = getWeb3().eth.contract(ABI_TABLE_FACTORY).at(conf().tableFactory);
-  return promisifyContractCall(tableFactoryContract.getTables.call)();
+  return promisifyWeb3Call(tableFactoryContract.getTables.call)();
 }
 
 export default TableService;

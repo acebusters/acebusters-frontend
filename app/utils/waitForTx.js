@@ -1,7 +1,7 @@
-import { promisifyContractCall } from './promisifyContractCall';
+import { promisifyWeb3Call } from './promisifyWeb3Call';
 
 export function waitForTx(web3, txHash) {
-  const getTransaction = promisifyContractCall(web3.eth.getTransaction);
+  const getTransaction = promisifyWeb3Call(web3.eth.getTransaction);
   let transaction;
 
   return new Promise((resolve, reject) => {
