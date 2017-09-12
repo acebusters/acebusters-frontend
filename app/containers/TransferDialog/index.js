@@ -20,8 +20,6 @@ const validate = (values, props) => {
   const { messages, maxAmount, minAmount = 0 } = props;
   const amount = values.get('amount');
 
-  validateFloat(messages, errors, amount, minAmount, maxAmount);
-
   // address validation
   if (!values.get('address') && !props.hideAddress) {
     errors.address = 'Required';
@@ -29,7 +27,7 @@ const validate = (values, props) => {
     errors.address = 'Invalid Ethereum Address.';
   }
 
-  return errors;
+  return validateFloat(messages, errors, amount, minAmount, maxAmount);
 };
 
 const warn = () => {

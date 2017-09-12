@@ -30,6 +30,7 @@ const Exchange = (props) => {
         <ExchangeContainer>
           {amountUnit === NTZ && nutzBalance && floor &&
             <ExchangeDialog
+              form="exchangeNTZ"
               title={<FormattedMessage {...messages.sellTitle} />}
               descr={<FormattedMessage {...messages.floorPrice} values={{ amount: formatNtz(floor.mul(NTZ_DECIMALS)) }} />}
               amountUnit={NTZ}
@@ -47,6 +48,7 @@ const Exchange = (props) => {
           }
           {amountUnit === ETH && ethBalance && ceiling &&
             <ExchangeDialog
+              form="exchangeETH"
               title={<FormattedMessage {...messages.purchaseTitle} />}
               descr={<FormattedMessage {...messages.ceilingPrice} values={{ amount: formatNtz(ceiling.mul(NTZ_DECIMALS)) }} />}
               amountUnit={ETH}

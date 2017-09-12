@@ -76,7 +76,6 @@ class ExchangeDialog extends React.Component { // eslint-disable-line react/pref
             modalDismiss={this.props.modalDismiss}
             amountUnit={this.props.amountUnit}
             setAmountUnit={this.props.setAmountUnit}
-            reset={this.props.reset}
             placeholder={placeholder}
           />
 
@@ -128,7 +127,6 @@ ExchangeDialog.propTypes = {
   title: PropTypes.node,
   descr: PropTypes.node,
   amountUnit: PropTypes.string.isRequired,
-  reset: PropTypes.func,
   placeholder: PropTypes.string,
 };
 

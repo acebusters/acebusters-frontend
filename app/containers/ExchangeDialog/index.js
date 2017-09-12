@@ -16,9 +16,7 @@ const validate = (values, props) => {
   const { maxAmount, minAmount = 0 } = props;
   const amount = values.get('amount');
 
-  validateFloat(messages, errors, amount, minAmount, maxAmount);
-
-  return errors;
+  return validateFloat(messages, errors, amount, minAmount, maxAmount);
 };
 
 const warn = () => {
@@ -26,23 +24,23 @@ const warn = () => {
   return warnings;
 };
 
-const valueSelector = formValueSelector('exchange');
-
-const mapStateToProps = (state) => ({
-  messages,
-  amount: valueSelector(state, 'amount'),
-  hasWeb3: makeSelectHasWeb3()(state),
-  networkSupported: makeSelectNetworkSupported()(state),
-});
-
-function mapDispatchToProps(dispatch) {
+const mapStateToProps = (state, ownProps) => {
+  const valueSelector = formValueSelector(ownProps.form);
   return {
-    stopSubmit: (errors) => dispatch(stopSubmit('exchange', errors)),
+    messages,
+    amount: valueSelector(state, 'amount'),
+    hasWeb3: makeSelectHasWeb3()(state),
+    networkSupported: makeSelectNetworkSupported()(state),
+  };
+};
+
+function mapDispatchToProps(dispatch, ownProps) {
+  return {
+    stopSubmit: (errors) => dispatch(stopSubmit(ownProps.form, errors)),
   };
 }
 
 export default reduxForm({
-  form: 'exchange',
   validate,
   warn,
 })(
