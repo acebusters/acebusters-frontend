@@ -6,6 +6,7 @@ export function* updateLoggedInStatusSaga(action) { // SET_AUTH action
     storageService.removeItem('privKey');
     storageService.removeItem('email');
     storageService.removeItem('accountId');
+    storageService.removeItem('proxyAddr');
   } else {
     Raven.setUserContext({
       email: action.newAuthState.email,
@@ -13,5 +14,6 @@ export function* updateLoggedInStatusSaga(action) { // SET_AUTH action
     storageService.setItem('privKey', action.newAuthState.privKey);
     storageService.setItem('email', action.newAuthState.email);
     storageService.setItem('accountId', action.newAuthState.accountId);
+    storageService.setItem('proxyAddr', action.newAuthState.proxyAddr);
   }
 }

@@ -14,12 +14,6 @@ import Container from '../../components/Container';
 import Button from '../../components/Button';
 import H1 from '../../components/H1';
 import FieldIntl from '../../components/FieldIntl';
-import NoWeb3Message from '../../components/Web3Alerts/NoWeb3';
-import UnsupportedNetworkMessage from '../../components/Web3Alerts/UnsupportedNetwork';
-import { getWeb3 } from '../../containers/AccountProvider/utils';
-import { makeSelectHasWeb3, makeSelectNetworkSupported } from '../../containers/AccountProvider/selectors';
-import { promisifyWeb3Call } from '../../utils/promisifyWeb3Call';
-import { ABI_ACCOUNT_FACTORY, conf } from '../../app.config';
 
 import messages from './messages';
 
@@ -81,7 +75,6 @@ export class ConfirmPage extends React.PureComponent { // eslint-disable-line re
 
     this.state = {
       type: null,
-      isLocked: null,
       msg: {
         header: messages.header,
         label: messages.label,
@@ -108,15 +101,7 @@ export class ConfirmPage extends React.PureComponent { // eslint-disable-line re
       this.setState({
         type: receipt.type,
         msg: messagesByReceiptType(receipt.type),
-        isLocked: null,
       });
-
-      const factory = getWeb3().eth.contract(ABI_ACCOUNT_FACTORY).at(conf().accountFactory);
-      const getAccount = promisifyWeb3Call(factory.getAccount);
-
-      if (receipt.type === Type.RESET_CONF) {
-        getAccount(receipt.oldSignerAddr).then((acc) => this.setState({ isLocked: acc[2] }));
-      }
     } catch (e) {
       // Note: means that it is an invalid code
     }
@@ -147,9 +132,8 @@ export class ConfirmPage extends React.PureComponent { // eslint-disable-line re
   }
 
   render() {
-    const { error, handleSubmit, invalid, submitting, hasWeb3, isNetworkSupported } = this.props;
-    const { msg, isLocked, type } = this.state;
-    const allowSubmit = type === Type.CREATE_CONF || (hasWeb3 && isNetworkSupported && !isLocked) || isLocked;
+    const { error, handleSubmit, invalid, submitting } = this.props;
+    const { msg } = this.state;
 
     return (
       <Container>
@@ -168,18 +152,10 @@ export class ConfirmPage extends React.PureComponent { // eslint-disable-line re
 
           {error && <strong>{error}</strong>}
 
-          {isLocked === false && !hasWeb3 &&
-            <NoWeb3Message />
-          }
-
-          {isLocked === false && hasWeb3 && !isNetworkSupported &&
-            <UnsupportedNetworkMessage />
-          }
-
           <Button
             type="submit"
             size="large"
-            disabled={submitting || invalid || !allowSubmit}
+            disabled={submitting || invalid}
           >
             {(!submitting)
               ? <FormattedMessage {...msg.button} />
@@ -197,8 +173,6 @@ ConfirmPage.propTypes = {
   dispatch: PropTypes.func.isRequired,
   submitting: PropTypes.bool,
   hasWeb3: PropTypes.bool,
-  isNetworkSupported: PropTypes.bool,
-  handleSubmit: PropTypes.func,
   error: PropTypes.any,
 };
 
@@ -213,8 +187,6 @@ const mapStateToProps = (state, ownProps) => ({
   initialValues: {
     confCode: ownProps.params.confCode && decodeURIComponent(ownProps.params.confCode),
   },
-  hasWeb3: makeSelectHasWeb3()(state, ownProps),
-  isNetworkSupported: makeSelectNetworkSupported()(state, ownProps),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(reduxForm({ form: 'confirm', validate, warn })(ConfirmPage));
