@@ -130,8 +130,6 @@ class DashboardRoot extends React.Component {
       this.watchProxyEvents(this.props.account.proxy);
       this.watchTokenEvents(this.props.account.proxy);
       this.watchPowerEvents(this.props.account.proxy);
-      this.power.balanceOf.call(this.props.account.proxy);
-      this.pullPayment.paymentOf.call(this.props.account.proxy);
     }
 
     this.state = {
@@ -147,9 +145,6 @@ class DashboardRoot extends React.Component {
       this.watchProxyEvents(nextAccount.proxy);
       this.watchTokenEvents(nextAccount.proxy);
       this.watchPowerEvents(nextAccount.proxy);
-      this.power.balanceOf.call(nextAccount.proxy);
-
-      this.pullPayment.paymentOf.call(nextAccount.proxy);
     }
 
     if (this.props.dashboardTxs.txError !== nextProps.dashboardTxs.txError && nextProps.dashboardTxs.txError) {
@@ -170,8 +165,9 @@ class DashboardRoot extends React.Component {
   }
 
   watchProxyEvents(proxyAddr) {
-    this.proxy = this.web3.eth.contract(ABI_PROXY).at(proxyAddr);
+    this.pullPayment.paymentOf.call(proxyAddr);
 
+    this.proxy = this.web3.eth.contract(ABI_PROXY).at(proxyAddr);
     this.web3.eth.getBlockNumber((err, blockNumber) => {
       this.proxy.allEvents({
         fromBlock: blockNumber - LOOK_BEHIND_PERIOD,
@@ -181,7 +177,6 @@ class DashboardRoot extends React.Component {
           .then((events) => this.props.proxyEvents(events, proxyAddr));
       });
     });
-
     this.proxy.allEvents({
       toBlock: 'latest',
     }).watch((error, event) => {
@@ -200,6 +195,7 @@ class DashboardRoot extends React.Component {
   }
 
   watchPowerEvents(proxyAddr) {
+    this.power.balanceOf.call(proxyAddr);
     this.web3.eth.getBlockNumber((err, blockNumber) => {
       this.power.allEvents({
         fromBlock: blockNumber - LOOK_BEHIND_PERIOD,
