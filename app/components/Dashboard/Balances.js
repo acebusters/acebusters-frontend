@@ -2,12 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {
-  formatEth,
-  formatNtz,
+  toEth,
+  toNtz,
   formatAbp,
 } from '../../utils/amountFormatter';
 
 import WithLoading from '../WithLoading';
+import GloryNumber from './GloryNumber';
 
 import { Bold, BalanceSection, BalanceWrapper } from './styles';
 
@@ -28,7 +29,7 @@ const Balances = ({
         type="inline"
         styles={{ layout: { marginLeft: '15px' } }}
       >
-        {babzBalance && formatNtz(babzBalance)} <Bold>NTZ</Bold>
+        {babzBalance && <GloryNumber number={toNtz(babzBalance)} postfix={<Bold>NTZ</Bold>} decimals={0} />}
       </WithLoading>
     </BalanceWrapper>
 
@@ -39,7 +40,7 @@ const Balances = ({
         type="inline"
         styles={{ layout: { marginLeft: '15px' } }}
       >
-        {weiBalance && formatEth(weiBalance)} <Bold>ETH</Bold>
+        {weiBalance && <GloryNumber number={toEth(weiBalance)} postfix={<Bold>ETH</Bold>} />}
       </WithLoading>
     </BalanceWrapper>
 

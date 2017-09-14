@@ -17,13 +17,19 @@ export const babz = (ntz) => NTZ_DECIMALS.mul(ntz);
 
 export const bn = (amount) => (typeof amount === 'object' && amount !== null) ? amount : new BigNumber(amount || 0);
 
-export function formatAmount(decimals, amount, dp) {
+export function toAmount(decimals, amount) {
   const amountBn = bn(amount);
-  const divBn = amountBn.div(decimals);
+  return amountBn.div(decimals);
+}
+
+export function formatAmount(decimals, amount, dp) {
+  const divBn = toAmount(decimals, amount);
   const decimalPlaces = dp === undefined ? divBn.dp() : dp;
   return divBn.toFormat(decimalPlaces);
 }
 
+export const toEth = toAmount.bind(null, ETH_DECIMALS);
+export const toNtz = toAmount.bind(null, NTZ_DECIMALS);
 export const formatNtz = (amount, dp = 0) => formatAmount(NTZ_DECIMALS, amount, dp);
 export const formatAbp = formatAmount.bind(null, ABP_DECIMALS);
 export const formatEth = formatAmount.bind(null, ETH_DECIMALS);
