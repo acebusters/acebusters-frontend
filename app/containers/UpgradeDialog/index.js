@@ -74,7 +74,8 @@ class UpgradeDialog extends React.Component {
       );
       await waitForTx(getWeb3(), txHash);
     } catch (e) {
-      throw new SubmissionError(`Error: ${e.message || e}`);
+      setImmediate(() => this.props.change('accept', false));
+      throw new SubmissionError({ _error: `Error: ${e.message || e}` });
     }
   }
 
@@ -140,6 +141,7 @@ UpgradeDialog.propTypes = {
   submitting: PropTypes.bool,
   handleSubmit: PropTypes.func,
   accountUnlocked: PropTypes.func,
+  change: PropTypes.func,
   onSuccessButtonClick: PropTypes.func,
 };
 
