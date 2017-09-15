@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 import { Form, Field, reduxForm, SubmissionError, propTypes, change, formValueSelector } from 'redux-form/immutable';
 import { browserHistory } from 'react-router';
 import { Receipt, Type } from 'poker-helper';
-import Pusher from 'pusher-js';
 
 // components
 import Container from '../../components/Container';
@@ -19,7 +18,7 @@ import * as accountService from '../../services/account';
 import * as storageService from '../../services/localStorage';
 import { makeSelectInjected, makeSelectNetworkSupported } from '../../containers/AccountProvider/selectors';
 import { getWeb3 } from '../../containers/AccountProvider/utils';
-import { conf, ABI_PROXY } from '../../app.config';
+import { ABI_PROXY } from '../../app.config';
 import { promisifyWeb3Call } from '../../utils/promisifyWeb3Call';
 
 import { walletExport, register, accountTxHashReceived } from './actions';
@@ -48,19 +47,6 @@ const warn = (values) => {
   }
   return warnings;
 };
-
-function waitForAccountTxHash(signerAddr) {
-  const pusher = new Pusher(conf().pusherApiKey, { cluster: 'eu', encrypted: true });
-  const channel = pusher.subscribe(signerAddr);
-  return new Promise((resolve) => {
-    channel.bind('update', (event) => {
-      if (event.type === 'txHash') {
-        resolve(event.payload);
-        channel.unbind('update');
-      }
-    });
-  });
-}
 
 const totalBits = 768;
 const bitsToBytes = (bits) => bits / 8;
@@ -122,10 +108,7 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
       return transactionHash;
     }
 
-    return Promise.all([
-      waitForAccountTxHash(wallet.address),
-      accountService.addWallet(confCode, wallet),
-    ]).then(([txHash]) => txHash);
+    return accountService.addWallet(confCode, wallet).then(() => undefined);
   }
 
   handleCreate(wallet, receipt, confCode) {
@@ -139,8 +122,8 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
       .then((txHash) => {
         if (txHash) {
           this.props.onAccountTxHashReceived(txHash);
-          browserHistory.push('/login');
         }
+        browserHistory.push('/login');
       });
   }
 
