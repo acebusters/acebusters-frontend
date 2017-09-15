@@ -7,6 +7,9 @@ export default class Captcha extends React.Component { // eslint-disable-line re
   componentWillReceiveProps(nextProps) {
     if (nextProps.error && nextProps.error !== this.props.error) {
       this.recaptcha.reset();
+      if (typeof nextProps.input.onChange === 'function') {
+        nextProps.input.onChange(false);
+      }
     }
   }
 

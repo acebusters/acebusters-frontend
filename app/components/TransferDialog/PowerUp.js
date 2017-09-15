@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedHTMLMessage } from 'react-intl';
+import { FormattedMessage, FormattedHTMLMessage } from 'react-intl';
 
 import TransferDialog from '../../containers/TransferDialog';
 
@@ -25,8 +25,11 @@ const PowerUp = (props) => {
         <TransferDialog
           handleTransfer={handlePowerUp}
           maxAmount={nutzBalance}
+          label={<FormattedMessage {...messages.powerUpAmountLabel} />}
           hideAddress
           amountUnit="NTZ"
+          placeholder="0"
+          {...props}
         />
         :
         <Alert theme="warning">

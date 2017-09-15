@@ -8,7 +8,6 @@ import { createStructuredSelector } from 'reselect';
 import { browserHistory } from 'react-router';
 import Pusher from 'pusher-js';
 import Raven from 'raven-js';
-import { FormattedMessage } from 'react-intl';
 import { Receipt } from 'poker-helper';
 import * as storageService from '../../services/sessionStorage';
 
@@ -22,7 +21,6 @@ import Seat from '../Seat';
 import Button from '../../components/Button';
 import WithLoading from '../../components/WithLoading';
 import { nickNameByAddress } from '../../services/nicknames';
-import messages from './messages';
 import { formatNtz } from '../../utils/amountFormatter';
 import { promisifyContractCall } from '../../utils/promisifyContractCall';
 
@@ -48,6 +46,7 @@ import {
   setExitHand,
   sitOutToggle,
   bet,
+  fishTxHash,
 } from './actions';
 // selectors
 import makeSelectAccountData, {
@@ -58,7 +57,6 @@ import makeSelectAccountData, {
 
 import {
   makeLastReceiptSelector,
-  makeMyLastReceiptSelector,
   makeMyStackSelector,
   makeMyStandingUpSelector,
   makeMyPendingSeatSelector,
@@ -79,6 +77,7 @@ import {
   makeMySitoutSelector,
   makeLatestHandSelector,
   makeSelectWinners,
+  makeMyLastReceiptSelector,
 } from './selectors';
 
 import TableComponent from '../../components/Table';
@@ -86,7 +85,6 @@ import web3Connect from '../AccountProvider/web3Connect';
 import TableService, { getHand, fetchTableState } from '../../services/tableService';
 import * as reservationService from '../../services/reservationService';
 import JoinDialog from '../JoinDialog';
-import JoinSlides from '../JoinDialog/slides';
 import InviteDialog from '../InviteDialog';
 import RebuyDialog from '../RebuyDialog';
 
@@ -255,6 +253,8 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       this.props.seatReserved(this.tableAddr, event.payload);
     } else if (event.type === 'seatsRelease') {
       this.props.seatsReleased(this.tableAddr, event.payload);
+    } else if (event.type === 'txHash') {
+      this.props.fishTxHash(event.payload);
     }
   }
 
@@ -302,17 +302,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       await reserveSeat();
     }
 
-    const slides = (
-      <div>
-        <JoinSlides />
-        <Button size="large" onClick={this.props.modalDismiss}>
-          <FormattedMessage {...messages.joinModal.buttonDismiss} />
-        </Button>
-      </div>
-    );
-
     this.props.modalDismiss();
-    this.props.modalAdd(slides);
     this.props.setPending(
       this.tableAddr,
       this.props.latestHand,
@@ -321,6 +311,8 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     );
 
     if (account.isLocked) {
+      const signerChannel = this.pusher.subscribe(signerAddr);
+      signerChannel.bind('update', this.handleUpdate);
       await reserveSeat();
     }
   }
@@ -364,10 +356,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     //    sitout === undefined, for enabled "pause"
     //    sitout === null, for disabled "pause"
     // And we are only able to toggle sitout when it's enabled.
-    const sitout = this.props.sitout;
+    const { sitout, sitoutAmount } = this.props;
 
     if (sitout !== undefined && sitout <= 0) return null;
-    if (this.props.sitoutAmount <= -1) return null;
+    if (sitoutAmount <= -1) return null;
 
     // Note: if it's enabled "play" (> 0), then set it to disabled "pause" (null)
     // otherwise it's enabled "pause", then set it to disabled "play" (0)
@@ -376,7 +368,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     const sitoutAction = bet(
       this.props.params.tableAddr,
       handId,
-      this.props.sitoutAmount,
+      sitoutAmount,
       this.props.privKey,
       this.props.myPos,
       this.props.lastReceipt,
@@ -417,8 +409,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
   watchTable(error, result) {
     if (error) {
-      const errorElement = (<p>{error}/</p>);
-      this.props.modalAdd(errorElement);
+      Raven.captureException(error, { tags: {
+        tableAddr: this.props.params.tableAddr,
+        handId: this.props.latestHand,
+      } });
       return;
     }
 
@@ -605,6 +599,7 @@ export function mapDispatchToProps() {
     setExitHand,
     updateReceived,
     addMessage,
+    fishTxHash,
     seatReserved,
   };
 }
@@ -669,6 +664,7 @@ Table.propTypes = {
   seatsReleased: React.PropTypes.func,
   updateReceived: React.PropTypes.func,
   addMessage: React.PropTypes.func,
+  fishTxHash: React.PropTypes.func,
   location: React.PropTypes.object,
   account: React.PropTypes.object,
   myPendingSeat: React.PropTypes.number,

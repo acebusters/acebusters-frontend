@@ -18,12 +18,11 @@ export const CONTRACT_METHOD_SUCCESS = 'acebusters/AccountProvider/CONTRACT_METH
 export const CONTRACT_METHOD_ERROR = 'acebusters/AccountProvider/CONTRACT_METHOD_ERROR';
 
 export const CONTRACT_TX_SEND = 'acebusters/AccountProvider/CONTRACT_TX_SEND';
-export const CONTRACT_TX_SUCCESS = 'acebusters/AccountProvider/CONTRACT_TX_SUCCESS';
+export const CONTRACT_TX_SENDED = 'acebusters/AccountProvider/CONTRACT_TX_SENDED';
 export const CONTRACT_TX_ERROR = 'acebusters/AccountProvider/CONTRACT_TX_ERROR';
-
-export const ETH_TRANSFER = 'acebusters/AccountProvider/ETH_TRANSFER';
-export const ETH_TRANSFER_SUCCESS = 'acebusters/AccountProvider/ETH_TRANSFER_SUCCESS';
-export const ETH_TRANSFER_ERROR = 'acebusters/AccountProvider/ETH_TRANSFER_ERROR';
+export const CONTRACT_TX_NOT_EXISTS = 'acebusters/AccountProvider/CONTRACT_TX_NOT_EXISTS';
+export const CONTRACT_TX_FAILED = 'acebusters/AccountProvider/CONTRACT_TX_FAILED';
+export const CONTRACT_TX_MINED = 'acebusters/AccountProvider/CONTRACT_TX_MINED';
 
 export const PROXY_EVENTS = 'acebusters/AccountProvider/PROXY_EVENTS';
 
@@ -150,18 +149,6 @@ export function contractMethodError({ address, key, payload }) {
   return { type: CONTRACT_METHOD_ERROR, address, key, payload };
 }
 
-export function transferETH(payload) {
-  return { type: ETH_TRANSFER, payload };
-}
-
-export function transferETHSuccess(payload) {
-  return { type: ETH_TRANSFER_SUCCESS, payload };
-}
-
-export function transferETHError(payload) {
-  return { type: ETH_TRANSFER_ERROR, payload };
-}
-
 export function proxyEvent(event, proxy) {
   return proxyEvents([event], proxy);
 }
@@ -178,12 +165,24 @@ export function contractTxSend(payload) {
   return { type: CONTRACT_TX_SEND, payload };
 }
 
-export function contractTxSuccess(payload) {
-  return { type: CONTRACT_TX_SUCCESS, payload };
+export function contractTxSended(payload) {
+  return { type: CONTRACT_TX_SENDED, payload };
 }
 
 export function contractTxError(payload) {
   return { type: CONTRACT_TX_ERROR, payload };
+}
+
+export function contractTxNotExists(payload, txHash) {
+  return { type: CONTRACT_TX_NOT_EXISTS, payload, meta: { txHash } };
+}
+
+export function contractTxFailed(payload, txHash) {
+  return { type: CONTRACT_TX_FAILED, payload, meta: { txHash } };
+}
+
+export function contractTxMined(txHash) {
+  return { type: CONTRACT_TX_MINED, meta: { txHash } };
 }
 
 export function contractEvent(event, proxy) {

@@ -18,6 +18,9 @@ import {
   toggleMenuOpen,
   toggleMenuActive,
 } from './actions';
+import {
+  makeSitoutInProgressSelector,
+} from '../Table/selectors';
 
 import TableMenu from '../../components/TableMenu';
 
@@ -47,6 +50,7 @@ const mapStateToProps = createStructuredSelector({
   blocky: makeBlockySelector(),
   nickName: makeNickNameSelector(),
   standingUp: makeStandingUpSelector(),
+  sitoutInProgress: makeSitoutInProgressSelector(),
 });
 
 export default connect(

@@ -1,6 +1,8 @@
 import { connect } from 'react-redux';
 import { reduxForm, formValueSelector } from 'redux-form/immutable';
+import { stopSubmit } from 'redux-form';
 
+import { validateFloat } from '../../utils/inputValidators';
 import ExchangeDialog from '../../components/ExchangeDialog';
 import messages from './messages';
 
@@ -9,11 +11,12 @@ import {
   makeSelectNetworkSupported,
 } from '../AccountProvider/selectors';
 
-const validate = (values) => {
+const validate = (values, props) => {
   const errors = {};
-  if (!values.get('amount')) {
-    errors.amount = 'Required';
-  }
+  const { maxAmount, minAmount = 0 } = props;
+  const amount = values.get('amount');
+
+  validateFloat(messages, errors, amount, minAmount, maxAmount);
 
   return errors;
 };
@@ -32,10 +35,16 @@ const mapStateToProps = (state) => ({
   networkSupported: makeSelectNetworkSupported()(state),
 });
 
-export default connect(mapStateToProps)(
-  reduxForm({
-    form: 'exchange',
-    validate,
-    warn,
-  })(ExchangeDialog)
+function mapDispatchToProps(dispatch) {
+  return {
+    stopSubmit: (errors) => dispatch(stopSubmit('exchange', errors)),
+  };
+}
+
+export default reduxForm({
+  form: 'exchange',
+  validate,
+  warn,
+})(
+  connect(mapStateToProps, mapDispatchToProps)(ExchangeDialog)
 );

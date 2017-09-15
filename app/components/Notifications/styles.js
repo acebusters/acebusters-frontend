@@ -73,7 +73,7 @@ export const Category = styled.h3`
 `;
 
 export const Details = styled.span`
-  padding-left: 8px;
+  padding: 0 8px;
   font-size: 12px;
 `;
 

@@ -15,9 +15,7 @@ export function* injectedWeb3ListenerSaga() {
         if (prevInjected !== injected) {
           yield put(updateInjectedAccount(injected));
         }
-      } catch (e) {
-        console.error(e);
-      } // eslint-disable-line no-empty
+      } catch (e) {} // eslint-disable-line no-empty
     }
 
     yield call(delay, 2000);

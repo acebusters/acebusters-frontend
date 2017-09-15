@@ -4,8 +4,7 @@ import {
   ACCOUNT_LOADED,
   CONTRACT_EVENTS,
   PROXY_EVENTS,
-  CONTRACT_TX_SUCCESS,
-  ETH_TRANSFER_SUCCESS,
+  CONTRACT_TX_SENDED,
   CONTRACT_TX_ERROR,
 } from '../AccountProvider/actions';
 
@@ -23,6 +22,7 @@ import {
 import { composeReducers } from '../../utils/composeReducers';
 
 import { conf } from '../../app.config';
+import { last } from '../../utils';
 
 const confParams = conf();
 
@@ -71,14 +71,8 @@ function dashboardReducer(state = initialState, action) {
     case ACCOUNT_LOADED:
       return state.set('proxy', action.payload.proxy);
 
-    case CONTRACT_TX_SUCCESS:
-      return addNTZPending(
-        initEvents(state),
-        payload
-      );
-
-    case ETH_TRANSFER_SUCCESS:
-      return addETHPending(
+    case CONTRACT_TX_SENDED:
+      return addPending(
         initEvents(state),
         payload
       );
@@ -128,63 +122,76 @@ function setProxy(state, proxy) {
 }
 
 function completePending(state, event) {
-  return state.deleteIn(['events', event.transactionHash]);
+  if (state.getIn(['events', event.transactionHash, 'pending'])) {
+    return state.deleteIn(['events', event.transactionHash]);
+  }
+
+  return state;
 }
 
-function addETHPending(state, { txHash, amount, address }) {
-  return state.setIn(
-    ['events', txHash],
-    fromJS({
-      address,
-      value: amount.toString ? amount.toString() : amount,
-      type: 'outcome',
-      unit: 'eth',
-      pending: true,
-      transactionHash: txHash,
-    }),
-  );
-}
-
-function addNTZPending(state, { methodName, args, txHash, address }) {
+function addPending(state, { methodName, args, txHash, address }) {
   if (address === confParams.pwrAddr) {
     return state;
   }
 
-  if (methodName === 'transfer' && args[0] !== confParams.ntzAddr) {
+  if (methodName === 'forward' && args[2] === '') { // eth transfer
+    const amount = args[1];
     return state.setIn(
       ['events', txHash],
       fromJS({
-        address: args[0],
-        value: args[1].toString ? args[1].toString() : args[1],
+        address,
+        value: amount.toString ? amount.toString() : amount,
         type: 'outcome',
-        unit: 'ntz',
+        unit: 'eth',
         pending: true,
         transactionHash: txHash,
       }),
     );
-  } else if (methodName === 'transfer' && args[0] === confParams.ntzAddr) {
+  } else if (methodName === 'withdraw') {
     return state.setIn(
       ['events', txHash],
       fromJS({
-        address: confParams.ntzAddr,
-        value: args[1].toString ? args[1].toString() : args[1],
-        type: 'outcome',
-        unit: 'ntz',
-        pending: true,
-        transactionHash: txHash,
-      }),
-    );
-  } else if ( // eth claim
-    methodName === 'transferFrom' &&
-    args[0] === confParams.ntzAddr &&
-    args[2] === 0
-  ) {
-    return state.setIn(
-      ['events', txHash],
-      fromJS({
-        address: confParams.ntzAddr,
+        address: confParams.pullAddr,
         type: 'income',
         unit: 'eth',
+        pending: true,
+        transactionHash: txHash,
+      }),
+    );
+  } else if (methodName === 'purchase') {
+    const options = typeof last(args) === 'function' ? args[args.length - 2] : last(args);
+    const amount = options.value;
+    return state.setIn(
+      ['events', txHash],
+      fromJS({
+        address,
+        value: amount.toString ? amount.toString() : amount,
+        type: 'outcome',
+        unit: 'eth',
+        pending: true,
+        transactionHash: txHash,
+      }),
+    );
+  } else if (methodName === 'powerUp') {
+    return state.setIn(
+      ['events', txHash],
+      fromJS({
+        address: conf().pwrAddr,
+        value: args[0].toString ? args[0].toString() : args[0],
+        type: 'outcome',
+        unit: 'ntz',
+        pending: true,
+        transactionHash: txHash,
+      }),
+    );
+  } else if (methodName === 'sell') {
+    return state.setIn(
+      ['events', txHash],
+      fromJS({
+        address: confParams.ntzAddr,
+        value: args[1].toString ? args[1].toString() : args[1],
+        type: 'outcome',
+        unit: 'ntz',
         pending: true,
         transactionHash: txHash,
       }),
@@ -194,10 +201,15 @@ function addNTZPending(state, { methodName, args, txHash, address }) {
   return state;
 }
 
+function hasConflict(state, event) {
+  return state.hasIn(['events', event.transactionHash]);
+}
+
 function addProxyContractEvent(state, event) {
+  const path = hasConflict(state, event) ? ['events', `${event.transactionHash}-${event.event}`] : ['events', event.transactionHash];
   const isDeposit = event.event === 'Deposit';
   return state.setIn(
-    ['events', event.transactionHash],
+    path,
     makeDashboardEvent(event, {
       address: isDeposit ? event.args.sender : event.args.to,
       unit: 'eth',
@@ -207,10 +219,27 @@ function addProxyContractEvent(state, event) {
 }
 
 function addNutzContractEvent(state, event) {
+  const path = hasConflict(state, event) ? ['events', `${event.transactionHash}-${event.event}`] : ['events', event.transactionHash];
   if (event.event === 'Transfer') {
     const isIncome = event.args.to === state.get('proxy');
+
+    if (event.address === conf().pwrAddr) {
+      if (isIncome) { // power up
+        return state.setIn(
+          path,
+          makeDashboardEvent(event, {
+            address: conf().pwrAddr,
+            unit: 'abp',
+            type: 'income',
+          }),
+        );
+      }
+
+      return state;
+    }
+
     return state.setIn(
-      ['events', event.transactionHash],
+      path,
       makeDashboardEvent(event, {
         address: isIncome ? event.args.from : event.args.to,
         unit: 'ntz',
@@ -219,7 +248,7 @@ function addNutzContractEvent(state, event) {
     );
   } else if (event.event === 'Sell') {
     return state.setIn(
-      ['events', event.transactionHash],
+      path,
       makeDashboardEvent(event, {
         address: confParams.ntzAddr,
         unit: 'ntz',
@@ -228,7 +257,7 @@ function addNutzContractEvent(state, event) {
     );
   } else if (event.event === 'Purchase') {
     return state.setIn(
-      ['events', event.transactionHash],
+      path,
       makeDashboardEvent(event, {
         address: event.args.purchaser,
         unit: 'ntz',

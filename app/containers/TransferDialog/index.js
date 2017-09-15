@@ -3,8 +3,10 @@ import PropTypes from 'prop-types';
 import ethUtil from 'ethereumjs-util';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
-
 import { reduxForm } from 'redux-form/immutable';
+
+import { normalizerFloat } from '../../utils/amountFormatter';
+import { validateFloat } from '../../utils/inputValidators';
 
 import { makeSelectHasWeb3, makeSelectNetworkSupported } from '../../containers/AccountProvider/selectors';
 
@@ -15,15 +17,18 @@ const isEthereumAddress = (address) => ethUtil.isValidAddress(address) || ethUti
 
 const validate = (values, props) => {
   const errors = {};
-  if (!values.get('amount')) {
-    errors.amount = 'Required';
-  }
+  const { messages, maxAmount, minAmount = 0 } = props;
+  const amount = values.get('amount');
 
+  validateFloat(messages, errors, amount, minAmount, maxAmount);
+
+  // address validation
   if (!values.get('address') && !props.hideAddress) {
     errors.address = 'Required';
   } else if (!isEthereumAddress(values.get('address'))) {
     errors.address = 'Invalid Ethereum Address.';
   }
+
   return errors;
 };
 
@@ -39,7 +44,13 @@ const DIALOGS = {
 
 const TransferDialogContainer = (props) => {
   const SpecifiedDialog = DIALOGS[props.type];
-  return <SpecifiedDialog name="transfer-dialog" {...props} />;
+  return (
+    <SpecifiedDialog
+      name="transfer-dialog"
+      normalizer={normalizerFloat}
+      {...props}
+    />
+  );
 };
 TransferDialogContainer.propTypes = {
   type: PropTypes.oneOf(['default', 'token']),

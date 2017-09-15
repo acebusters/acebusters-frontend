@@ -12,46 +12,52 @@ export function conf() {
     sub = window.location.host.split('.')[0];
   }
   // ### PRODUCTION ENVIRONMENT CONFIG
-  if (sub === 'app') {
+  if (sub === 'dapp') {
     return {
-      recaptchaKey: '',
+      recaptchaKey: '6LcE0RQUAAAAAEf6UWFsHEPedPBmRPAQiaSiWynN',
       defaultRefCode: DEFAULT_REF_CODE,
       etherscanUrl: 'https://etherscan.io/',
-      gethUrl: '',
-      firstBlockHash: '',
-      networkName: '',
-      oracleUrl: '',
-      txUrl: '',
-      accountUrl: '',
-      reservationUrl: '',
-      ntzAddr: '',
-      pwrAddr: '',
-      accountFactory: '',
-      tableFactory: '',
+      gethUrl: 'wss://mainnet.acebusters.com:443',
+      firstBlockHash: '0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3',
+      networkName: 'Ethereum Main Net',
+      oracleUrl: 'https://lzckarzxxa.execute-api.eu-west-1.amazonaws.com/v0',
+      accountUrl: 'https://k7j57cmm86.execute-api.eu-west-1.amazonaws.com/v0',
+      reservationUrl: 'https://6j6m8132w7.execute-api.eu-west-1.amazonaws.com/v0',
+      gasStatUrl: '',
+      ntzAddr: '0x49c95e30fe50470c12d658d81b33d5be95b610e3',
+      pwrAddr: '0xe54700f8bdb1640ad945bae67e8a9cbdf650188a',
+      pullAddr: '0x36cda1038a9556ebe626bcd7bab4e46f38d896ec',
+      accountFactory: '0x271ccdc5e304a3d76a4cfbee3e594d63bc051da0',
+      tableFactory: '0x9508817ad157c1fdc2c9fafc2090a6bfe443c912',
       sentryDSN: 'https://8c3e021848b247ddaf627c8040f94e07@sentry.io/153017',
       gaProperty: 'UA-98848213-1',
+      changellyMerchantId: '',
+      intercomAppId: 'z9xn3a6h',
     };
   }
 
   // ### STAGING ENVIRONMENT CONFIG
-  if (sub === 'beta') {
+  if (sub === 'staging') {
     return {
       recaptchaKey: '6LcE0RQUAAAAAEf6UWFsHEPedPBmRPAQiaSiWynN',
       defaultRefCode: DEFAULT_REF_CODE,
       etherscanUrl: 'https://rinkeby.etherscan.io/',
-      gethUrl: 'ws://rinkeby.acebusters.com:8546',
+      gethUrl: 'wss://rinkeby3.acebusters.com:443',
       firstBlockHash: '0x6341fd3daf94b748c72ced5a5b26028f2474f5f00d824504e4fa37a75767e177',
       networkName: 'Rinkeby Testnet',
       oracleUrl: 'https://v83iq1161a.execute-api.eu-west-1.amazonaws.com/v0',
-      txUrl: 'https://h5fb9klhzc.execute-api.eu-west-1.amazonaws.com/v0',
       accountUrl: 'https://vps13t4f7e.execute-api.eu-west-1.amazonaws.com/v0',
       reservationUrl: 'https://uiw0k5puaf.execute-api.eu-west-1.amazonaws.com/v0',
-      ntzAddr: '0x8895dc6374f3198ac298857bc4a85ac225a87c6c',
-      pwrAddr: '0x4a7ec091d4a28f8b2e6ed687bad330c2c8fe9846',
+      gasStatUrl: 'https://l70xam4hh9.execute-api.eu-west-1.amazonaws.com/v0',
+      ntzAddr: '0x91e59449a0888e47b7c9e9432d58e24710dd81e8',
+      pwrAddr: '0xe715cca08969433b85764601a38589762f799a8e',
+      pullAddr: '0x82237f0bd620aeb98fa2bfc4241a477b4196bfca',
       accountFactory: '0x46a7e61dedd2abad8caf98d4da1205f830f62815',
       tableFactory: '0x9020237ffcc244a2d4bb202663494e0c0a3f9672',
       sentryDSN: 'https://8c3e021848b247ddaf627c8040f94e07@sentry.io/153017',
       gaProperty: 'UA-98848213-1',
+      intercomAppId: '',
+      changellyMerchantId: '',
     };
   }
 
@@ -60,19 +66,22 @@ export function conf() {
     recaptchaKey: '6LcE0RQUAAAAAEf6UWFsHEPedPBmRPAQiaSiWynN',
     defaultRefCode: DEFAULT_REF_CODE,
     etherscanUrl: 'https://rinkeby.etherscan.io/',
-    gethUrl: 'ws://rinkeby.acebusters.com:8546',
+    gethUrl: 'wss://rinkeby3.acebusters.com:443',
     firstBlockHash: '0x6341fd3daf94b748c72ced5a5b26028f2474f5f00d824504e4fa37a75767e177',
     networkName: 'Rinkeby Testnet',
     oracleUrl: 'https://evm4rumeob.execute-api.eu-west-1.amazonaws.com/v0',
-    txUrl: 'https://khengvfg6c.execute-api.eu-west-1.amazonaws.com/v0',
     accountUrl: 'https://hsqkzjp3m8.execute-api.eu-west-1.amazonaws.com/v0',
     reservationUrl: 'https://6er5q4s7b0.execute-api.eu-west-1.amazonaws.com/v0',
-    ntzAddr: '0x179237e4e955369a69bd26499e3b89f6df9e5d7b',
-    pwrAddr: '0xff2aae8ac40d291b70b5f011c5eacb37f17eb9e4',
+    gasStatUrl: 'https://4by2hfw9mg.execute-api.eu-west-1.amazonaws.com/v0',
+    ntzAddr: '0x889802a69b2c408819f028331443bcf8711ea6d8',
+    pwrAddr: '0x5059721ecc85868ac07224d0ba40043d2541f0d6',
+    pullAddr: '0xefe5522bb845f5479cd373ca82ac60a582a6731b',
     accountFactory: '0x12a023f15ef0a1763f2a6736cc88a1ef9f0556f1',
     tableFactory: '0xbeb2f096f9438a4723b541db402d2dbf6bd86b17',
     sentryDSN: 'https://8c3e021848b247ddaf627c8040f94e07@sentry.io/153017',
     gaProperty: 'UA-XXXXX-Y',
+    intercomAppId: 'z9xn3a6h',
+    changellyMerchantId: '1b495d1ecc26',
   };
 }
 
@@ -157,7 +166,8 @@ export const STATUS_MSG = {
   // },
 };
 
-export const ABI_TOKEN_CONTRACT = [{ constant: true, inputs: [], name: 'name', outputs: [{ name: '', type: 'string' }], payable: false, type: 'function' }, { constant: false, inputs: [{ name: '_spender', type: 'address' }, { name: '_amountNtz', type: 'uint256' }], name: 'approve', outputs: [], payable: false, type: 'function' }, { constant: true, inputs: [{ name: '', type: 'uint256' }], name: 'admins', outputs: [{ name: '', type: 'address' }], payable: false, type: 'function' }, { constant: false, inputs: [{ name: '_admin', type: 'address' }], name: 'removeAdmin', outputs: [], payable: false, type: 'function' }, { constant: true, inputs: [], name: 'totalSupply', outputs: [{ name: '', type: 'uint256' }], payable: false, type: 'function' }, { constant: false, inputs: [{ name: '_from', type: 'address' }, { name: '_to', type: 'address' }, { name: '_amountNtz', type: 'uint256' }], name: 'transferFrom', outputs: [{ name: '', type: 'bool' }], payable: false, type: 'function' }, { constant: true, inputs: [], name: 'decimals', outputs: [{ name: '', type: 'uint256' }], payable: false, type: 'function' }, { constant: false, inputs: [], name: 'purchaseTokens', outputs: [], payable: true, type: 'function' }, { constant: true, inputs: [], name: 'floor', outputs: [{ name: '', type: 'uint256' }], payable: false, type: 'function' }, { constant: false, inputs: [{ name: '_to', type: 'address' }, { name: '_amountNtz', type: 'uint256' }, { name: '_data', type: 'bytes' }], name: 'transData', outputs: [{ name: '', type: 'bool' }], payable: false, type: 'function' }, { constant: false, inputs: [{ name: '_amountWei', type: 'uint256' }, { name: '_beneficiary', type: 'address' }], name: 'allocateEther', outputs: [], payable: false, type: 'function' }, { constant: true, inputs: [], name: 'powerAddr', outputs: [{ name: '', type: 'address' }], payable: false, type: 'function' }, { constant: false, inputs: [{ name: '_maxPower', type: 'uint256' }], name: 'setMaxPower', outputs: [], payable: false, type: 'function' }, { constant: false, inputs: [{ name: '_newCeiling', type: 'uint256' }], name: 'moveCeiling', outputs: [], payable: false, type: 'function' }, { constant: false, inputs: [{ name: '_admin', type: 'address' }], name: 'addAdmin', outputs: [], payable: false, type: 'function' }, { constant: true, inputs: [{ name: '_owner', type: 'address' }], name: 'balanceOf', outputs: [{ name: '', type: 'uint256' }], payable: false, type: 'function' }, { constant: true, inputs: [], name: 'ceiling', outputs: [{ name: '', type: 'uint256' }], payable: false, type: 'function' }, { constant: true, inputs: [], name: 'symbol', outputs: [{ name: '', type: 'string' }], payable: false, type: 'function' }, { constant: false, inputs: [{ name: '_to', type: 'address' }, { name: '_amountNtz', type: 'uint256' }], name: 'transfer', outputs: [{ name: '', type: 'bool' }], payable: false, type: 'function' }, { constant: false, inputs: [{ name: '_amountNtz', type: 'uint256' }], name: 'dilutePower', outputs: [], payable: false, type: 'function' }, { constant: true, inputs: [], name: 'activeSupply', outputs: [{ name: '', type: 'uint256' }], payable: false, type: 'function' }, { constant: true, inputs: [], name: 'reserve', outputs: [{ name: '', type: 'uint256' }], payable: false, type: 'function' }, { constant: false, inputs: [{ name: '_newFloor', type: 'uint256' }], name: 'moveFloor', outputs: [], payable: false, type: 'function' }, { constant: true, inputs: [{ name: '_owner', type: 'address' }, { name: '_spender', type: 'address' }], name: 'allowance', outputs: [{ name: '', type: 'uint256' }], payable: false, type: 'function' }, { inputs: [{ name: '_downTime', type: 'uint256' }], payable: false, type: 'constructor' }, { payable: true, type: 'fallback' }, { anonymous: false, inputs: [{ indexed: true, name: 'purchaser', type: 'address' }, { indexed: false, name: 'value', type: 'uint256' }], name: 'Purchase', type: 'event' }, { anonymous: false, inputs: [{ indexed: true, name: 'seller', type: 'address' }, { indexed: false, name: 'value', type: 'uint256' }], name: 'Sell', type: 'event' }, { anonymous: false, inputs: [{ indexed: true, name: 'owner', type: 'address' }, { indexed: true, name: 'spender', type: 'address' }, { indexed: false, name: 'value', type: 'uint256' }], name: 'Approval', type: 'event' }, { anonymous: false, inputs: [{ indexed: true, name: 'from', type: 'address' }, { indexed: true, name: 'to', type: 'address' }, { indexed: false, name: 'value', type: 'uint256' }], name: 'Transfer', type: 'event' }];
+export const ABI_TOKEN_CONTRACT = [{ constant: true, inputs: [], name: 'name', outputs: [{ name: '', type: 'string' }], payable: false, stateMutability: 'view', type: 'function' }, { constant: false, inputs: [{ name: '_spender', type: 'address' }, { name: '_amountBabz', type: 'uint256' }], name: 'approve', outputs: [], payable: false, stateMutability: 'nonpayable', type: 'function' }, { constant: true, inputs: [], name: 'totalSupply', outputs: [{ name: '', type: 'uint256' }], payable: false, stateMutability: 'view', type: 'function' }, { constant: true, inputs: [], name: 'powerPool', outputs: [{ name: '', type: 'uint256' }], payable: false, stateMutability: 'view', type: 'function' }, { constant: false, inputs: [{ name: '_from', type: 'address' }, { name: '_to', type: 'address' }, { name: '_amountBabz', type: 'uint256' }], name: 'transferFrom', outputs: [{ name: '', type: 'bool' }], payable: false, stateMutability: 'nonpayable', type: 'function' }, { constant: true, inputs: [], name: 'decimals', outputs: [{ name: '', type: 'uint256' }], payable: false, stateMutability: 'view', type: 'function' }, { constant: true, inputs: [], name: 'floor', outputs: [{ name: '', type: 'uint256' }], payable: false, stateMutability: 'view', type: 'function' }, { constant: false, inputs: [{ name: '_to', type: 'address' }, { name: '_amountBabz', type: 'uint256' }, { name: '_data', type: 'bytes' }], name: 'transData', outputs: [{ name: '', type: 'bool' }], payable: false, stateMutability: 'nonpayable', type: 'function' }, { constant: true, inputs: [{ name: '_owner', type: 'address' }], name: 'balanceOf', outputs: [{ name: '', type: 'uint256' }], payable: false, stateMutability: 'view', type: 'function' }, { constant: true, inputs: [], name: 'ceiling', outputs: [{ name: '', type: 'uint256' }], payable: false, stateMutability: 'view', type: 'function' }, { constant: false, inputs: [{ name: '_holder', type: 'address' }, { name: '_amountBabz', type: 'uint256' }], name: 'powerDown', outputs: [], payable: false, stateMutability: 'nonpayable', type: 'function' }, { constant: true, inputs: [], name: 'owner', outputs: [{ name: '', type: 'address' }], payable: false, stateMutability: 'view', type: 'function' }, { constant: true, inputs: [], name: 'symbol', outputs: [{ name: '', type: 'string' }], payable: false, stateMutability: 'view', type: 'function' }, { constant: false, inputs: [{ name: '_amountBabz', type: 'uint256' }], name: 'powerUp', outputs: [], payable: false, stateMutability: 'nonpayable', type: 'function' }, { constant: false, inputs: [{ name: '_to', type: 'address' }, { name: '_amountBabz', type: 'uint256' }], name: 'transfer', outputs: [{ name: '', type: 'bool' }], payable: false, stateMutability: 'nonpayable', type: 'function' }, { constant: false, inputs: [{ name: '_from', type: 'address' }, { name: '_to', type: 'address' }, { name: '_amountBabz', type: 'uint256' }, { name: '_data', type: 'bytes' }], name: 'transferFrom', outputs: [{ name: '', type: 'bool' }], payable: false, stateMutability: 'nonpayable', type: 'function' }, { constant: true, inputs: [], name: 'activeSupply', outputs: [{ name: '', type: 'uint256' }], payable: false, stateMutability: 'view', type: 'function' }, { constant: false, inputs: [{ name: '_to', type: 'address' }, { name: '_amountBabz', type: 'uint256' }, { name: '_data', type: 'bytes' }], name: 'transfer', outputs: [{ name: '', type: 'bool' }], payable: false, stateMutability: 'nonpayable', type: 'function' }, { constant: false, inputs: [{ name: '_price', type: 'uint256' }, { name: '_amountBabz', type: 'uint256' }], name: 'sell', outputs: [], payable: false, stateMutability: 'nonpayable', type: 'function' }, { constant: true, inputs: [{ name: '_owner', type: 'address' }, { name: '_spender', type: 'address' }], name: 'allowance', outputs: [{ name: '', type: 'uint256' }], payable: false, stateMutability: 'view', type: 'function' }, { constant: false, inputs: [{ name: '_price', type: 'uint256' }], name: 'purchase', outputs: [], payable: true, stateMutability: 'payable', type: 'function' }, { constant: false, inputs: [{ name: 'newOwner', type: 'address' }], name: 'transferOwnership', outputs: [], payable: false, stateMutability: 'nonpayable', type: 'function' }, { anonymous: false, inputs: [{ indexed: true, name: 'purchaser', type: 'address' }, { indexed: false, name: 'value', type: 'uint256' }], name: 'Purchase', type: 'event' }, { anonymous: false, inputs: [{ indexed: true, name: 'seller', type: 'address' }, { indexed: false, name: 'value', type: 'uint256' }], name: 'Sell', type: 'event' }, { anonymous: false, inputs: [{ indexed: true, name: 'owner', type: 'address' }, { indexed: true, name: 'spender', type: 'address' }, { indexed: false, name: 'value', type: 'uint256' }], name: 'Approval', type: 'event' }, { anonymous: false, inputs: [{ indexed: true, name: 'from', type: 'address' }, { indexed: true, name: 'to', type: 'address' }, { indexed: false, name: 'value', type: 'uint256' }], name: 'Transfer', type: 'event' }];
+export const ABI_PULL_PAYMENT_CONTRACT = [{ constant: false, inputs: [{ name: '_owner', type: 'address' }, { name: '_newDate', type: 'uint256' }], name: 'changeWithdrawalDate', outputs: [], payable: false, type: 'function' }, { constant: false, inputs: [], name: 'withdraw', outputs: [], payable: false, type: 'function' }, { constant: true, inputs: [], name: 'dailyLimit', outputs: [{ name: '', type: 'uint256' }], payable: false, type: 'function' }, { constant: true, inputs: [], name: 'lastDay', outputs: [{ name: '', type: 'uint256' }], payable: false, type: 'function' }, { constant: true, inputs: [{ name: '_owner', type: 'address' }], name: 'balanceOf', outputs: [{ name: 'value', type: 'uint256' }], payable: false, type: 'function' }, { constant: false, inputs: [{ name: '_dest', type: 'address' }], name: 'asyncSend', outputs: [], payable: true, type: 'function' }, { constant: true, inputs: [], name: 'owner', outputs: [{ name: '', type: 'address' }], payable: false, type: 'function' }, { constant: false, inputs: [{ name: '_dailyLimit', type: 'uint256' }], name: 'changeDailyLimit', outputs: [], payable: false, type: 'function' }, { constant: true, inputs: [{ name: '_owner', type: 'address' }], name: 'paymentOf', outputs: [{ name: 'value', type: 'uint256' }, { name: 'date', type: 'uint256' }], payable: false, type: 'function' }, { constant: true, inputs: [], name: 'spentToday', outputs: [{ name: '', type: 'uint256' }], payable: false, type: 'function' }, { constant: false, inputs: [{ name: 'newOwner', type: 'address' }], name: 'transferOwnership', outputs: [], payable: false, type: 'function' }];
 export const ABI_POWER_CONTRACT = [{ constant: true, inputs: [], name: 'name', outputs: [{ name: '', type: 'string' }], payable: false, type: 'function' }, { constant: true, inputs: [{ name: '', type: 'uint256' }], name: 'downs', outputs: [{ name: 'owner', type: 'address' }, { name: 'total', type: 'uint256' }, { name: 'left', type: 'uint256' }, { name: 'start', type: 'uint256' }], payable: false, type: 'function' }, { constant: false, inputs: [{ name: '_holder', type: 'address' }, { name: '_value', type: 'uint256' }, { name: '_data', type: 'bytes32' }], name: 'slashPower', outputs: [{ name: '', type: 'uint256' }], payable: false, type: 'function' }, { constant: true, inputs: [], name: 'totalSupply', outputs: [{ name: '', type: 'uint256' }], payable: false, type: 'function' }, { constant: true, inputs: [], name: 'decimals', outputs: [{ name: '', type: 'uint256' }], payable: false, type: 'function' }, { constant: false, inputs: [{ name: '_maxPower', type: 'uint256' }], name: 'setMaxPower', outputs: [], payable: false, type: 'function' }, { constant: false, inputs: [{ name: '_pos', type: 'uint256' }, { name: '_holder', type: 'address' }, { name: '_value', type: 'uint256' }, { name: '_data', type: 'bytes32' }], name: 'slashDownRequest', outputs: [{ name: '', type: 'uint256' }], payable: false, type: 'function' }, { constant: true, inputs: [{ name: '_pos', type: 'uint256' }, { name: '_now', type: 'uint256' }], name: 'vestedDown', outputs: [{ name: '', type: 'uint256' }], payable: false, type: 'function' }, { constant: false, inputs: [{ name: '_pos', type: 'uint256' }, { name: '_now', type: 'uint256' }], name: 'downTickTest', outputs: [{ name: 'success', type: 'bool' }], payable: false, type: 'function' }, { constant: true, inputs: [{ name: '_holder', type: 'address' }], name: 'balanceOf', outputs: [{ name: 'balance', type: 'uint256' }], payable: false, type: 'function' }, { constant: false, inputs: [{ name: '_totalBabzBefore', type: 'uint256' }, { name: '_amountBabz', type: 'uint256' }], name: 'dilutePower', outputs: [{ name: '', type: 'bool' }], payable: false, type: 'function' }, { constant: true, inputs: [], name: 'symbol', outputs: [{ name: '', type: 'string' }], payable: false, type: 'function' }, { constant: false, inputs: [{ name: '_to', type: 'address' }, { name: '_amountPower', type: 'uint256' }], name: 'transfer', outputs: [{ name: 'success', type: 'bool' }], payable: false, type: 'function' }, { constant: true, inputs: [], name: 'activeSupply', outputs: [{ name: '', type: 'uint256' }], payable: false, type: 'function' }, { constant: false, inputs: [{ name: '_from', type: 'address' }, { name: '_amountBabz', type: 'uint256' }, { name: '_data', type: 'bytes' }], name: 'tokenFallback', outputs: [], payable: false, type: 'function' }, { constant: true, inputs: [], name: 'downtime', outputs: [{ name: '', type: 'uint256' }], payable: false, type: 'function' }, { constant: false, inputs: [{ name: '_pos', type: 'uint256' }], name: 'downTick', outputs: [{ name: 'success', type: 'bool' }], payable: false, type: 'function' }, { inputs: [{ name: '_nutzAddr', type: 'address' }, { name: '_downtime', type: 'uint256' }], payable: false, type: 'constructor' }, { anonymous: false, inputs: [{ indexed: true, name: 'holder', type: 'address' }, { indexed: false, name: 'value', type: 'uint256' }, { indexed: false, name: 'data', type: 'bytes32' }], name: 'Slashing', type: 'event' }, { anonymous: false, inputs: [{ indexed: true, name: 'from', type: 'address' }, { indexed: true, name: 'to', type: 'address' }, { indexed: false, name: 'value', type: 'uint256' }], name: 'Transfer', type: 'event' }];
 export const ABI_ACCOUNT_FACTORY = [{ constant: true, inputs: [{ name: '_proxy', type: 'address' }], name: 'getSigner', outputs: [{ name: '', type: 'address' }], payable: false, type: 'function' }, { constant: false, inputs: [{ name: '_signer', type: 'address' }, { name: '_lockAddr', type: 'address' }], name: 'create', outputs: [], payable: false, type: 'function' }, { constant: false, inputs: [{ name: '_newSigner', type: 'address' }], name: 'handleRecovery', outputs: [], payable: false, type: 'function' }, { constant: true, inputs: [{ name: '_signer', type: 'address' }], name: 'getAccount', outputs: [{ name: '', type: 'address' }, { name: '', type: 'address' }, { name: '', type: 'bool' }], payable: false, type: 'function' }, { anonymous: false, inputs: [{ indexed: true, name: 'signer', type: 'address' }, { indexed: false, name: 'proxy', type: 'address' }], name: 'AccountCreated', type: 'event' }, { anonymous: false, inputs: [{ indexed: true, name: 'newSigner', type: 'address' }, { indexed: false, name: 'proxy', type: 'address' }, { indexed: false, name: 'oldSigner', type: 'address' }], name: 'AccountRecovered', type: 'event' }];
 export const ABI_TABLE = [{ constant: true, inputs: [], name: 'active', outputs: [{ name: '', type: 'bool' }], payable: false, type: 'function' }, { constant: true, inputs: [{ name: '_handId', type: 'uint256' }, { name: '_addr', type: 'address' }], name: 'getOut', outputs: [{ name: '', type: 'uint256' }, { name: '', type: 'uint256' }], payable: false, type: 'function' }, { constant: true, inputs: [{ name: '', type: 'uint256' }], name: 'seats', outputs: [{ name: 'senderAddr', type: 'address' }, { name: 'amount', type: 'uint256' }, { name: 'signerAddr', type: 'address' }, { name: 'exitHand', type: 'uint256' }], payable: false, type: 'function' }, { constant: false, inputs: [{ name: '_toggleReceipt', type: 'bytes' }], name: 'toggleActive', outputs: [], payable: false, type: 'function' }, { constant: true, inputs: [{ name: '_addr', type: 'address' }], name: 'inLineup', outputs: [{ name: '', type: 'bool' }], payable: false, type: 'function' }, { constant: false, inputs: [{ name: '_r', type: 'bytes32' }, { name: '_s', type: 'bytes32' }, { name: '_pl', type: 'bytes32' }], name: 'leave', outputs: [], payable: false, type: 'function' }, { constant: true, inputs: [], name: 'lastNettingRequestTime', outputs: [{ name: '', type: 'uint256' }], payable: false, type: 'function' }, { constant: true, inputs: [], name: 'lastHandNetted', outputs: [{ name: '', type: 'uint32' }], payable: false, type: 'function' }, { constant: false, inputs: [{ name: '_sigs', type: 'bytes' }, { name: '_newBal1', type: 'bytes32' }, { name: '_newBal2', type: 'bytes32' }], name: 'settle', outputs: [], payable: false, type: 'function' }, { constant: true, inputs: [], name: 'tokenAddr', outputs: [{ name: '', type: 'address' }], payable: false, type: 'function' }, { constant: false, inputs: [{ name: '_now', type: 'uint256' }], name: 'netHelp', outputs: [{ name: '', type: 'uint256' }], payable: false, type: 'function' }, { constant: true, inputs: [], name: 'oracle', outputs: [{ name: '', type: 'address' }], payable: false, type: 'function' }, { constant: false, inputs: [{ name: '_data', type: 'bytes32[]' }], name: 'submit', outputs: [{ name: '', type: 'uint256' }], payable: false, type: 'function' }, { constant: true, inputs: [{ name: '', type: 'uint256' }], name: 'hands', outputs: [{ name: 'claimCount', type: 'uint256' }], payable: false, type: 'function' }, { constant: true, inputs: [{ name: '_handId', type: 'uint256' }, { name: '_addr', type: 'address' }], name: 'getIn', outputs: [{ name: '', type: 'uint256' }], payable: false, type: 'function' }, { constant: true, inputs: [], name: 'getLineup', outputs: [{ name: '', type: 'uint256' }, { name: 'addresses', type: 'address[]' }, { name: 'amounts', type: 'uint256[]' }, { name: 'exitHands', type: 'uint256[]' }], payable: false, type: 'function' }, { constant: true, inputs: [], name: 'lastNettingRequestHandId', outputs: [{ name: '', type: 'uint32' }], payable: false, type: 'function' }, { constant: false, inputs: [{ name: '_from', type: 'address' }, { name: '_value', type: 'uint256' }, { name: '_data', type: 'bytes' }], name: 'tokenFallback', outputs: [], payable: false, type: 'function' }, { constant: false, inputs: [], name: 'net', outputs: [], payable: false, type: 'function' }, { constant: true, inputs: [], name: 'smallBlind', outputs: [{ name: '', type: 'uint256' }], payable: false, type: 'function' }, { inputs: [{ name: '_token', type: 'address' }, { name: '_oracle', type: 'address' }, { name: '_smallBlind', type: 'uint256' }, { name: '_seats', type: 'uint256' }], payable: false, type: 'constructor' }, { anonymous: false, inputs: [{ indexed: true, name: 'addr', type: 'address' }, { indexed: false, name: 'amount', type: 'uint256' }], name: 'Join', type: 'event' }, { anonymous: false, inputs: [{ indexed: false, name: 'hand', type: 'uint256' }], name: 'NettingRequest', type: 'event' }, { anonymous: false, inputs: [{ indexed: false, name: 'hand', type: 'uint256' }], name: 'Netted', type: 'event' }, { anonymous: false, inputs: [{ indexed: false, name: 'addr', type: 'address' }], name: 'Leave', type: 'event' }];
@@ -168,17 +178,24 @@ export const ABI_TABLE_FACTORY = [{ constant: false, inputs: [{ name: '_newOwner
 
 export const TIMEOUT_PERIOD = 60;
 
+function bn(num) {
+  return num * 1000000000000;
+}
+
 // chip values and colors
 export const chipValues = [
-  [50000000000000000, '#f056c5'],
-  [10000000000000000, '#e7e401'],
-  [5000000000000000, '#774ac1'],
-  [1000000000000000, '#ac2a2a'],
-  [500000000000000, '#328eee'],
-  [100000000000000, '#745f2a'],
-  [10000000000000, '#FF0080'],
-  [1000000000000, '#FFFFFF'],
+  [bn(25000), '#53353f'],
+  [bn(5000), '#f056c5'],
+  [bn(1000), '#e7e401'],
+  [bn(500), '#774ac1'],
+  [bn(100), '#000000'],
+  [bn(50), '#328eee'],
+  [bn(25), '#027707'],
+  [bn(5), '#d48b30'],
+  [bn(1), '#FFFFFF'],
 ];
+
+export const seatChipColor = '#E01E40';
 
 export const SEAT_COORDS = [
   [10, 40, 0],

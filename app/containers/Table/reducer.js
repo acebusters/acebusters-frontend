@@ -79,6 +79,12 @@ export default function tableReducer(state = initialState, action) {
         String(item.pos),
       ]), state);
 
+    case TableActions.sitOutToggle.REQUEST:
+      return state.setIn([action.payload.tableAddr, action.payload.handId.toString(), 'sitoutInProgress'], action.payload.pos);
+
+    case TableActions.sitOutToggle.FAILURE:
+      return state.deleteIn([action.payload.tableAddr, action.payload.handId.toString(), 'sitoutInProgress']);
+
     case TableActions.LINEUP_RECEIVED: {
       let lineup = List([]);
       let amounts = List([]);
@@ -179,6 +185,17 @@ export default function tableReducer(state = initialState, action) {
       }
 
       let hand = table.get(action.hand.handId.toString());
+
+      const sitoutInProgress = hand.getIn(['sitoutInProgress']);
+      if (action.hand.lineup && action.hand.lineup[sitoutInProgress] && sitoutInProgress !== undefined) {
+        if (
+          action.hand.lineup[sitoutInProgress].sitout !== hand.getIn(['lineup', sitoutInProgress, 'sitout']) ||
+          action.hand.lineup[sitoutInProgress].last !== hand.getIn(['lineup', sitoutInProgress, 'last'])
+        ) {
+          hand = hand.delete('sitoutInProgress');
+        }
+      }
+
       // if the hand state changed, make sure to update it
       if (hand.get('changed') !== action.hand.changed ||
         hand.get('distribution') !== action.hand.distribution) {

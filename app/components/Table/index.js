@@ -10,7 +10,6 @@ import ActionBar from '../../containers/ActionBar';
 import tableImage from './tableBG.svg';
 import Pot from '../Pot';
 import Curtain from '../../containers/Curtain';
-import FeedbackButton from '../../containers/FeedbackButton';
 
 import {
   TableContainer,
@@ -36,7 +35,7 @@ const TableComponent = (props) => (
         <PokerTable>
           <img src={tableImage} alt="" />
           { props.potSize > 0 &&
-            <Pot className="pot" potSize={props.potSize} top="55%" left="50%" />
+            <Pot className="pot" potSize={props.potSize} top="58%" left="50%" />
           }
 
           { props.seats }
@@ -60,8 +59,6 @@ const TableComponent = (props) => (
       <ActionBar className="action-bar" {...props} sb={props.sb}></ActionBar>
 
     </TableContainer>
-
-    <FeedbackButton />
 
   </div>
 );

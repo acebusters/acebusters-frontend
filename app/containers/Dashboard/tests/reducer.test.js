@@ -83,6 +83,41 @@ describe('dashboard reducer tests', () => {
     }));
   });
 
+  it('should handle events with same transactionHash', () => {
+    expect(dashboardReducer(
+      fromJS({
+        events: {
+          '0x67ed561b9e1842016fda612d1940135465968cd3de0ea7008e7240347fe80bc1': {
+          },
+        },
+      }),
+      proxyEvent({
+        event: 'Deposit',
+        address: '0x7c08ca8bef208ac8be8cd03ad15fbef643dd355c',
+        blockNumber: 582975,
+        transactionHash: '0x67ed561b9e1842016fda612d1940135465968cd3de0ea7008e7240347fe80bc1',
+        args: {
+          sender: '0x7caaca8bef208ac8be8cd03ad15fbef643dd355c',
+          value: '10000000',
+        },
+      })
+    )).toEqual(fromJS({
+      events: {
+        '0x67ed561b9e1842016fda612d1940135465968cd3de0ea7008e7240347fe80bc1': {
+        },
+        '0x67ed561b9e1842016fda612d1940135465968cd3de0ea7008e7240347fe80bc1-Deposit': {
+          blockNumber: 582975,
+          transactionHash: '0x67ed561b9e1842016fda612d1940135465968cd3de0ea7008e7240347fe80bc1',
+          value: '10000000',
+          timestamp: undefined,
+          address: '0x7caaca8bef208ac8be8cd03ad15fbef643dd355c',
+          unit: 'eth',
+          type: 'income',
+        },
+      },
+    }));
+  });
+
   it('should get proxy address from action meta', () => {
     expect(dashboardReducer(
       fromJS({ events: null }),

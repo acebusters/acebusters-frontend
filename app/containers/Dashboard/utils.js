@@ -3,7 +3,7 @@ import { FormattedDate, FormattedTime } from 'react-intl';
 import { conf } from '../../app.config';
 const confParams = conf();
 
-export function isSellStartEvent(event) {
+export function isSellEvent(event) {
   return (
     event.address === confParams.ntzAddr &&
     event.unit === 'ntz' &&
@@ -11,9 +11,9 @@ export function isSellStartEvent(event) {
   );
 }
 
-export function isSellEndEvent(event) {
+export function isETHPayoutEvent(event) {
   return (
-    event.address === confParams.ntzAddr &&
+    event.address === confParams.pullAddr &&
     event.unit === 'eth' &&
     event.type === 'income'
   );
@@ -25,6 +25,10 @@ export function isPurchaseEndEvent(event, proxyAddr) {
 
 export function isPurchaseStartEvent(event) {
   return event.address === confParams.ntzAddr && event.unit === 'eth';
+}
+
+export function isPowerUpEvent(event) {
+  return event.address === confParams.pwrAddr && event.unit === 'abp' && event.type === 'income';
 }
 
 export function formatDate(timestamp) {
