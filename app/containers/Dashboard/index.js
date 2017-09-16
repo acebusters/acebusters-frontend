@@ -118,6 +118,7 @@ class DashboardRoot extends React.Component {
     this.handleETHPayout = this.handleETHPayout.bind(this);
     this.handlePowerUp = this.handlePowerUp.bind(this);
     this.handlePowerDown = this.handlePowerDown.bind(this);
+    this.fishWarn = this.fishWarn.bind(this);
     this.web3 = props.web3Redux.web3;
 
     this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(confParams.ntzAddr);
@@ -134,6 +135,7 @@ class DashboardRoot extends React.Component {
 
     this.state = {
       downRequests: null,
+      isFishWarned: false,
     };
   }
 
@@ -162,6 +164,10 @@ class DashboardRoot extends React.Component {
         </div>
       );
     }
+  }
+
+  fishWarn() {
+    this.setState({ isFishWarned: true });
   }
 
   watchProxyEvents(proxyAddr) {
@@ -407,7 +413,7 @@ class DashboardRoot extends React.Component {
 
   render() {
     const { account } = this.props;
-    const { downRequests } = this.state;
+    const { downRequests, isFishWarned } = this.state;
     const qrUrl = `ether:${account.proxy}`;
     const downtime = this.power.downtime();
     const totalSupply = this.power.totalSupply();
@@ -456,6 +462,7 @@ class DashboardRoot extends React.Component {
             listTxns,
             qrUrl,
             messages,
+            isFishWarned,
             downRequests: downRequestsToList(
               downRequests,
               downtime,
@@ -468,6 +475,7 @@ class DashboardRoot extends React.Component {
             handleETHPayout: this.handleETHPayout,
             handlePowerDown: this.handlePowerDown,
             handlePowerUp: this.handlePowerUp,
+            fishWarn: this.fishWarn,
             ...this.props,
           }}
         />

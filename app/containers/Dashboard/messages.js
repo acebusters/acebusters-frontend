@@ -192,6 +192,6 @@ export default defineMessages({
   },
   upgradeAccount: {
     id: 'app.containers.Dashboard.upgradeAccount',
-    defaultMessage: 'Upgrade to Shark account',
+    defaultMessage: 'Unlock your Account',
   },
 });

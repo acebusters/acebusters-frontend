@@ -16,6 +16,8 @@ import {
   ReceiveWrapper,
   ReceiveSection,
 } from './styles';
+import Button from '../Button';
+import FishWarningDialog from './FishWarningDialog';
 
 export const AccountIsLocked = (props) => {
   const {
@@ -25,7 +27,14 @@ export const AccountIsLocked = (props) => {
     nutzBalance,
     floor,
     qrUrl,
+    modalAdd,
+    modalDismiss,
+    isFishWarned,
+    fishWarn,
   } = props;
+  const qrStyles = isFishWarned
+    ? { margin: 'auto' }
+    : { margin: 'auto', filter: 'blur(4px)', opacity: '.4' };
   return (
     <ReceiveSection>
       <ReceiveWrapper
@@ -35,28 +44,57 @@ export const AccountIsLocked = (props) => {
           flexDirection: 'column',
         }}
       >
+        {!isFishWarned &&
+          <span style={{ position: 'relative' }}>
+            <span
+              style={{
+                position: 'absolute',
+                zIndex: '1',
+                textAlign: 'center',
+                top: '70px',
+                width: '100%',
+              }}
+            >
+              <Button
+                size="medium"
+                onClick={() => modalAdd(
+                  <FishWarningDialog
+                    onSuccessButtonClick={() => {
+                      modalDismiss();
+                      fishWarn();
+                    }}
+                  />
+                )}
+              >
+                Deposit
+              </Button>
+            </span>
+          </span>
+        }
         <WithLoading
           isLoading={!account.proxy || account.proxy === '0x'}
           loadingSize="40px"
           styles={{
             layout: { transform: 'translateY(-50%)', left: 0 },
-            outer: { margin: 'auto' },
+            outer: qrStyles,
           }}
         >
           <QRCode value={qrUrl} size={100} />
         </WithLoading>
-        <WithLoading
-          isLoading={!account.proxy || account.proxy === '0x'}
-          loadingSize="40px"
-          styles={{
-            layout: { transform: 'translateY(-50%)', left: 0 },
-            outer: { marginTop: 'auto' },
-          }}
-        >
-          <Alert theme="success">
-            <Address style={{ width: 180 }}>{account.proxy}</Address>
-          </Alert>
-        </WithLoading>
+        {isFishWarned &&
+          <WithLoading
+            isLoading={!account.proxy || account.proxy === '0x'}
+            loadingSize="40px"
+            styles={{
+              layout: { transform: 'translateY(-50%)', left: 0 },
+              outer: { marginTop: 'auto' },
+            }}
+          >
+            <Alert theme="success">
+              <Address style={{ width: 180 }}>{account.proxy}</Address>
+            </Alert>
+          </WithLoading>
+        }
       </ReceiveWrapper>
 
       <ReceiveWrapper>
@@ -89,6 +127,10 @@ AccountIsLocked.propTypes = {
   nutzBalance: PropTypes.object,
   floor: PropTypes.object,
   qrUrl: PropTypes.string,
+  modalAdd: PropTypes.func,
+  modalDismiss: PropTypes.func,
+  isFishWarned: PropTypes.bool,
+  fishWarn: PropTypes.func,
 };
 
 export const AccountNotLocked = ({
