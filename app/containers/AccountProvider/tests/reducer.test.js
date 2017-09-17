@@ -15,6 +15,7 @@ describe('account reducer tests', () => {
       loggedIn: false,
       web3ReadyState: 0,
       web3ErrMsg: null,
+      refs: null,
     });
   });
 

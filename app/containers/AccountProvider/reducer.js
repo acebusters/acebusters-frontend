@@ -25,6 +25,7 @@ const initialState = fromJS({
   blocky: null,
   nickName: null,
   signerAddr: null,
+  refs: null,
   web3ReadyState: READY_STATE.CONNECTING,
   onSupportedNetwork: false,
   web3ErrMsg: null,
@@ -61,6 +62,7 @@ function accountProviderReducer(state = initialState, action) {
           .set('blocky', action.payload.blocky)
           .set('nickName', action.payload.nickName)
           .set('signerAddr', action.payload.signer)
+          .set('refs', action.payload.refs)
       );
 
     case WEB3_METHOD_SUCCESS:
@@ -99,7 +101,8 @@ function accountProviderReducer(state = initialState, action) {
               .delete('proxy')
               .set('blocky', null)
               .set('nickName', null)
-              .set('signerAddr', null);
+              .set('signerAddr', null)
+              .set('refs', null);
           }
 
           return newState

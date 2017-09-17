@@ -1,16 +1,17 @@
 import ethUtil from 'ethereumjs-util';
-import { select, put, take } from 'redux-saga/effects';
+import { select, put, take, call } from 'redux-saga/effects';
 import Raven from 'raven-js';
 
 import { createBlocky } from '../../../services/blockies';
 import { nickNameByAddress } from '../../../services/nicknames';
 import { ABI_PROXY } from '../../../app.config';
-import { makeSelectProxyAddr } from '../../../containers/AccountProvider/selectors';
+import { makeSelectProxyAddr, makeSelectAccountData } from '../selectors';
 import { promisifyWeb3Call } from '../../../utils/promisifyWeb3Call';
 
 import { getWeb3 } from '../utils';
 import { SET_AUTH, WEB3_CONNECTED, accountLoaded } from '../actions';
 
+import { getRefs } from '../../../services/account';
 
 export function* accountLoginSaga() {
   let initialLoad = true;
@@ -46,11 +47,15 @@ export function* accountLoginSaga() {
         promisifyWeb3Call(proxy.getOwner.call)(),
       ]);
 
+      const account = yield select(makeSelectAccountData());
+      const refs = yield call(getRefs, account.accountId);
+
       // write data into the state
       yield put(accountLoaded({
         owner,
         isLocked,
         signer,
+        refs,
         blocky: createBlocky(signer),
         nickName: nickNameByAddress(signer),
       }));

@@ -1,11 +1,10 @@
-import { select, takeEvery, call } from 'redux-saga/effects';
+import { select, takeEvery } from 'redux-saga/effects';
 import { LOCATION_CHANGE } from 'react-router-redux';
 
 import { conf } from '../../../app.config';
 
 import { SET_AUTH, ACCOUNT_LOADED } from '../../AccountProvider/actions';
 import { makeSelectAccountData } from '../../AccountProvider/selectors';
-import { getRefs } from '../../../services/account';
 
 function formatRefs(refs) {
   return refs.map((ref) => `${ref.id} (${ref.allowance}`).join(', ');
@@ -14,7 +13,7 @@ function formatRefs(refs) {
 export function* updateIntercomUser(action) {
   const account = yield select(makeSelectAccountData());
   if (window.Intercom && account.loggedIn) {
-    const refs = yield call(getRefs, account.accountId);
+    const refs = account.refs;
     window.Intercom('update', {
       email: account.email,
       user_id: action.payload.signer,
