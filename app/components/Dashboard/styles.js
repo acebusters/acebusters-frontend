@@ -184,3 +184,8 @@ export const DBButton = styled(AppButton)`
     }
   }
 `;
+
+export const Subtitle = styled.p`
+  text-align: center;
+  margin: -10px 0 20px;
+`;

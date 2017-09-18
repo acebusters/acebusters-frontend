@@ -15,7 +15,7 @@ import {
   SET_AMOUNT_UNIT,
   SET_INVEST_TYPE,
   OVERVIEW,
-  NTZ,
+  ETH,
   POWERUP,
 } from './actions';
 
@@ -43,7 +43,7 @@ const initialState = fromJS({
   failedTx: null,
   events: null,
   activeTab: OVERVIEW,
-  amountUnit: NTZ,
+  amountUnit: ETH,
   investType: POWERUP,
 });
 
