@@ -84,7 +84,7 @@ function Footer() {
       </Icons>
       <div>
         <CenterDiv>
-          <A href="http://www.acebusters.com/terms_of_use" target="_blank">Terms of Use</A>
+          <A href="http://www.acebusters.com/terms" target="_blank">Terms of Use</A>
         </CenterDiv>
         <CenterDiv>
           <Version>{// eslint-disable-next-line no-undef
