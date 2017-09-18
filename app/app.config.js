@@ -36,6 +36,7 @@ export function conf() {
       gtmId: 'GTM-T7SBXCK',
       intercomAppId: 'z9xn3a6h',
       pusherApiKey: 'd4832b88a2a81f296f53',
+      shapeshiftKey: '1418115287605',
     };
   }
 
@@ -61,6 +62,7 @@ export function conf() {
       gtmId: 'GTM-T7SBXCK',
       intercomAppId: 'm6zcmwwq',
       pusherApiKey: 'd4832b88a2a81f296f53',
+      shapeshiftKey: '',
     };
   }
 
@@ -86,6 +88,7 @@ export function conf() {
     gtmId: 'GTM-XXXX',
     intercomAppId: 'm6zcmwwq',
     pusherApiKey: 'd4832b88a2a81f296f53',
+    shapeshiftKey: '',
   };
 }
 

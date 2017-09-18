@@ -7,6 +7,7 @@ import messages from '../../containers/Dashboard/messages';
 import AccountProgress from '../../containers/Dashboard/AccountProgress';
 import WithLoading from '../WithLoading';
 import { MAIN_NET_GENESIS_BLOCK, conf } from '../../app.config';
+import shapeshiftButton from './shapeshift.png';
 
 import Alert from '../Alert';
 
@@ -18,6 +19,13 @@ import {
 } from './styles';
 import Button from '../Button';
 import FishWarningDialog from './FishWarningDialog';
+
+function handleShapeshiftClick(e) {
+  e.preventDefault();
+  window.open(e.currentTarget.href, conf().shapeshiftKey, 'width=700,height=500,toolbar=0,menubar=0,location=0,status=1,scrollbars=1,resizable=0,left=0,top=0');
+}
+
+const shapeShiftLink = (proxy) => `https://shapeshift.io/shifty.html?destination=${proxy}&output=ETH&apiKey=${conf().shapeshiftKey}`;
 
 export const AccountIsLocked = (props) => {
   const {
@@ -93,6 +101,15 @@ export const AccountIsLocked = (props) => {
             <Alert theme="success">
               <Address style={{ width: 180 }}>{account.proxy}</Address>
             </Alert>
+
+            {conf().firstBlockHash === MAIN_NET_GENESIS_BLOCK &&
+              <a
+                onClick={handleShapeshiftClick}
+                href={shapeShiftLink(account.proxy)}
+              >
+                <img src={shapeshiftButton} alt="Pay with Shapeshift" />
+              </a>
+            }
           </WithLoading>
         }
       </ReceiveWrapper>
@@ -164,6 +181,15 @@ export const AccountNotLocked = ({
         <Alert theme="danger">
           <FormattedMessage {...messages.ethAlert} />
         </Alert>
+      }
+
+      {conf().firstBlockHash === MAIN_NET_GENESIS_BLOCK &&
+        <a
+          onClick={handleShapeshiftClick}
+          href={shapeShiftLink(account.proxy)}
+        >
+          <img src={shapeshiftButton} alt="Pay with Shapeshift" />
+        </a>
       }
     </ReceiveWrapper>
   </ReceiveSection>
