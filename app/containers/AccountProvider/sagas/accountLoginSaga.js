@@ -11,6 +11,7 @@ import { promisifyWeb3Call } from '../../../utils/promisifyWeb3Call';
 import { getWeb3 } from '../utils';
 import { SET_AUTH, WEB3_CONNECTED, accountLoaded } from '../actions';
 
+import { clearExpiringStorage } from '../../../services/expiringLocalStorage';
 import { getRefs } from '../../../services/account';
 
 export function* accountLoginSaga() {
@@ -59,6 +60,8 @@ export function* accountLoginSaga() {
         blocky: createBlocky(signer),
         nickName: nickNameByAddress(signer),
       }));
+    } else {
+      clearExpiringStorage();
     }
   }
 }
