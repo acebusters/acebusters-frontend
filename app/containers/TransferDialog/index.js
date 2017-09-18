@@ -8,7 +8,7 @@ import { reduxForm } from 'redux-form/immutable';
 import { normalizerFloat } from '../../utils/amountFormatter';
 import { validateFloat } from '../../utils/inputValidators';
 
-import { makeSelectHasWeb3, makeSelectNetworkSupported } from '../../containers/AccountProvider/selectors';
+import { makeSelectCanSendTx } from '../../containers/AccountProvider/selectors';
 
 import DefaultDialog from '../../components/TransferDialog/Default';
 import TokenDialog from '../../components/TransferDialog/TokenDialog';
@@ -58,8 +58,7 @@ TransferDialogContainer.defaultProps = {
 };
 
 const mapStateToProps = createStructuredSelector({
-  hasWeb3: makeSelectHasWeb3(),
-  networkSupported: makeSelectNetworkSupported(),
+  canSendTx: makeSelectCanSendTx(),
 });
 
 export default connect(mapStateToProps)(

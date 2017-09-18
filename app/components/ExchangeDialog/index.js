@@ -6,8 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import { NTZ_DECIMALS, ETH_DECIMALS, formatNtz, formatEth, normalizerFloat } from '../../utils/amountFormatter';
 import { round } from '../../utils';
 
-import NoWeb3Message from '../Web3Alerts/NoWeb3';
-import UnsupportedNetworkMessage from '../Web3Alerts/UnsupportedNetwork';
+import Web3Alerts from '../../containers/Web3Alerts';
 import SubmitButton from '../SubmitButton';
 import TokenAmountField from '../Form/TokenAmountField';
 import H2 from '../H2';
@@ -50,8 +49,7 @@ class ExchangeDialog extends React.Component { // eslint-disable-line react/pref
       title,
       descr,
       invalid,
-      hasWeb3,
-      networkSupported,
+      canSendTx,
       placeholder,
     } = this.props;
     const expectedAmountUnit = amountUnit.toLowerCase() === 'ntz' ? 'eth' : 'ntz';
@@ -93,11 +91,10 @@ class ExchangeDialog extends React.Component { // eslint-disable-line react/pref
             </FeedbackField>
           }
 
-          {!hasWeb3 && <NoWeb3Message />}
-          {hasWeb3 && !networkSupported && <UnsupportedNetworkMessage />}
+          <Web3Alerts />
 
           <SubmitButton
-            disabled={invalid || !hasWeb3 || !networkSupported}
+            disabled={invalid || !canSendTx}
             submitting={submitting}
           >
             <FormattedMessage {...messages.submitButton} />
@@ -116,8 +113,7 @@ ExchangeDialog.propTypes = {
   submitting: PropTypes.bool,
   setAmountUnit: PropTypes.func,
   invalid: PropTypes.bool,
-  networkSupported: PropTypes.bool,
-  hasWeb3: PropTypes.bool,
+  canSendTx: PropTypes.bool,
   maxAmount: PropTypes.object, // BigNumber
   calcExpectedAmount: PropTypes.func,
   handleSubmit: PropTypes.func,

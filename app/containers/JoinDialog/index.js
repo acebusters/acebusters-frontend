@@ -7,12 +7,11 @@ import 'react-rangeslider/lib/index.css';
 import { createStructuredSelector } from 'reselect';
 import SubmitButton from '../../components/SubmitButton';
 import H2 from '../../components/H2';
-import NoWeb3Message from '../../components/Web3Alerts/NoWeb3';
-import UnsupportedNetworkMessage from '../../components/Web3Alerts/UnsupportedNetwork';
 import FormGroup from '../../components/Form/FormGroup';
+import Web3Alerts from '../../containers/Web3Alerts';
 
 import { makeSbSelector } from '../Table/selectors';
-import { makeSelectProxyAddr, makeSelectHasWeb3, makeSelectNetworkSupported } from '../AccountProvider/selectors';
+import { makeSelectProxyAddr, makeSelectCanSendTx } from '../AccountProvider/selectors';
 import { formatNtz } from '../../utils/amountFormatter';
 
 /* eslint-disable react/prop-types */
@@ -42,10 +41,9 @@ export class JoinDialog extends React.Component { // eslint-disable-line react/p
   render() {
     const {
       sb,
-      hasWeb3,
+      canSendTx,
       balance,
       modalDismiss,
-      networkSupported,
       handleSubmit,
       amount,
       submitting,
@@ -75,11 +73,10 @@ export class JoinDialog extends React.Component { // eslint-disable-line react/p
         <div>Max: {formatNtz(max)} NTZ</div>
         <div>{formatNtz(amount)} NTZ</div>
 
-        {!hasWeb3 && <NoWeb3Message />}
-        {hasWeb3 && !networkSupported && <UnsupportedNetworkMessage />}
+        <Web3Alerts />
 
         <SubmitButton
-          disabled={!hasWeb3 || !networkSupported}
+          disabled={!canSendTx}
           submitting={submitting}
         >
           Join
@@ -100,8 +97,7 @@ const valueSelector = formValueSelector('join');
 const mapStateToProps = createStructuredSelector({
   sb: makeSbSelector(),
   proxyAddr: makeSelectProxyAddr(),
-  hasWeb3: makeSelectHasWeb3(),
-  networkSupported: makeSelectNetworkSupported(),
+  canSendTx: makeSelectCanSendTx(),
   amount: (state) => valueSelector(state, 'amount'),
   initialValues: (state, props) => ({
     amount: makeSbSelector()(state, props) * 40,
@@ -112,8 +108,7 @@ JoinDialog.propTypes = {
   handleJoin: PropTypes.func,
   handleSubmit: PropTypes.func,
   modalDismiss: PropTypes.func,
-  hasWeb3: PropTypes.bool,
-  networkSupported: PropTypes.bool,
+  canSendTx: PropTypes.bool,
   pos: PropTypes.any,
   sb: PropTypes.number,
   submitting: PropTypes.bool,

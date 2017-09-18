@@ -6,10 +6,7 @@ import { validateFloat } from '../../utils/inputValidators';
 import ExchangeDialog from '../../components/ExchangeDialog';
 import messages from './messages';
 
-import {
-  makeSelectHasWeb3,
-  makeSelectNetworkSupported,
-} from '../AccountProvider/selectors';
+import { makeSelectCanSendTx } from '../AccountProvider/selectors';
 
 const validate = (values, props) => {
   const errors = {};
@@ -29,8 +26,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     messages,
     amount: valueSelector(state, 'amount'),
-    hasWeb3: makeSelectHasWeb3()(state),
-    networkSupported: makeSelectNetworkSupported()(state),
+    canSendTx: makeSelectCanSendTx()(state),
   };
 };
 

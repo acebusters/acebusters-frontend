@@ -7,8 +7,8 @@ import { Form, Field, SubmissionError, reduxForm } from 'redux-form/immutable';
 
 import { makeSelectAccountData } from '../../containers/AccountProvider/selectors';
 import { getWeb3 } from '../../containers/AccountProvider/utils';
-import NoWeb3Message from '../../components/Web3Alerts/NoWeb3';
-import UnsupportedNetworkMessage from '../../components/Web3Alerts/UnsupportedNetwork';
+import NoWeb3Message from '../../containers/Web3Alerts/NoWeb3';
+import UnsupportedNetworkMessage from '../../containers/Web3Alerts/UnsupportedNetwork';
 import SubmitButton from '../../components/SubmitButton';
 import FormGroup from '../../components/Form/FormGroup';
 import { CheckBox } from '../../components/Input';
@@ -106,9 +106,12 @@ class UpgradeDialog extends React.Component {
           </A>
         </H2>
 
-        {!account.injected && <NoWeb3Message />}
+        {!account.injected &&
+          <NoWeb3Message />
+        }
         {account.injected && !account.onSupportedNetwork &&
-          <UnsupportedNetworkMessage />}
+          <UnsupportedNetworkMessage />
+        }
 
         <Form onSubmit={handleSubmit(this.handleSubmit)}>
           {account.injected && !submitting && !success &&
@@ -131,7 +134,7 @@ class UpgradeDialog extends React.Component {
 
           {!success &&
             <SubmitButton
-              disabled={!account.injected || invalid}
+              disabled={!account.injected || !account.onSupportedNetwork || invalid}
               submitting={submitting}
             >
               Unlock

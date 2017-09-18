@@ -9,11 +9,10 @@ import { createStructuredSelector } from 'reselect';
 import SubmitButton from '../../components/SubmitButton';
 import H2 from '../../components/H2';
 import { makeSbSelector } from '../Table/selectors';
-import { makeSelectHasWeb3, makeSelectNetworkSupported } from '../AccountProvider/selectors';
+import { makeSelectCanSendTx } from '../AccountProvider/selectors';
+import Web3Alerts from '../Web3Alerts';
 import { formatNtz } from '../../utils/amountFormatter';
 
-import NoWeb3Message from '../../components/Web3Alerts/NoWeb3';
-import UnsupportedNetworkMessage from '../../components/Web3Alerts/UnsupportedNetwork';
 import FormGroup from '../../components/Form/FormGroup';
 
 import messages from './messages';
@@ -61,12 +60,11 @@ export class RebuyDialog extends React.Component {
 
   render() {
     const {
-      hasWeb3,
+      canSendTx,
       sb,
       balance,
       modalDismiss,
       submitting,
-      networkSupported,
       handleSubmit,
       amount,
     } = this.props;
@@ -110,8 +108,7 @@ export class RebuyDialog extends React.Component {
         </div>
         <div>{formatNtz(amount)} NTZ</div>
 
-        {!hasWeb3 && <NoWeb3Message />}
-        {hasWeb3 && !networkSupported && <UnsupportedNetworkMessage />}
+        <Web3Alerts />
 
         <ButtonContainer>
           <SubmitButton onClick={this.handleLeave} type="button">
@@ -119,7 +116,7 @@ export class RebuyDialog extends React.Component {
           </SubmitButton>
 
           <SubmitButton
-            disabled={!hasWeb3 || !networkSupported}
+            disabled={!canSendTx}
             submitting={submitting}
           >
             <FormattedMessage {...messages.rebuy} />
@@ -133,8 +130,7 @@ export class RebuyDialog extends React.Component {
 const valueSelector = formValueSelector('rebuy');
 const mapStateToProps = createStructuredSelector({
   sb: makeSbSelector(),
-  hasWeb3: makeSelectHasWeb3(),
-  networkSupported: makeSelectNetworkSupported(),
+  canSendTx: makeSelectCanSendTx(),
   amount: (state) => valueSelector(state, 'amount'),
   initialValues: (state, props) => ({
     amount: makeSbSelector()(state, props) * 40,
@@ -145,11 +141,10 @@ RebuyDialog.propTypes = {
   handleRebuy: PropTypes.func,
   handleSubmit: PropTypes.func,
   submitting: PropTypes.bool,
-  networkSupported: PropTypes.bool,
+  canSendTx: PropTypes.bool,
   handleLeave: PropTypes.func,
   modalDismiss: PropTypes.func,
   balance: React.PropTypes.number,
-  hasWeb3: React.PropTypes.bool,
   sb: PropTypes.number,
   amount: PropTypes.number,
   pos: PropTypes.number,
