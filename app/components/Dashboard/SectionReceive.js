@@ -101,15 +101,6 @@ export const AccountIsLocked = (props) => {
             <Alert theme="success">
               <Address style={{ width: 180 }}>{account.proxy}</Address>
             </Alert>
-
-            {conf().firstBlockHash === MAIN_NET_GENESIS_BLOCK &&
-              <a
-                onClick={handleShapeshiftClick}
-                href={shapeShiftLink(account.proxy)}
-              >
-                <img src={shapeshiftButton} alt="Pay with Shapeshift" />
-              </a>
-            }
           </WithLoading>
         }
       </ReceiveWrapper>
