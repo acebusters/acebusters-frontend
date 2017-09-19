@@ -11,6 +11,7 @@ import A from '../A';
 import H2 from '../H2';
 import List from '../List';
 import TimedButton from '../TimedButton';
+import Button from '../Button';
 
 import { Pane, SectionOverview, Subtitle } from './styles';
 
@@ -22,8 +23,23 @@ const Overview = (props) => {
 
   return (
     <Pane name="dashboard-overview">
-      <SectionOverview name="account-info">
-        <strong>Account email:</strong> {account.email}
+      <SectionOverview
+        name="account-info"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+        }}
+      >
+        <div style={{ margin: '1em' }}>
+          <strong>Account email:</strong>&nbsp;{account.email}
+        </div>
+        <Button
+          size="medium"
+          onClick={props.toggleInvestTour}
+          data-tour="tour-begin"
+        >
+          <i className="fa fa-graduation-cap" />&nbsp;Invest Tutorial
+        </Button>
       </SectionOverview>
       {account.refs && account.refs.length &&
         <SectionOverview
@@ -137,6 +153,7 @@ Overview.propTypes = {
   ethPayoutPending: PropTypes.bool,
   ethPayoutDate: PropTypes.object,
   handleETHPayout: PropTypes.func,
+  toggleInvestTour: PropTypes.func.isRequired,
 };
 
 export default Overview;

@@ -320,10 +320,10 @@ describe('cardSelector', () => {
             state: 'flop',
             lineup: [{
               address: P1_ADDR,
-              last: new Receipt(TBL_ADDR).sitOut(21, babz(100)).sign(P1_KEY),
+              last: new Receipt(TBL_ADDR).bet(21, babz(100)).sign(P1_KEY),
             }, {
               address: P2_ADDR,
-              last: new Receipt(TBL_ADDR).sitOut(21, babz(0)).sign(P2_KEY),
+              last: new Receipt(TBL_ADDR).bet(21, babz(0)).sign(P2_KEY),
               cards: [12, 21],
             }],
             holeCards: [15, 25],
@@ -356,10 +356,10 @@ describe('cardSelector', () => {
             state: 'flop',
             lineup: [{
               address: P1_ADDR,
-              last: new Receipt(TBL_ADDR).sitOut(21, babz(100)).sign(P1_KEY),
+              last: new Receipt(TBL_ADDR).bet(21, babz(100)).sign(P1_KEY),
             }, {
               address: P2_ADDR,
-              last: new Receipt(TBL_ADDR).sitOut(21, babz(0)).sign(P2_KEY),
+              last: new Receipt(TBL_ADDR).bet(21, babz(0)).sign(P2_KEY),
             }],
             holeCards: [15, 25],
           },

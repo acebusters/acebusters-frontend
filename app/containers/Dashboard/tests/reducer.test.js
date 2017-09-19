@@ -12,6 +12,7 @@ describe('dashboard reducer tests', () => {
       events: null,
       failedTx: null,
       investType: POWERUP,
+      investTour: false,
       proxy: null,
     });
   });

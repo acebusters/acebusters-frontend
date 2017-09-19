@@ -57,7 +57,10 @@ class ExchangeDialog extends React.Component { // eslint-disable-line react/pref
     const decimals = expectedAmountUnit === 'ntz' ? NTZ_DECIMALS : ETH_DECIMALS;
 
     return (
-      <div style={{ maxWidth: 480 }}>
+      <div
+        style={{ maxWidth: 480 }}
+        data-tour={`exchange-${amountUnit}-form`}
+      >
         {title && <H2>{title}</H2>}
         {descr}
 

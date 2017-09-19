@@ -39,3 +39,8 @@ export const getInvestType = () => createSelector(
   selectDashboard,
   (dashboard) => dashboard.get('investType'),
 );
+
+export const getInvestTour = () => createSelector(
+  selectDashboard,
+  (dashboard) => dashboard.get('investTour'),
+);
