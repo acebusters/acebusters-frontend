@@ -69,6 +69,11 @@ const makeSelectPrivKey = () => createSelector(
   (account) => account.get('privKey')
 );
 
+const makeSelectInjected = () => createSelector(
+  selectAccount,
+  (account) => account.get('injected'),
+);
+
 const makeSelectHasWeb3 = () => createSelector(
   selectAccount,
   (account) => !!(account.get('isLocked') || account.get('injected'))
@@ -102,4 +107,5 @@ export {
   makeSelectWeb3ErrMsg,
   makeSelectHasWeb3,
   makeSelectNetworkSupported,
+  makeSelectInjected,
 };

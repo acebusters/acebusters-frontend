@@ -83,7 +83,7 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
 
   render() {
     const { error, invalid, submitting, handleSubmit, asyncValidating } = this.props;
-    const termsLink = (<a href="http://www.acebusters.com/terms_of_use.html" target="_blank"><FormattedMessage {...messages.terms} /></a>);
+    const termsLink = (<a href="http://www.acebusters.com/terms_of_use" target="_blank"><FormattedMessage {...messages.terms} /></a>);
     return (
       <Container>
         <div>

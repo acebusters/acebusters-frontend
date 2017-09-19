@@ -1,4 +1,4 @@
-export function promisifyContractCall(method) {
+export function promisifyWeb3Call(method) {
   return (...args) => new Promise((resolve, reject) => {
     method(
       ...args,

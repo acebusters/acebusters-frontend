@@ -22,7 +22,7 @@ import Button from '../../components/Button';
 import WithLoading from '../../components/WithLoading';
 import { nickNameByAddress } from '../../services/nicknames';
 import { formatNtz } from '../../utils/amountFormatter';
-import { promisifyContractCall } from '../../utils/promisifyContractCall';
+import { promisifyWeb3Call } from '../../utils/promisifyWeb3Call';
 
 // config data
 import {
@@ -134,7 +134,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.tableEvents.watch(this.watchTable);
 
     // getting table data from oracle
-    this.pusher = new Pusher('d4832b88a2a81f296f53', { cluster: 'eu', encrypted: true });
+    this.pusher = new Pusher(conf().pusherApiKey, { cluster: 'eu', encrypted: true });
     this.channel = this.pusher.subscribe(this.tableAddr);
     this.tableService = new TableService(this.props.params.tableAddr, this.props.privKey);
 
@@ -265,7 +265,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
     const { signerAddr, myPos, account } = this.props;
 
-    const promise = promisifyContractCall(this.token.transData.sendTransaction)(
+    const promise = promisifyWeb3Call(this.token.transData.sendTransaction)(
       this.tableAddr,
       amount,
       `0x0${(myPos).toString(16)}${signerAddr.replace('0x', '')}`
@@ -281,7 +281,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   async handleJoin(pos, amount) {
     const { signerAddr, account } = this.props;
 
-    const promise = promisifyContractCall(this.token.transData.sendTransaction)(
+    const promise = promisifyWeb3Call(this.token.transData.sendTransaction)(
       this.tableAddr,
       amount,
       `0x0${(pos).toString(16)}${signerAddr.replace('0x', '')}`,

@@ -21,5 +21,5 @@ export const validateFloat = (messages, errors, amount, minAmount, maxAmount) =>
     floatErrors.amount = <FormattedMessage {...messages.amountTooHigh} values={{ maxAmount }} />;
   }
 
-  return errors;
+  return floatErrors;
 };

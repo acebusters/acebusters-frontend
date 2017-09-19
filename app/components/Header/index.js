@@ -3,12 +3,13 @@ import PropTypes from 'prop-types';
 import onClickOutside from 'react-onclickoutside';
 
 import Navbar from './Navbar';
-import UserMenu from './UserMenu';
 import NavItem from './NavItem';
 
 import {
   StyledHeader,
   NavToggle,
+  StyledUserName,
+  StyledUserImage,
 } from './styles';
 
 class Header extends React.Component {
@@ -33,24 +34,27 @@ class Header extends React.Component {
         <i className="fa fa-bars fa-2"></i>
       </NavToggle>,
       <NavItem
-        to="dashboard"
+        to="lobby"
         collapsed={this.props.collapsed}
         key="2"
-        title="Dashboard"
-        location={this.props.location}
-      />,
-      <NavItem
-        to="lobby"
-        key="3"
-        collapsed={this.props.collapsed}
         title="Lobby"
         location={this.props.location}
       />,
-      <UserMenu
-        onLogout={this.props.onClickLogout}
+      <NavItem
+        to="dashboard"
+        key="3"
         collapsed={this.props.collapsed}
+        title={<span>
+          <StyledUserImage src={this.props.blocky} />
+          <StyledUserName>{this.props.nickName}</StyledUserName>
+        </span>}
+        location={this.props.location}
+      />,
+      <NavItem
+        onClick={this.props.onClickLogout}
         key="4"
-        {...this.props}
+        collapsed={this.props.collapsed}
+        title="Sign Out"
       />,
     ]) : ([
       <NavItem
@@ -89,6 +93,8 @@ Header.propTypes = {
   onClickLogout: PropTypes.func,
   setCollapsed: PropTypes.func,
   collapsed: PropTypes.bool,
+  nickName: PropTypes.string,
+  blocky: PropTypes.string,
 };
 
 Header.defaultProps = {

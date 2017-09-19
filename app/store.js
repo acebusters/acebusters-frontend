@@ -71,6 +71,8 @@ export default function configureStore(initialState = {}, history) {
       loggedIn: true,
       privKey: storageService.getItem('privKey'),
       email: storageService.getItem('email'),
+      accountId: storageService.getItem('accountId'),
+      proxyAddr: storageService.getItem('proxyAddr'),
     }));
   } else {
     store.dispatch(setAuthState({ loggedIn: false }));

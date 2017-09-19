@@ -42,7 +42,6 @@ class TokenAmountField extends React.Component {
     this.state = { amountFocus: false };
     this.handleAmountFocus = this.handleAmountFocus.bind(this);
     this.handleAmountBlur = this.handleAmountBlur.bind(this);
-    this.handleUnitFocus = this.handleUnitFocus.bind(this);
   }
 
   handleAmountFocus() {
@@ -53,10 +52,6 @@ class TokenAmountField extends React.Component {
     this.setState({ amountFocus: false });
   }
 
-  handleUnitFocus() {
-    this.props.reset();
-  }
-
   render() {
     const {
       input,
@@ -64,19 +59,25 @@ class TokenAmountField extends React.Component {
       type,
       amountUnit,
       setAmountUnit,
+      maxAmount,
       meta: { touched, error, warning },
     } = this.props;
+    const balanceZero = maxAmount.toString() === '0';
     return (
       <FormGroup>
         <Label htmlFor={input.name}>{label}</Label>
         <ControlWrapper>
-          <FieldGroup focus={this.state.amountFocus}>
+          <FieldGroup
+            focus={this.state.amountFocus}
+            disabled={balanceZero}
+          >
             <InputWithUnit
               {...input}
               {...this.props}
               onFocus={this.handleAmountFocus}
               type={type}
               id={input.name}
+              disabled={balanceZero}
             />
             <Unit name="unit">{amountUnit}</Unit>
           </FieldGroup>
@@ -85,7 +86,6 @@ class TokenAmountField extends React.Component {
               selected={amountUnit}
               onSelect={setAmountUnit}
               options={tokens}
-              handleFocus={this.handleUnitFocus}
               {...this.props}
             />
           </FieldGroup>
@@ -104,7 +104,7 @@ TokenAmountField.propTypes = {
   meta: PropTypes.object,
   amountUnit: PropTypes.string,
   setAmountUnit: PropTypes.func,
-  reset: PropTypes.func.isRequired,
+  maxAmount: PropTypes.object,
 };
 
 export default TokenAmountField;

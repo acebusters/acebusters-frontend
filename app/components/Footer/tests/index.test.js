@@ -9,7 +9,7 @@ describe('<Footer />', () => {
       <Footer />
     );
     expect(renderedComponent.contains(
-      <A href="http://www.acebusters.com/terms_of_use.html">Terms of Use</A>
+      <A href="http://www.acebusters.com/terms_of_use" target="_blank">Terms of Use</A>
     )).toBe(true);
   });
 

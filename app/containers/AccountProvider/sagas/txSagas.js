@@ -1,15 +1,16 @@
+import { eventChannel } from 'redux-saga';
 import { select, actionChannel, put, take, call } from 'redux-saga/effects';
+import Pusher from 'pusher-js';
 import { Receipt } from 'poker-helper';
 import BigNumber from 'bignumber.js';
-import { ABI_PROXY } from '../../../app.config';
+import { conf, ABI_PROXY } from '../../../app.config';
 import { last } from '../../../utils';
-import { promisifyContractCall } from '../../../utils/promisifyContractCall';
+import { promisifyWeb3Call } from '../../../utils/promisifyWeb3Call';
 import { sendTx } from '../../../services/transactions';
 
 import { getWeb3 } from '../utils';
 
 import { CONTRACT_TX_SEND, contractTxSended, contractTxError } from '../actions';
-import { FISH_TX_HASH } from '../../Table/actions';
 import { makeSelectAccountData } from '../selectors';
 
 function getTxArgs({ data, dest, args, methodName }) {
@@ -19,20 +20,22 @@ function getTxArgs({ data, dest, args, methodName }) {
 }
 
 function* contractTransactionSend(action) {
-  const { proxy: proxyAddr, injected: injectedAddr, isLocked, owner } = yield select(makeSelectAccountData());
+  const { proxy: proxyAddr, injected: injectedAddr, isLocked, owner, signerAddr } = yield select(makeSelectAccountData());
   const txArgs = yield call(getTxArgs, action.payload);
 
   if (isLocked) {
     const forwardReceipt = new Receipt(owner).forward(0, ...txArgs).sign(action.payload.privKey);
+    const txHashChannel = fishTxHashChannel(signerAddr);
     yield call(sendTx, forwardReceipt);
-    const { txHash } = yield take(FISH_TX_HASH);
+    const txHash = yield take(txHashChannel);
+    txHashChannel.close();
     return txHash;
   }
 
   const web3 = yield call(getWeb3, true);
   const proxy = web3.eth.contract(ABI_PROXY).at(proxyAddr);
-  const estimateGas = yield call(promisifyContractCall, proxy.forward.estimateGas);
-  const sendTransaction = yield call(promisifyContractCall, proxy.forward.sendTransaction);
+  const estimateGas = yield call(promisifyWeb3Call, proxy.forward.estimateGas);
+  const sendTransaction = yield call(promisifyWeb3Call, proxy.forward.sendTransaction);
   const gas = yield call(estimateGas, ...txArgs, { from: injectedAddr });
 
   return yield call(sendTransaction, ...txArgs, { from: injectedAddr, gas: Math.round(gas * 1.9) });
@@ -54,4 +57,21 @@ export function* contractTransactionSendSaga() {
       yield put(contractTxError({ address: dest, error, args, methodName, action }));
     }
   }
+}
+
+function fishTxHashChannel(signerAddr) {
+  const pusher = new Pusher(conf().pusherApiKey, { cluster: 'eu', encrypted: true });
+  const signerChannel = pusher.subscribe(signerAddr);
+  signerChannel.bind('update', () => null); // workaround for subscribe on updates before the receipt sending
+  return eventChannel((emitter) => {
+    signerChannel.bind('update', (event) => {
+      if (event.type === 'txHash') {
+        emitter(event.payload);
+      }
+    });
+
+    return () => {
+      signerChannel.unbind_all();
+    };
+  });
 }

@@ -86,6 +86,10 @@ export default defineMessages({
     id: 'app.containers.Dashboard.ethAlert',
     defaultMessage: 'Never send real ether to this address. It is a Rinkeby Testnet Address. Only send Rinkeby TestEther to this Address. Otherwise your Ether will be lost',
   },
+  ethLimit: {
+    id: 'app.containers.Dashboard.ethLimit',
+    defaultMessage: 'Warning: account limit {limit} ETH. To deposit more, ',
+  },
   ntzTransferTitle: {
     id: 'app.containers.Dashboard.ntzTransferTitle',
     defaultMessage: 'Transfer NTZ',
@@ -129,6 +133,14 @@ export default defineMessages({
   purchaseTitle: {
     id: 'app.containers.Dashboard.purchaseTitle',
     defaultMessage: 'Exchange ETH for NTZ',
+  },
+  floorPrice: {
+    id: 'app.containers.Dashboard.floorPrice',
+    defaultMessage: '{amount} NTZ for 1 ETH',
+  },
+  ceilingPrice: {
+    id: 'app.containers.Dashboard.ceilingPrice',
+    defaultMessage: '1 ETH for {amount} NTZ',
   },
   tableJoin: {
     id: 'app.containers.Dashboard.tableJoin',

@@ -200,13 +200,16 @@ WebsocketProvider.prototype.sendAsync = function sendAsync(payload, callback) {
   }, 200);
 };
 
-WebsocketProvider.prototype.waitForConnection = function waitForConnection(callback, interval) {
+WebsocketProvider.prototype.waitForConnection = function waitForConnection(callback, duration) {
   if (this.connection.readyState === 1) {
     callback();
   } else {
-    setTimeout(() => {
-      this.waitForConnection(callback, interval);
-    }, interval);
+    const interval = setInterval(() => {
+      if (this.connection.readyState === 1) {
+        clearInterval(interval);
+        callback();
+      }
+    }, duration);
   }
 };
 

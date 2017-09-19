@@ -20,7 +20,7 @@ const displayImage = (src, icon) => {
   return null;
 };
 
-const NavItem = ({ title, to, image, iconClass, collapsed, collapseOnMobile }) => (
+const NavItem = ({ title, to, image, iconClass, collapsed, collapseOnMobile, onClick }) => (
   <StyledItem
     collapsed={collapsed}
     collapseOnMobile={collapseOnMobile}
@@ -29,6 +29,7 @@ const NavItem = ({ title, to, image, iconClass, collapsed, collapseOnMobile }) =
       component={StyledLink}
       activeComponent={ActiveLink}
       to={to}
+      onClick={onClick || null}
     >
       {displayImage(image, iconClass)}
       <StyledSpan>{title}</StyledSpan>
@@ -37,12 +38,13 @@ const NavItem = ({ title, to, image, iconClass, collapsed, collapseOnMobile }) =
 );
 
 NavItem.propTypes = {
-  title: PropTypes.string,
+  title: PropTypes.any,
   collapsed: PropTypes.bool,
   collapseOnMobile: PropTypes.bool,
   to: PropTypes.any,
   image: PropTypes.string,
   iconClass: PropTypes.string,
+  onClick: PropTypes.any,
 };
 
 NavItem.defaultProps = {

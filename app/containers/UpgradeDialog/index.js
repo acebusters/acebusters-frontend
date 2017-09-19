@@ -19,7 +19,7 @@ import { accountUnlocked } from '../AccountProvider/actions';
 
 import { ABI_PROXY } from '../../app.config';
 import { waitForTx } from '../../utils/waitForTx';
-import { promisifyContractCall } from '../../utils/promisifyContractCall';
+import { promisifyWeb3Call } from '../../utils/promisifyWeb3Call';
 import * as accountService from '../../services/account';
 
 const validate = (values) => {
@@ -63,7 +63,7 @@ class UpgradeDialog extends React.Component {
   async handleSubmit() {
     const { account } = this.props;
     const proxyContract = getWeb3(true).eth.contract(ABI_PROXY).at(account.proxy);
-    const unlockTx = promisifyContractCall(proxyContract.unlock);
+    const unlockTx = promisifyWeb3Call(proxyContract.unlock);
 
     try {
       const unlockRequest = new Receipt().unlockRequest(account.injected).sign(`0x${account.privKey}`);
@@ -74,7 +74,8 @@ class UpgradeDialog extends React.Component {
       );
       await waitForTx(getWeb3(), txHash);
     } catch (e) {
-      throw new SubmissionError(`Error: ${e.message || e}`);
+      setImmediate(() => this.props.change('accept', false));
+      throw new SubmissionError({ _error: `Error: ${e.message || e}` });
     }
   }
 
@@ -140,6 +141,7 @@ UpgradeDialog.propTypes = {
   submitting: PropTypes.bool,
   handleSubmit: PropTypes.func,
   accountUnlocked: PropTypes.func,
+  change: PropTypes.func,
   onSuccessButtonClick: PropTypes.func,
 };
 

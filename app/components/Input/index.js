@@ -48,6 +48,9 @@ export const InputWithUnit = styled.input`
   &:focus {
     outline: none;
   }
+  &:disabled {
+    cursor: not-allowed;
+  }
 `;
 
 export const CheckBox = styled.input`

@@ -6,6 +6,7 @@ import { FormattedMessage } from 'react-intl';
 import messages from '../../containers/Dashboard/messages';
 import AccountProgress from '../../containers/Dashboard/AccountProgress';
 import WithLoading from '../WithLoading';
+import { MAIN_NET_GENESIS_BLOCK, conf } from '../../app.config';
 
 import Alert from '../Alert';
 
@@ -29,10 +30,9 @@ export const AccountIsLocked = (props) => {
     <ReceiveSection>
       <ReceiveWrapper
         style={{
+          margin: '12px 10px',
           display: 'flex',
           flexDirection: 'column',
-          margin: '0 10px',
-          alignItems: 'center',
         }}
       >
         <WithLoading
@@ -40,7 +40,7 @@ export const AccountIsLocked = (props) => {
           loadingSize="40px"
           styles={{
             layout: { transform: 'translateY(-50%)', left: 0 },
-            outer: { marginTop: '20%' },
+            outer: { margin: 'auto' },
           }}
         >
           <QRCode value={qrUrl} size={100} />
@@ -53,21 +53,23 @@ export const AccountIsLocked = (props) => {
             outer: { marginTop: 'auto' },
           }}
         >
-          <Alert style={{ width: 220 }} theme="success">
-            <Address>{account.proxy}</Address>
+          <Alert theme="success">
+            <Address style={{ width: 180 }}>{account.proxy}</Address>
           </Alert>
         </WithLoading>
       </ReceiveWrapper>
 
       <ReceiveWrapper>
-        <Alert theme="danger">
-          <FormattedMessage {...messages.ethAlert} />
-        </Alert>
+        {conf().firstBlockHash !== MAIN_NET_GENESIS_BLOCK &&
+          <Alert theme="danger">
+            <FormattedMessage {...messages.ethAlert} />
+          </Alert>
+        }
 
         {ethBalance && nutzBalance && floor &&
           <Alert theme="warning">
-            Warning: account limit {ETH_FISH_LIMIT.toString()} ETH<br />
-            <BtnUpgrade {...props} /> to deposit more.
+            <FormattedMessage values={{ limit: ETH_FISH_LIMIT.toString() }} {...messages.ethLimit} />
+            <BtnUpgrade {...props} />
             <AccountProgress
               ethBalance={ethBalance}
               nutzBalance={nutzBalance}
@@ -96,7 +98,7 @@ export const AccountNotLocked = ({
   <ReceiveSection>
     <ReceiveWrapper
       style={{
-        alignSelf: 'center',
+        alignSelf: 'flex-start',
         margin: '0 12px',
       }}
     >
@@ -113,12 +115,14 @@ export const AccountNotLocked = ({
     </ReceiveWrapper>
 
     <ReceiveWrapper>
-      <Alert style={{ marginTop: 15, marginBottom: 0 }} theme="success">
+      <Alert style={{ marginTop: 0, marginBottom: 10 }} theme="success">
         <Address>{account.proxy}</Address>
       </Alert>
-      <Alert theme="danger">
-        <FormattedMessage {...messages.ethAlert} />
-      </Alert>
+      {conf().firstBlockHash !== MAIN_NET_GENESIS_BLOCK &&
+        <Alert theme="danger">
+          <FormattedMessage {...messages.ethAlert} />
+        </Alert>
+      }
     </ReceiveWrapper>
   </ReceiveSection>
 );

@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import ethUtil from 'ethereumjs-util';
 import { connect } from 'react-redux';
 import { Form, Field, reduxForm, SubmissionError, propTypes, change, formValueSelector } from 'redux-form/immutable';
 import { browserHistory } from 'react-router';
 import { Receipt, Type } from 'poker-helper';
-import Pusher from 'pusher-js';
 
 // components
 import Container from '../../components/Container';
@@ -16,11 +16,10 @@ import { ErrorMessage } from '../../components/FormMessages';
 
 import * as accountService from '../../services/account';
 import * as storageService from '../../services/localStorage';
+import { makeSelectInjected, makeSelectNetworkSupported } from '../../containers/AccountProvider/selectors';
 import { getWeb3 } from '../../containers/AccountProvider/utils';
-import { waitForTx } from '../../utils/waitForTx';
-import { promisifyContractCall } from '../../utils/promisifyContractCall';
-import { conf, ABI_ACCOUNT_FACTORY, ABI_PROXY } from '../../app.config';
-import { sendTx } from '../../services/transactions';
+import { ABI_PROXY } from '../../app.config';
+import { promisifyWeb3Call } from '../../utils/promisifyWeb3Call';
 
 import { walletExport, register, accountTxHashReceived } from './actions';
 
@@ -49,18 +48,8 @@ const warn = (values) => {
   return warnings;
 };
 
-function waitForAccountTxHash(signerAddr) {
-  const pusher = new Pusher('d4832b88a2a81f296f53', { cluster: 'eu', encrypted: true });
-  const channel = pusher.subscribe(signerAddr);
-  return new Promise((resolve) => {
-    channel.bind('update', (event) => {
-      if (event.type === 'txHash') {
-        resolve(event.payload);
-        channel.unbind('update');
-      }
-    });
-  });
-}
+const totalBits = 768;
+const bitsToBytes = (bits) => bits / 8;
 
 export class GeneratePage extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
@@ -75,50 +64,72 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     };
   }
 
+  componentDidMount() {
+    const crypto = window.crypto || window.msCrypto;
+    if (crypto.getRandomValues) {
+      const raw = Array.from(crypto.getRandomValues(new Uint8Array(bitsToBytes(totalBits))));
+      this.updateEntropy({ raw });
+      this.handleSaveEntropyClick();
+    }
+  }
+
   handleSaveEntropyClick() {
     this.setState({ entropySaved: true });
   }
 
+  async createTx(wallet, receipt, confCode) {
+    const { injectedAccount, networkSupported } = this.props;
+    if (injectedAccount && networkSupported) {
+      const web3 = getWeb3(true);
+      const proxy = web3.eth.contract(ABI_PROXY);
+
+      const getTransactionCount = promisifyWeb3Call(getWeb3(true).eth.getTransactionCount);
+      const create = (...args) => new Promise((resolve, reject) => {
+        const gas = 41154 + 489800; // estimated by remix
+        proxy.new(...args, {
+          from: injectedAccount,
+          data: '0x6060604052341561000f57600080fd5b5b5b60008054600160a060020a03191633600160a060020a03161790555b60008054600160a060020a03191633600160a060020a03161790555b5b6103ce806100596000396000f3006060604052361561005f5763ffffffff7c0100000000000000000000000000000000000000000000000000000000600035041663893d20e881146100a0578063c0ee0b8a146100cf578063d7f31eb914610136578063f2fde38b1461019d575b5b33600160a060020a03167fe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c3460405190815260200160405180910390a25b005b34156100ab57600080fd5b6100b36101be565b604051600160a060020a03909116815260200160405180910390f35b34156100da57600080fd5b61009e60048035600160a060020a03169060248035919060649060443590810190830135806020601f820181900481020160405190810160405281815292919060208401838380828437509496506101ce95505050505050565b005b341561014157600080fd5b61009e60048035600160a060020a03169060248035919060649060443590810190830135806020601f820181900481020160405190810160405281815292919060208401838380828437509496506101d495505050505050565b005b34156101a857600080fd5b61009e600160a060020a0360043516610345565b005b600054600160a060020a03165b90565b5b505050565b60005433600160a060020a039081169116146101ef57600080fd5b600160a060020a038316151561020457600080fd5b82600160a060020a0316828260405180828051906020019080838360005b8381101561023b5780820151818401525b602001610222565b50505050905090810190601f1680156102685780820380516001836020036101000a031916815260200191505b5091505060006040518083038185876187965a03f192505050151561028957fe5b60008211156101ce5782600160a060020a03167f180489ed98391c12b0b024acb7dcd85ce43619bcf0780aeca68aa3dd44651a5d838360405182815260406020820181815290820183818151815260200191508051906020019080838360005b838110156103025780820151818401525b6020016102e9565b50505050905090810190601f16801561032f5780820380516001836020036101000a031916815260200191505b50935050505060405180910390a25b5b5b505050565b60005433600160a060020a0390811691161461036057600080fd5b600160a060020a038116151561037557600080fd5b6000805473ffffffffffffffffffffffffffffffffffffffff1916600160a060020a0383161790555b5b505600a165627a7a723058207b75869999701f2afeb11246cb5c8b8a8b820eed3479e1b831949aff5dd2bc790029',
+          gas,
+        }, (err, result) => {
+          if (err) { reject(err); } else { resolve(result); }
+        });
+      });
+
+      const txCount = await getTransactionCount(injectedAccount);
+      const proxyAddr = ethUtil.bufferToHex(ethUtil.generateAddress(injectedAccount, txCount));
+      const { transactionHash } = await create(wallet.address, 0);
+
+      await accountService.addWallet(
+        confCode,
+        wallet,
+        proxyAddr
+      );
+
+      return transactionHash;
+    }
+
+    return accountService.addWallet(confCode, wallet).then(() => undefined);
+  }
+
   handleCreate(wallet, receipt, confCode) {
-    return Promise.all([
-      waitForAccountTxHash(wallet.address),
-      accountService.addWallet(confCode, wallet),
-    ])
-      .catch(throwSubmitError)
-      .then(([txHash]) => {
-        this.props.onAccountTxHashReceived(txHash);
+    return this.createTx(wallet, receipt, confCode)
+      .catch((err) => {
+        if (err.message.indexOf('Error: MetaMask Tx Signature') === -1) {
+          throwSubmitError(err);
+        }
+        return Promise.resolve();
+      })
+      .then((txHash) => {
+        if (txHash) {
+          this.props.onAccountTxHashReceived(txHash);
+        }
         browserHistory.push('/login');
       });
   }
 
-  async handleRecovery(wallet, receipt, confCode, privKey) {
-    const factory = getWeb3().eth.contract(ABI_ACCOUNT_FACTORY).at(conf().accountFactory);
-    const getAccount = promisifyContractCall(factory.getAccount);
-    const newSignerAddr = wallet.address;
-
+  async handleRecovery(wallet, receipt, confCode) {
     try {
-      const backedAccount = await accountService.getAccount(receipt.accountId);
-      const backendWallet = JSON.parse(backedAccount.wallet);
-
-      const acc = await getAccount(backendWallet.address);
-      const proxyAddr = acc[0];
-      const isLocked = acc[2];
-      const data = factory.handleRecovery.getData(newSignerAddr);
-
-      let txHash;
-      if (isLocked) {
-        const forwardReceipt = new Receipt(proxyAddr).forward(0, factory.address, 0, data).sign(privKey);
-        const result = await sendTx(forwardReceipt, confCode);
-        txHash = result.txHash;
-      } else {
-        const proxy = getWeb3(true).eth.contract(ABI_PROXY).at(proxyAddr);
-        const forward = promisifyContractCall(proxy.forward.sendTransaction);
-        txHash = await forward(factory.address, 0, data, { from: window.web3.eth.accounts[0] });
-      }
-
-      await waitForTx(getWeb3(), txHash);
       await accountService.resetWallet(confCode, wallet);
-
       browserHistory.push('/login');
     } catch (e) {
       throwSubmitError(e);
@@ -171,12 +182,11 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     const { entropySaved, secretCreated } = this.state;
     return (
       <Container>
-
         {!entropySaved ?
           <div>
             <H1>Create Randomness for Secret</H1>
             <Form onSubmit={handleSubmit(this.handleSaveEntropyClick)}>
-              <MouseEntropy totalBits={768} width="100%" height="200px" onFinish={this.updateEntropy} sampleRate={0} />
+              <MouseEntropy totalBits={totalBits} width="100%" height="200px" onFinish={this.updateEntropy} sampleRate={0} />
               <Field name="entropy" type="hidden" component={FormField} label="" value={entropy} />
               {error && <ErrorMessage error={error} />}
               <Button
@@ -244,6 +254,8 @@ function mapDispatchToProps(dispatch) {
 const selector = formValueSelector('register');
 const mapStateToProps = (state) => ({
   entropy: selector(state, 'entropy'),
+  injectedAccount: makeSelectInjected()(state),
+  networkSupported: makeSelectNetworkSupported()(state),
 });
 
 // Wrap the component to inject dispatch and state into it

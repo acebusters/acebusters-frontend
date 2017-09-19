@@ -1,9 +1,9 @@
-import { promisifyContractCall } from '../../utils/promisifyContractCall';
+import { promisifyWeb3Call } from '../../utils/promisifyWeb3Call';
 
 const EMPTY_ADDR = '0x0000000000000000000000000000000000000000';
 
 function getLineup(contract) {
-  return promisifyContractCall(contract.getLineup.call)().then((lineup) => {
+  return promisifyWeb3Call(contract.getLineup.call)().then((lineup) => {
     const rv = [];
     for (let i = 0; i < lineup[1].length; i += 1) {
       rv.push({
@@ -22,7 +22,7 @@ function getLineup(contract) {
 }
 
 function getIns(contract, handId, lineup) {
-  const getIn = promisifyContractCall(contract.getIn.call);
+  const getIn = promisifyWeb3Call(contract.getIn.call);
   return Promise.all(lineup.map(({ address }) => {
     if (address === EMPTY_ADDR) {
       return Promise.resolve(null);
@@ -33,7 +33,7 @@ function getIns(contract, handId, lineup) {
 }
 
 function getOuts(contract, handId, lineup) {
-  const getOut = promisifyContractCall(contract.getOut.call);
+  const getOut = promisifyWeb3Call(contract.getOut.call);
   return Promise.all(lineup.map(({ address }) => {
     if (address === EMPTY_ADDR) {
       return Promise.resolve(null);
@@ -44,11 +44,11 @@ function getOuts(contract, handId, lineup) {
 }
 
 function getLastNettingRequestHandId(contract) {
-  return promisifyContractCall(contract.lastNettingRequestHandId.call)();
+  return promisifyWeb3Call(contract.lastNettingRequestHandId.call)();
 }
 
 function getLastNettingRequestTime(contract) {
-  return promisifyContractCall(contract.lastNettingRequestTime.call)();
+  return promisifyWeb3Call(contract.lastNettingRequestTime.call)();
 }
 
 function handsRange(handA, handB) {

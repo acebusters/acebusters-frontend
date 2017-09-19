@@ -48,6 +48,7 @@ class ExchangeDialog extends React.Component { // eslint-disable-line react/pref
       calcExpectedAmount,
       amountUnit,
       title,
+      descr,
       invalid,
       hasWeb3,
       networkSupported,
@@ -60,6 +61,7 @@ class ExchangeDialog extends React.Component { // eslint-disable-line react/pref
     return (
       <div style={{ maxWidth: 480 }}>
         {title && <H2>{title}</H2>}
+        {descr}
 
         <Form onSubmit={handleSubmit(this.handleSubmit)}>
           <Field
@@ -74,7 +76,6 @@ class ExchangeDialog extends React.Component { // eslint-disable-line react/pref
             modalDismiss={this.props.modalDismiss}
             amountUnit={this.props.amountUnit}
             setAmountUnit={this.props.setAmountUnit}
-            reset={this.props.reset}
             placeholder={placeholder}
           />
 
@@ -124,8 +125,8 @@ ExchangeDialog.propTypes = {
   stopSubmit: PropTypes.func,
   amount: PropTypes.string,
   title: PropTypes.node,
+  descr: PropTypes.node,
   amountUnit: PropTypes.string.isRequired,
-  reset: PropTypes.func,
   placeholder: PropTypes.string,
 };
 
