@@ -5,6 +5,7 @@ import {
   CONTRACT_EVENTS,
   PROXY_EVENTS,
   CONTRACT_TX_SENDED,
+  CONTRACT_TX_FAILED,
   CONTRACT_TX_ERROR,
 } from '../AccountProvider/actions';
 
@@ -82,6 +83,15 @@ function dashboardReducer(state = initialState, action) {
         ...payload,
         error: formatTxErrorMessage(payload.error),
       }));
+
+    case CONTRACT_TX_FAILED:
+      return state.withMutations((st) => {
+        if (st.hasIn(['events', meta.txHash])) {
+          return st.setIn(['events', meta.txHash, 'error'], 'Ran out of gas');
+        }
+
+        return st;
+      });
 
     case MODAL_DISMISS:
       return state.set('failedTx', null);

@@ -27,3 +27,4 @@ export const setInvestType = (which) => ({
   type: SET_INVEST_TYPE,
   which,
 });
+
