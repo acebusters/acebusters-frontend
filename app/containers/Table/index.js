@@ -10,6 +10,7 @@ import Pusher from 'pusher-js';
 import Raven from 'raven-js';
 import { Receipt } from 'poker-helper';
 import * as storageService from '../../services/sessionStorage';
+import * as reservationService from '../../services/reservationService';
 
 // components and styles
 import TableDebug from '../../containers/TableDebug';
@@ -46,7 +47,7 @@ import {
   setExitHand,
   sitOutToggle,
   bet,
-  fishTxHash,
+  reserveSeat,
 } from './actions';
 // selectors
 import makeSelectAccountData, {
@@ -83,7 +84,6 @@ import {
 import TableComponent from '../../components/Table';
 import web3Connect from '../AccountProvider/web3Connect';
 import TableService, { getHand, fetchTableState } from '../../services/tableService';
-import * as reservationService from '../../services/reservationService';
 import JoinDialog from '../JoinDialog';
 import InviteDialog from '../InviteDialog';
 import RebuyDialog from '../RebuyDialog';
@@ -253,8 +253,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       this.props.seatReserved(this.tableAddr, event.payload);
     } else if (event.type === 'seatsRelease') {
       this.props.seatsReleased(this.tableAddr, event.payload);
-    } else if (event.type === 'txHash') {
-      this.props.fishTxHash(event.payload);
     }
   }
 
@@ -287,9 +285,9 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       `0x0${(pos).toString(16)}${signerAddr.replace('0x', '')}`,
     );
 
-    const reserveSeat = async () => {
+    const reserve = async () => {
       const txHash = await promise;
-      reservationService.reserve(
+      this.props.reserveSeat(
         this.tableAddr,
         pos,
         this.props.signerAddr,
@@ -299,7 +297,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     };
 
     if (!account.isLocked) {
-      await reserveSeat();
+      await reserve();
     }
 
     this.props.modalDismiss();
@@ -313,7 +311,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     if (account.isLocked) {
       const signerChannel = this.pusher.subscribe(signerAddr);
       signerChannel.bind('update', this.handleUpdate);
-      await reserveSeat();
+      await reserve();
     }
   }
 
@@ -599,8 +597,8 @@ export function mapDispatchToProps() {
     setExitHand,
     updateReceived,
     addMessage,
-    fishTxHash,
     seatReserved,
+    reserveSeat,
   };
 }
 
@@ -656,6 +654,7 @@ Table.propTypes = {
   setPending: React.PropTypes.func,
   setExitHand: React.PropTypes.func,
   modalDismiss: React.PropTypes.func,
+  reserveSeat: React.PropTypes.func,
   winners: React.PropTypes.array,
   dispatch: React.PropTypes.func,
   lineupReceived: React.PropTypes.func,
@@ -664,7 +663,6 @@ Table.propTypes = {
   seatsReleased: React.PropTypes.func,
   updateReceived: React.PropTypes.func,
   addMessage: React.PropTypes.func,
-  fishTxHash: React.PropTypes.func,
   location: React.PropTypes.object,
   account: React.PropTypes.object,
   myPendingSeat: React.PropTypes.number,

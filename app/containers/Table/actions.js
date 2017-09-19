@@ -23,7 +23,7 @@ export const EXIT_HAND_SET = 'acebusters/Table/EXIT_HAND_SET';
 export const RECEIPT_SET = 'acebusters/Table/RECEIPT_SET';
 export const ADD_MESSAGE = 'acebusters/Chat/ADD_MESSAGE';
 export const SEND_MESSAGE = 'acebusters/Chat/SEND_MESSAGE';
-export const FISH_TX_HASH = 'acebusters/Table/FISH_TX_HASH';
+export const RESERVE_SEAT = 'acebusters/Chat/RESERVE_SEAT';
 
 export function setCards(tableAddr, handId, cards) {
   return { type: SET_CARDS, tableAddr, handId, cards };
@@ -113,6 +113,9 @@ export function sendMessage(message, tableAddr, privKey) {
   return { type: SEND_MESSAGE, message, tableAddr, privKey };
 }
 
-export function fishTxHash(txHash) {
-  return { type: FISH_TX_HASH, txHash };
+export function reserveSeat(tableAddr, pos, signerAddr, txHash, amount) {
+  return {
+    type: RESERVE_SEAT,
+    payload: { tableAddr, pos, signerAddr, txHash, amount },
+  };
 }

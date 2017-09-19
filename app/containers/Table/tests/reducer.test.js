@@ -14,6 +14,7 @@ import {
   seatsReleased,
   addMessage,
   tableReceived,
+  setExitHand,
 } from '../actions';
 
 import { babz } from '../../../utils/amountFormatter';
@@ -43,6 +44,23 @@ describe('table reducer tests', () => {
     const nextState = tableReducer(state, tableReceived(tableAddr));
     expect(nextState.get(tableAddr)).toBeDefined();
     expect(nextState.getIn([tableAddr, 'reservation'])).toBeDefined();
+  });
+
+  it('should set exitHand for player', () => {
+    const lineup = [{
+      address: P1_ADDR,
+    }, {
+      address: P2_ADDR,
+    }];
+
+    const state = fromJS({
+      [tableAddr]: {
+        0: {
+          lineup,
+        } },
+    });
+    const nextState = tableReducer(state, setExitHand(tableAddr, 0, 0, 2));
+    expect(nextState.getIn([tableAddr, '0', 'lineup', 0, 'exitHand'])).toBe(2);
   });
 
   it('should not override existing table state when table received', () => {
