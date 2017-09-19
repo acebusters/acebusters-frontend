@@ -24,7 +24,7 @@ const Tabs = ({ activeTab, tabs, setActiveTab, disabledTabs }) => (
         );
       }
       return (
-        <Tab name="tab" key={tab.name}>
+        <Tab name="tab" key={tab.name} data-tour={tab.name}>
           <TabButton
             disabled={tab.name === activeTab}
             onClick={() => setActiveTab(tab.name)}

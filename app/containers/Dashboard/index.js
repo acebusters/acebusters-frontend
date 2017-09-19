@@ -5,6 +5,8 @@ import { createStructuredSelector } from 'reselect';
 import { FormattedMessage } from 'react-intl';
 import BigNumber from 'bignumber.js';
 
+import InvestTour from '../../components/Dashboard/InvestTour';
+
 import web3Connect from '../AccountProvider/web3Connect';
 import { getWeb3 } from '../AccountProvider/sagas';
 import { addEventsDate, isUserEvent } from '../AccountProvider/utils';
@@ -41,6 +43,7 @@ import {
   setActiveTab,
   setAmountUnit,
   setInvestType,
+  toggleInvestTour,
 } from './actions';
 import messages from './messages';
 import { txnsToList } from './txnsToList';
@@ -48,6 +51,7 @@ import {
   getActiveTab,
   getAmountUnit,
   getInvestType,
+  getInvestTour,
   createDashboardTxsSelector,
 } from './selectors';
 import { downRequestsToList } from './downRequestsToList';
@@ -479,6 +483,7 @@ class DashboardRoot extends React.Component {
             ...this.props,
           }}
         />
+        <InvestTour {...this.props} />
       </Container>
     );
   }
@@ -499,6 +504,7 @@ const mapDispatchToProps = (dispatch) => ({
   setInvestType,
   setActiveTab,
   setAmountUnit,
+  toggleInvestTour,
   notifyCreate: (type, props) => dispatch(notifyCreate(type, props)),
   modalAdd,
   modalDismiss,
@@ -517,6 +523,7 @@ const mapStateToProps = createStructuredSelector({
   privKey: makeSelectPrivKey(),
   amountUnit: getAmountUnit(),
   investType: getInvestType(),
+  investTour: getInvestTour(),
 });
 
 export default web3Connect(
