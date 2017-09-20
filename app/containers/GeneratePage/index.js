@@ -60,7 +60,9 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     this.updateEntropy = this.updateEntropy.bind(this);
     this.state = {
       secretCreated: false,
+      sharkSignup: (false && props.injectedAccount && props.networkSupported),
       entropySaved: false, // not actually saved, just a UI device
+      ...this.loadReceipt(),
     };
   }
 
@@ -73,13 +75,25 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     }
   }
 
+  loadReceipt() {
+    const state = {
+      confCode: decodeURIComponent(storageService.getItem('ab-confCode') || ''),
+    };
+
+    if (state.confCode) {
+      state.receipt = Receipt.parse(state.confCode);
+    }
+
+    return state;
+  }
+
   handleSaveEntropyClick() {
     this.setState({ entropySaved: true });
   }
 
   async createTx(wallet, receipt, confCode) {
-    const { injectedAccount, networkSupported } = this.props;
-    if (injectedAccount && networkSupported) {
+    const { injectedAccount } = this.props;
+    if (this.state.sharkSignup) {
       const web3 = getWeb3(true);
       const proxy = web3.eth.contract(ABI_PROXY);
 
@@ -137,12 +151,12 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
   }
 
   handleSubmit(values, dispatch) {
-    let confCode = storageService.getItem('ab-confCode');
+    const { confCode, receipt } = this.state;
+
     if (!confCode) {
-      throw new SubmissionError({ _error: 'Error: session token lost.' });
+      throw new SubmissionError({ _error: 'Session receipt is lost' });
     }
-    confCode = decodeURIComponent(confCode);
-    const receipt = Receipt.parse(confCode);
+
     if (receipt.type !== Type.CREATE_CONF && receipt.type !== Type.RESET_CONF) {
       throw new SubmissionError({ _error: `Error: unknown session type ${receipt.type}.` });
     }
@@ -179,10 +193,10 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
 
   render() {
     const { error, handleSubmit, submitting, entropy, invalid } = this.props;
-    const { entropySaved, secretCreated } = this.state;
+    const { entropySaved, secretCreated, receipt } = this.state;
     return (
       <Container>
-        {!entropySaved ?
+        {!entropySaved &&
           <div>
             <H1>Create Randomness for Secret</H1>
             <Form onSubmit={handleSubmit(this.handleSaveEntropyClick)}>
@@ -198,23 +212,32 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
               </Button>
             </Form>
           </div>
-          :
+        }
+        {entropySaved &&
           <div>
             <H1>Encrypt & Save Your Account!</H1>
-            <Form onSubmit={handleSubmit(this.handleSubmit)}>
+            <Form
+              onSubmit={handleSubmit(this.handleSubmit)}
+              ref={(form) => { this.form = form; }}
+            >
               <Field name="password" type="password" component={FormField} label="Password" />
               <Field name="confirmedPassword" type="password" component={FormField} label="Confirm Password" />
               {error && <ErrorMessage error={error} />}
+
               <Button type="submit" disabled={submitting || invalid} size="large">
-                { (!submitting) ? 'Encrypt and Save' : 'Please wait ...' }
+                {!submitting ? 'Encrypt and Save' : 'Please wait ...'}
               </Button>
             </Form>
           </div>
         }
 
-        { submitting &&
+        {submitting &&
           <div>
-            <H1>Registering please wait ...</H1>
+            <H1>
+              {receipt.type === Type.CREATE_CONF
+                ? 'Registering please wait...'
+                : 'Recovering your account...'}
+            </H1>
           </div>
         }
       </Container>
@@ -244,8 +267,8 @@ const throwSubmitError = (err) => {
 
 function mapDispatchToProps(dispatch) {
   return {
-    walletExport: (data) => dispatch(walletExport(data)),
-    onAccountTxHashReceived: (txHash) => dispatch(accountTxHashReceived(txHash)),
+    walletExport: (...args) => dispatch(walletExport(...args)),
+    onAccountTxHashReceived: (...args) => dispatch(accountTxHashReceived(...args)),
     onEntropyUpdated: (data) => dispatch(change('register', 'entropy', data)),
   };
 }
