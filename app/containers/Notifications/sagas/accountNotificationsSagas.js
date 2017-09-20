@@ -21,11 +21,19 @@ export function* injectedWeb3Notification({ payload: { isLocked } }) {
   if (!isLocked) {
     yield call(delay, 2000);
     const web3 = getWeb3(true);
-    const injected = yield select(makeSelectInjected());
     if (!web3) {
       yield* createPersistNotification(noWeb3Danger);
-    } else if (!injected) {
-      yield* createPersistNotification(noInjectedDanger);
+    } else {
+      while (true) { // eslint-disable-line no-constant-condition
+        const injected = yield select(makeSelectInjected());
+        if (!injected) {
+          yield* createPersistNotification(noInjectedDanger);
+        } else {
+          yield* removeNotification(noInjectedDanger);
+        }
+
+        yield call(delay, 2000);
+      }
     }
   }
 }
