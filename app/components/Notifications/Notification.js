@@ -32,15 +32,12 @@ const Notification = ({
       <Category>{category}</Category>
       <Details>{details}</Details>
       <IconWrapper>
-        {dismissable ?
+        {dismissable &&
           <ButtonWrapper onClick={() => notifyRemove(txId)}>
             <Icon className="fa fa-times" />
           </ButtonWrapper>
-          :
-          <ButtonWrapper>
-            {infoIcon && infoIcon}
-          </ButtonWrapper>
         }
+        {!dismissable && infoIcon}
       </IconWrapper>
     </Wrapper>
   </Container>
