@@ -221,8 +221,13 @@ class DashboardRoot extends React.Component {
     this.power.allEvents({
       toBlock: 'latest',
     }).watch((error, event) => {
-      addEventsDate([event])
-        .then((events) => this.props.contractEvents(events, proxyAddr));
+      console.log(event);
+      if (!error && isUserEvent(proxyAddr)(event)) {
+        addEventsDate([event])
+          .then((events) => this.props.contractEvents(events, proxyAddr));
+        this.power.balanceOf.call(proxyAddr);
+        this.token.balanceOf.call(proxyAddr);
+      }
     });
   }
 
@@ -244,8 +249,8 @@ class DashboardRoot extends React.Component {
 
     this.token.allEvents({
       toBlock: 'latest',
-    }).watch((watchError, event) => {
-      if (!watchError && isUserEvent(proxyAddr)(event)) {
+    }).watch((error, event) => {
+      if (!error && isUserEvent(proxyAddr)(event)) {
         if (event.event === 'Sell') {
           this.pullPayment.paymentOf.call(proxyAddr);
         }
