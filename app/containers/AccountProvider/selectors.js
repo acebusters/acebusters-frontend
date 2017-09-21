@@ -73,10 +73,15 @@ const makeSelectOwner = () => createSelector(
   (account) => account.get('owner'),
 );
 
-const makeSelectHasWeb3 = () => createSelector(
+const makeSelectIsLocked = () => createSelector(
   selectAccount,
+  (account) => !!account.get('isLocked'),
+);
+
+const makeSelectHasWeb3 = () => createSelector(
+  makeSelectIsLocked(),
   makeSelectInjected(),
-  (account, injected) => !!(account.get('isLocked') || injected)
+  (isLocked, injected) => !!(isLocked || injected)
 );
 
 const makeSelectWrongInjected = () => createSelector(
@@ -96,10 +101,17 @@ const makeSelectProxyAddr = () => createSelector(
 );
 
 const makeSelectCanSendTx = () => createSelector(
+  makeSelectIsLocked(),
   makeSelectHasWeb3(),
   makeSelectNetworkSupported(),
   makeSelectWrongInjected(),
-  (hasWeb3, networkSupported, wrongInjected) => hasWeb3 && networkSupported && !wrongInjected,
+  (isLocked, hasWeb3, networkSupported, wrongInjected) => {
+    if (isLocked) {
+      return true;
+    }
+
+    return hasWeb3 && networkSupported && !wrongInjected;
+  },
 );
 
 /**
@@ -124,4 +136,5 @@ export {
   makeSelectWrongInjected,
   makeSelectOwner,
   makeSelectCanSendTx,
+  makeSelectIsLocked,
 };
