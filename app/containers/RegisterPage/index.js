@@ -26,6 +26,8 @@ const validate = (values) => {
     errors.email = 'Required';
   } else if (!emailRegex.test(values.get('email'))) {
     errors.email = 'Invalid email address.';
+  } else if (values.get('email').length >= 256) {
+    errors.email = 'Email address must be less than 256 characters.';
   }
   if (!values.get('captchaResponse')) {
     errors.captchaResponse = 'Required';

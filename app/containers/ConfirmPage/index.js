@@ -21,6 +21,8 @@ const validate = (values) => {
   const errors = {};
   if (!values.get('confCode')) {
     errors.confCode = 'Required';
+  } else if (values.get('confCode').length >= 256) {
+    errors.confCode = 'Must be less than 256 characters.';
   } else {
     try {
       const receipt = Receipt.parse(values.get('confCode'));

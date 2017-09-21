@@ -29,6 +29,8 @@ const validate = (values) => {
     errors.password = 'Required';
   } else if (values.get('password').length < 8) {
     errors.password = 'Must be 8 characters or more.';
+  } else if (values.get('password').length >= 32) {
+    errors.password = 'Must be less than 32 characters.';
   }
   if (values.get('password') !== values.get('confirmedPassword')) {
     errors.confirmedPassword = 'Passwords dont match';
