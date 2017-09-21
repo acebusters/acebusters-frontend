@@ -221,7 +221,6 @@ class DashboardRoot extends React.Component {
     this.power.allEvents({
       toBlock: 'latest',
     }).watch((error, event) => {
-      console.log(event);
       if (!error && isUserEvent(proxyAddr)(event)) {
         addEventsDate([event])
           .then((events) => this.props.contractEvents(events, proxyAddr));
