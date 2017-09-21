@@ -43,7 +43,11 @@ function accountProviderReducer(state = initialState, action) {
       return state.set('web3ErrMsg', action.err ? (action.err.message || 'Connection Error') : null);
 
     case ACCOUNT_UNLOCKED:
-      return state.set('isLocked', false);
+      return (
+        state
+          .set('isLocked', false)
+          .set('owner', state.get('injected'))
+      );
 
     case INJECT_ACCOUNT_UPDATE:
       return state.set('injected', action.payload);
