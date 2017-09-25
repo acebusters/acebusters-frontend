@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import messages from '../../containers/Dashboard/messages';
 import WithLoading from '../../components/WithLoading';
 import { formatEth } from '../../utils/amountFormatter';
 import { conf } from '../../app.config';
@@ -13,10 +12,11 @@ import List from '../List';
 import TimedButton from '../TimedButton';
 import Button from '../Button';
 
+import Economy from './Economy';
 import { Pane, SectionOverview, Subtitle } from './styles';
 
 const Overview = (props) => {
-  const { account, listTxns, downRequests, ethAllowance, ethPayoutDate, ethPayoutPending, handleETHPayout } = props;
+  const { account, listTxns, downRequests, ethAllowance, ethPayoutDate, ethPayoutPending, handleETHPayout, messages } = props;
   const requestColumnStyle = { width: 20, textAlign: 'left', whiteSpace: 'nowrap' };
   const emptyColumnStyle = { width: 20 };
   const ethAmount = formatEth(ethAllowance);
@@ -114,6 +114,11 @@ const Overview = (props) => {
         </SectionOverview>
       }
 
+      <SectionOverview name="economy">
+        <H2><FormattedMessage {...messages.economyTitle} /></H2>
+        <Economy {...props} />
+      </SectionOverview>
+
       <SectionOverview name="transaction-history">
         <H2><FormattedMessage {...messages.included} /></H2>
         <Subtitle>
@@ -153,6 +158,7 @@ Overview.propTypes = {
   ethPayoutPending: PropTypes.bool,
   ethPayoutDate: PropTypes.object,
   handleETHPayout: PropTypes.func,
+  messages: PropTypes.object,
   toggleInvestTour: PropTypes.func.isRequired,
 };
 

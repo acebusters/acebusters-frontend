@@ -198,4 +198,32 @@ export default defineMessages({
     id: 'app.containers.Dashboard.upgradeAccount',
     defaultMessage: 'Unlock your Account',
   },
+  economyTitle: {
+    id: 'app.containers.Dashboard.economyTitle',
+    defaultMessage: 'Acebusters Economy',
+  },
+  economyListTotal: {
+    id: 'app.containers.Dashboard.economyListTotal',
+    defaultMessage: 'Total',
+  },
+  economyListActive: {
+    id: 'app.containers.Dashboard.economyListActive',
+    defaultMessage: 'Active',
+  },
+  economyListOwnership: {
+    id: 'app.containers.Dashboard.economyListOwnership',
+    defaultMessage: 'Your Ownership',
+  },
+  ntzUnit: {
+    id: 'app.containers.Dashboard.ntzUnit',
+    defaultMessage: '{amount} NTZ',
+  },
+  abpUnit: {
+    id: 'app.containers.Dashboard.abpUnit',
+    defaultMessage: '{amount} ABP',
+  },
+  percentUnit: {
+    id: 'app.containers.Dashboard.percentUnit',
+    defaultMessage: '{amount} %',
+  },
 });
