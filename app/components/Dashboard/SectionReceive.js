@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import QRCode from 'qrcode.react';
+import ethUtil from 'ethereumjs-util';
 import { FormattedMessage } from 'react-intl';
 
 import messages from '../../containers/Dashboard/messages';
@@ -99,7 +100,7 @@ export const AccountIsLocked = (props) => {
             }}
           >
             <Alert theme="success" data-tour="wallet-address">
-              <Address style={{ width: 180 }}>{account.proxy}</Address>
+              <Address style={{ width: 180 }}>{ethUtil.toChecksumAddress(account.proxy)}</Address>
             </Alert>
           </WithLoading>
         }
@@ -170,7 +171,7 @@ export const AccountNotLocked = ({
         theme="success"
         data-tour="wallet-address"
       >
-        <Address>{account.proxy}</Address>
+        <Address>{ethUtil.toChecksumAddress(account.proxy)}</Address>
       </Alert>
       {conf().firstBlockHash !== MAIN_NET_GENESIS_BLOCK &&
         <Alert theme="danger">
@@ -181,7 +182,7 @@ export const AccountNotLocked = ({
       {conf().firstBlockHash === MAIN_NET_GENESIS_BLOCK &&
         <a
           onClick={handleShapeshiftClick}
-          href={shapeShiftLink(account.proxy)}
+          href={shapeShiftLink(ethUtil.toChecksumAddress(account.proxy))}
         >
           <img src={shapeshiftButton} alt="Pay with Shapeshift" />
         </a>
