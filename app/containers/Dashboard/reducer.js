@@ -7,6 +7,7 @@ import {
   CONTRACT_TX_SENDED,
   CONTRACT_TX_FAILED,
   CONTRACT_TX_ERROR,
+  SET_AUTH,
 } from '../AccountProvider/actions';
 
 import { MODAL_DISMISS } from '../App/actions';
@@ -113,6 +114,22 @@ function dashboardReducer(state = initialState, action) {
         composeReducers(addNutzContractEvent, completePending),
         setProxy(initEvents(state), meta.proxy)
       );
+
+    case SET_AUTH:
+      return state
+        .withMutations((newState) => {
+          if (!action.newAuthState.loggedIn) {
+            return newState
+              .set('proxy', null)
+              .set('failedTx', null)
+              .set('events', null)
+              .set('activeTab', OVERVIEW)
+              .set('amountUnit', ETH)
+              .set('investType', POWERUP)
+              .set('investTour', false);
+          }
+          return state;
+        });
 
     default:
       return state;
