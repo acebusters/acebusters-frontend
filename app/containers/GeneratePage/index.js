@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import ethUtil from 'ethereumjs-util';
 import { connect } from 'react-redux';
 import { Form, Field, reduxForm, SubmissionError, propTypes, change, formValueSelector } from 'redux-form/immutable';
+import { stopSubmit } from 'redux-form';
 import { browserHistory } from 'react-router';
 import { Receipt, Type } from 'poker-helper';
 
@@ -66,6 +67,10 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
       entropySaved: false, // not actually saved, just a UI device
       ...this.loadReceipt(),
     };
+
+    this.confirmation = this.confirm().catch(({ errors }) => {
+      this.props.dispatch(stopSubmit('register', errors));
+    });
   }
 
   componentDidMount() {
@@ -77,13 +82,42 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     }
   }
 
+  async confirm() {
+    const { confCode, receipt } = this.state;
+    const storedConfCode = decodeURIComponent(storageService.getItem('ab-confCode') || '');
+
+    if (storedConfCode === confCode) {
+      return;
+    }
+
+    if (!receipt) {
+      throw new SubmissionError({ _error: 'Wrong receipt' });
+    }
+
+    if (receipt.type === Type.CREATE_CONF) {
+      try {
+        await accountService.confirm(confCode);
+      } catch (err) {
+        if (err.status !== 409) {
+          throw new SubmissionError({ _error: `Email Confirmation failed with error code ${err}` });
+        }
+      }
+    } else if (receipt.type !== Type.RESET_CONF) {
+      throw new SubmissionError({ _error: 'Unknown receipt type' });
+    }
+
+    storageService.setItem('ab-confCode', confCode);
+  }
+
   loadReceipt() {
     const state = {
-      confCode: decodeURIComponent(storageService.getItem('ab-confCode') || ''),
+      confCode: decodeURIComponent(this.props.params.confCode || ''),
     };
 
     if (state.confCode) {
-      state.receipt = Receipt.parse(state.confCode);
+      try {
+        state.receipt = Receipt.parse(state.confCode);
+      } catch (e) { } // eslint-disable-line
     }
 
     return state;
@@ -152,7 +186,7 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     }
   }
 
-  handleSubmit(values, dispatch) {
+  async handleSubmit(values, dispatch) {
     const { confCode, receipt } = this.state;
 
     if (!confCode) {
@@ -174,7 +208,8 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     // Register saga is called, we return the promise here,
     // so we can display form errors if any of the async ops fail.
     return (
-      register(values, dispatch)
+      this.confirmation
+        .then(() => register(values, dispatch))
         .catch(throwWorkerError)
         // If worker success, ...
         .then((workerRsp) => {

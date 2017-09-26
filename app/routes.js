@@ -160,7 +160,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: '/generate',
+      path: '/generate/:confCode',
       name: 'generate',
       getComponent(nextState, cb) {
         const importModules = Promise.all([
@@ -177,7 +177,7 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
-      path: '/confirm(/:confCode)',
+      path: '/confirm',
       name: 'confirmPage',
       getComponent(location, cb) {
         import('containers/ConfirmPage')
