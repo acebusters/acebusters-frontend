@@ -17,6 +17,10 @@ export function* authNotification({ newAuthState }) {
   }
 }
 
+function selectNotification(state, txId) {
+  return state.get('notifications').find((item) => item.get('txId') === txId);
+}
+
 export function* injectedWeb3Notification({ payload: { isLocked } }) {
   if (!isLocked) {
     yield call(delay, 2000);
@@ -26,9 +30,11 @@ export function* injectedWeb3Notification({ payload: { isLocked } }) {
     } else {
       while (true) { // eslint-disable-line no-constant-condition
         const injected = yield select(makeSelectInjected());
-        if (!injected) {
+        const notification = yield select(selectNotification, noInjectedDanger.txId);
+
+        if (!injected && !notification) {
           yield* createPersistNotification(noInjectedDanger);
-        } else {
+        } else if (injected && notification) {
           yield* removeNotification(noInjectedDanger);
         }
 

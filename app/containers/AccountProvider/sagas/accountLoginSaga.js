@@ -49,17 +49,17 @@ export function* accountLoginSaga() {
       ]);
 
       const account = yield select(makeSelectAccountData());
-      const refs = yield call(getRefs, account.accountId);
 
-      // write data into the state
       yield put(accountLoaded({
         owner,
         isLocked,
         signer,
-        refs,
         blocky: createBlocky(signer),
         nickName: nickNameByAddress(signer),
       }));
+
+      const refs = yield call(getRefs, account.accountId);
+      yield put(accountLoaded({ refs }));
     } else {
       clearExpiringStorage();
     }

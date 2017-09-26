@@ -14,15 +14,20 @@ export function* updateIntercomUser(action) {
   const account = yield select(makeSelectAccountData());
   if (window.Intercom && account.loggedIn) {
     const refs = account.refs;
-    window.Intercom('update', {
+    const data = {
       email: account.email,
       user_id: action.payload.signer,
       proxy: action.payload.proxy,
       fish: action.payload.isLocked,
       nickname: action.payload.nickName,
-      promo_code: refs.length === 1 ? refs[0].id : undefined,
-      refs: refs.length === 1 ? undefined : formatRefs(refs),
-    });
+    };
+
+    if (refs) {
+      data.promo_code = refs.length === 1 ? refs[0].id : undefined;
+      data.refs = refs.length === 1 ? undefined : formatRefs(refs);
+    }
+
+    window.Intercom('update', data);
   }
 }
 

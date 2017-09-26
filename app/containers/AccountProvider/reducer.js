@@ -59,6 +59,9 @@ function accountProviderReducer(state = initialState, action) {
       return state.set('proxyTxHash', action.payload);
 
     case ACCOUNT_LOADED:
+      if (action.payload.refs) {
+        return state.set('refs', action.payload.refs);
+      }
       return (
         state
           .set('isLocked', action.payload.isLocked)
@@ -66,7 +69,6 @@ function accountProviderReducer(state = initialState, action) {
           .set('blocky', action.payload.blocky)
           .set('nickName', action.payload.nickName)
           .set('signerAddr', action.payload.signer)
-          .set('refs', action.payload.refs)
       );
 
     case WEB3_METHOD_SUCCESS:
