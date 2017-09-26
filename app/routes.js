@@ -8,6 +8,7 @@ import { tableStateSaga } from './containers/Table/sagas';
 import { selectAccount } from './containers/AccountProvider/selectors';
 import { notificationsSaga } from './containers/Notifications/sagas';
 import { actionBarSaga } from './containers/ActionBar/sagas';
+import { tableMenuSaga } from './containers/TableMenu/sagas';
 import { appSaga } from './containers/App/sagas';
 
 const errorLoading = (err) => {
@@ -40,6 +41,7 @@ export default function createRoutes(store) {
   injectSagas([
     accountSaga,
     actionBarSaga,
+    tableMenuSaga,
     tableStateSaga,
     notificationsSaga,
     appSaga,

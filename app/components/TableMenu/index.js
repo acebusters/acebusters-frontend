@@ -23,7 +23,8 @@ class TableMenu extends React.Component {
   render() {
     const {
       loggedIn, open, myPos, sitout, handleClickLogout, onLeave, onSitout,
-      standingUp, myLastReceipt, state, sitoutInProgress, myStack,
+      standingUp, myLastReceipt, state, sitoutInProgress, myStack, isMuted,
+      handleClickMuteToggle,
     } = this.props;
     const isSitoutFlag = typeof sitout === 'number';
     const menuClose = [
@@ -61,6 +62,13 @@ class TableMenu extends React.Component {
         // disabled: myPos === undefined ||
         //   seatStatus === STATUS_MSG.sittingIn ||
         //   seatStatus === STATUS_MSG.standingUp,
+      },
+      {
+        name: 'mute',
+        icon: `fa ${isMuted ? 'fa-volume-off' : 'fa-volume-up'}`,
+        title: isMuted ? 'Unmute' : 'Mute',
+        onClick: () => handleClickMuteToggle(!isMuted),
+        disabled: false,
       },
     ];
     const menuUserOpen = [
@@ -157,6 +165,8 @@ TableMenu.propTypes = {
   state: PropTypes.string,
   sitoutInProgress: PropTypes.number,
   myStack: PropTypes.number,
+  isMuted: PropTypes.bool,
+  handleClickMuteToggle: PropTypes.func,
 };
 
 export default onClickOutside(TableMenu);

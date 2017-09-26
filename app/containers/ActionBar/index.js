@@ -52,6 +52,8 @@ import {
   makeMyStackSelector,
 } from '../Seat/selectors';
 
+import { makeSelectIsMuted } from '../TableMenu/selectors';
+
 import { setCards, bet, pay, fold, check } from '../Table/actions';
 
 import ActionBar from '../../components/ActionBar';
@@ -128,8 +130,8 @@ class ActionBarContainer extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     const wasDisabled = !prevProps.active || prevState.disabled;
     const disabled = !this.props.active || this.state.disabled;
-    // should play sound
-    if (wasDisabled && !disabled) {
+    // should play sound if not muted
+    if (wasDisabled && !disabled && !prevProps.isMuted) {
       playIsPlayerTurn();
     }
   }
@@ -328,6 +330,7 @@ const mapStateToProps = createStructuredSelector({
   executeAction: getExecuteAction(),
   latestHand: makeLatestHandSelector(),
   canICheck: makeCanICheckSelector(),
+  isMuted: makeSelectIsMuted(),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ActionBarContainer);
