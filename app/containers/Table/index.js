@@ -225,7 +225,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           params={this.props.params}
           balance={balance && Number(balance.toString())}
         />,
-        this.handleLeave
+        { closeHandler: this.handleLeave }
       );
     }
   }

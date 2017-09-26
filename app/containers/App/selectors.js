@@ -24,7 +24,7 @@ export const makeModalSelector = () => createSelector(
   selectGlobal,
   (state) => (state && state.get('modalStack').size > 0) ? {
     node: state.get('modalStack').last(),
-    closeHandler: state.get('modalCloseHandlers').last(),
+    ...state.get('modalOptions').last(),
   } : null
 );
 

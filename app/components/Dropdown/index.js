@@ -33,7 +33,8 @@ const Dropdown = ({
           </ModalButton>
           ))
         }
-      </ModalContainer>
+      </ModalContainer>,
+      { backdrop: true }
     );
   };
 

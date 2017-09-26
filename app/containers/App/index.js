@@ -60,7 +60,7 @@ export function App({ notifications, loggedIn, modal, ...props }) {
 
       <ModalsTransitionGroup>
         {modal &&
-          <ModalContainer style={{ zIndex: 7 }}>
+          <ModalContainer style={{ zIndex: 7 }} onClick={modal.backdrop ? (modal.closeHandler || props.modalDismiss) : null}>
             <ModalDialog
               onClose={modal.closeHandler || props.modalDismiss}
             >
@@ -88,6 +88,7 @@ App.propTypes = {
   modal: PropTypes.shape({
     node: PropTypes.any,
     closeHandler: PropTypes.func,
+    backdrop: PropTypes.bool,
   }),
   notifications: PropTypes.array,
   loggedIn: PropTypes.bool,
