@@ -66,9 +66,9 @@ export default defineMessages({
     id: 'app.containers.Dashboard.included',
     defaultMessage: 'Transaction History',
   },
-  powerDownRequests: {
-    id: 'app.containers.Dashboard.powerDownRequests',
-    defaultMessage: 'Power Down Requests',
+  powerDownPayout: {
+    id: 'app.containers.Dashboard.powerDownPayout',
+    defaultMessage: 'Power Down Pay-Out',
   },
   ethPayout: {
     id: 'app.containers.Dashboard.ethPayout',

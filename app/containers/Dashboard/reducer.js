@@ -163,14 +163,23 @@ function completePending(state, event) {
 }
 
 function addPending(state, { methodName, args, txHash, address }) {
-  if (address === confParams.pwrAddr) {
-    return state;
-  }
+  const path = ['events', txHash];
 
-  if (methodName === 'forward' && args[2] === '') { // eth transfer
+  if (address === conf().pwrAddr && methodName === 'downTick') {
+    return state.setIn(
+      path,
+      fromJS({
+        address,
+        type: 'income',
+        unit: 'ntz',
+        pending: true,
+        transactionHash: txHash,
+      }),
+    );
+  } else if (methodName === 'forward' && args[2] === '') { // eth transfer
     const amount = args[1];
     return state.setIn(
-      ['events', txHash],
+      path,
       fromJS({
         address,
         value: amount.toString ? amount.toString() : amount,
@@ -182,7 +191,7 @@ function addPending(state, { methodName, args, txHash, address }) {
     );
   } else if (methodName === 'withdraw') {
     return state.setIn(
-      ['events', txHash],
+      path,
       fromJS({
         address: confParams.pullAddr,
         type: 'income',
@@ -195,7 +204,7 @@ function addPending(state, { methodName, args, txHash, address }) {
     const options = typeof last(args) === 'function' ? args[args.length - 2] : last(args);
     const amount = options.value;
     return state.setIn(
-      ['events', txHash],
+      path,
       fromJS({
         address,
         value: amount.toString ? amount.toString() : amount,
@@ -207,7 +216,7 @@ function addPending(state, { methodName, args, txHash, address }) {
     );
   } else if (methodName === 'powerUp') {
     return state.setIn(
-      ['events', txHash],
+      path,
       fromJS({
         address: conf().pwrAddr,
         value: args[0].toString ? args[0].toString() : args[0],
@@ -219,7 +228,7 @@ function addPending(state, { methodName, args, txHash, address }) {
     );
   } else if (methodName === 'sell') {
     return state.setIn(
-      ['events', txHash],
+      path,
       fromJS({
         address: confParams.ntzAddr,
         value: args[1].toString ? args[1].toString() : args[1],

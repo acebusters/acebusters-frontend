@@ -2,22 +2,25 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import WithLoading from '../../components/WithLoading';
 import { formatEth } from '../../utils/amountFormatter';
 import { conf } from '../../app.config';
 
 import A from '../A';
 import H2 from '../H2';
 import List from '../List';
-import TimedButton from '../TimedButton';
 import Button from '../Button';
 
 import Economy from './Economy';
+import ETHPayout from './ETHPayout';
+import ABPPayout from './ABPPayout';
 import { Pane, SectionOverview, Subtitle } from './styles';
 
 const Overview = (props) => {
-  const { account, listTxns, downRequests, ethAllowance, ethPayoutDate, ethPayoutPending, handleETHPayout, messages } = props;
-  const requestColumnStyle = { width: 20, textAlign: 'left', whiteSpace: 'nowrap' };
+  const {
+    account, listTxns, messages,
+    downs, handleABPPayout, downtime, abpPayoutPending,
+    ethAllowance, ethPayoutDate, ethPayoutPending, handleETHPayout,
+  } = props;
   const emptyColumnStyle = { width: 20 };
   const ethAmount = formatEth(ethAllowance);
 
@@ -41,6 +44,7 @@ const Overview = (props) => {
           <i className="fa fa-graduation-cap" />&nbsp;Invest Tutorial
         </Button>
       </SectionOverview>
+
       {account.refs && account.refs.length &&
         <SectionOverview
           name="refs"
@@ -62,56 +66,25 @@ const Overview = (props) => {
           />
         </SectionOverview>
       }
+
       {ethAllowance && ethAllowance.toNumber() > 0 && ethPayoutDate &&
-        <SectionOverview
-          name="eth-payout"
-          style={{
-            alignItems: 'center',
-          }}
-        >
-          <H2><FormattedMessage {...messages.ethPayout} /></H2>
-          <p style={{ fontSize: 18, margin: '-5px 0 10px' }}>
-            {ethAmount} ETH
-          </p>
-          <TimedButton
-            until={ethPayoutDate.toNumber()}
-            onClick={() => handleETHPayout(ethAmount)}
-            disabled={ethPayoutPending}
-          >
-            Execute Pay-out
-            {ethPayoutPending &&
-              <WithLoading
-                isLoading
-                loadingSize="14px"
-                type="inline"
-                styles={{ outer: { marginLeft: 5 } }}
-              />
-            }
-          </TimedButton>
-        </SectionOverview>
+        <ETHPayout
+          payoutDate={ethPayoutDate}
+          pending={ethPayoutPending}
+          handlePayout={handleETHPayout}
+          amount={ethAmount}
+          messages={messages}
+        />
       }
 
-      {!account.isLocked && downRequests && downRequests.length > 0 &&
-        <SectionOverview name="power-down-requests">
-          <H2><FormattedMessage {...messages.powerDownRequests} /></H2>
-          <List
-            items={downRequests}
-            headers={[
-              'Total',
-              'Payed-Out',
-              'Request date',
-              'Next Pay-Out',
-              '',
-            ]}
-            columnsStyle={{
-              0: requestColumnStyle,
-              1: requestColumnStyle,
-              2: requestColumnStyle,
-              3: requestColumnStyle,
-            }}
-            noDataMsg="No Requests Yet"
-          />
-        </SectionOverview>
+      {!account.isLocked && downs && downtime && downs[0].toNumber() > 0 &&
+        <ABPPayout
+          downs={downs}
+          downtime={downtime}
+          pending={abpPayoutPending}
+          handlePayout={handleABPPayout}
+          messages={messages}
+        />
       }
 
       <SectionOverview name="economy">
@@ -153,11 +126,14 @@ const Overview = (props) => {
 Overview.propTypes = {
   account: PropTypes.object,
   listTxns: PropTypes.array,
-  downRequests: PropTypes.array,
+  downs: PropTypes.array,
+  downtime: PropTypes.object,
   ethAllowance: PropTypes.object,
   ethPayoutPending: PropTypes.bool,
+  abpPayoutPending: PropTypes.bool,
   ethPayoutDate: PropTypes.object,
   handleETHPayout: PropTypes.func,
+  handleABPPayout: PropTypes.func,
   messages: PropTypes.object,
   toggleInvestTour: PropTypes.func.isRequired,
 };

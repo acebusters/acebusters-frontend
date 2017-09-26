@@ -10,7 +10,14 @@ import { formatEth, formatNtz, formatAbp } from '../../utils/amountFormatter';
 
 import { Icon, TypeIcon, Error, ErrorIcon, typeIcons } from './styles';
 import messages from './messages';
-import { isSellEvent, isETHPayoutEvent, isPurchaseStartEvent, isPurchaseEndEvent, isPowerUpEvent, formatDate } from './utils';
+import {
+  isSellEvent,
+  isETHPayoutEvent,
+  isABPPayoutEvent,
+  isPurchaseStartEvent, isPurchaseEndEvent,
+  isPowerUpEvent,
+  formatDate,
+} from './utils';
 
 const confParams = conf();
 
@@ -118,11 +125,18 @@ function txDescription(event, tableAddrs, proxyAddr) {
     );
   } else if (isPowerUpEvent(event)) {
     return 'Power Up';
-  } else if (event.address === confParams.pwrAddr) {
+  } else if (isABPPayoutEvent(event)) {
     return (
       <FormattedMessage
         key="descr"
-        {...(event.type === 'income' ? messages.powerDownPayoutStatus : messages.powerUpStatus)}
+        {...messages.powerDownPayoutStatus}
+      />
+    );
+  } else if (event.address === confParams.pwrAddr && event.type === 'outcome') {
+    return (
+      <FormattedMessage
+        key="descr"
+        {...messages.powerUpStatus}
       />
     );
   } else if (isETHPayoutEvent(event)) {

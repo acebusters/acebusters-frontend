@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect';
 import { fromJS } from 'immutable';
 
-import { isETHPayoutEvent } from './utils';
+import { isETHPayoutEvent, isABPPayoutEvent } from './utils';
 
 function selectDashboard(state) {
   return state.get('dashboard');
@@ -16,6 +16,10 @@ export const createDashboardTxsSelector = () => createSelector(
     pendingETHPayout: (
       (dashboard.get('events') || fromJS({})).toList().toJS()
         .filter((event) => event.pending && !event.error && isETHPayoutEvent(event)).length > 0
+    ),
+    pendingABPPayout: (
+      (dashboard.get('events') || fromJS({})).toList().toJS()
+        .filter((event) => event.pending && !event.error && isABPPayoutEvent(event)).length > 0
     ),
   }),
 );
