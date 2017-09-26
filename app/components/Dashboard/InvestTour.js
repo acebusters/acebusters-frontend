@@ -1,21 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Tour from 'reactour';
+import { FormattedMessage, FormattedHTMLMessage } from 'react-intl';
 
 import {
   OVERVIEW,
   WALLET,
   EXCHANGE,
-  INVEST,
 } from '../../containers/Dashboard/actions';
 
 import A from '../A';
 import Alert from '../Alert';
 
+import messages from './investTourMessages';
+
 const InvestTour = ({
   setActiveTab,
   setAmountUnit,
-  setInvestType,
   investTour,
   toggleInvestTour,
 }) => {
@@ -26,12 +27,12 @@ const InvestTour = ({
   };
   const metaMaskWarning = (
     <Alert theme="danger">
-      <i>For each step, ensure that MetaMask uses the &#39;Ethereum Main Net&#39;!</i>
+      <i><FormattedMessage {...messages.metaMaskWarn} /></i>
     </Alert>
   );
   const confirmationNote = (
     <Alert theme="info">
-      Transaction confirmations are shown in &#39;Overview&#39; tab.
+      <FormattedMessage {...messages.confirmationNote} />
     </Alert>
   );
   const STEPS = [
@@ -39,20 +40,17 @@ const InvestTour = ({
       selector: '[data-tour="tour-begin"]',
       content: (
         <div>
-          To invest in Acebusters, follow these easy steps:
-          <ol>
-            <li>Unlock your account</li>
-            <li>Deposit ether</li>
-            <li>Exchange ether for nutz</li>
-            <li>Power Up!</li>
-          </ol>
+          <FormattedHTMLMessage {...messages.step1} />
+          <A href="http://help.acebusters.com/how-to-participate-in-the-crowdsale/invest-using-the-acebusters-dapp-recommended" target="_blank">
+            <FormattedMessage {...messages.step1_link} />
+          </A>
         </div>
-      ),
+        ),
       style: stepStyle,
     },
     {
       selector: '[data-tour="wallet"]',
-      content: <div>Goto the &#39;Wallet&#39; tab</div>,
+      content: <div><FormattedMessage {...messages.step2} /></div>,
       action: () => setActiveTab(WALLET),
       style: stepStyle,
     },
@@ -60,10 +58,14 @@ const InvestTour = ({
       selector: '[data-tour="wallet"]',
       content: (
         <div>
-          Unlock your account:<span style={{ float: 'right' }}>[1/2]</span>
+          <FormattedMessage {...messages.step3_title} />
           <ol>
-            <li>Install the <A href="https://metamask.io/" target="_blank">MetaMask</A> plugin</li>
-            <li>Fund your MetaMask wallet with ether</li>
+            <li>
+              <FormattedMessage {...messages.step3_li1_a} />
+              <A href="https://metamask.io/" target="_blank">MetaMask</A>
+              <FormattedMessage {...messages.step3_li1_b} />
+            </li>
+            <li><FormattedMessage {...messages.step3_li2} /></li>
           </ol>
           {metaMaskWarning}
         </div>
@@ -73,17 +75,7 @@ const InvestTour = ({
     },
     {
       selector: '[data-tour="wallet-unlock"]',
-      content: (
-        <div>
-          Unlock your account:<span style={{ float: 'right' }}>[2/2]</span>
-          <ol>
-            <li>Click the &#39;Unlock your Account&#39; button</li>
-            <li>Confirm the MetaMask transaction pop-up</li>
-            <li>Wait for the transaction to confirm</li>
-          </ol>
-          After these steps, the &#39;Account Limit Warning&#39; will disappear.
-        </div>
-      ),
+      content: <FormattedHTMLMessage {...messages.step4} />,
       position: 'top',
       style: stepStyle,
     },
@@ -91,8 +83,7 @@ const InvestTour = ({
       selector: '[data-tour="wallet-address"]',
       content: (
         <div>
-          <p>Deposit ether to your account address (in green).</p>
-          <Alert theme="info">You can deposit from any wallet, but make sure to leave at least 0.05ETH in MetaMask for future transactions.</Alert>
+          <FormattedHTMLMessage {...messages.step5} />
           {confirmationNote}
         </div>
       ),
@@ -100,7 +91,7 @@ const InvestTour = ({
     },
     {
       selector: '[data-tour="exchange"]',
-      content: <div>Goto the &#39;Exchange&#39; tab</div>,
+      content: <div><FormattedMessage {...messages.step6} /></div>,
       action: () => {
         setActiveTab(EXCHANGE);
         setAmountUnit('eth');
@@ -109,13 +100,20 @@ const InvestTour = ({
     },
     {
       selector: '[data-tour="exchange-eth-form"]',
+      content: <FormattedHTMLMessage {...messages.step7} />,
+      style: stepStyle,
+    },
+    {
+      selector: '[data-tour="exchange-eth-form"]',
       content: (
         <div>
-          <p>Select the &#39;Ethereum&#39; from the dropdown, and use the form to exchange ETH for NTZ.</p>
+          <i style={{ margin: '10px auto 10px 40%' }} className="fa fa-4x fa-clock-o" />
+          <FormattedHTMLMessage {...messages.step8} />
         </div>
       ),
       style: stepStyle,
     },
+    /* commented-out until end of ICO
     {
       selector: '[data-tour="invest"]',
       content: <div>Goto the &#39;Invest&#39; tab</div>,
@@ -148,6 +146,7 @@ const InvestTour = ({
       ),
       style: stepStyle,
     },
+    */
   ];
   return (
     <Tour
@@ -170,7 +169,6 @@ const InvestTour = ({
 InvestTour.propTypes = {
   setActiveTab: PropTypes.func,
   setAmountUnit: PropTypes.func,
-  setInvestType: PropTypes.func,
   investTour: PropTypes.bool.isRequired,
   toggleInvestTour: PropTypes.func.isRequired,
 };

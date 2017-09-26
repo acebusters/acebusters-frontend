@@ -198,6 +198,10 @@ export default defineMessages({
     id: 'app.containers.Dashboard.upgradeAccount',
     defaultMessage: 'Unlock your Account',
   },
+  investTutButton: {
+    id: 'app.containers.Dashboard.investTutButton',
+    defaultMessage: 'Invest Tutorial',
+  },
   economyTitle: {
     id: 'app.containers.Dashboard.economyTitle',
     defaultMessage: 'Acebusters Economy',

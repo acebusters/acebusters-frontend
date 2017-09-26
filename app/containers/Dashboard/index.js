@@ -73,6 +73,7 @@ import {
   ABI_PROXY,
   ABI_TABLE_FACTORY,
   ABI_PULL_PAYMENT_CONTRACT,
+  MAIN_NET_GENESIS_BLOCK,
   conf,
 } from '../../app.config';
 
@@ -406,9 +407,15 @@ class DashboardRoot extends React.Component {
       tables,
       account.proxy
     );
+    // before crowdsale end, disable INVEST tab on production
+    const disabledTabs = conf().firstBlockHash === MAIN_NET_GENESIS_BLOCK ? [INVEST] : [];
     return (
       <Container>
-        <Tabs tabs={TABS} {...this.props} />
+        <Tabs
+          tabs={TABS}
+          disabledTabs={disabledTabs}
+          {...this.props}
+        />
         <Balances
           babzBalance={babzBalance}
           pwrBalance={pwrBalance}
