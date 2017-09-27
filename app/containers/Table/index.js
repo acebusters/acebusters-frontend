@@ -86,7 +86,6 @@ import web3Connect from '../AccountProvider/web3Connect';
 import TableService, { getHand, fetchTableState } from '../../services/tableService';
 import JoinDialog from '../JoinDialog';
 import InviteDialog from '../InviteDialog';
-import RebuyDialog from '../RebuyDialog';
 
 const SpinnerWrapper = styled.div`
   position: absolute;
@@ -223,13 +222,13 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
       this.props.modalDismiss();
       this.props.modalAdd(
-        <RebuyDialog
-          pos={this.props.myPos}
-          handleRebuy={this.handleRebuy}
-          handleLeave={this.handleLeave}
+        <JoinDialog
+          onJoin={this.handleRebuy}
+          onLeave={() => this.handleLeave(this.props.myPos)}
           modalDismiss={this.props.modalDismiss}
           params={this.props.params}
           balance={balance && Number(balance.toString())}
+          rebuy
         />,
         { closeHandler: this.handleLeave }
       );
@@ -339,8 +338,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     if (open && myPos === undefined && !pending) {
       this.props.modalAdd((
         <JoinDialog
-          pos={pos}
-          handleJoin={this.handleJoin}
+          onJoin={(amount) => this.handleJoin(pos, amount)}
           modalDismiss={this.props.modalDismiss}
           params={this.props.params}
           balance={balance}

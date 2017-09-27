@@ -1,5 +1,7 @@
 import React, { PropTypes } from 'react';
+import styled from 'styled-components';
 import { connect } from 'react-redux';
+import { FormattedMessage } from 'react-intl';
 import { Form, Field, reduxForm, formValueSelector } from 'redux-form/immutable';
 
 import Slider from 'react-rangeslider';
@@ -14,6 +16,8 @@ import { makeSbSelector } from '../Table/selectors';
 import { makeSelectProxyAddr, makeSelectCanSendTx } from '../AccountProvider/selectors';
 import { formatNtz } from '../../utils/amountFormatter';
 
+import messages from './messages';
+
 /* eslint-disable react/prop-types */
 const renderSlider = ({ input, ...props }) => (
   <FormGroup>
@@ -27,6 +31,18 @@ const renderSlider = ({ input, ...props }) => (
 );
 /* eslint-enable react/prop-types */
 
+const ButtonContainer = styled.div`
+  display: flex;
+
+  & > * {
+    flex: 1;
+  }
+
+  & > * + * {
+    margin-left: 10px;
+  }
+`;
+
 export class JoinDialog extends React.Component { // eslint-disable-line react/prefer-stateless-function
 
   constructor(props) {
@@ -35,7 +51,7 @@ export class JoinDialog extends React.Component { // eslint-disable-line react/p
   }
 
   handleSubmit(values) {
-    return this.props.handleJoin(this.props.pos, values.get('amount'));
+    return this.props.onJoin(values.get('amount'));
   }
 
   render() {
@@ -47,6 +63,8 @@ export class JoinDialog extends React.Component { // eslint-disable-line react/p
       handleSubmit,
       amount,
       submitting,
+      onLeave,
+      rebuy,
     } = this.props;
 
     const min = sb * 40;
@@ -55,9 +73,11 @@ export class JoinDialog extends React.Component { // eslint-disable-line react/p
     if (balance < min) {
       return (
         <div style={{ minWidth: '20em' }}>
-          <H2>Sorry!</H2>
-          <p>Your balance is not sufficient to join this table!</p>
-          <SubmitButton onClick={modalDismiss}>OK</SubmitButton>
+          <H2><FormattedMessage {...messages.sorry} /></H2>
+          <p><FormattedMessage {...(rebuy ? messages.balanceOutRebuy : messages.balanceOutJoin)} /></p>
+          <SubmitButton onClick={modalDismiss}>
+            <FormattedMessage {...messages.ok} />
+          </SubmitButton>
         </div>
       );
     }
@@ -70,17 +90,24 @@ export class JoinDialog extends React.Component { // eslint-disable-line react/p
           max={max}
           step={sb}
         />
-        <div>Max: {formatNtz(max)} NTZ</div>
+        <div><FormattedMessage {...messages.max} /> {formatNtz(max)} NTZ</div>
         <div>{formatNtz(amount)} NTZ</div>
 
         <Web3Alerts />
 
-        <SubmitButton
-          disabled={!canSendTx}
-          submitting={submitting}
-        >
-          Join
-        </SubmitButton>
+        <ButtonContainer>
+          <SubmitButton
+            disabled={!canSendTx}
+            submitting={submitting}
+          >
+            <FormattedMessage {...(rebuy ? messages.rebuy : messages.join)} />
+          </SubmitButton>
+          {rebuy && onLeave &&
+            <SubmitButton type="button" onClick={onLeave}>
+              <FormattedMessage {...messages.leave} />
+            </SubmitButton>
+          }
+        </ButtonContainer>
       </Form>
     );
   }
@@ -105,11 +132,12 @@ const mapStateToProps = createStructuredSelector({
 });
 
 JoinDialog.propTypes = {
-  handleJoin: PropTypes.func,
+  onJoin: PropTypes.func,
+  onLeave: PropTypes.func,
+  rebuy: PropTypes.bool,
   handleSubmit: PropTypes.func,
   modalDismiss: PropTypes.func,
   canSendTx: PropTypes.bool,
-  pos: PropTypes.any,
   sb: PropTypes.number,
   submitting: PropTypes.bool,
   amount: PropTypes.number,
