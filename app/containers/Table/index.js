@@ -210,9 +210,15 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
     const toggleKey = this.tableAddr + handId;
     // display Rebuy modal if state === 'waiting' and user stack is no greater than 0
-    if (nextProps.state === 'waiting' && nextProps.myStack !== null && nextProps.myStack <= 0
-        && (nextProps.state !== this.props.state || nextProps.myStack !== this.props.myStack)
-        && !nextProps.standingUp && !storageService.getItem(`rebuyModal[${toggleKey}]`)) {
+    if (
+      nextProps.state === 'waiting' &&
+      nextProps.myStack !== null && nextProps.myStack <= 0 &&
+      (
+        nextProps.state !== this.props.state ||
+        (nextProps.myStack !== this.props.myStack && this.props.myStack > 0)
+      ) &&
+      !nextProps.standingUp && !storageService.getItem(`rebuyModal[${toggleKey}]`)
+    ) {
       const balance = this.balance;
 
       this.props.modalDismiss();
@@ -269,10 +275,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       `0x0${(myPos).toString(16)}${signerAddr.replace('0x', '')}`
     );
 
-    storageService.removeItem(`rebuyModal[${toggleKey}]`);
 
     return Promise.resolve(account.isLocked ? null : promise).then(() => {
       this.props.modalDismiss();
+      storageService.removeItem(`rebuyModal[${toggleKey}]`);
     });
   }
 
