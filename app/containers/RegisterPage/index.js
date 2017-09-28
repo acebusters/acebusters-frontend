@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Form, Field, reduxForm, propTypes } from 'redux-form/immutable';
+import { Form, Field, reduxForm, propTypes, formValueSelector } from 'redux-form/immutable';
 import { FormattedMessage } from 'react-intl';
 
 // components
@@ -84,7 +84,7 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
   }
 
   render() {
-    const { error, invalid, submitting, handleSubmit, asyncValidating } = this.props;
+    const { error, invalid, submitting, handleSubmit, asyncValidating, defaultRefCode } = this.props;
     const termsLink = (<a href="http://www.acebusters.com/terms" target="_blank"><FormattedMessage {...messages.terms} /></a>);
     return (
       <Container>
@@ -93,12 +93,12 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
           <Form
             onSubmit={handleSubmit(this.handleSubmit)}
           >
-            <Field name="email" type="email" component={FormField} label="e-mail" autoFocus />
+            <Field name="email" type="email" component={FormField} label="E-mail" autoFocus />
             <Field
               name="referral"
               type="text"
               component={FormField}
-              label="referral code"
+              label={defaultRefCode ? 'Referral code (optional)' : 'Referral code'}
             />
             <Field name="captchaResponse" component={Captcha} error={error} />
             {error && <ErrorMessage error={error} />}
@@ -121,6 +121,7 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
 RegisterPage.propTypes = {
   ...propTypes,
   input: React.PropTypes.any,
+  defaultRefCode: React.PropTypes.string,
 };
 
 function mapDispatchToProps(dispatch) {
@@ -130,11 +131,14 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
+const valueSelector = formValueSelector('register');
+
 // Which props do we want to inject, given the global state?
 const mapStateToProps = (state, props) => ({
   initialValues: {
     referral: props.params.refCode,
   },
+  defaultRefCode: valueSelector(state, 'defaultRef'),
 });
 
 // Wrap the component to inject dispatch and state into it
