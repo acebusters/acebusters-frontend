@@ -3,8 +3,10 @@ import PropTypes from 'prop-types';
 import { FormattedMessage, FormattedHTMLMessage } from 'react-intl';
 
 import { ABP_DECIMALS } from '../../utils/amountFormatter';
-import TransferDialog from '../../containers/TransferDialog';
+import ExchangeDialog from '../../containers/ExchangeDialog';
+import { ABP, NTZ } from '../../containers/Dashboard/actions';
 
+import FormField from '../Form/FormField';
 import Alert from '../Alert';
 
 import { Description } from './styles';
@@ -12,34 +14,39 @@ import { Description } from './styles';
 const PowerDown = (props) => {
   const {
     messages,
-    totalSupplyPwr,
     pwrBalance,
     handlePowerDown,
+    powerDownMinAbp,
+    calcABPtoNTZ,
   } = props;
-  const minPowerDownPwr = totalSupplyPwr.div(10000).div(ABP_DECIMALS).ceil();
   return (
     <div>
       <Description>
-        <FormattedHTMLMessage
-          {...messages.powerDownDescr}
-          values={{
-            min: minPowerDownPwr,
-          }}
-        />
+        <FormattedHTMLMessage {...messages.powerDownDescr} />
+        <Alert theme="info">
+          <FormattedMessage
+            values={{ min: powerDownMinAbp }}
+            {...messages.powerDownMin}
+          />
+        </Alert>
       </Description>
       {pwrBalance && pwrBalance.equals(0) ?
         <Alert theme="warning">
           <FormattedMessage {...messages.powerDownPrereq} />
         </Alert>
         :
-        <TransferDialog
-          handleTransfer={handlePowerDown}
+        <ExchangeDialog
+          form="exchangeABPtoNTZ"
+          handleExchange={handlePowerDown}
           maxAmount={pwrBalance.div(ABP_DECIMALS)}
-          minAmount={minPowerDownPwr}
+          minAmount={powerDownMinAbp}
           hideAddress
           label={<FormattedMessage {...messages.powerDownAmountLabel} />}
-          amountUnit="ABP"
-          placeholder="0.00"
+          calcExpectedAmount={(num) => calcABPtoNTZ(num).toFormat(0)}
+          expectedAmountUnit={NTZ}
+          amountUnit={ABP}
+          placeholder="0.000"
+          component={FormField}
           {...props}
         />
       }
@@ -48,9 +55,10 @@ const PowerDown = (props) => {
 };
 PowerDown.propTypes = {
   messages: PropTypes.object.isRequired,
-  totalSupplyPwr: PropTypes.object.isRequired,
   handlePowerDown: PropTypes.func.isRequired,
   pwrBalance: PropTypes.object,
+  powerDownMinAbp: PropTypes.object.isRequired,
+  calcABPtoNTZ: PropTypes.func.isRequired,
 };
 
 export default PowerDown;

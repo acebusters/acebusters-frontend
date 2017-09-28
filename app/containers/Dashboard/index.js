@@ -218,6 +218,9 @@ class DashboardRoot extends React.Component {
     this.power.downtime.call();
     this.power.totalSupply.call();
     this.power.activeSupply.call();
+    if (typeof this.power.minimumPowerUpSizeBabz === 'function') {
+      this.power.minimumPowerUpSizeBabz.call();
+    }
     this.power.allEvents({
       toBlock: 'latest',
     }).watch((error, event) => {
@@ -382,6 +385,7 @@ class DashboardRoot extends React.Component {
   }
 
   render() {
+    let minPowerUpBabz;
     const { account } = this.props;
     const { isFishWarned } = this.state;
     const qrUrl = `ether:${account.proxy}`;
@@ -390,6 +394,11 @@ class DashboardRoot extends React.Component {
     const totalSupplyPwr = this.power.totalSupply();
     const activeSupplyPwr = this.power.activeSupply();
     const activeSupplyBabz = this.token.activeSupply();
+    if (typeof this.power.minimumPowerUpSizeBabz === 'function') {
+      minPowerUpBabz = this.power.minimumPowerUpSizeBabz();
+    } else {
+      minPowerUpBabz = 10000;
+    }
     const weiBalance = this.web3.eth.balance(account.proxy);
     const ethBalance = weiBalance && weiBalance.div(ETH_DECIMALS);
     const babzBalance = this.token.balanceOf(account.proxy);
@@ -400,8 +409,6 @@ class DashboardRoot extends React.Component {
     const floor = this.token.floor();
     const ceiling = this.token.ceiling();
     const tables = this.tableFactory.getTables();
-    const calcETHAmount = (ntz) => new BigNumber(ntz.toString()).div(floor);
-    const calcNTZAmount = (eth) => ceiling.mul(eth.toString());
     const listTxns = txnsToList(
       this.props.dashboardTxs.dashboardEvents,
       tables,
@@ -426,8 +433,7 @@ class DashboardRoot extends React.Component {
           paneType={this.props.activeTab}
           paneProps={{
             ETH_FISH_LIMIT,
-            calcETHAmount,
-            calcNTZAmount,
+            minPowerUpBabz,
             weiBalance,
             floor,
             ceiling,

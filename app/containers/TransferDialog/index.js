@@ -10,7 +10,6 @@ import { validateFloat } from '../../utils/inputValidators';
 
 import { makeSelectCanSendTx } from '../../containers/AccountProvider/selectors';
 
-import DefaultDialog from '../../components/TransferDialog/Default';
 import TokenDialog from '../../components/TransferDialog/TokenDialog';
 
 const isEthereumAddress = (address) => ethUtil.isValidAddress(address) || ethUtil.isValidChecksumAddress(address);
@@ -37,7 +36,6 @@ const warn = () => {
 
 const DIALOGS = {
   token: TokenDialog,
-  default: DefaultDialog,
 };
 
 const TransferDialogContainer = (props) => {
@@ -51,7 +49,7 @@ const TransferDialogContainer = (props) => {
   );
 };
 TransferDialogContainer.propTypes = {
-  type: PropTypes.oneOf(['default', 'token']),
+  type: PropTypes.oneOf(['token']),
 };
 TransferDialogContainer.defaultProps = {
   type: 'default',
