@@ -23,6 +23,7 @@ export const CONTRACT_TX_ERROR = 'acebusters/AccountProvider/CONTRACT_TX_ERROR';
 export const CONTRACT_TX_NOT_EXISTS = 'acebusters/AccountProvider/CONTRACT_TX_NOT_EXISTS';
 export const CONTRACT_TX_FAILED = 'acebusters/AccountProvider/CONTRACT_TX_FAILED';
 export const CONTRACT_TX_MINED = 'acebusters/AccountProvider/CONTRACT_TX_MINED';
+export const CONTRACT_TX_APPEARED = 'acebusters/AccountProvider/CONTRACT_TX_APPEARED';
 
 export const PROXY_EVENTS = 'acebusters/AccountProvider/PROXY_EVENTS';
 
@@ -183,6 +184,10 @@ export function contractTxFailed(payload, txHash) {
 
 export function contractTxMined(txHash) {
   return { type: CONTRACT_TX_MINED, meta: { txHash } };
+}
+
+export function contractTxAppeared(txHash) {
+  return { type: CONTRACT_TX_APPEARED, meta: { txHash } };
 }
 
 export function contractEvent(event, proxy) {

@@ -66,13 +66,17 @@ export default defineMessages({
     id: 'app.containers.Dashboard.included',
     defaultMessage: 'Transaction History',
   },
-  powerDownRequests: {
-    id: 'app.containers.Dashboard.powerDownRequests',
-    defaultMessage: 'Power Down Requests',
+  powerDownPayout: {
+    id: 'app.containers.Dashboard.powerDownPayout',
+    defaultMessage: 'Power Down Pay-Out',
   },
   ethPayout: {
     id: 'app.containers.Dashboard.ethPayout',
     defaultMessage: 'ETH Payout',
+  },
+  refs: {
+    id: 'app.containers.Dashboard.refs',
+    defaultMessage: 'Promo codes',
   },
   transactionErrorTitle: {
     id: 'app.containers.Dashboard.transactionErrorTitle',
@@ -192,6 +196,38 @@ export default defineMessages({
   },
   upgradeAccount: {
     id: 'app.containers.Dashboard.upgradeAccount',
-    defaultMessage: 'Upgrade to Shark account',
+    defaultMessage: 'Unlock your Account',
+  },
+  investTutButton: {
+    id: 'app.containers.Dashboard.investTutButton',
+    defaultMessage: 'Invest Tutorial',
+  },
+  economyTitle: {
+    id: 'app.containers.Dashboard.economyTitle',
+    defaultMessage: 'Acebusters Economy',
+  },
+  economyListTotal: {
+    id: 'app.containers.Dashboard.economyListTotal',
+    defaultMessage: 'Total',
+  },
+  economyListActive: {
+    id: 'app.containers.Dashboard.economyListActive',
+    defaultMessage: 'Active',
+  },
+  economyListOwnership: {
+    id: 'app.containers.Dashboard.economyListOwnership',
+    defaultMessage: 'Your Ownership',
+  },
+  ntzUnit: {
+    id: 'app.containers.Dashboard.ntzUnit',
+    defaultMessage: '{amount} NTZ',
+  },
+  abpUnit: {
+    id: 'app.containers.Dashboard.abpUnit',
+    defaultMessage: '{amount} ABP',
+  },
+  percentUnit: {
+    id: 'app.containers.Dashboard.percentUnit',
+    defaultMessage: '{amount} %',
   },
 });

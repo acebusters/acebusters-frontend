@@ -31,7 +31,7 @@ export function formatAmount(decimals, amount, dp) {
 export const toEth = toAmount.bind(null, ETH_DECIMALS);
 export const toNtz = toAmount.bind(null, NTZ_DECIMALS);
 export const formatNtz = (amount, dp = 0) => formatAmount(NTZ_DECIMALS, amount, dp);
-export const formatAbp = formatAmount.bind(null, ABP_DECIMALS);
+export const formatAbp = (amount, dp = 3) => formatAmount(ABP_DECIMALS, amount, dp);
 export const formatEth = formatAmount.bind(null, ETH_DECIMALS);
 
 // only allow digits and one dot

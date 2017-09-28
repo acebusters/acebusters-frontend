@@ -3,8 +3,7 @@ import PropTypes from 'prop-types';
 import { Form, Field } from 'redux-form/immutable';
 import BigNumber from 'bignumber.js';
 
-import NoWeb3Message from '../Web3Alerts/NoWeb3';
-import UnsupportedNetworkMessage from '../Web3Alerts/UnsupportedNetwork';
+import Web3Alerts from '../../containers/Web3Alerts';
 import { ErrorMessage } from '../FormMessages';
 import SubmitButton from '../SubmitButton';
 import FormField from '../Form/FormField';
@@ -31,8 +30,7 @@ class TokenDialog extends React.Component { // eslint-disable-line react/prefer-
       maxAmount,
       minAmount,
       invalid,
-      hasWeb3,
-      networkSupported,
+      canSendTx,
       normalizer,
       placeholder,
     } = this.props;
@@ -64,12 +62,11 @@ class TokenDialog extends React.Component { // eslint-disable-line react/prefer-
 
           {error && <ErrorMessage>{error}</ErrorMessage>}
 
-          {!hasWeb3 && <NoWeb3Message />}
-          {hasWeb3 && !networkSupported && <UnsupportedNetworkMessage />}
+          <Web3Alerts />
 
           <SubmitButton
             type="submit"
-            disabled={invalid || !hasWeb3 || !networkSupported}
+            disabled={invalid || !canSendTx}
             submitting={submitting}
           >
             Submit
@@ -80,8 +77,7 @@ class TokenDialog extends React.Component { // eslint-disable-line react/prefer-
   }
 }
 TokenDialog.propTypes = {
-  hasWeb3: PropTypes.bool,
-  networkSupported: PropTypes.bool,
+  canSendTx: PropTypes.bool,
   submitting: PropTypes.bool,
   invalid: PropTypes.bool,
   maxAmount: PropTypes.object, // BigNumber

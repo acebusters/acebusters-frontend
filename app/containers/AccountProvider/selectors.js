@@ -18,12 +18,7 @@ const makeBlockySelector = () => createSelector(
 
 const makeNickNameSelector = () => createSelector(
   selectAccount,
-  (account) => {
-    if (account.get('nickName') === null) {
-      return 'Guest';
-    }
-    return account.get('nickName');
-  },
+  (account) => account.get('nickName') || 'Guest',
 );
 
 const makeSelectAccountData = () => createSelector(
@@ -33,7 +28,6 @@ const makeSelectAccountData = () => createSelector(
 
 const makeSignerAddrSelector = () => createSelector(
   selectAccount,
-  // (account) => account.get('signerAddr'),
   (account) => {
     if (account && account.get('privKey')) {
       const privKeyBuffer = new Buffer(account.get('privKey').replace('0x', ''), 'hex');
@@ -74,9 +68,26 @@ const makeSelectInjected = () => createSelector(
   (account) => account.get('injected'),
 );
 
-const makeSelectHasWeb3 = () => createSelector(
+const makeSelectOwner = () => createSelector(
   selectAccount,
-  (account) => !!(account.get('isLocked') || account.get('injected'))
+  (account) => account.get('owner'),
+);
+
+const makeSelectIsLocked = () => createSelector(
+  selectAccount,
+  (account) => !!account.get('isLocked'),
+);
+
+const makeSelectHasWeb3 = () => createSelector(
+  makeSelectIsLocked(),
+  makeSelectInjected(),
+  (isLocked, injected) => !!(isLocked || injected)
+);
+
+const makeSelectWrongInjected = () => createSelector(
+  makeSelectInjected(),
+  makeSelectOwner(),
+  (injected, owner) => (injected || '').toLowerCase() !== (owner || '').toLowerCase(),
 );
 
 const makeSelectNetworkSupported = () => createSelector(
@@ -87,6 +98,20 @@ const makeSelectNetworkSupported = () => createSelector(
 const makeSelectProxyAddr = () => createSelector(
   selectAccount,
   (account) => account.get('proxy')
+);
+
+const makeSelectCanSendTx = () => createSelector(
+  makeSelectIsLocked(),
+  makeSelectHasWeb3(),
+  makeSelectNetworkSupported(),
+  makeSelectWrongInjected(),
+  (isLocked, hasWeb3, networkSupported, wrongInjected) => {
+    if (isLocked) {
+      return true;
+    }
+
+    return hasWeb3 && networkSupported && !wrongInjected;
+  },
 );
 
 /**
@@ -108,4 +133,8 @@ export {
   makeSelectHasWeb3,
   makeSelectNetworkSupported,
   makeSelectInjected,
+  makeSelectWrongInjected,
+  makeSelectOwner,
+  makeSelectCanSendTx,
+  makeSelectIsLocked,
 };

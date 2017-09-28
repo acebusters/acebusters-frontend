@@ -45,6 +45,7 @@ export const LogoWrapper = styled.div`
   display: flex;
   align-items: center;
   pointer-events: none;
+  color: #FFF;
   @media (min-width: ${curtainStickyWidth}) {
     display: none;
   }

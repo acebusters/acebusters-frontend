@@ -10,7 +10,11 @@ import {
   NavToggle,
   StyledUserName,
   StyledUserImage,
+  LogoWrapper,
 } from './styles';
+
+import { Logo } from '../Logo';
+import Link from '../Link';
 
 class Header extends React.Component {
   constructor(props) {
@@ -79,6 +83,11 @@ class Header extends React.Component {
         id="header"
       >
         <Navbar loggedIn={this.props.loggedIn}>
+          <Link to="/">
+            <LogoWrapper>
+              <Logo />
+            </LogoWrapper>
+          </Link>
           {navButtons}
         </Navbar>
       </StyledHeader>

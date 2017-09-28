@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import ethUtil from 'ethereumjs-util';
 import { connect } from 'react-redux';
 import { Form, Field, reduxForm, SubmissionError, propTypes, change, formValueSelector } from 'redux-form/immutable';
+import { stopSubmit } from 'redux-form';
 import { browserHistory } from 'react-router';
 import { Receipt, Type } from 'poker-helper';
 
@@ -29,6 +30,8 @@ const validate = (values) => {
     errors.password = 'Required';
   } else if (values.get('password').length < 8) {
     errors.password = 'Must be 8 characters or more.';
+  } else if (values.get('password').length >= 32) {
+    errors.password = 'Must be less than 32 characters.';
   }
   if (values.get('password') !== values.get('confirmedPassword')) {
     errors.confirmedPassword = 'Passwords dont match';
@@ -60,8 +63,14 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     this.updateEntropy = this.updateEntropy.bind(this);
     this.state = {
       secretCreated: false,
+      sharkSignup: (false && props.injectedAccount && props.networkSupported),
       entropySaved: false, // not actually saved, just a UI device
+      ...this.loadReceipt(),
     };
+
+    this.confirmation = this.confirm().catch(({ errors }) => {
+      this.props.dispatch(stopSubmit('register', errors));
+    });
   }
 
   componentDidMount() {
@@ -73,13 +82,54 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     }
   }
 
+  async confirm() {
+    const { confCode, receipt } = this.state;
+    const storedConfCode = decodeURIComponent(storageService.getItem('ab-confCode') || '');
+
+    if (storedConfCode === confCode) {
+      return;
+    }
+
+    if (!receipt) {
+      throw new SubmissionError({ _error: 'Wrong receipt' });
+    }
+
+    if (receipt.type === Type.CREATE_CONF) {
+      try {
+        await accountService.confirm(confCode);
+      } catch (err) {
+        if (err.status !== 409) {
+          throw new SubmissionError({ _error: `Email Confirmation failed with error code ${err}` });
+        }
+      }
+    } else if (receipt.type !== Type.RESET_CONF) {
+      throw new SubmissionError({ _error: 'Unknown receipt type' });
+    }
+
+    storageService.setItem('ab-confCode', confCode);
+  }
+
+  loadReceipt() {
+    const state = {
+      confCode: decodeURIComponent(this.props.params.confCode || ''),
+    };
+
+    if (state.confCode) {
+      try {
+        state.receipt = Receipt.parse(state.confCode);
+      } catch (e) { } // eslint-disable-line
+    }
+
+    return state;
+  }
+
   handleSaveEntropyClick() {
     this.setState({ entropySaved: true });
   }
 
   async createTx(wallet, receipt, confCode) {
-    const { injectedAccount, networkSupported } = this.props;
-    if (injectedAccount && networkSupported) {
+    const { injectedAccount } = this.props;
+    if (this.state.sharkSignup) {
       const web3 = getWeb3(true);
       const proxy = web3.eth.contract(ABI_PROXY);
 
@@ -136,13 +186,13 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     }
   }
 
-  handleSubmit(values, dispatch) {
-    let confCode = storageService.getItem('ab-confCode');
+  async handleSubmit(values, dispatch) {
+    const { confCode, receipt } = this.state;
+
     if (!confCode) {
-      throw new SubmissionError({ _error: 'Error: session token lost.' });
+      throw new SubmissionError({ _error: 'Session receipt is lost' });
     }
-    confCode = decodeURIComponent(confCode);
-    const receipt = Receipt.parse(confCode);
+
     if (receipt.type !== Type.CREATE_CONF && receipt.type !== Type.RESET_CONF) {
       throw new SubmissionError({ _error: `Error: unknown session type ${receipt.type}.` });
     }
@@ -158,7 +208,8 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     // Register saga is called, we return the promise here,
     // so we can display form errors if any of the async ops fail.
     return (
-      register(values, dispatch)
+      this.confirmation
+        .then(() => register(values, dispatch))
         .catch(throwWorkerError)
         // If worker success, ...
         .then((workerRsp) => {
@@ -179,10 +230,10 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
 
   render() {
     const { error, handleSubmit, submitting, entropy, invalid } = this.props;
-    const { entropySaved, secretCreated } = this.state;
+    const { entropySaved, secretCreated, receipt } = this.state;
     return (
       <Container>
-        {!entropySaved ?
+        {!entropySaved &&
           <div>
             <H1>Create Randomness for Secret</H1>
             <Form onSubmit={handleSubmit(this.handleSaveEntropyClick)}>
@@ -198,23 +249,32 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
               </Button>
             </Form>
           </div>
-          :
+        }
+        {entropySaved &&
           <div>
             <H1>Encrypt & Save Your Account!</H1>
-            <Form onSubmit={handleSubmit(this.handleSubmit)}>
+            <Form
+              onSubmit={handleSubmit(this.handleSubmit)}
+              ref={(form) => { this.form = form; }}
+            >
               <Field name="password" type="password" component={FormField} label="Password" />
               <Field name="confirmedPassword" type="password" component={FormField} label="Confirm Password" />
               {error && <ErrorMessage error={error} />}
+
               <Button type="submit" disabled={submitting || invalid} size="large">
-                { (!submitting) ? 'Encrypt and Save' : 'Please wait ...' }
+                {!submitting ? 'Encrypt and Save' : 'Please wait ...'}
               </Button>
             </Form>
           </div>
         }
 
-        { submitting &&
+        {submitting &&
           <div>
-            <H1>Registering please wait ...</H1>
+            <H1>
+              {receipt.type === Type.CREATE_CONF
+                ? 'Registering please wait...'
+                : 'Recovering your account...'}
+            </H1>
           </div>
         }
       </Container>
@@ -244,8 +304,8 @@ const throwSubmitError = (err) => {
 
 function mapDispatchToProps(dispatch) {
   return {
-    walletExport: (data) => dispatch(walletExport(data)),
-    onAccountTxHashReceived: (txHash) => dispatch(accountTxHashReceived(txHash)),
+    walletExport: (...args) => dispatch(walletExport(...args)),
+    onAccountTxHashReceived: (...args) => dispatch(accountTxHashReceived(...args)),
     onEntropyUpdated: (data) => dispatch(change('register', 'entropy', data)),
   };
 }

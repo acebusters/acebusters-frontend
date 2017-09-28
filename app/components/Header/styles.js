@@ -202,3 +202,11 @@ export const StyledItem = styled.li`
     display: ${(props) => props.collapsed ? 'none' : 'block'};
   }
 `;
+
+export const LogoWrapper = styled.div`
+  position: absolute;
+  left: 15px;
+  top: 13px;
+
+  text-decoration: none;
+`;

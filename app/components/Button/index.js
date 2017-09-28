@@ -35,16 +35,6 @@ const SharedButton = styled.button`
     margin-left: 10px;
   }
 
-  &:disabled {
-    cursor: default;
-  }
-`;
-
-const Medium = styled(SharedButton)`
-  padding: 0.1em 0.5em;
-  font-size: 16px;
-  background-color: ${black};
-
   &:hover {
     color: ${baseColor};
   }
@@ -52,6 +42,28 @@ const Medium = styled(SharedButton)`
   &:active {
     color: ${baseColor};
   }
+
+  &:disabled {
+    cursor: default;
+  }
+`;
+
+const Small = styled(SharedButton)`
+  padding: 0.1em 0.5em;
+  font-size: 16px;
+  background-color: ${black};
+
+  &:disabled {
+    color: ${white};
+    opacity: 0.6;
+  }
+`;
+
+const Medium = styled(SharedButton)`
+  margin: 0.2em;
+  padding: 0.7em 1.2em;
+  font-size: 16px;
+  background-color: ${black};
 
   &:disabled {
     color: ${white};
@@ -90,6 +102,7 @@ const Icon = styled.i`
 const sizes = {
   medium: Medium,
   large: Large,
+  small: Small,
   link: A,
 };
 
@@ -114,14 +127,14 @@ function Button({
 Button.propTypes = {
   onClick: PropTypes.func,
   type: PropTypes.string,
-  size: PropTypes.oneOf(['large', 'medium', 'link']),
+  size: PropTypes.oneOf(['large', 'medium', 'small', 'link']),
   icon: PropTypes.string,
   disabled: PropTypes.bool,
   children: PropTypes.node,
 };
 
 function getButtonComponent({ size, href }) {
-  const component = sizes[size] || Medium;
+  const component = sizes[size] || Small;
 
   if (href) {
     return component.withComponent(SharedButton.withComponent('a'));

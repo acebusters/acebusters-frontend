@@ -32,7 +32,7 @@ const Content = styled.div`
   /* theme */
   ${(props) => (props.theme.contentLeftBorder && `border-left: ${(props).theme.contentLeftBorder};`)}
   background-color: transparent;
-  color: ${fontPrimary}
+  color: ${fontPrimary};
 
   min-height: 100%;
   z-index: 800;

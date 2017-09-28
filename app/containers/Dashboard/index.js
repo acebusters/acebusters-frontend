@@ -5,6 +5,8 @@ import { createStructuredSelector } from 'reselect';
 import { FormattedMessage } from 'react-intl';
 import BigNumber from 'bignumber.js';
 
+import InvestTour from '../../components/Dashboard/InvestTour';
+
 import web3Connect from '../AccountProvider/web3Connect';
 import { getWeb3 } from '../AccountProvider/sagas';
 import { addEventsDate, isUserEvent } from '../AccountProvider/utils';
@@ -41,6 +43,7 @@ import {
   setActiveTab,
   setAmountUnit,
   setInvestType,
+  toggleInvestTour,
 } from './actions';
 import messages from './messages';
 import { txnsToList } from './txnsToList';
@@ -48,9 +51,9 @@ import {
   getActiveTab,
   getAmountUnit,
   getInvestType,
+  getInvestTour,
   createDashboardTxsSelector,
 } from './selectors';
-import { downRequestsToList } from './downRequestsToList';
 
 import Container from '../../components/Container';
 import H2 from '../../components/H2';
@@ -70,6 +73,7 @@ import {
   ABI_PROXY,
   ABI_TABLE_FACTORY,
   ABI_PULL_PAYMENT_CONTRACT,
+  MAIN_NET_GENESIS_BLOCK,
   conf,
 } from '../../app.config';
 
@@ -116,8 +120,10 @@ class DashboardRoot extends React.Component {
     this.handleNTZSell = this.handleNTZSell.bind(this);
     this.handleETHTransfer = this.handleETHTransfer.bind(this);
     this.handleETHPayout = this.handleETHPayout.bind(this);
+    this.handleABPPayout = this.handleABPPayout.bind(this);
     this.handlePowerUp = this.handlePowerUp.bind(this);
     this.handlePowerDown = this.handlePowerDown.bind(this);
+    this.fishWarn = this.fishWarn.bind(this);
     this.web3 = props.web3Redux.web3;
 
     this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(confParams.ntzAddr);
@@ -133,7 +139,7 @@ class DashboardRoot extends React.Component {
     }
 
     this.state = {
-      downRequests: null,
+      isFishWarned: false,
     };
   }
 
@@ -164,8 +170,13 @@ class DashboardRoot extends React.Component {
     }
   }
 
+  fishWarn() {
+    this.setState({ isFishWarned: true });
+  }
+
   watchProxyEvents(proxyAddr) {
     this.pullPayment.paymentOf.call(proxyAddr);
+    this.power.downs.call(proxyAddr);
 
     this.proxy = this.web3.eth.contract(ABI_PROXY).at(proxyAddr);
     this.web3.eth.getBlockNumber((err, blockNumber) => {
@@ -190,8 +201,6 @@ class DashboardRoot extends React.Component {
         this.web3.eth.getBalance(proxyAddr);
       }
     });
-
-    this.loadDownRequests();
   }
 
   watchPowerEvents(proxyAddr) {
@@ -208,17 +217,25 @@ class DashboardRoot extends React.Component {
 
     this.power.downtime.call();
     this.power.totalSupply.call();
+    this.power.activeSupply.call();
     this.power.allEvents({
       toBlock: 'latest',
     }).watch((error, event) => {
-      addEventsDate([event])
-        .then((events) => this.props.contractEvents(events, proxyAddr));
+      if (!error && isUserEvent(proxyAddr)(event)) {
+        addEventsDate([event])
+          .then((events) => this.props.contractEvents(events, proxyAddr));
+        this.power.balanceOf.call(proxyAddr);
+        this.power.downs.call(proxyAddr);
+        this.token.balanceOf.call(proxyAddr);
+      }
     });
   }
 
   watchTokenEvents(proxyAddr) {
     this.token.floor.call();
     this.token.ceiling.call();
+    this.token.totalSupply.call();
+    this.token.activeSupply.call();
     this.token.balanceOf.call(proxyAddr);
     this.web3.eth.getBalance(proxyAddr);
 
@@ -234,8 +251,8 @@ class DashboardRoot extends React.Component {
 
     this.token.allEvents({
       toBlock: 'latest',
-    }).watch((watchError, event) => {
-      if (!watchError && isUserEvent(proxyAddr)(event)) {
+    }).watch((error, event) => {
+      if (!error && isUserEvent(proxyAddr)(event)) {
         if (event.event === 'Sell') {
           this.pullPayment.paymentOf.call(proxyAddr);
         }
@@ -245,48 +262,6 @@ class DashboardRoot extends React.Component {
         this.web3.eth.getBalance(proxyAddr);
       }
     });
-  }
-
-  loadDownRequests() {
-    const power = getWeb3().eth.contract(ABI_POWER_CONTRACT).at(confParams.pwrAddr);
-    const result = [];
-    const batchSize = 20;
-    let stop = false;
-    const promise = new Promise((resolve, reject) => {
-      const runBatch = (base) => {
-        // ToDo: find a bug with batch and use it
-        // const batch = getWeb3().createBatch();
-        for (let i = 0; i < batchSize; i += 1) {
-          // batch.add(
-          power.downs.call(base + i, (err, request) => { // eslint-disable-line
-            if (err) {
-              reject(err);
-              return;
-            }
-            if (request[0] !== '0x') {
-              result[base + i] = [base + i, ...request];
-            } else {
-              stop = true;
-            }
-
-            if (i + 1 === batchSize) {
-              if (stop) {
-                resolve(result);
-              } else {
-                runBatch(base + batchSize);
-              }
-            }
-          });
-        }
-        // batch.execute();
-      };
-
-      runBatch(0);
-    });
-
-    promise
-      .then((requests) => requests.filter((r) => r[1] === this.props.account.proxy))
-      .then((requests) => this.setState({ downRequests: requests }));
   }
 
   async handleETHPayout(amount) {
@@ -397,25 +372,30 @@ class DashboardRoot extends React.Component {
     });
   }
 
-  handleTickClick(pos) {
-    this.power.downTick.sendTransaction(pos, (err, result) => {
+  handleABPPayout() {
+    const { account } = this.props;
+    this.power.downTick.sendTransaction(account.proxy, (err, result) => {
       if (result) {
-        waitForTx(getWeb3(), result).then(() => this.loadDownRequests());
+        waitForTx(getWeb3(), result).then(() => this.power.downs.call(account.proxy));
       }
     });
   }
 
   render() {
     const { account } = this.props;
-    const { downRequests } = this.state;
+    const { isFishWarned } = this.state;
     const qrUrl = `ether:${account.proxy}`;
     const downtime = this.power.downtime();
-    const totalSupply = this.power.totalSupply();
+    const totalSupplyBabz = this.token.totalSupply();
+    const totalSupplyPwr = this.power.totalSupply();
+    const activeSupplyPwr = this.power.activeSupply();
+    const activeSupplyBabz = this.token.activeSupply();
     const weiBalance = this.web3.eth.balance(account.proxy);
     const ethBalance = weiBalance && weiBalance.div(ETH_DECIMALS);
     const babzBalance = this.token.balanceOf(account.proxy);
     const nutzBalance = babzBalance && babzBalance.div(NTZ_DECIMALS);
     const pwrBalance = this.power.balanceOf(account.proxy);
+    const downs = this.power.downs(account.proxy);
     const [ethAllowance, ethPayoutDate] = this.pullPayment.paymentOf(account.proxy) || [];
     const floor = this.token.floor();
     const ceiling = this.token.ceiling();
@@ -427,9 +407,15 @@ class DashboardRoot extends React.Component {
       tables,
       account.proxy
     );
+    // before crowdsale end, disable INVEST tab on production
+    const disabledTabs = conf().firstBlockHash === MAIN_NET_GENESIS_BLOCK ? [INVEST] : [];
     return (
       <Container>
-        <Tabs tabs={TABS} {...this.props} />
+        <Tabs
+          tabs={TABS}
+          disabledTabs={disabledTabs}
+          {...this.props}
+        />
         <Balances
           babzBalance={babzBalance}
           pwrBalance={pwrBalance}
@@ -450,27 +436,32 @@ class DashboardRoot extends React.Component {
             ethAllowance,
             ethPayoutDate,
             ethPayoutPending: this.props.dashboardTxs.pendingETHPayout,
+            abpPayoutPending: this.props.dashboardTxs.pendingABPPayout,
             pwrBalance,
             nutzBalance,
-            totalSupply,
+            totalSupplyPwr,
+            totalSupplyBabz,
+            activeSupplyPwr,
+            activeSupplyBabz,
             listTxns,
             qrUrl,
             messages,
-            downRequests: downRequestsToList(
-              downRequests,
-              downtime,
-              (pos) => this.handleTickClick(pos),
-            ),
+            isFishWarned,
+            downtime,
+            downs: downs && [...downs],
             handleNTZSell: this.handleNTZSell,
             handleNTZPurchase: this.handleNTZPurchase,
             handleNTZTransfer: this.handleNTZTransfer,
             handleETHTransfer: this.handleETHTransfer,
             handleETHPayout: this.handleETHPayout,
+            handleABPPayout: this.handleABPPayout,
             handlePowerDown: this.handlePowerDown,
             handlePowerUp: this.handlePowerUp,
+            fishWarn: this.fishWarn,
             ...this.props,
           }}
         />
+        <InvestTour {...this.props} />
       </Container>
     );
   }
@@ -491,6 +482,7 @@ const mapDispatchToProps = (dispatch) => ({
   setInvestType,
   setActiveTab,
   setAmountUnit,
+  toggleInvestTour,
   notifyCreate: (type, props) => dispatch(notifyCreate(type, props)),
   modalAdd,
   modalDismiss,
@@ -509,6 +501,7 @@ const mapStateToProps = createStructuredSelector({
   privKey: makeSelectPrivKey(),
   amountUnit: getAmountUnit(),
   investType: getInvestType(),
+  investTour: getInvestTour(),
 });
 
 export default web3Connect(

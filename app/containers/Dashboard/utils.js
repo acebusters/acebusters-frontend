@@ -19,6 +19,13 @@ export function isETHPayoutEvent(event) {
   );
 }
 
+export function isABPPayoutEvent(event) {
+  return (
+    event.address === confParams.pwrAddr
+    && event.type === 'income'
+  );
+}
+
 export function isPurchaseEndEvent(event, proxyAddr) {
   return event.address === proxyAddr && event.unit === 'ntz';
 }

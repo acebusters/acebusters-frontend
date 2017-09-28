@@ -3,7 +3,7 @@
  */
 import { Map, List, fromJS } from 'immutable';
 import * as TableActions from './actions';
-import * as storageService from '../../services/localStorage';
+import * as storageService from '../../services/expiringLocalStorage';
 import { createBlocky } from '../../services/blockies';
 
 // Expecting a structure of the state like this:
@@ -33,6 +33,7 @@ import { createBlocky } from '../../services/blockies';
 
 // The initial application state
 export const initialState = fromJS({});
+const daySeconds = 60 * 60 * 24;
 
 export default function tableReducer(state = initialState, action) {
   switch (action.type) {
@@ -44,7 +45,7 @@ export default function tableReducer(state = initialState, action) {
         created: action.created,
       };
       const newState = state.updateIn([action.tableAddr, 'messages'], (list) => list.push(message));
-      storageService.setItem(`messages${action.tableAddr}`, newState.getIn([action.tableAddr, 'messages']).toJS());
+      storageService.setItem(`messages${action.tableAddr}`, newState.getIn([action.tableAddr, 'messages']).toJS(), daySeconds);
       return newState;
     }
 
@@ -146,7 +147,7 @@ export default function tableReducer(state = initialState, action) {
 
     case TableActions.SET_CARDS: {
       const handIdStr = action.handId.toString();
-      storageService.setItem(`holeCards${action.tableAddr}${handIdStr}`, action.cards);
+      storageService.setItem(`holeCards${action.tableAddr}${handIdStr}`, action.cards, daySeconds);
       return state.setIn([action.tableAddr, handIdStr, 'holeCards'], fromJS(action.cards));
     }
 

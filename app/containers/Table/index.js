@@ -10,6 +10,7 @@ import Pusher from 'pusher-js';
 import Raven from 'raven-js';
 import { Receipt } from 'poker-helper';
 import * as storageService from '../../services/sessionStorage';
+import * as reservationService from '../../services/reservationService';
 
 // components and styles
 import TableDebug from '../../containers/TableDebug';
@@ -46,7 +47,7 @@ import {
   setExitHand,
   sitOutToggle,
   bet,
-  fishTxHash,
+  reserveSeat,
 } from './actions';
 // selectors
 import makeSelectAccountData, {
@@ -83,10 +84,8 @@ import {
 import TableComponent from '../../components/Table';
 import web3Connect from '../AccountProvider/web3Connect';
 import TableService, { getHand, fetchTableState } from '../../services/tableService';
-import * as reservationService from '../../services/reservationService';
 import JoinDialog from '../JoinDialog';
 import InviteDialog from '../InviteDialog';
-import RebuyDialog from '../RebuyDialog';
 
 const SpinnerWrapper = styled.div`
   position: absolute;
@@ -210,22 +209,28 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
     const toggleKey = this.tableAddr + handId;
     // display Rebuy modal if state === 'waiting' and user stack is no greater than 0
-    if (nextProps.state === 'waiting' && nextProps.myStack !== null && nextProps.myStack <= 0
-        && (nextProps.state !== this.props.state || nextProps.myStack !== this.props.myStack)
-        && !nextProps.standingUp && !storageService.getItem(`rebuyModal[${toggleKey}]`)) {
+    if (
+      nextProps.state === 'waiting' &&
+      nextProps.myStack !== null && nextProps.myStack <= 0 &&
+      (
+        nextProps.state !== this.props.state ||
+        (nextProps.myStack !== this.props.myStack && this.props.myStack > 0)
+      ) &&
+      !nextProps.standingUp && !storageService.getItem(`rebuyModal[${toggleKey}]`)
+    ) {
       const balance = this.balance;
 
       this.props.modalDismiss();
       this.props.modalAdd(
-        <RebuyDialog
-          pos={this.props.myPos}
-          handleRebuy={this.handleRebuy}
-          handleLeave={this.handleLeave}
+        <JoinDialog
+          onJoin={this.handleRebuy}
+          onLeave={() => this.handleLeave(this.props.myPos)}
           modalDismiss={this.props.modalDismiss}
           params={this.props.params}
           balance={balance && Number(balance.toString())}
+          rebuy
         />,
-        this.handleLeave
+        { closeHandler: this.handleLeave }
       );
     }
   }
@@ -253,8 +258,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       this.props.seatReserved(this.tableAddr, event.payload);
     } else if (event.type === 'seatsRelease') {
       this.props.seatsReleased(this.tableAddr, event.payload);
-    } else if (event.type === 'txHash') {
-      this.props.fishTxHash(event.payload);
     }
   }
 
@@ -271,10 +274,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       `0x0${(myPos).toString(16)}${signerAddr.replace('0x', '')}`
     );
 
-    storageService.removeItem(`rebuyModal[${toggleKey}]`);
 
     return Promise.resolve(account.isLocked ? null : promise).then(() => {
       this.props.modalDismiss();
+      storageService.removeItem(`rebuyModal[${toggleKey}]`);
     });
   }
 
@@ -287,9 +290,9 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       `0x0${(pos).toString(16)}${signerAddr.replace('0x', '')}`,
     );
 
-    const reserveSeat = async () => {
+    const reserve = async () => {
       const txHash = await promise;
-      reservationService.reserve(
+      this.props.reserveSeat(
         this.tableAddr,
         pos,
         this.props.signerAddr,
@@ -299,7 +302,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     };
 
     if (!account.isLocked) {
-      await reserveSeat();
+      await reserve();
     }
 
     this.props.modalDismiss();
@@ -313,7 +316,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     if (account.isLocked) {
       const signerChannel = this.pusher.subscribe(signerAddr);
       signerChannel.bind('update', this.handleUpdate);
-      await reserveSeat();
+      await reserve();
     }
   }
 
@@ -335,8 +338,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     if (open && myPos === undefined && !pending) {
       this.props.modalAdd((
         <JoinDialog
-          pos={pos}
-          handleJoin={this.handleJoin}
+          onJoin={(amount) => this.handleJoin(pos, amount)}
           modalDismiss={this.props.modalDismiss}
           params={this.props.params}
           balance={balance}
@@ -599,8 +601,8 @@ export function mapDispatchToProps() {
     setExitHand,
     updateReceived,
     addMessage,
-    fishTxHash,
     seatReserved,
+    reserveSeat,
   };
 }
 
@@ -656,6 +658,7 @@ Table.propTypes = {
   setPending: React.PropTypes.func,
   setExitHand: React.PropTypes.func,
   modalDismiss: React.PropTypes.func,
+  reserveSeat: React.PropTypes.func,
   winners: React.PropTypes.array,
   dispatch: React.PropTypes.func,
   lineupReceived: React.PropTypes.func,
@@ -664,7 +667,6 @@ Table.propTypes = {
   seatsReleased: React.PropTypes.func,
   updateReceived: React.PropTypes.func,
   addMessage: React.PropTypes.func,
-  fishTxHash: React.PropTypes.func,
   location: React.PropTypes.object,
   account: React.PropTypes.object,
   myPendingSeat: React.PropTypes.number,

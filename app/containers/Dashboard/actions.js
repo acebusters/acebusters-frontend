@@ -12,6 +12,7 @@ export const NTZ = 'ntz';
 export const SET_ACTIVE_TAB = 'acebusters/Dashboard/SET_ACTIVE_TAB';
 export const SET_AMOUNT_UNIT = 'acebusters/Dashboard/SET_AMOUNT_UNIT';
 export const SET_INVEST_TYPE = 'acebusters/Dashboard/SET_INVEST_TYPE';
+export const TOGGLE_INVEST_TOUR = 'acebusters/Dashboard/TOGGLE_INVEST_TOUR';
 
 export const setActiveTab = (whichTab) => ({
   type: SET_ACTIVE_TAB,
@@ -26,4 +27,8 @@ export const setAmountUnit = (unit) => ({
 export const setInvestType = (which) => ({
   type: SET_INVEST_TYPE,
   which,
+});
+
+export const toggleInvestTour = () => ({
+  type: TOGGLE_INVEST_TOUR,
 });

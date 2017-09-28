@@ -8,11 +8,8 @@ import {
   menuClose,
 } from '../../variables';
 
-import {
-  Logo,
-  LogoName,
-  NameContainer,
-} from '../Logo';
+import { Logo } from '../Logo';
+import Link from '../Link';
 
 export const CurtainWrapper = styled.div`
   width: ${curtainWidth};
@@ -74,21 +71,15 @@ export const ToggleText = styled.span`
 const CurtainHeaderContainer = styled.div`
   display: flex;
   align-items: center;
-  margin: 6px 0 16px 8px;
-`;
+  margin: 20px 0 5px 8px;
 
-const CurtainLogoContainer = styled.div`
-  width: 60px;
-  height: 60px;
+  color: #fff;
 `;
 
 export const CurtainHeader = () => (
   <CurtainHeaderContainer>
-    <CurtainLogoContainer>
+    <Link to="/">
       <Logo name="curtain-logo" />
-    </CurtainLogoContainer>
-    <NameContainer>
-      <LogoName name="container-name" />
-    </NameContainer>
+    </Link>
   </CurtainHeaderContainer>
 );

@@ -3,10 +3,12 @@
  */
 import { fromJS } from 'immutable';
 import * as types from './actions';
+import * as storageService from '../../services/localStorage';
 
 export const initialState = fromJS({
   open: false,
   active: false,
+  muted: storageService.getItem('muted') || false,
 });
 
 export default function tableMenuReducer(state = initialState, action) {
@@ -18,6 +20,14 @@ export default function tableMenuReducer(state = initialState, action) {
 
     case types.MENU_TOGGLE_ACTIVE: {
       return state.set('active', !state.get('active'));
+    }
+
+    case types.MUTE: {
+      return state.set('muted', true);
+    }
+
+    case types.UNMUTE: {
+      return state.set('muted', false);
     }
 
     default: {

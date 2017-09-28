@@ -1,6 +1,6 @@
 {
   "name": "ab-web",
-  "version": "1.0.0-rc1",
+  "version": "1.0.1-rc1",
   "description": "A web app housing accounts, economy, and poker.",
   "repository": {
     "type": "git",
@@ -196,6 +196,7 @@
     "collectCoverageFrom": [
       "app/containers/Table/*.{js,jsx}",
       "app/containers/Table/sagas/*.{js,jsx}",
+      "!app/containers/Table/sagas/index.js",
       "!app/containers/Table/index.js",
       "!app/containers/Table/messages.js",
       "!app/containers/index.js",
@@ -208,8 +209,8 @@
     "coverageThreshold": {
       "global": {
         "statements": 52,
-        "branches": 55,
-        "functions": 67,
+        "branches": 54,
+        "functions": 65.5,
         "lines": 66
       }
     },
@@ -245,7 +246,7 @@
     "localStorage": "1.0.3",
     "lodash": "4.17.2",
     "minimist": "1.2.0",
-    "poker-helper": "^0.6.3",
+    "poker-helper": "^0.6.4",
     "prop-types": "^15.5.10",
     "pusher-js": "^4.0.0",
     "qrcode.react": "^0.6.1",
@@ -265,6 +266,7 @@
     "react-router-redux": "4.0.6",
     "react-router-scroll": "0.4.1",
     "react-test-renderer": "^15.6.1",
+    "reactour": "^1.5.0",
     "redux": "3.6.0",
     "redux-form": "^6.5.0",
     "redux-form-saga": "^0.1.0",
@@ -341,7 +343,7 @@
     "pre-commit": "1.2.2",
     "react-addons-shallow-compare": "^15.6.0",
     "react-addons-test-utils": "15.6.0",
-    "redux-saga-tester": "^1.0.186",
+    "redux-saga-tester": "1.0.186",
     "rimraf": "2.6.1",
     "shelljs": "0.7.7",
     "sinon": "2.3.2",

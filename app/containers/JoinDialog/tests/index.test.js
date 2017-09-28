@@ -18,7 +18,7 @@ describe('Join Dialog', () => {
     const joinDialog = shallow(
       <JoinDialog {...props} />
     );
-    expect(joinDialog.nodes[0].props.children[0].props.children).toEqual('Sorry!');
+    expect(joinDialog.nodes[0].props.children[0].props.children.props.defaultMessage).toEqual('Sorry!');
   });
 });
 

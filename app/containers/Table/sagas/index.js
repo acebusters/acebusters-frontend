@@ -11,6 +11,7 @@ import { sitoutFlow } from './sitoutFlowSaga';
 import { updateScanner } from './updateScannerSaga';
 import { payFlow } from './payFlowSaga';
 import { lineupScanner } from './lineupScannerSaga';
+import { reservationSaga } from './reservationSaga';
 
 const rc = new ReceiptCache();
 const pokerHelper = new PokerHelper(rc);
@@ -24,6 +25,7 @@ export function* tableStateSaga(dispatch) {
   yield takeEvery(LINEUP_RECEIVED, lineupScanner, dispatch);
 
   yield fork(payFlow, pokerHelper);
-  yield fork(sitoutFlow);
   yield fork(updateScanner, pokerHelper);
+  yield fork(sitoutFlow);
+  yield fork(reservationSaga);
 }

@@ -5,7 +5,9 @@ import {
   CONTRACT_EVENTS,
   PROXY_EVENTS,
   CONTRACT_TX_SENDED,
+  CONTRACT_TX_FAILED,
   CONTRACT_TX_ERROR,
+  SET_AUTH,
 } from '../AccountProvider/actions';
 
 import { MODAL_DISMISS } from '../App/actions';
@@ -14,8 +16,9 @@ import {
   SET_ACTIVE_TAB,
   SET_AMOUNT_UNIT,
   SET_INVEST_TYPE,
+  TOGGLE_INVEST_TOUR,
   OVERVIEW,
-  NTZ,
+  ETH,
   POWERUP,
 } from './actions';
 
@@ -36,6 +39,7 @@ const confParams = conf();
  *   transactionHash: string;
  *   timestamp?: number;
  *   pending?: boolean;
+ *   investTour: false;
  * }
  */
 const initialState = fromJS({
@@ -43,8 +47,9 @@ const initialState = fromJS({
   failedTx: null,
   events: null,
   activeTab: OVERVIEW,
-  amountUnit: NTZ,
+  amountUnit: ETH,
   investType: POWERUP,
+  investTour: false,
 });
 
 function formatTxErrorMessage(error) {
@@ -68,6 +73,9 @@ function dashboardReducer(state = initialState, action) {
     case SET_INVEST_TYPE:
       return state.set('investType', action.which);
 
+    case TOGGLE_INVEST_TOUR:
+      return state.set('investTour', !state.get('investTour'));
+
     case ACCOUNT_LOADED:
       return state.set('proxy', action.payload.proxy);
 
@@ -83,6 +91,15 @@ function dashboardReducer(state = initialState, action) {
         error: formatTxErrorMessage(payload.error),
       }));
 
+    case CONTRACT_TX_FAILED:
+      return state.withMutations((st) => {
+        if (st.hasIn(['events', meta.txHash])) {
+          return st.setIn(['events', meta.txHash, 'error'], 'Ran out of gas');
+        }
+
+        return st;
+      });
+
     case MODAL_DISMISS:
       return state.set('failedTx', null);
 
@@ -97,6 +114,22 @@ function dashboardReducer(state = initialState, action) {
         composeReducers(addNutzContractEvent, completePending),
         setProxy(initEvents(state), meta.proxy)
       );
+
+    case SET_AUTH:
+      return state
+        .withMutations((newState) => {
+          if (!action.newAuthState.loggedIn) {
+            return newState
+              .set('proxy', null)
+              .set('failedTx', null)
+              .set('events', null)
+              .set('activeTab', OVERVIEW)
+              .set('amountUnit', ETH)
+              .set('investType', POWERUP)
+              .set('investTour', false);
+          }
+          return state;
+        });
 
     default:
       return state;
@@ -130,14 +163,23 @@ function completePending(state, event) {
 }
 
 function addPending(state, { methodName, args, txHash, address }) {
-  if (address === confParams.pwrAddr) {
-    return state;
-  }
+  const path = ['events', txHash];
 
-  if (methodName === 'forward' && args[2] === '') { // eth transfer
+  if (address === conf().pwrAddr && methodName === 'downTick') {
+    return state.setIn(
+      path,
+      fromJS({
+        address,
+        type: 'income',
+        unit: 'ntz',
+        pending: true,
+        transactionHash: txHash,
+      }),
+    );
+  } else if (methodName === 'forward' && args[2] === '') { // eth transfer
     const amount = args[1];
     return state.setIn(
-      ['events', txHash],
+      path,
       fromJS({
         address,
         value: amount.toString ? amount.toString() : amount,
@@ -149,7 +191,7 @@ function addPending(state, { methodName, args, txHash, address }) {
     );
   } else if (methodName === 'withdraw') {
     return state.setIn(
-      ['events', txHash],
+      path,
       fromJS({
         address: confParams.pullAddr,
         type: 'income',
@@ -162,7 +204,7 @@ function addPending(state, { methodName, args, txHash, address }) {
     const options = typeof last(args) === 'function' ? args[args.length - 2] : last(args);
     const amount = options.value;
     return state.setIn(
-      ['events', txHash],
+      path,
       fromJS({
         address,
         value: amount.toString ? amount.toString() : amount,
@@ -174,7 +216,7 @@ function addPending(state, { methodName, args, txHash, address }) {
     );
   } else if (methodName === 'powerUp') {
     return state.setIn(
-      ['events', txHash],
+      path,
       fromJS({
         address: conf().pwrAddr,
         value: args[0].toString ? args[0].toString() : args[0],
@@ -186,7 +228,7 @@ function addPending(state, { methodName, args, txHash, address }) {
     );
   } else if (methodName === 'sell') {
     return state.setIn(
-      ['events', txHash],
+      path,
       fromJS({
         address: confParams.ntzAddr,
         value: args[1].toString ? args[1].toString() : args[1],

@@ -17,3 +17,8 @@ export const makeSelectActive = () => createSelector(
   selectTableMenu,
   (tableMenu) => tableMenu.get('active'),
 );
+
+export const makeSelectIsMuted = () => createSelector(
+  selectTableMenu,
+  (tableMenu) => tableMenu.get('muted'),
+);

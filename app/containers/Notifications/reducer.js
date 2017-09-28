@@ -1,5 +1,6 @@
 import { List, Map } from 'immutable';
 import * as types from './actions';
+import { SET_AUTH } from '../AccountProvider/actions';
 
 export const initialState = List([]);
 
@@ -17,6 +18,9 @@ export default function notificationsReducer(state = initialState, action) {
       return state.map(
         (note) => note.set('removing', note.get('txId') === action.txId)
       );
+
+    case SET_AUTH:
+      return !action.newAuthState.loggedIn ? state.clear() : state;
 
     default:
       return state;

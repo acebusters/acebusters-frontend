@@ -3,8 +3,7 @@ import PropTypes from 'prop-types';
 import { Form, Field } from 'redux-form/immutable';
 import BigNumber from 'bignumber.js';
 
-import NoWeb3Message from '../Web3Alerts/NoWeb3';
-import UnsupportedNetworkMessage from '../Web3Alerts/UnsupportedNetwork';
+import Web3Alerts from '../../containers/Web3Alerts';
 import { ErrorMessage } from '../FormMessages';
 import SubmitButton from '../SubmitButton';
 import FormField from '../Form/FormField';
@@ -34,8 +33,7 @@ class DefaultDialog extends React.Component { // eslint-disable-line react/prefe
       title,
       description,
       invalid,
-      hasWeb3,
-      networkSupported,
+      canSendTx,
       normalizer,
       label,
       placeholder,
@@ -68,12 +66,11 @@ class DefaultDialog extends React.Component { // eslint-disable-line react/prefe
 
           {error && <ErrorMessage>{error}</ErrorMessage>}
 
-          {!hasWeb3 && <NoWeb3Message />}
-          {hasWeb3 && !networkSupported && <UnsupportedNetworkMessage />}
+          <Web3Alerts />
 
           <SubmitButton
             type="submit"
-            disabled={invalid || !hasWeb3 || !networkSupported}
+            disabled={invalid || !canSendTx}
             submitting={submitting}
           >
             Submit
@@ -86,8 +83,7 @@ class DefaultDialog extends React.Component { // eslint-disable-line react/prefe
 DefaultDialog.propTypes = {
   title: PropTypes.any,
   description: PropTypes.any,
-  hasWeb3: PropTypes.bool,
-  networkSupported: PropTypes.bool,
+  canSendTx: PropTypes.bool,
   submitting: PropTypes.bool,
   invalid: PropTypes.bool,
   hideAddress: PropTypes.bool,

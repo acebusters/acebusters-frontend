@@ -12,17 +12,18 @@ import { Description } from './styles';
 const PowerDown = (props) => {
   const {
     messages,
-    totalSupply,
+    totalSupplyPwr,
     pwrBalance,
     handlePowerDown,
   } = props;
+  const minPowerDownPwr = totalSupplyPwr.div(10000).div(ABP_DECIMALS).ceil();
   return (
     <div>
       <Description>
         <FormattedHTMLMessage
           {...messages.powerDownDescr}
           values={{
-            min: totalSupply.div(10000).div(ABP_DECIMALS).ceil().toNumber(),
+            min: minPowerDownPwr,
           }}
         />
       </Description>
@@ -34,7 +35,7 @@ const PowerDown = (props) => {
         <TransferDialog
           handleTransfer={handlePowerDown}
           maxAmount={pwrBalance.div(ABP_DECIMALS)}
-          minAmount={totalSupply.div(10000).div(ABP_DECIMALS).ceil()}
+          minAmount={minPowerDownPwr}
           hideAddress
           label={<FormattedMessage {...messages.powerDownAmountLabel} />}
           amountUnit="ABP"
@@ -47,7 +48,7 @@ const PowerDown = (props) => {
 };
 PowerDown.propTypes = {
   messages: PropTypes.object.isRequired,
-  totalSupply: PropTypes.object.isRequired,
+  totalSupplyPwr: PropTypes.object.isRequired,
   handlePowerDown: PropTypes.func.isRequired,
   pwrBalance: PropTypes.object,
 };

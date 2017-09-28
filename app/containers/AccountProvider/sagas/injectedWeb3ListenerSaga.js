@@ -4,12 +4,12 @@ import { getWeb3 } from '../../AccountProvider/utils';
 import { promisifyWeb3Call } from '../../../utils/promisifyWeb3Call';
 
 import { updateInjectedAccount } from '../actions';
+import { makeSelectInjected } from '../selectors';
 
 export function* injectedWeb3ListenerSaga() {
   while (true) { // eslint-disable-line no-constant-condition
     if (window.web3) {
-      const state = yield select();
-      const prevInjected = yield call([state, state.getIn], ['account', 'injected']);
+      const prevInjected = yield select(makeSelectInjected());
       try {
         const [injected] = yield call(promisifyWeb3Call(getWeb3(true).eth.getAccounts));
         if (prevInjected !== injected) {

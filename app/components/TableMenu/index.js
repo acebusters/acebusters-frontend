@@ -7,15 +7,11 @@ import MenuItem from './MenuItem';
 
 import {
  LogoWrapper,
- TableLogoContainer,
  MenuContainer,
 } from './styles';
 
-import {
-  Logo,
-  LogoName,
-  NameContainer,
-} from '../Logo';
+import { Logo } from '../Logo';
+import Link from '../Link';
 
 class TableMenu extends React.Component {
   handleClickOutside() {
@@ -27,8 +23,10 @@ class TableMenu extends React.Component {
   render() {
     const {
       loggedIn, open, myPos, sitout, handleClickLogout, onLeave, onSitout,
-      standingUp, myLastReceipt, state, sitoutInProgress,
+      standingUp, myLastReceipt, state, sitoutInProgress, myStack, isMuted,
+      handleClickMuteToggle,
     } = this.props;
+    const isSitoutFlag = typeof sitout === 'number';
     const menuClose = [
       // Note: sitout value possibilities
       // sitout > 0, for enabled "play"
@@ -38,14 +36,15 @@ class TableMenu extends React.Component {
       // myPos === -1, then not at table"pause"
       {
         name: 'sitout',
-        icon: (typeof sitout === 'number') ? 'fa fa-play' : 'fa fa-pause',
-        title: (typeof sitout === 'number') ? 'Sit-In' : 'Sit-Out',
+        icon: isSitoutFlag ? 'fa fa-play' : 'fa fa-pause',
+        title: isSitoutFlag ? 'Sit-In' : 'Sit-Out',
         onClick: onSitout,
         disabled: myPos === undefined || sitout === 0 || sitout === null ||
                   standingUp || sitoutInProgress !== undefined ||
+                  (isSitoutFlag && !myStack) || // player can't sit-in if his balance is empty
                   // player can't sit-in in the hand he sit-out after game started
                   (
-                    typeof sitout === 'number' &&
+                    isSitoutFlag &&
                     sitout > 0 &&
                     myLastReceipt &&
                     state !== 'waiting' &&
@@ -63,6 +62,13 @@ class TableMenu extends React.Component {
         // disabled: myPos === undefined ||
         //   seatStatus === STATUS_MSG.sittingIn ||
         //   seatStatus === STATUS_MSG.standingUp,
+      },
+      {
+        name: 'mute',
+        icon: `fa ${isMuted ? 'fa-volume-off' : 'fa-volume-up'}`,
+        title: isMuted ? 'Unmute' : 'Mute',
+        onClick: () => handleClickMuteToggle(!isMuted),
+        disabled: false,
       },
     ];
     const menuUserOpen = [
@@ -130,12 +136,9 @@ class TableMenu extends React.Component {
     return (
       <div>
         <LogoWrapper name="logo-wrapper">
-          <TableLogoContainer>
+          <Link to="/">
             <Logo />
-          </TableLogoContainer>
-          <NameContainer>
-            <LogoName name="logo-name" />
-          </NameContainer>
+          </Link>
         </LogoWrapper>
         <MenuContainer open={open} name="menu-container">
           <MenuHeader {...this.props} />
@@ -161,6 +164,9 @@ TableMenu.propTypes = {
   myLastReceipt: PropTypes.object,
   state: PropTypes.string,
   sitoutInProgress: PropTypes.number,
+  myStack: PropTypes.number,
+  isMuted: PropTypes.bool,
+  handleClickMuteToggle: PropTypes.func,
 };
 
 export default onClickOutside(TableMenu);

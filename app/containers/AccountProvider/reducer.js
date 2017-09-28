@@ -25,6 +25,7 @@ const initialState = fromJS({
   blocky: null,
   nickName: null,
   signerAddr: null,
+  refs: null,
   web3ReadyState: READY_STATE.CONNECTING,
   onSupportedNetwork: false,
   web3ErrMsg: null,
@@ -42,7 +43,11 @@ function accountProviderReducer(state = initialState, action) {
       return state.set('web3ErrMsg', action.err ? (action.err.message || 'Connection Error') : null);
 
     case ACCOUNT_UNLOCKED:
-      return state.set('isLocked', false);
+      return (
+        state
+          .set('isLocked', false)
+          .set('owner', state.get('injected'))
+      );
 
     case INJECT_ACCOUNT_UPDATE:
       return state.set('injected', action.payload);
@@ -54,6 +59,9 @@ function accountProviderReducer(state = initialState, action) {
       return state.set('proxyTxHash', action.payload);
 
     case ACCOUNT_LOADED:
+      if (action.payload.refs) {
+        return state.set('refs', action.payload.refs);
+      }
       return (
         state
           .set('isLocked', action.payload.isLocked)
@@ -99,7 +107,8 @@ function accountProviderReducer(state = initialState, action) {
               .delete('proxy')
               .set('blocky', null)
               .set('nickName', null)
-              .set('signerAddr', null);
+              .set('signerAddr', null)
+              .set('refs', null);
           }
 
           return newState

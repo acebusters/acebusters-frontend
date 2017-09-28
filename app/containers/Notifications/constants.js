@@ -84,6 +84,17 @@ export const noWeb3Danger = {
   type: 'danger',
 };
 
+export const noInjectedDanger = {
+  txId: 'NO_INJECTED_MESSAGE',
+  notifyType: 'ACCOUNT_LOADED',
+  category: 'No ETH account',
+  details: 'Unlock your metamask account with password or create new one',
+  removing: false,
+  dismissable: true,
+  date: new Date(),
+  type: 'danger',
+};
+
 export const txPending = {
   removing: false,
   dismissable: false,
