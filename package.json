@@ -210,7 +210,7 @@
       "global": {
         "statements": 52,
         "branches": 54,
-        "functions": 65.5,
+        "functions": 64,
         "lines": 66
       }
     },

@@ -359,6 +359,19 @@ const makeSelectWinners = () => createSelector(
 
     if (handState !== 'showdown') {
       const lastMan = pokerHelper.nextPlayer(lineup, 0, 'active', handState);
+      // if there is no amount for lastMan
+      if (amounts[lineup[lastMan].address] === undefined) {
+        const entries = Object.entries(amounts);
+        // if there is only one amount which is more than zero
+        if (entries.filter((entry) => entry[1] > 0).length === 1) {
+          const [winnerAddress, winnerAmount] = entries.find((entry) => entry[1] > 0);
+          return [{
+            addr: winnerAddress,
+            amount: winnerAmount,
+            maxBet: selectMaxBet(lineup, winnerAddress),
+          }];
+        }
+      }
       return [{
         addr: lineup[lastMan].address,
         amount: amounts[lineup[lastMan].address],
