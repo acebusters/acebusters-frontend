@@ -47,7 +47,9 @@ const ActionBar = (props) => {
             <ControlFold {...props} />
             <ControlCheckCall {...props} />
             <ControlBetRaise {...props} />
-            {sliderOpen ? <Slider {...props} /> : null }
+            {sliderOpen &&
+              <Slider {...props} />
+            }
           </ControlWrapper>
         </ControlPanel>
 
