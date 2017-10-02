@@ -6,9 +6,9 @@ import React from 'react';
 import Button from 'components/Button';
 import Container from 'components/Container';
 import { TableStriped } from 'components/List';
-import H2 from 'components/H2';
 import { createStructuredSelector } from 'reselect';
 import LobbyItem from '../LobbyItem';
+import LobbyMessage from '../LobbyMessage';
 import { tableReceived, lineupReceived, updateReceived } from '../Table/actions';
 import { makeSelectLobby } from './selectors';
 import web3Connect from '../AccountProvider/web3Connect';
@@ -69,9 +69,11 @@ class LobbyComponent extends React.PureComponent { // eslint-disable-line
 
     return (
       <Container>
-        <H2> Table Overview </H2>
+        <LobbyMessage
+          bookmark="lobby-msg"
+        />
 
-        <TableStriped>
+        <TableStriped style={{ marginTop: 20 }}>
           <thead>
             <tr>
               <th key="number">#</th>
