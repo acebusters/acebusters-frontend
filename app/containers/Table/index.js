@@ -378,7 +378,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     return sitOutToggle(sitoutAction, this.props.dispatch);
   }
 
-  handleLeave(pos) {
+  async handleLeave(pos) {
     const lineup = (this.props.lineup) ? this.props.lineup.toJS() : null;
     const handId = this.props.latestHand;
     const state = this.props.state;
@@ -400,6 +400,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     storageService.removeItem(`rebuyModal[${this.tableAddr + handId}]`);
     this.props.modalDismiss();
     this.props.modalAdd(statusElement);
+
+    if (!this.props.sitout) {
+      await this.handleSitout();
+    }
 
     return this.tableService.leave(exitHand, lineup[pos].address).catch((err) => {
       Raven.captureException(err, { tags: {
