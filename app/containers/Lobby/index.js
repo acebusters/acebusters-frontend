@@ -1,20 +1,12 @@
-/**
- * Created by helge on 06.10.16.
- */
-
 import React from 'react';
-import Button from 'components/Button';
-import Container from 'components/Container';
-import { TableStriped } from 'components/List';
+import PropTypes from 'prop-types';
+import Lobby from 'components/Lobby';
 import { createStructuredSelector } from 'reselect';
-import LobbyItem from '../LobbyItem';
-import LobbyMessage from '../LobbyMessage';
 import { tableReceived, lineupReceived, updateReceived } from '../Table/actions';
 import { makeSelectLobby } from './selectors';
 import web3Connect from '../AccountProvider/web3Connect';
-import WithLoading from '../../components/WithLoading';
-import { fetchTableState, fetchTables } from '../../services/tableService';
 
+import { fetchTableState, fetchTables } from '../../services/tableService';
 import { ABI_TABLE } from '../../app.config';
 
 async function getTableData(table, action) {
@@ -28,8 +20,7 @@ async function getTableData(table, action) {
 
 const getTableHand = (tableAddr, action) => fetchTableState(tableAddr).then((rsp) => action(tableAddr, rsp));
 
-class LobbyComponent extends React.PureComponent { // eslint-disable-line
-
+class LobbyContainer extends React.PureComponent {
   constructor(props) {
     super(props);
     this.handleRefresh = this.handleRefresh.bind(this);
@@ -64,53 +55,21 @@ class LobbyComponent extends React.PureComponent { // eslint-disable-line
   }
 
   render() {
-    const { refreshing } = this.state;
-    const { lobby } = this.props;
-
     return (
-      <Container>
-        <LobbyMessage
-          bookmark="lobby-msg"
-        />
-
-        <TableStriped style={{ marginTop: 20 }}>
-          <thead>
-            <tr>
-              <th key="number">#</th>
-              <th key="blind">Blinds</th>
-              <th key="play">Players </th>
-              <th key="hand">Hand</th>
-              <th key="actn" />
-            </tr>
-          </thead>
-          {lobby && lobby.length > 0 && (
-            <tbody>
-              {lobby.map((tableAddr, i) =>
-                <LobbyItem key={i} tableAddr={tableAddr} />
-              )}
-            </tbody>
-          )}
-        </TableStriped>
-
-        <WithLoading
-          isLoading={lobby.length === 0}
-        />
-
-        <Button onClick={this.handleRefresh} size="medium">
-          Refresh
-          <WithLoading
-            isLoading={refreshing}
-            loadingSize="14px"
-            type="inline"
-            styles={{
-              inner: { marginLeft: 5 },
-            }}
-          />
-        </Button>
-      </Container>
+      <Lobby
+        refreshing={this.state.refreshing}
+        handleRefresh={this.handleRefresh}
+        {...this.props}
+      />
     );
   }
 }
+LobbyContainer.propTypes = {
+  web3Redux: PropTypes.any,
+  tableReceived: PropTypes.func,
+  updateReceived: PropTypes.func,
+  lineupReceived: PropTypes.func,
+};
 
 export function mapDispatchToProps() {
   return {
@@ -124,12 +83,4 @@ const mapStateToProps = createStructuredSelector({
   lobby: makeSelectLobby(),
 });
 
-LobbyComponent.propTypes = {
-  lobby: React.PropTypes.array,
-  web3Redux: React.PropTypes.any,
-  tableReceived: React.PropTypes.func,
-  updateReceived: React.PropTypes.func,
-  lineupReceived: React.PropTypes.func,
-};
-
-export default web3Connect(mapStateToProps, mapDispatchToProps)(LobbyComponent);
+export default web3Connect(mapStateToProps, mapDispatchToProps)(LobbyContainer);
