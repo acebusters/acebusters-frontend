@@ -6,11 +6,11 @@ export default defineMessages({
     defaultMessage: 'Sorry!',
   },
   balanceOutJoin: {
-    id: 'app.containers.JoinDialog.balanceOut',
+    id: 'app.containers.JoinDialog.balanceOutJoin',
     defaultMessage: 'Your balance is not sufficient to join this table!',
   },
   balanceOutRebuy: {
-    id: 'app.containers.JoinDialog.balanceOut',
+    id: 'app.containers.JoinDialog.balanceOutRebuy',
     defaultMessage: 'Your balance is not sufficient to rebuy!',
   },
   ok: {
