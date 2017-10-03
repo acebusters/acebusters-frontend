@@ -25,24 +25,25 @@ export default class LobbyMessage extends React.Component {
     }
   }
 
-  async getIdByBookmark(bookmark) {
-    if (this.state.bookmarks) {
-      return this.state.bookmarks[bookmark];
-    }
-
+  async fetchSettings() {
     const r = await fetch('https://ab-marketing.prismic.io/api/v2');
     const json = await r.json();
 
     this.setState({
       bookmarks: json.bookmarks,
+      ref: json.refs[0].ref,
     });
-
-    return json.bookmarks[bookmark];
   }
 
   async fetchDocument(bookmark) {
-    const documentId = await this.getIdByBookmark(bookmark);
-    const r = await fetch(`https://ab-marketing.prismic.io/api/v2/documents/search?ref=Wc4-7ScAACgANK0y&q=%5B%5Bat(document.id%2C+%22${documentId}%22)%5D%5D&format=json`, {
+    if (!this.state.bookmarks) {
+      await this.fetchSettings();
+    }
+
+    const { ref, bookmarks } = this.state;
+    const documentId = await bookmarks[bookmark];
+
+    const r = await fetch(`https://ab-marketing.prismic.io/api/v2/documents/search?ref=${ref}&q=%5B%5Bat(document.id%2C+%22${documentId}%22)%5D%5D&format=json`, {
       headers: {
         Accept: 'application/json',
       },
