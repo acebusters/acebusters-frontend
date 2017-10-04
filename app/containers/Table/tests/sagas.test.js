@@ -11,20 +11,25 @@ import { PLAYER1, PLAYER2, PLAYER3, PLAYER4, PLAYER_EMPTY } from './consts';
 import { updateScanner } from '../sagas/updateScannerSaga';
 import { payFlow } from '../sagas/payFlowSaga';
 import { formActionSaga } from '../../../services/reduxFormSaga';
+import { loadTableSaga } from '../sagas/loadTableSaga';
+import { sitoutFlow } from '../sagas/sitoutFlowSaga';
 import { babz } from '../../../utils/amountFormatter';
 import {
   bet,
   pay,
   updateReceived,
+  loadTable,
+  sitOutToggle,
   UPDATE_RECEIVED,
   ADD_MESSAGE,
   RECEIPT_SET,
   BET,
   SHOW,
   NET,
+  LOAD_TABLE,
 } from '../actions';
 
-const tableAddr = '0x112233';
+const tableAddr = '0x1122331122331122331122331122331122331122';
 
 describe('Saga Tests', () => {
   it('should disptach sb action when i am sb', () => {
@@ -411,5 +416,85 @@ describe('Saga Tests', () => {
     sagaTester.dispatch(updateReceived(tableAddr, hand));
     expect(sagaTester.getLatestCalledAction().type).toEqual(UPDATE_RECEIVED);
     expect(sagaTester.getCalledActions().length).toEqual(3);
+  });
+
+  it('should load table', () => {
+    const initialState = fromJS({
+      account: {
+        privKey: PLAYER2.key,
+      },
+      table: {
+        [tableAddr]: {
+          data: {
+            lastHandNetted: 1,
+          },
+          3: {
+            lineup: [{
+              address: PLAYER1.address,
+            }, {
+              address: PLAYER2.address,
+            }],
+            state: 'dealing',
+          },
+        },
+      },
+    });
+
+    const sagaTester = new SagaTester({ initialState });
+    sagaTester.start(loadTableSaga, new PokerHelper());
+    sagaTester.dispatch(loadTable(tableAddr));
+    const load = sagaTester.getLatestCalledAction();
+    expect(load.type).toEqual(LOAD_TABLE);
+    expect(load.tableAddr).toEqual(tableAddr);
+    expect(sagaTester.getCalledActions().length).toEqual(1);
+    expect(sagaTester.numCalled(LOAD_TABLE)).toEqual(1);
+  });
+
+  it('should toggle sitout', async () => {
+    // mock a successful request
+    nock('http://ab.com', { filteringScope: () => true })
+      .filteringPath(() => '/')
+      .post('/')
+      .reply(200, '{"cards":[12,13]}');
+
+    const initialState = fromJS({
+      account: {
+        privKey: PLAYER2.key,
+      },
+      table: {
+        [tableAddr]: {
+          data: {
+            lastHandNetted: 1,
+          },
+          3: {
+            lineup: [{
+              address: PLAYER1.address,
+              last: new Receipt(tableAddr).bet(1, babz(1000)).sign(PLAYER1.key),
+              cards: [21, 32],
+            }, {
+              address: PLAYER2.address,
+              last: new Receipt(tableAddr).bet(1, babz(1000)).sign(PLAYER1.key),
+              cards: [36, 49],
+            }],
+            state: 'dealing',
+          },
+        },
+      },
+    });
+
+    const sagaTester = new SagaTester({ initialState });
+    sagaTester.start(formActionSaga);
+    sagaTester.start(sitoutFlow);
+    const sitoutAction = bet(tableAddr, 3, babz(1), PLAYER2.key, 1, 'prevReceipt');
+
+    await sitOutToggle(sitoutAction, (action) => sagaTester.dispatch(action));
+    const [request, success] = sagaTester.getCalledActions();
+    expect(request.type).toEqual(sitOutToggle.REQUEST);
+    expect(request.payload.type).toEqual(BET);
+    expect(request.payload.prevReceipt).toEqual('prevReceipt');
+    expect(request.payload.handId).toEqual(3);
+    expect(request.payload.pos).toEqual(1);
+    expect(request.payload.tableAddr).toEqual(tableAddr);
+    expect(success.type).toEqual(sitOutToggle.SUCCESS);
   });
 });

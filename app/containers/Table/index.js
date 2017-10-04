@@ -10,7 +10,6 @@ import Pusher from 'pusher-js';
 import Raven from 'raven-js';
 import { Receipt } from 'poker-helper';
 import * as storageService from '../../services/sessionStorage';
-import * as reservationService from '../../services/reservationService';
 
 // components and styles
 import TableDebug from '../../containers/TableDebug';
@@ -36,6 +35,7 @@ import {
 import { modalAdd, modalDismiss } from '../App/actions';
 // actions
 import {
+  loadTable,
   handRequest,
   lineupReceived,
   seatReserved,
@@ -74,16 +74,16 @@ import {
   makeMyHandValueSelector,
   makeMyPosSelector,
   makeSitoutAmountSelector,
-  makeMissingHandSelector,
   makeMySitoutSelector,
   makeLatestHandSelector,
   makeSelectWinners,
   makeMyLastReceiptSelector,
+  makeTableLoadingStateSelector,
 } from './selectors';
 
 import TableComponent from '../../components/Table';
 import web3Connect from '../AccountProvider/web3Connect';
-import TableService, { getHand, fetchTableState } from '../../services/tableService';
+import TableService from '../../services/tableService';
 import JoinDialog from '../JoinDialog';
 import InviteDialog from '../InviteDialog';
 
@@ -93,24 +93,6 @@ const SpinnerWrapper = styled.div`
   top: 40%;
   transform: translate(-50%, -50%)
 `;
-
-const getTableData = async (table, props) => {
-  const lineup = await table.getLineup.callPromise();
-
-  if (lineup[1].length === 0) {
-    throw new Error('Table doesn\'t exists');
-  }
-
-  const [sb, reservation, tableState] = await Promise.all([
-    table.smallBlind.callPromise(),
-    reservationService.lineup(table.address),
-    fetchTableState(table.address),
-  ]);
-
-  props.lineupReceived(table.address, lineup, sb);
-  props.updateReceived(table.address, tableState);
-  props.reservationReceived(table.address, reservation);
-};
 
 export class Table extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -140,14 +122,21 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.state = {
       notFound: false,
     };
-    getTableData(this.table, this.props)
-      .then(
-        () => this.channel.bind('update', this.handleUpdate), // bind to future state updates
-        () => this.setState({ notFound: true }),
-      );
+  }
+
+  componentWillMount() {
+    this.props.loadTable(this.tableAddr);
   }
 
   componentWillReceiveProps(nextProps) {
+    if (this.props.tableLoadingState === 'loading') {
+      if (nextProps.tableLoadingState === 'success') {
+        this.channel.bind('update', this.handleUpdate); // bind to future state updates
+      } else if (nextProps.tableLoadingState === 'error') {
+        this.setState({ notFound: true });
+      }
+    }
+
     const handId = this.props.latestHand;
     const { isMyTurn } = nextProps;
     // # if player <out of turn>: send usual <timeout>
@@ -193,19 +182,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
     // show winner and forward browser to url of next hand
     this.pushed = (this.pushed) ? this.pushed : {};
-
-    // fetch hands that we might need for stack calculation
-    if (nextProps.missingHands && nextProps.missingHands.length > 0) {
-      this.getHandStarted = (this.getHandStarted) ? this.getHandStarted : {};
-      for (let i = 0; i < nextProps.missingHands.length; i += 1) {
-        if (!this.getHandStarted[nextProps.missingHands[i].toString()]) {
-          this.getHandStarted[nextProps.missingHands[i].toString()] = true;
-          getHand(this.tableAddr, nextProps.missingHands[i]).then((rsp) => {
-            this.props.updateReceived(this.tableAddr, rsp);
-          });
-        }
-      }
-    }
 
     const toggleKey = this.tableAddr + handId;
     // display Rebuy modal if state === 'waiting' and user stack is no greater than 0
@@ -595,6 +571,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
 export function mapDispatchToProps() {
   return {
+    loadTable,
     handRequest,
     lineupReceived,
     reservationReceived,
@@ -620,7 +597,6 @@ const mapStateToProps = createStructuredSelector({
   latestHand: makeLatestHandSelector(),
   lastReceipt: makeLastReceiptSelector(),
   myLastReceipt: makeMyLastReceiptSelector(),
-  missingHands: makeMissingHandSelector(),
   myHand: makeMyHandValueSelector(),
   myStack: makeMyStackSelector(),
   myPos: makeMyPosSelector(),
@@ -634,6 +610,7 @@ const mapStateToProps = createStructuredSelector({
   winners: makeSelectWinners(),
   standingUp: makeMyStandingUpSelector(),
   myPendingSeat: makeMyPendingSeatSelector(),
+  tableLoadingState: makeTableLoadingStateSelector(),
 });
 
 Table.propTypes = {
@@ -649,7 +626,6 @@ Table.propTypes = {
   privKey: React.PropTypes.string,
   lastReceipt: React.PropTypes.string,
   latestHand: React.PropTypes.any,
-  missingHands: React.PropTypes.any,
   sitoutAmount: React.PropTypes.number,
   standingUp: React.PropTypes.bool,
   proxyAddr: React.PropTypes.string,
@@ -670,10 +646,12 @@ Table.propTypes = {
   seatReserved: React.PropTypes.func,
   seatsReleased: React.PropTypes.func,
   updateReceived: React.PropTypes.func,
+  loadTable: React.PropTypes.func,
   addMessage: React.PropTypes.func,
   location: React.PropTypes.object,
   account: React.PropTypes.object,
   myPendingSeat: React.PropTypes.number,
+  tableLoadingState: React.PropTypes.string,
 };
 
 
