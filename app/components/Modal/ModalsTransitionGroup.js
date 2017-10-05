@@ -5,7 +5,7 @@ const leave = 'modals-leave';
 const leaveActive = 'modals-leave-active';
 const leaveTimeout = 200;
 
-export const ModalsTransitionGroup = styled(CSSTransitionGroup).attrs({
+const ModalsTransitionGroup = styled(CSSTransitionGroup).attrs({
   transitionName: { leave, leaveActive },
   transitionLeaveTimeout: leaveTimeout,
   transitionEnter: false,
@@ -19,3 +19,5 @@ export const ModalsTransitionGroup = styled(CSSTransitionGroup).attrs({
     transition: opacity ${leaveTimeout}ms ease-in;
   }
 `;
+
+export default ModalsTransitionGroup;

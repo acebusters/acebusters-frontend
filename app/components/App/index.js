@@ -1,12 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import Footer from 'components/Footer';
 import Content from 'components/Content';
-import { ModalContainer, ModalDialog } from 'components/Modal';
-import { ModalsTransitionGroup } from 'components/Modal/ModalsTransitionGroup';
-import Notifications from 'containers/Notifications';
+import Footer from 'components/Footer';
 import GoogleTagManager from 'containers/GTM';
+import Modal from 'containers/Modal';
+import Notifications from 'containers/Notifications';
 import Header from 'containers/Header';
 import { conf } from '../../app.config';
 
@@ -15,8 +14,6 @@ import { StyledDashboard } from './styles';
 const App = (props) => {
   const {
     location,
-    modalDismiss,
-    modal,
     notifications,
    } = props;
   const pathname = location.pathname;
@@ -47,18 +44,8 @@ const App = (props) => {
 
       {isNotTable && <Footer />}
 
-      <ModalsTransitionGroup>
-        {modal &&
-          <ModalContainer
-            style={{ zIndex: 7 }}
-            onClick={modal.backdrop ? (modal.closeHandler || modalDismiss) : null}
-          >
-            <ModalDialog onClose={modal.closeHandler || modalDismiss}>
-              {modal.node}
-            </ModalDialog>
-          </ModalContainer>
-        }
-      </ModalsTransitionGroup>
+      <Modal {...props} />
+
     </div>
   );
 };
@@ -71,14 +58,8 @@ App.propTypes = {
   children: PropTypes.node,
   location: PropTypes.object,
   handleClickLogout: PropTypes.func,
-  modalDismiss: PropTypes.func,
   fixed: PropTypes.bool,
   params: PropTypes.object,
-  modal: PropTypes.shape({
-    node: PropTypes.any,
-    closeHandler: PropTypes.func,
-    backdrop: PropTypes.bool,
-  }),
   notifications: PropTypes.array,
 };
 

@@ -1,9 +1,9 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 import Footer from 'components/Footer';
-import { ModalsTransitionGroup } from 'components/Modal/ModalsTransitionGroup';
 import Header from 'containers/Header';
 import GoogleTagManager from 'containers/GTM';
+import Modal from 'containers/Modal';
 import Notifications from 'containers/Notifications';
 import App from '../index';
 
@@ -23,7 +23,7 @@ describe('is not table', () => {
     expect(el.find(Header).length).toBe(1);
     expect(el.find(GoogleTagManager).length).toBe(1);
     expect(el.find(Footer).length).toBe(1);
-    expect(el.find(ModalsTransitionGroup).length).toBe(1);
+    expect(el.find(Modal).length).toBe(1);
     expect(el.find(Notifications).length).toBe(1);
   });
 });
@@ -37,7 +37,7 @@ describe('is table', () => {
   });
   it('should render', () => {
     expect(el.find(GoogleTagManager).length).toBe(1);
-    expect(el.find(ModalsTransitionGroup).length).toBe(1);
+    expect(el.find(Modal).length).toBe(1);
     expect(el.find(Notifications).length).toBe(1);
   });
 });
