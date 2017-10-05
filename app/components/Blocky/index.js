@@ -1,4 +1,4 @@
-import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 const Blocky = styled.div`
@@ -12,7 +12,7 @@ const Blocky = styled.div`
 `;
 
 Blocky.propTypes = {
-  blocky: React.PropTypes.string,
+  blocky: PropTypes.string,
 };
 
 export default Blocky;

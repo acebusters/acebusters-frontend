@@ -1,10 +1,5 @@
-/**
- * Copyright (c) 2017 Acebusters
- * Use of this source code is governed by an ISC
- * license that can be found in the LICENSE file.
-*/
-
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { chipValues, seatChipColor } from '../../app.config';
 import { white } from '../../variables';
@@ -112,10 +107,10 @@ function Pot(props) {
 }
 
 Pot.propTypes = {
-  potSize: React.PropTypes.number,
-  top: React.PropTypes.string,
-  left: React.PropTypes.string,
-  short: React.PropTypes.bool,
+  potSize: PropTypes.number,
+  top: PropTypes.string,
+  left: PropTypes.string,
+  short: PropTypes.bool,
 };
 
 export default Pot;

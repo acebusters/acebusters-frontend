@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import LoadingIndicator from '../LoadingIndicator';
 
 function LoadingButton(props) {
@@ -11,7 +12,7 @@ function LoadingButton(props) {
 }
 
 LoadingButton.propTypes = {
-  className: React.PropTypes.string,
+  className: PropTypes.string,
 };
 
 export default LoadingButton;

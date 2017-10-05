@@ -1,6 +1,6 @@
 /* eslint no-multi-spaces: "off", key-spacing: "off" */
-
 import React from 'react';
+import PropTypes from 'prop-types';
 import { keyframes } from 'styled-components';
 
 const spinnerAnimation = keyframes`
@@ -78,11 +78,11 @@ const WithLoading = ({ children, isLoading, loadingSize, type = 'block', styles 
 };
 
 WithLoading.propTypes = {
-  children: React.PropTypes.node,
-  isLoading:  React.PropTypes.bool.isRequired,
-  loadingSize: React.PropTypes.string,
-  type:  React.PropTypes.string,
-  styles:  React.PropTypes.object,
+  children: PropTypes.node,
+  isLoading:  PropTypes.bool.isRequired,
+  loadingSize: PropTypes.string,
+  type:  PropTypes.string,
+  styles:  PropTypes.object,
 };
 
 export default WithLoading;

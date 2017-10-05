@@ -1,7 +1,5 @@
-/**
-* Created by jzobro 20170518
-*/
 import React from 'react';
+import PropTypes from 'prop-types';
 import {
   ButtonIcon,
   ButtonStyle,
@@ -22,8 +20,8 @@ const ButtonJoinSeat = ({ coords, onClickHandler }) => (
 );
 
 ButtonJoinSeat.propTypes = {
-  coords: React.PropTypes.array,
-  onClickHandler: React.PropTypes.func,
+  coords: PropTypes.array,
+  onClickHandler: PropTypes.func,
 };
 
 export default ButtonJoinSeat;

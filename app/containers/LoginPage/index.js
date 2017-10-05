@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
 import { Form, Field, reduxForm, SubmissionError, propTypes } from 'redux-form/immutable';
@@ -173,11 +174,11 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
 
 LoginPage.propTypes = {
   ...propTypes,
-  location: React.PropTypes.any,
-  setProgress: React.PropTypes.func,
-  walletImport: React.PropTypes.func,
-  setAuthState: React.PropTypes.func,
-  notifyAdd: React.PropTypes.func,
+  location: PropTypes.any,
+  setProgress: PropTypes.func,
+  walletImport: PropTypes.func,
+  setAuthState: PropTypes.func,
+  notifyAdd: PropTypes.func,
 };
 
 

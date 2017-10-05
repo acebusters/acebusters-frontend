@@ -1,6 +1,3 @@
-/**
- * Created by helge on 24.08.16.
- */
 import React from 'react';
 import PropTypes from 'prop-types';
 import Raven from 'raven-js';
@@ -292,8 +289,8 @@ ActionBarContainer.propTypes = {
   mode: PropTypes.string,
   updateActionBar: PropTypes.func,
   canICheck: PropTypes.bool,
-  isMyTurn: React.PropTypes.bool,
-  hand: React.PropTypes.object,
+  isMyTurn: PropTypes.bool,
+  hand: PropTypes.object,
 };
 
 export function mapDispatchToProps(dispatch) {

@@ -1,7 +1,5 @@
-/**
-* Created by jzobro 20170519
-*/
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import {
   TimerBackground,
@@ -28,7 +26,7 @@ const SeatTimer = ({ timeLeft }) => (
 );
 
 SeatTimer.propTypes = {
-  timeLeft: React.PropTypes.number,
+  timeLeft: PropTypes.number,
 };
 
 export default SeatTimer;

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Form, Field, reduxForm, propTypes, formValueSelector } from 'redux-form/immutable';
 import { FormattedMessage } from 'react-intl';
@@ -120,8 +121,8 @@ export class RegisterPage extends React.Component { // eslint-disable-line react
 
 RegisterPage.propTypes = {
   ...propTypes,
-  input: React.PropTypes.any,
-  defaultRefCode: React.PropTypes.string,
+  input: PropTypes.any,
+  defaultRefCode: PropTypes.string,
 };
 
 function mapDispatchToProps(dispatch) {

@@ -1,7 +1,5 @@
-/**
-* Created by jzobro 20170520
-*/
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import CardsComponent from './CardsComponent';
 import SeatInfo from './SeatInfo';
@@ -45,10 +43,10 @@ const Seat = (props) => {
   );
 };
 Seat.propTypes = {
-  myPos: React.PropTypes.number,
-  pos: React.PropTypes.number,
-  coords: React.PropTypes.array,
-  seatStatus: React.PropTypes.object,
+  myPos: PropTypes.number,
+  pos: PropTypes.number,
+  coords: PropTypes.array,
+  seatStatus: PropTypes.object,
 };
 
 export default Seat;

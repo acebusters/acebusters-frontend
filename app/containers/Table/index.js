@@ -1,8 +1,5 @@
-/**
- * Created by helge on 24.08.16.
- */
-// react + redux
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { createStructuredSelector } from 'reselect';
 import { browserHistory } from 'react-router';
@@ -615,44 +612,44 @@ const mapStateToProps = createStructuredSelector({
 });
 
 Table.propTypes = {
-  state: React.PropTypes.string,
-  board: React.PropTypes.array,
-  hand: React.PropTypes.object,
-  isMyTurn: React.PropTypes.bool,
-  myHand: React.PropTypes.object,
-  myStack: React.PropTypes.number,
-  lineup: React.PropTypes.object,
-  sitout: React.PropTypes.any,
-  params: React.PropTypes.object,
-  privKey: React.PropTypes.string,
-  lastReceipt: React.PropTypes.string,
-  latestHand: React.PropTypes.any,
-  sitoutAmount: React.PropTypes.number,
-  standingUp: React.PropTypes.bool,
-  proxyAddr: React.PropTypes.string,
-  signerAddr: React.PropTypes.string,
-  web3Redux: React.PropTypes.any,
-  data: React.PropTypes.any,
-  myPos: React.PropTypes.any,
-  potSize: React.PropTypes.number,
-  modalAdd: React.PropTypes.func,
-  setPending: React.PropTypes.func,
-  setExitHand: React.PropTypes.func,
-  modalDismiss: React.PropTypes.func,
-  reserveSeat: React.PropTypes.func,
-  winners: React.PropTypes.array,
-  dispatch: React.PropTypes.func,
-  lineupReceived: React.PropTypes.func,
-  reservationReceived: React.PropTypes.func, // eslint-disable-line react/no-unused-prop-types
-  seatReserved: React.PropTypes.func,
-  seatsReleased: React.PropTypes.func,
-  updateReceived: React.PropTypes.func,
-  loadTable: React.PropTypes.func,
-  addMessage: React.PropTypes.func,
-  location: React.PropTypes.object,
-  account: React.PropTypes.object,
-  myPendingSeat: React.PropTypes.number,
-  tableLoadingState: React.PropTypes.string,
+  state: PropTypes.string,
+  board: PropTypes.array,
+  hand: PropTypes.object,
+  isMyTurn: PropTypes.bool,
+  myHand: PropTypes.object,
+  myStack: PropTypes.number,
+  lineup: PropTypes.object,
+  sitout: PropTypes.any,
+  params: PropTypes.object,
+  privKey: PropTypes.string,
+  lastReceipt: PropTypes.string,
+  latestHand: PropTypes.any,
+  sitoutAmount: PropTypes.number,
+  standingUp: PropTypes.bool,
+  proxyAddr: PropTypes.string,
+  signerAddr: PropTypes.string,
+  web3Redux: PropTypes.any,
+  data: PropTypes.any,
+  myPos: PropTypes.any,
+  potSize: PropTypes.number,
+  modalAdd: PropTypes.func,
+  setPending: PropTypes.func,
+  setExitHand: PropTypes.func,
+  modalDismiss: PropTypes.func,
+  reserveSeat: PropTypes.func,
+  winners: PropTypes.array,
+  dispatch: PropTypes.func,
+  lineupReceived: PropTypes.func,
+  reservationReceived: PropTypes.func, // eslint-disable-line react/no-unused-prop-types
+  seatReserved: PropTypes.func,
+  seatsReleased: PropTypes.func,
+  updateReceived: PropTypes.func,
+  loadTable: PropTypes.func,
+  addMessage: PropTypes.func,
+  location: PropTypes.object,
+  account: PropTypes.object,
+  myPendingSeat: PropTypes.number,
+  tableLoadingState: PropTypes.string,
 };
 
 

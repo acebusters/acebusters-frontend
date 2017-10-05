@@ -47,8 +47,8 @@ const handle = (props) => {
   );
 };
 handle.propTypes = {
-  value: React.PropTypes.number,
-  dragging: React.PropTypes.bool,
+  value: PropTypes.number,
+  dragging: PropTypes.bool,
 };
 
 const Slider = (props) => (

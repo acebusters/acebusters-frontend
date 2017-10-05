@@ -1,9 +1,5 @@
-/**
- * Created by helge on 10.03.17.
- */
-
-
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Form, Field, reduxForm } from 'redux-form/immutable';
 import { FormattedMessage } from 'react-intl';

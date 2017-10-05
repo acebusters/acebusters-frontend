@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 const Tr = styled.tr`
@@ -44,8 +45,8 @@ function ListItem({ values, columnsStyle = {} }) {
 }
 
 ListItem.propTypes = {
-  values: React.PropTypes.array,
-  columnsStyle: React.PropTypes.object,
+  values: PropTypes.array,
+  columnsStyle: PropTypes.object,
 };
 
 export default ListItem;

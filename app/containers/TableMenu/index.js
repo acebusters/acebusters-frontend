@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import { browserHistory } from 'react-router';
@@ -34,7 +35,7 @@ const TableMenuContainer = (props) => (
   />
 );
 TableMenuContainer.propTypes = {
-  open: React.PropTypes.bool,
+  open: PropTypes.bool,
 };
 
 const mapDispatchToProps = (dispatch) => ({

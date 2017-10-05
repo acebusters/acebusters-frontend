@@ -1,7 +1,3 @@
-/**
- * Created by helge on 14.02.17.
- */
-
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Board } from './Board';
@@ -64,7 +60,7 @@ const TableComponent = (props) => (
 );
 
 Seats.propTypes = {
-  seats: React.PropTypes.array,
+  seats: PropTypes.array,
 };
 
 TableComponent.propTypes = {

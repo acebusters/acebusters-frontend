@@ -1,5 +1,5 @@
-/* eslint-disable react/jsx-filename-extension */
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import {
@@ -50,10 +50,10 @@ const Logo = ({ href, logoLg, sidebarMini, collapse }) => (
     );
 
 Logo.propTypes = {
-  href: React.PropTypes.string,
-  logoLg: React.PropTypes.element,
-  sidebarMini: React.PropTypes.bool,
-  collapse: React.PropTypes.bool,
+  href: PropTypes.string,
+  logoLg: PropTypes.element,
+  sidebarMini: PropTypes.bool,
+  collapse: PropTypes.bool,
 };
 
 export default Logo;

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 
@@ -11,7 +12,7 @@ import { web3Connect, clearWeb3Error } from './actions';
 import { modalAdd, modalDismiss } from '../App/actions';
 import SubmitButton from '../../components/SubmitButton';
 
-export class AccountProvider extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export class AccountProvider extends React.PureComponent {
   componentDidMount() {
     this.props.web3Connect(); // initiate web3
   }
@@ -52,16 +53,16 @@ export class AccountProvider extends React.PureComponent { // eslint-disable-lin
 }
 
 AccountProvider.propTypes = {
-  children: React.PropTypes.oneOfType([
-    React.PropTypes.arrayOf(React.PropTypes.node),
-    React.PropTypes.node,
+  children: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.node),
+    PropTypes.node,
   ]),
-  web3Connect: React.PropTypes.func,
-  web3ErrMsg: React.PropTypes.string,
-  isWeb3Connected: React.PropTypes.bool,
-  clearWeb3Error: React.PropTypes.func,
-  modalAdd: React.PropTypes.func,
-  modalDismiss: React.PropTypes.func,
+  web3Connect: PropTypes.func,
+  web3ErrMsg: PropTypes.string,
+  isWeb3Connected: PropTypes.bool,
+  clearWeb3Error: PropTypes.func,
+  modalAdd: PropTypes.func,
+  modalDismiss: PropTypes.func,
 };
 
 function mapDispatchToProps(dispatch) {

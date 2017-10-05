@@ -1,6 +1,6 @@
 /* eslint no-multi-spaces: "off", key-spacing: "off", jsx-a11y/no-static-element-interactions: "off" */
-
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { byEightDirection, throttleSync } from './sampling';
 import Bits from './bits';
@@ -140,11 +140,11 @@ class MouseEntropy extends React.Component {
 }
 
 MouseEntropy.propTypes = {
-  onFinish:   React.PropTypes.func.isRequired,
-  totalBits:  React.PropTypes.number.isRequired,
-  width:      React.PropTypes.string.isRequired,
-  height:     React.PropTypes.string.isRequired,
-  sampleRate: React.PropTypes.number.isRequired,
+  onFinish:   PropTypes.func.isRequired,
+  totalBits:  PropTypes.number.isRequired,
+  width:      PropTypes.string.isRequired,
+  height:     PropTypes.string.isRequired,
+  sampleRate: PropTypes.number.isRequired,
 };
 
 export default MouseEntropy;

@@ -1,7 +1,5 @@
-/**
-* Created by jzobro 20170524
-*/
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import Card from '../Card';
 
@@ -30,8 +28,8 @@ const CardsComponent = ({
   </CardContainer>
 );
 CardsComponent.propTypes = {
-  folded: React.PropTypes.bool,
-  holeCards: React.PropTypes.array, // array of cards
+  folded: PropTypes.bool,
+  holeCards: PropTypes.array, // array of cards
 };
 
 export default CardsComponent;

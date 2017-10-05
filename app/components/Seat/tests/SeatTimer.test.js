@@ -1,12 +1,9 @@
-/**
-* Created by jzobro 20170524
-*/
 import React from 'react';
 import { shallow } from 'enzyme';
 import SeatTimer from '../SeatTimer';
 
-// timerProgress: React.PropTypes.number,
-// timerType: React.PropTypes.string, // sitout or action
+// timerProgress: PropTypes.number,
+// timerType: PropTypes.string, // sitout or action
 
 describe('components.seat.SeatTimer', () => {
   describe('sitout timer', () => {

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { createStructuredSelector } from 'reselect';
@@ -58,9 +59,9 @@ class LobbyItem extends React.PureComponent { // eslint-disable-line
 }
 
 LobbyItem.propTypes = {
-  tableAddr: React.PropTypes.string,
-  data: React.PropTypes.object,
-  lastHandId: React.PropTypes.number,
+  tableAddr: PropTypes.string,
+  data: PropTypes.object,
+  lastHandId: PropTypes.number,
 };
 
 const mapStateToProps = createStructuredSelector({

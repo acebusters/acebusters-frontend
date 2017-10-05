@@ -6,7 +6,8 @@
  * otherwise it'll render a link with an onclick
  */
 
-import React, { PropTypes, Children } from 'react';
+import React, { Children } from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import A from '../A';
 
