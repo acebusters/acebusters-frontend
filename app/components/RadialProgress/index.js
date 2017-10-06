@@ -1,5 +1,6 @@
 /* eslint react/prop-types: 0 */
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import enhancer from './enhancer';
 
@@ -104,16 +105,16 @@ class Radial extends Component {
 }
 
 Radial.PropTypes = {
-  className: React.PropTypes.string,
-  percent: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string]),
-  prefixCls: React.PropTypes.string,
-  strokeColor: React.PropTypes.string,
-  strokeLinecap: React.PropTypes.oneOf(['round', 'square']),
-  strokeWidth: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string]),
-  style: React.PropTypes.object,
-  trailColor: React.PropTypes.string,
-  trailWidth: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string]),
-  gapPosition: React.PropTypes.oneOf(['top', 'bottom', 'left', 'right']),
+  className: PropTypes.string,
+  percent: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  prefixCls: PropTypes.string,
+  strokeColor: PropTypes.string,
+  strokeLinecap: PropTypes.oneOf(['round', 'square']),
+  strokeWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  style: PropTypes.object,
+  trailColor: PropTypes.string,
+  trailWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  gapPosition: PropTypes.oneOf(['top', 'bottom', 'left', 'right']),
 };
 
 Radial.defaultProps = {

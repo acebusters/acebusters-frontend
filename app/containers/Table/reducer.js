@@ -49,10 +49,24 @@ export default function tableReducer(state = initialState, action) {
       return newState;
     }
 
+    case TableActions.LOAD_TABLE: {
+      return state.setIn([action.tableAddr, 'load'], 'loading');
+    }
+
+    case TableActions.TABLE_LOAD_ERROR: {
+      return state.setIn([action.tableAddr, 'load'], 'error');
+    }
+
+    case TableActions.TABLE_LOAD_SUCCESS: {
+      return state.setIn([action.tableAddr, 'load'], 'success');
+    }
+
     case TableActions.TABLE_RECEIVED:
-      return state.set(action.tableAddr, state.get(action.tableAddr) || Map({
-        reservation: Map({}),
-      }));
+      return state
+        .setIn([action.tableAddr, 'load'], 'success')
+        .set(action.tableAddr, state.get(action.tableAddr) || Map({
+          reservation: Map({}),
+        }));
 
     case TableActions.RESERVATION_RECEIVED:
       return state.setIn(

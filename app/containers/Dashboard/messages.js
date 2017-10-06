@@ -6,6 +6,10 @@
 import { defineMessages } from 'react-intl';
 
 export default defineMessages({
+  amount: {
+    id: 'app.containers.Dashboard.amount',
+    defaultMessage: 'Amount',
+  },
   amountRequired: {
     id: 'app.containers.Dashboard.amountRequired',
     defaultMessage: 'The amount field cannot be empty',
@@ -112,7 +116,19 @@ export default defineMessages({
   },
   powerUpDescr: {
     id: 'app.containers.Dashboard.powerUpDescr',
-    defaultMessage: 'Power Up will convert NTZ to ABP immediately so you can invest in the Acebuster\'s economy.',
+    defaultMessage: 'Power Up will convert NTZ to ABP and make you a shareholder in the Acebusters Economy. Holding ABP, you will profit from our growth and be able to vote on governance policies.',
+  },
+  powerUpAvailable: {
+    id: 'app.containers.Dashboard.powerUpAvailable',
+    defaultMessage: 'Available: ~{amount} ABP',
+  },
+  powerUpMinAmount: {
+    id: 'app.containers.Dashboard.powerUpMinAmount',
+    defaultMessage: 'Minimum Power Up Amount: ~{amount} NTZ',
+  },
+  powerUpRate: {
+    id: 'app.containers.Dashboard.powerUpRate',
+    defaultMessage: 'Rate: ~{amount} NTZ for 1 ABP',
   },
   powerDownAmountLabel: {
     id: 'app.containers.Dashboard.powerDownAmountLabel',
@@ -124,7 +140,11 @@ export default defineMessages({
   },
   powerDownDescr: {
     id: 'app.containers.Dashboard.powerDownDescr',
-    defaultMessage: 'Power Down will convert ABP back to NTZ over a period of 3 months.<br />Minimum Power Down amount: {min} ABP',
+    defaultMessage: 'Power Down will convert ABP back to NTZ. Powerdown is split over multiple payouts and a period of 3 months.',
+  },
+  powerDownMin: {
+    id: 'app.containers.Dashboard.powerDownMin',
+    defaultMessage: 'Minimum Power Down amount: ~{min} ABP',
   },
   powerDownPrereq: {
     id: 'app.containers.Dashboard.powerDownPrereq',
@@ -140,11 +160,11 @@ export default defineMessages({
   },
   floorPrice: {
     id: 'app.containers.Dashboard.floorPrice',
-    defaultMessage: '{amount} NTZ for 1 ETH',
+    defaultMessage: 'Rate: {amount} NTZ for 1 ETH',
   },
   ceilingPrice: {
     id: 'app.containers.Dashboard.ceilingPrice',
-    defaultMessage: '1 ETH for {amount} NTZ',
+    defaultMessage: 'Rate: 1 ETH for {amount} NTZ',
   },
   tableJoin: {
     id: 'app.containers.Dashboard.tableJoin',

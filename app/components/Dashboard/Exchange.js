@@ -3,9 +3,19 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import BigNumber from 'bignumber.js';
 
+import {
+  NTZ_DECIMALS,
+  ETH_DECIMALS,
+  formatNtz,
+  formatEth,
+} from '../../utils/amountFormatter';
+import { round } from '../../utils';
+
 import ExchangeDialog from '../../containers/ExchangeDialog';
 import { ETH, NTZ } from '../../containers/Dashboard/actions';
-import { formatNtz, NTZ_DECIMALS } from '../../utils/amountFormatter';
+
+import TokenAmountField from '../Form/TokenAmountField';
+import Alert from '../Alert';
 
 import { Pane, Section, ExchangeContainer } from './styles';
 
@@ -16,25 +26,36 @@ const Exchange = (props) => {
     messages,
     account,
     ethBalance,
-    calcETHAmount,
-    calcNTZAmount,
     nutzBalance,
     ceiling,
     floor,
     handleNTZSell,
     handleNTZPurchase,
   } = props;
+  const calcETHAmount = (ntz) => new BigNumber(ntz.toString()).div(floor);
+  const calcNTZAmount = (eth) => ceiling.mul(eth.toString());
+  const calcExpectedAmountETH = (amount) => formatEth(calcETHAmount(round(amount, 8)).mul(ETH_DECIMALS));
+  const calcExpectedAmountNTZ = (amount) => formatNtz(calcNTZAmount(round(amount, 8)).mul(NTZ_DECIMALS));
   return (
     <Pane name="dashboard-exchange" >
       <Section>
         <ExchangeContainer>
           {amountUnit === NTZ && nutzBalance && floor &&
             <ExchangeDialog
-              form="exchangeNTZ"
+              form="exchangeNTZtoETH"
+              component={TokenAmountField}
+              label={<FormattedMessage {...messages.amount} />}
               title={<FormattedMessage {...messages.sellTitle} />}
-              descr={<FormattedMessage {...messages.floorPrice} values={{ amount: formatNtz(floor.mul(NTZ_DECIMALS)) }} />}
+              descr={
+                <Alert theme="info" style={{ textAlign: 'center' }}>
+                  <FormattedMessage
+                    {...messages.floorPrice}
+                    values={{ amount: formatNtz(floor.mul(NTZ_DECIMALS)) }}
+                  />
+                </Alert>
+              }
               amountUnit={NTZ}
-              calcExpectedAmount={calcETHAmount}
+              calcExpectedAmount={calcExpectedAmountETH}
               handleExchange={handleNTZSell}
               maxAmount={BigNumber.min(
                 account.isLocked
@@ -43,16 +64,26 @@ const Exchange = (props) => {
                 nutzBalance
               )}
               placeholder="0"
+              expectedAmountUnit={ETH}
               {...props}
             />
           }
           {amountUnit === ETH && ethBalance && ceiling &&
             <ExchangeDialog
-              form="exchangeETH"
+              form="exchangeETHtoNTZ"
+              component={TokenAmountField}
+              label={<FormattedMessage {...messages.amount} />}
               title={<FormattedMessage {...messages.purchaseTitle} />}
-              descr={<FormattedMessage {...messages.ceilingPrice} values={{ amount: formatNtz(ceiling.mul(NTZ_DECIMALS)) }} />}
+              descr={
+                <Alert theme="info" style={{ textAlign: 'center' }}>
+                  <FormattedMessage
+                    {...messages.floorPrice}
+                    values={{ amount: formatNtz(ceiling.mul(NTZ_DECIMALS)) }}
+                  />
+                </Alert>
+              }
               amountUnit={ETH}
-              calcExpectedAmount={calcNTZAmount}
+              calcExpectedAmount={calcExpectedAmountNTZ}
               handleExchange={handleNTZPurchase}
               maxAmount={BigNumber.min(
                 account.isLocked
@@ -61,6 +92,7 @@ const Exchange = (props) => {
                 ethBalance
               )}
               placeholder="0.00"
+              expectedAmountUnit={NTZ}
               {...props}
             />
           }
@@ -74,8 +106,6 @@ Exchange.propTypes = {
   amountUnit: PropTypes.oneOf([ETH, NTZ]),
   account: PropTypes.object,
   ethBalance: PropTypes.object,
-  calcETHAmount: PropTypes.func,
-  calcNTZAmount: PropTypes.func,
   nutzBalance: PropTypes.object,
   messages: PropTypes.object,
   ceiling: PropTypes.object,

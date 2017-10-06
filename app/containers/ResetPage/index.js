@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { Form, Field, reduxForm, SubmissionError, propTypes } from 'redux-form/immutable';
@@ -98,7 +99,7 @@ export class ResetPage extends React.Component { // eslint-disable-line react/pr
 
 ResetPage.propTypes = {
   ...propTypes,
-  input: React.PropTypes.any,
+  input: PropTypes.any,
 };
 
 function mapDispatchToProps(dispatch) {

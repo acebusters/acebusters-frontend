@@ -1,5 +1,5 @@
-/* eslint-disable react/jsx-filename-extension */
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import {
@@ -71,10 +71,10 @@ const Navbar = (props) => (
 
 
 Navbar.propTypes = {
-  children: React.PropTypes.node,
-  topNav: React.PropTypes.bool,
-  collapsed: React.PropTypes.bool,
-  loggedIn: React.PropTypes.bool,
+  children: PropTypes.node,
+  topNav: PropTypes.bool,
+  collapsed: PropTypes.bool,
+  loggedIn: PropTypes.bool,
 };
 
 export default Navbar;

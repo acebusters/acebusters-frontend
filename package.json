@@ -1,6 +1,6 @@
 {
   "name": "ab-web",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A web app housing accounts, economy, and poker.",
   "repository": {
     "type": "git",
@@ -210,7 +210,7 @@
       "global": {
         "statements": 52,
         "branches": 54,
-        "functions": 65.5,
+        "functions": 64,
         "lines": 66
       }
     },
@@ -246,7 +246,8 @@
     "localStorage": "1.0.3",
     "lodash": "4.17.2",
     "minimist": "1.2.0",
-    "poker-helper": "^0.6.4",
+    "poker-helper": "0.6.7",
+    "prismic-reactjs": "^0.1.0",
     "prop-types": "^15.5.10",
     "pusher-js": "^4.0.0",
     "qrcode.react": "^0.6.1",

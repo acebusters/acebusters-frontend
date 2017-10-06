@@ -1,5 +1,5 @@
-
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 const boxSizing = 'box-sizing: content-box;';
@@ -161,17 +161,17 @@ class Slides extends React.Component {
 }
 
 Slides.propTypes = {
-  children: React.PropTypes.array.isRequired,
-  width: React.PropTypes.number.isRequired,
-  height: React.PropTypes.number.isRequired,
-  SlidesWrapperComponent: React.PropTypes.instanceOf(React.Component),
-  SlideBoxComponent: React.PropTypes.instanceOf(React.Component),
-  SlidesOuterComponent: React.PropTypes.instanceOf(React.Component),
-  SlidesInnerComponent: React.PropTypes.instanceOf(React.Component),
-  SlideLeftComponent: React.PropTypes.instanceOf(React.Component),
-  SlideRightComponent: React.PropTypes.instanceOf(React.Component),
-  DotBoxComponent: React.PropTypes.instanceOf(React.Component),
-  DotComponent: React.PropTypes.instanceOf(React.Component),
+  children: PropTypes.array.isRequired,
+  width: PropTypes.number.isRequired,
+  height: PropTypes.number.isRequired,
+  SlidesWrapperComponent: PropTypes.instanceOf(React.Component),
+  SlideBoxComponent: PropTypes.instanceOf(React.Component),
+  SlidesOuterComponent: PropTypes.instanceOf(React.Component),
+  SlidesInnerComponent: PropTypes.instanceOf(React.Component),
+  SlideLeftComponent: PropTypes.instanceOf(React.Component),
+  SlideRightComponent: PropTypes.instanceOf(React.Component),
+  DotBoxComponent: PropTypes.instanceOf(React.Component),
+  DotComponent: PropTypes.instanceOf(React.Component),
 };
 
 export default Slides;

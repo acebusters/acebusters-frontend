@@ -1,8 +1,6 @@
-/**
-* Created by jzobro 20170519
-*/
 /* Replaced by ButtonOpenSeat until Invite process is complete */
 import React from 'react';
+import PropTypes from 'prop-types';
 import {
   ButtonIcon,
   ButtonStyle,
@@ -22,8 +20,8 @@ const ButtonInvite = ({ coords, onClickHandler }) => (
   </SeatWrapper>
 );
 ButtonInvite.propTypes = {
-  onClickHandler: React.PropTypes.func,
-  coords: React.PropTypes.array,
+  onClickHandler: PropTypes.func,
+  coords: PropTypes.array,
 };
 
 export default ButtonInvite;

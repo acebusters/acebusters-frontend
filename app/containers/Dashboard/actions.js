@@ -5,6 +5,7 @@ export const EXCHANGE = 'exchange';
 export const INVEST = 'invest';
 export const POWERUP = 'powerUp';
 export const POWERDOWN = 'powerDown';
+export const ABP = 'apb';
 export const ETH = 'eth';
 export const NTZ = 'ntz';
 

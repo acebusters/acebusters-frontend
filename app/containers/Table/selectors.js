@@ -359,6 +359,19 @@ const makeSelectWinners = () => createSelector(
 
     if (handState !== 'showdown') {
       const lastMan = pokerHelper.nextPlayer(lineup, 0, 'active', handState);
+      // if there is no amount for lastMan
+      if (amounts[lineup[lastMan].address] === undefined) {
+        const entries = Object.entries(amounts);
+        // if there is only one amount which is more than zero
+        if (entries.filter((entry) => entry[1] > 0).length === 1) {
+          const [winnerAddress, winnerAmount] = entries.find((entry) => entry[1] > 0);
+          return [{
+            addr: winnerAddress,
+            amount: winnerAmount,
+            maxBet: selectMaxBet(lineup, winnerAddress),
+          }];
+        }
+      }
       return [{
         addr: lineup[lastMan].address,
         amount: amounts[lineup[lastMan].address],
@@ -467,39 +480,41 @@ const makeMyMaxBetSelector = () => createSelector(
   }
 );
 
+const missingHandSelector = (table) => {
+  if (!table) {
+    return null;
+  }
+  // get state of contract
+  const lastHandNetted = table.getIn(['data', 'lastHandNetted']);
+  if (typeof lastHandNetted === 'undefined' || lastHandNetted < 1) {
+    return null;
+  }
+  // get progress of state channel
+  let maxHand = 0;
+  table.keySeq().forEach((k) => {
+    if (!isNaN(k)) {
+      const handId = parseInt(k, 10);
+      if (handId > maxHand) {
+        maxHand = handId;
+      }
+    }
+  });
+  // handle empty state channel
+  if (maxHand <= lastHandNetted) {
+    return [lastHandNetted + 1];
+  }
+  const rsp = [];
+  for (let i = lastHandNetted + 1; i < maxHand; i += 1) {
+    if (!table.get(i.toString())) {
+      rsp.push(i);
+    }
+  }
+  return rsp;
+};
+
 const makeMissingHandSelector = () => createSelector(
   [tableStateSelector],
-  (table) => {
-    if (!table) {
-      return null;
-    }
-    // get state of contract
-    const lastHandNetted = table.getIn(['data', 'lastHandNetted']);
-    if (typeof lastHandNetted === 'undefined' || lastHandNetted < 1) {
-      return null;
-    }
-    // get progress of state channel
-    let maxHand = 0;
-    table.keySeq().forEach((k) => {
-      if (!isNaN(k)) {
-        const handId = parseInt(k, 10);
-        if (handId > maxHand) {
-          maxHand = handId;
-        }
-      }
-    });
-    // handle empty state channel
-    if (maxHand <= lastHandNetted) {
-      return [lastHandNetted + 1];
-    }
-    const rsp = [];
-    for (let i = lastHandNetted + 1; i < maxHand; i += 1) {
-      if (!table.get(i.toString())) {
-        rsp.push(i);
-      }
-    }
-    return rsp;
-  }
+  missingHandSelector
 );
 
 const makeLatestHandSelector = () => createSelector(
@@ -551,6 +566,11 @@ const makeSitoutInProgressSelector = () => createSelector(
   (hand) => (hand && hand.get) ? hand.get('sitoutInProgress') : undefined
 );
 
+const makeTableLoadingStateSelector = () => createSelector(
+  tableStateSelector,
+  (table) => (table) ? (table.get('load')) : null
+);
+
 export {
     tableStateSelector,
     actionSelector,
@@ -579,6 +599,7 @@ export {
     makeHandSelector,
     makeMaxBetSelector,
     makeMyMaxBetSelector,
+    missingHandSelector,
     makeMissingHandSelector,
     makeMessagesSelector,
     makePlayersCountSelector,
@@ -587,4 +608,5 @@ export {
     makeHandsSelector,
     makeMyLastReceiptSelector,
     makeSitoutInProgressSelector,
+    makeTableLoadingStateSelector,
 };

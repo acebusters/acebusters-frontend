@@ -1,7 +1,5 @@
-/**
- * Created by helge on 24.08.16.
- */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { VectorCards } from 'ab-vector-cards';
 
 import { CardBack, CardFront, CardStyle } from '../Seat/styles';
@@ -47,9 +45,9 @@ function Card(props) {
 }
 
 Card.propTypes = {
-  cardNumber: React.PropTypes.number,
-  size: React.PropTypes.number,
-  folded: React.PropTypes.bool,
+  cardNumber: PropTypes.number,
+  size: PropTypes.number,
+  folded: PropTypes.bool,
 };
 
 export default Card;

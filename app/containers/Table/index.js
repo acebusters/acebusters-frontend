@@ -1,8 +1,5 @@
-/**
- * Created by helge on 24.08.16.
- */
-// react + redux
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { createStructuredSelector } from 'reselect';
 import { browserHistory } from 'react-router';
@@ -10,7 +7,6 @@ import Pusher from 'pusher-js';
 import Raven from 'raven-js';
 import { Receipt } from 'poker-helper';
 import * as storageService from '../../services/sessionStorage';
-import * as reservationService from '../../services/reservationService';
 
 // components and styles
 import TableDebug from '../../containers/TableDebug';
@@ -36,6 +32,7 @@ import {
 import { modalAdd, modalDismiss } from '../App/actions';
 // actions
 import {
+  loadTable,
   handRequest,
   lineupReceived,
   seatReserved,
@@ -74,16 +71,16 @@ import {
   makeMyHandValueSelector,
   makeMyPosSelector,
   makeSitoutAmountSelector,
-  makeMissingHandSelector,
   makeMySitoutSelector,
   makeLatestHandSelector,
   makeSelectWinners,
   makeMyLastReceiptSelector,
+  makeTableLoadingStateSelector,
 } from './selectors';
 
 import TableComponent from '../../components/Table';
 import web3Connect from '../AccountProvider/web3Connect';
-import TableService, { getHand, fetchTableState } from '../../services/tableService';
+import TableService from '../../services/tableService';
 import JoinDialog from '../JoinDialog';
 import InviteDialog from '../InviteDialog';
 
@@ -93,24 +90,6 @@ const SpinnerWrapper = styled.div`
   top: 40%;
   transform: translate(-50%, -50%)
 `;
-
-const getTableData = async (table, props) => {
-  const lineup = await table.getLineup.callPromise();
-
-  if (lineup[1].length === 0) {
-    throw new Error('Table doesn\'t exists');
-  }
-
-  const [sb, reservation, tableState] = await Promise.all([
-    table.smallBlind.callPromise(),
-    reservationService.lineup(table.address),
-    fetchTableState(table.address),
-  ]);
-
-  props.lineupReceived(table.address, lineup, sb);
-  props.updateReceived(table.address, tableState);
-  props.reservationReceived(table.address, reservation);
-};
 
 export class Table extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -140,14 +119,21 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.state = {
       notFound: false,
     };
-    getTableData(this.table, this.props)
-      .then(
-        () => this.channel.bind('update', this.handleUpdate), // bind to future state updates
-        () => this.setState({ notFound: true }),
-      );
+  }
+
+  componentWillMount() {
+    this.props.loadTable(this.tableAddr);
   }
 
   componentWillReceiveProps(nextProps) {
+    if (this.props.tableLoadingState === 'loading') {
+      if (nextProps.tableLoadingState === 'success') {
+        this.channel.bind('update', this.handleUpdate); // bind to future state updates
+      } else if (nextProps.tableLoadingState === 'error') {
+        this.setState({ notFound: true });
+      }
+    }
+
     const handId = this.props.latestHand;
     const { isMyTurn } = nextProps;
     // # if player <out of turn>: send usual <timeout>
@@ -193,19 +179,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
     // show winner and forward browser to url of next hand
     this.pushed = (this.pushed) ? this.pushed : {};
-
-    // fetch hands that we might need for stack calculation
-    if (nextProps.missingHands && nextProps.missingHands.length > 0) {
-      this.getHandStarted = (this.getHandStarted) ? this.getHandStarted : {};
-      for (let i = 0; i < nextProps.missingHands.length; i += 1) {
-        if (!this.getHandStarted[nextProps.missingHands[i].toString()]) {
-          this.getHandStarted[nextProps.missingHands[i].toString()] = true;
-          getHand(this.tableAddr, nextProps.missingHands[i]).then((rsp) => {
-            this.props.updateReceived(this.tableAddr, rsp);
-          });
-        }
-      }
-    }
 
     const toggleKey = this.tableAddr + handId;
     // display Rebuy modal if state === 'waiting' and user stack is no greater than 0
@@ -336,14 +309,15 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     }
 
     if (open && myPos === undefined && !pending) {
-      this.props.modalAdd((
+      this.props.modalAdd(
         <JoinDialog
           onJoin={(amount) => this.handleJoin(pos, amount)}
           modalDismiss={this.props.modalDismiss}
           params={this.props.params}
           balance={balance}
-        />
-      ));
+        />,
+        { backdrop: true },
+      );
     } else if (open && this.props.myPos !== undefined && !pending) {
       this.props.modalAdd((
         <InviteDialog />
@@ -378,7 +352,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     return sitOutToggle(sitoutAction, this.props.dispatch);
   }
 
-  handleLeave(pos) {
+  async handleLeave(pos) {
     const lineup = (this.props.lineup) ? this.props.lineup.toJS() : null;
     const handId = this.props.latestHand;
     const state = this.props.state;
@@ -400,6 +374,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     storageService.removeItem(`rebuyModal[${this.tableAddr + handId}]`);
     this.props.modalDismiss();
     this.props.modalAdd(statusElement);
+
+    if (!this.props.sitout) {
+      await this.handleSitout();
+    }
 
     return this.tableService.leave(exitHand, lineup[pos].address).catch((err) => {
       Raven.captureException(err, { tags: {
@@ -591,6 +569,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
 export function mapDispatchToProps() {
   return {
+    loadTable,
     handRequest,
     lineupReceived,
     reservationReceived,
@@ -616,7 +595,6 @@ const mapStateToProps = createStructuredSelector({
   latestHand: makeLatestHandSelector(),
   lastReceipt: makeLastReceiptSelector(),
   myLastReceipt: makeMyLastReceiptSelector(),
-  missingHands: makeMissingHandSelector(),
   myHand: makeMyHandValueSelector(),
   myStack: makeMyStackSelector(),
   myPos: makeMyPosSelector(),
@@ -630,46 +608,48 @@ const mapStateToProps = createStructuredSelector({
   winners: makeSelectWinners(),
   standingUp: makeMyStandingUpSelector(),
   myPendingSeat: makeMyPendingSeatSelector(),
+  tableLoadingState: makeTableLoadingStateSelector(),
 });
 
 Table.propTypes = {
-  state: React.PropTypes.string,
-  board: React.PropTypes.array,
-  hand: React.PropTypes.object,
-  isMyTurn: React.PropTypes.bool,
-  myHand: React.PropTypes.object,
-  myStack: React.PropTypes.number,
-  lineup: React.PropTypes.object,
-  sitout: React.PropTypes.any,
-  params: React.PropTypes.object,
-  privKey: React.PropTypes.string,
-  lastReceipt: React.PropTypes.string,
-  latestHand: React.PropTypes.any,
-  missingHands: React.PropTypes.any,
-  sitoutAmount: React.PropTypes.number,
-  standingUp: React.PropTypes.bool,
-  proxyAddr: React.PropTypes.string,
-  signerAddr: React.PropTypes.string,
-  web3Redux: React.PropTypes.any,
-  data: React.PropTypes.any,
-  myPos: React.PropTypes.any,
-  potSize: React.PropTypes.number,
-  modalAdd: React.PropTypes.func,
-  setPending: React.PropTypes.func,
-  setExitHand: React.PropTypes.func,
-  modalDismiss: React.PropTypes.func,
-  reserveSeat: React.PropTypes.func,
-  winners: React.PropTypes.array,
-  dispatch: React.PropTypes.func,
-  lineupReceived: React.PropTypes.func,
-  reservationReceived: React.PropTypes.func, // eslint-disable-line react/no-unused-prop-types
-  seatReserved: React.PropTypes.func,
-  seatsReleased: React.PropTypes.func,
-  updateReceived: React.PropTypes.func,
-  addMessage: React.PropTypes.func,
-  location: React.PropTypes.object,
-  account: React.PropTypes.object,
-  myPendingSeat: React.PropTypes.number,
+  state: PropTypes.string,
+  board: PropTypes.array,
+  hand: PropTypes.object,
+  isMyTurn: PropTypes.bool,
+  myHand: PropTypes.object,
+  myStack: PropTypes.number,
+  lineup: PropTypes.object,
+  sitout: PropTypes.any,
+  params: PropTypes.object,
+  privKey: PropTypes.string,
+  lastReceipt: PropTypes.string,
+  latestHand: PropTypes.any,
+  sitoutAmount: PropTypes.number,
+  standingUp: PropTypes.bool,
+  proxyAddr: PropTypes.string,
+  signerAddr: PropTypes.string,
+  web3Redux: PropTypes.any,
+  data: PropTypes.any,
+  myPos: PropTypes.any,
+  potSize: PropTypes.number,
+  modalAdd: PropTypes.func,
+  setPending: PropTypes.func,
+  setExitHand: PropTypes.func,
+  modalDismiss: PropTypes.func,
+  reserveSeat: PropTypes.func,
+  winners: PropTypes.array,
+  dispatch: PropTypes.func,
+  lineupReceived: PropTypes.func,
+  reservationReceived: PropTypes.func, // eslint-disable-line react/no-unused-prop-types
+  seatReserved: PropTypes.func,
+  seatsReleased: PropTypes.func,
+  updateReceived: PropTypes.func,
+  loadTable: PropTypes.func,
+  addMessage: PropTypes.func,
+  location: PropTypes.object,
+  account: PropTypes.object,
+  myPendingSeat: PropTypes.number,
+  tableLoadingState: PropTypes.string,
 };
 
 

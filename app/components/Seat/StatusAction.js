@@ -1,7 +1,5 @@
-/**
-* Created by jzobro 20170520
-*/
 import React from 'react';
+import PropTypes from 'prop-types';
 import isEmpty from 'lodash/isEmpty';
 
 import SeatTimer from './SeatTimer';
@@ -44,15 +42,15 @@ const StatusAction = ({
   return null;
 };
 StatusAction.propTypes = {
-  pos: React.PropTypes.number,
-  showStatus: React.PropTypes.object,
-  sitout: React.PropTypes.oneOfType([
-    React.PropTypes.string,
-    React.PropTypes.number,
+  pos: PropTypes.number,
+  showStatus: PropTypes.object,
+  sitout: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
   ]),
-  timeLeft: React.PropTypes.number,
-  wasMostRecentAction: React.PropTypes.bool,
-  whosTurn: React.PropTypes.number,
+  timeLeft: PropTypes.number,
+  wasMostRecentAction: PropTypes.bool,
+  whosTurn: PropTypes.number,
 };
 
 export default StatusAction;

@@ -48,5 +48,5 @@ export function WarningMessage(props) {
 }
 
 WarningMessage.propTypes = {
-  warning: React.PropTypes.string,
+  warning: PropTypes.string,
 };

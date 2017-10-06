@@ -1,8 +1,5 @@
-/**
- * Created by helge on 09.03.17.
- */
-
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { formValueSelector } from 'redux-form/immutable';
 import Radial from '../../components/RadialProgress';
@@ -17,7 +14,7 @@ export function LoginProgressWrapper(props) {
 }
 
 LoginProgressWrapper.propTypes = {
-  progress: React.PropTypes.any,
+  progress: PropTypes.any,
 };
 
 const selector = formValueSelector('login');

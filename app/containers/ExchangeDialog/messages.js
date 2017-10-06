@@ -19,7 +19,7 @@ export default defineMessages({
   },
   expectedAmount: {
     id: 'app.containers.ExchangeDialog.expectedAmount',
-    defaultMessage: 'Receive: {amount}',
+    defaultMessage: 'Receive: ~{amount}',
   },
   sellTitle: {
     id: 'app.containers.ExchangeDialog.sellTitle',

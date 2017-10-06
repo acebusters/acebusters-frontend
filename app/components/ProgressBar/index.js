@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import ProgressBar from './ProgressBar';
 
 function withProgressBar(WrappedComponent) {
@@ -76,9 +77,9 @@ function withProgressBar(WrappedComponent) {
 
 
   AppWithProgressBar.propTypes = {
-    location: React.PropTypes.object,
-    router: React.PropTypes.object,
-    progress: React.PropTypes.number,
+    location: PropTypes.object,
+    router: PropTypes.object,
+    progress: PropTypes.number,
   };
 
   return AppWithProgressBar;

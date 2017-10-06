@@ -4,6 +4,9 @@ export const HAND_REQUEST = 'acebusters/Table/HAND_REQUEST';
 export const NEXT_HAND = 'acebusters/Table/NEXT_HAND';
 export const SET_CARDS = 'acebusters/Table/SET_CARDS';
 export const RESIZE_TABLE = 'acebusters/Table/RESIZE_TABLE';
+export const LOAD_TABLE = 'acebusters/Table/LOAD_TABLE';
+export const TABLE_LOAD_ERROR = 'acebusters/Table/TABLE_LOAD_ERROR';
+export const TABLE_LOAD_SUCCESS = 'acebusters/Table/TABLE_LOAD_SUCCESS';
 export const TABLE_RECEIVED = 'acebusters/Table/TABLE_RECEIVED';
 export const UPDATE_RECEIVED = 'acebusters/Table/UPDATE_RECEIVED';
 export const LINEUP_RECEIVED = 'acebusters/Table/LINEUP_RECEIVED';
@@ -59,6 +62,18 @@ export function handRequest(tableAddr, handId) {
 
 export function tableReceived(tableAddr) {
   return { type: TABLE_RECEIVED, tableAddr };
+}
+
+export function loadTable(tableAddr) {
+  return { type: LOAD_TABLE, tableAddr };
+}
+
+export function tableLoadError(tableAddr) {
+  return { type: TABLE_LOAD_ERROR, tableAddr };
+}
+
+export function tableLoadSuccess(tableAddr) {
+  return { type: TABLE_LOAD_SUCCESS, tableAddr };
 }
 
 export function setPending(tableAddr, handId, pos, data) {

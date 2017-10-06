@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import Pot from '../Pot';
 import { nickNameByAddress } from '../../services/nicknames';
@@ -53,14 +54,14 @@ const SeatInfo = ({
 );
 
 SeatInfo.propTypes = {
-  amountCoords: React.PropTypes.array,
-  blocky: React.PropTypes.string,
-  dealer: React.PropTypes.number, // which seat is dealer
-  lastAmount: React.PropTypes.number,
-  pos: React.PropTypes.number, // which position is THIS seat
-  signerAddr: React.PropTypes.string,
-  seatStatus: React.PropTypes.object,
-  stackSize: React.PropTypes.number,
+  amountCoords: PropTypes.array,
+  blocky: PropTypes.string,
+  dealer: PropTypes.number, // which seat is dealer
+  lastAmount: PropTypes.number,
+  pos: PropTypes.number, // which position is THIS seat
+  signerAddr: PropTypes.string,
+  seatStatus: PropTypes.object,
+  stackSize: PropTypes.number,
 };
 
 export default SeatInfo;

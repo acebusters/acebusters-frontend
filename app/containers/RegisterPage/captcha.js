@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { conf } from '../../app.config';
 
@@ -27,6 +28,6 @@ export default class Captcha extends React.Component { // eslint-disable-line re
 }
 
 Captcha.propTypes = {
-  error: React.PropTypes.any,
-  input: React.PropTypes.any,
+  error: PropTypes.any,
+  input: PropTypes.any,
 };

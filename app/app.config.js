@@ -60,7 +60,7 @@ export function conf() {
       sentryDSN: 'https://8c3e021848b247ddaf627c8040f94e07@sentry.io/153017',
       gaProperty: 'UA-98848213-1',
       gtmId: 'GTM-T7SBXCK',
-      intercomAppId: 'm6zcmwwq',
+      intercomAppId: '',
       pusherApiKey: 'd4832b88a2a81f296f53',
       shapeshiftKey: '',
     };
@@ -86,7 +86,7 @@ export function conf() {
     sentryDSN: 'https://8c3e021848b247ddaf627c8040f94e07@sentry.io/153017',
     gaProperty: 'UA-XXXXX-Y',
     gtmId: 'GTM-XXXX',
-    intercomAppId: 'm6zcmwwq',
+    intercomAppId: '',
     pusherApiKey: 'd4832b88a2a81f296f53',
     shapeshiftKey: '',
   };

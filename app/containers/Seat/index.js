@@ -1,7 +1,5 @@
-/**
- * Created by helge on 24.08.16.
- */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 
@@ -123,10 +121,10 @@ const mapStateToProps = createStructuredSelector({
 });
 
 Seat.propTypes = {
-  lastAmount: React.PropTypes.number,
-  changed: React.PropTypes.number,
-  whosTurn: React.PropTypes.number,
-  pos: React.PropTypes.number,
+  lastAmount: PropTypes.number,
+  changed: PropTypes.number,
+  whosTurn: PropTypes.number,
+  pos: PropTypes.number,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Seat);

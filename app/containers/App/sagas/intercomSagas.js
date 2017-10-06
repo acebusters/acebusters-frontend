@@ -49,9 +49,15 @@ export function* restartIntercomOnLogout(action) {
 }
 
 export default function* intercomSaga() {
+  const appId = conf().intercomAppId;
+
+  if (!appId) {
+    return;
+  }
+
   if (window.Intercom) {
     window.intercomSettings = {
-      app_id: conf().intercomAppId,
+      app_id: appId,
     };
     window.Intercom('boot');
   }

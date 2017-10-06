@@ -3,12 +3,11 @@ import PropTypes from 'prop-types';
 import { Form, Field } from 'redux-form/immutable';
 import { FormattedMessage } from 'react-intl';
 
-import { NTZ_DECIMALS, ETH_DECIMALS, formatNtz, formatEth, normalizerFloat } from '../../utils/amountFormatter';
-import { round } from '../../utils';
+import { normalizerFloat } from '../../utils/amountFormatter';
+import { ABP, ETH, NTZ } from '../../containers/Dashboard/actions';
 
 import Web3Alerts from '../../containers/Web3Alerts';
 import SubmitButton from '../SubmitButton';
-import TokenAmountField from '../Form/TokenAmountField';
 import H2 from '../H2';
 
 import {
@@ -39,23 +38,20 @@ class ExchangeDialog extends React.Component { // eslint-disable-line react/pref
 
   render() {
     const {
+      amountUnit,
       messages,
       handleSubmit,
       submitting,
       maxAmount,
       amount = 0,
       calcExpectedAmount,
-      amountUnit,
+      expectedAmountUnit,
       title,
       descr,
       invalid,
       canSendTx,
       placeholder,
     } = this.props;
-    const expectedAmountUnit = amountUnit.toLowerCase() === 'ntz' ? 'eth' : 'ntz';
-    const formatExpValue = expectedAmountUnit === 'ntz' ? formatNtz : formatEth;
-    const decimals = expectedAmountUnit === 'ntz' ? NTZ_DECIMALS : ETH_DECIMALS;
-
     return (
       <div
         style={{ maxWidth: 480 }}
@@ -68,8 +64,7 @@ class ExchangeDialog extends React.Component { // eslint-disable-line react/pref
           <Field
             normalize={normalizerFloat}
             name="amount"
-            component={TokenAmountField}
-            label={<FormattedMessage {...messages.sellTitle} />}
+            label={this.props.label}
             autoFocus
             maxAmount={maxAmount}
             minAmount={this.props.minAmount}
@@ -77,6 +72,7 @@ class ExchangeDialog extends React.Component { // eslint-disable-line react/pref
             modalDismiss={this.props.modalDismiss}
             amountUnit={this.props.amountUnit}
             setAmountUnit={this.props.setAmountUnit}
+            component={this.props.component}
             placeholder={placeholder}
           />
 
@@ -84,9 +80,7 @@ class ExchangeDialog extends React.Component { // eslint-disable-line react/pref
             <FeedbackField>
               <FormattedMessage
                 {...messages.expectedAmount}
-                values={{
-                  amount: formatExpValue(calcExpectedAmount(round(amount, 8)).mul(decimals)),
-                }}
+                values={{ amount: calcExpectedAmount(amount) }}
               />
               <ReceiveUnit>
                 {expectedAmountUnit.toUpperCase()}
@@ -118,7 +112,7 @@ ExchangeDialog.propTypes = {
   invalid: PropTypes.bool,
   canSendTx: PropTypes.bool,
   maxAmount: PropTypes.object, // BigNumber
-  calcExpectedAmount: PropTypes.func,
+  calcExpectedAmount: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func,
   handleExchange: PropTypes.func, // eslint-disable-line
   stopSubmit: PropTypes.func,
@@ -126,6 +120,9 @@ ExchangeDialog.propTypes = {
   title: PropTypes.node,
   descr: PropTypes.node,
   amountUnit: PropTypes.string.isRequired,
+  expectedAmountUnit: PropTypes.oneOf([NTZ, ETH, ABP]),
+  component: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
+  label: PropTypes.node,
   placeholder: PropTypes.string,
 };
 
