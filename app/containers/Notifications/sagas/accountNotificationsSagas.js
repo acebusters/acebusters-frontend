@@ -22,10 +22,10 @@ function selectNotification(state, txId) {
 }
 
 export function* injectedWeb3Notification({ payload: { isLocked } }) {
-  if (!isLocked) {
+  if (isLocked === false) {
     yield call(delay, 2000);
     const web3 = getWeb3(true);
-    if (!web3) {
+    if (!isLocked && !web3) {
       yield* createPersistNotification(noWeb3Danger);
     } else {
       while (true) { // eslint-disable-line no-constant-condition
