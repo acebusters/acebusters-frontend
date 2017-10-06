@@ -47,7 +47,7 @@ const Exchange = (props) => {
               label={<FormattedMessage {...messages.amount} />}
               title={<FormattedMessage {...messages.sellTitle} />}
               descr={
-                <Alert theme="info">
+                <Alert theme="info" style={{ textAlign: 'center' }}>
                   <FormattedMessage
                     {...messages.floorPrice}
                     values={{ amount: formatNtz(floor.mul(NTZ_DECIMALS)) }}
@@ -75,7 +75,7 @@ const Exchange = (props) => {
               label={<FormattedMessage {...messages.amount} />}
               title={<FormattedMessage {...messages.purchaseTitle} />}
               descr={
-                <Alert theme="info">
+                <Alert theme="info" style={{ textAlign: 'center' }}>
                   <FormattedMessage
                     {...messages.floorPrice}
                     values={{ amount: formatNtz(ceiling.mul(NTZ_DECIMALS)) }}

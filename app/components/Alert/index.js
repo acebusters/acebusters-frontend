@@ -30,11 +30,6 @@ const Alert = styled.div`
   border-radius: 4px;
   color: ${(props) => textColors[props.theme]};
   background-color: ${(props) => bgColors[props.theme]};
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 40px;
 `;
 
 export default Alert;
