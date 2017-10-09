@@ -68,6 +68,7 @@ import PanesRoot from '../../components/Dashboard/PanesRoot';
 import Tabs from '../../components/Dashboard/Tabs';
 
 import {
+  ABI_CONTROLLER_CONTRACT,
   ABI_TOKEN_CONTRACT,
   ABI_POWER_CONTRACT,
   ABI_PROXY,
@@ -126,6 +127,7 @@ class DashboardRoot extends React.Component {
     this.fishWarn = this.fishWarn.bind(this);
     this.web3 = props.web3Redux.web3;
 
+    this.controller = this.web3.eth.contract(ABI_CONTROLLER_CONTRACT).at(confParams.contrAddr);
     this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(confParams.ntzAddr);
     this.power = this.web3.eth.contract(ABI_POWER_CONTRACT).at(confParams.pwrAddr);
     this.tableFactory = this.web3.eth.contract(ABI_TABLE_FACTORY).at(confParams.tableFactory);
@@ -390,7 +392,7 @@ class DashboardRoot extends React.Component {
     const { isFishWarned } = this.state;
     const qrUrl = `ether:${account.proxy}`;
     const downtime = this.power.downtime();
-    const totalSupplyBabz = this.token.totalSupply();
+    const totalSupplyBabz = this.controller.completeSupply();
     const totalSupplyPwr = this.power.totalSupply();
     const activeSupplyPwr = this.power.activeSupply();
     const activeSupplyBabz = this.token.activeSupply();
