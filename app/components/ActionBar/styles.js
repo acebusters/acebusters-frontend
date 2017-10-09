@@ -23,6 +23,7 @@ export const ActionBarWrapper = styled.div`
   display: flex;
   flex-direction: column;
   opacity: ${(props) => props.active && !props.disabled ? 1 : 0.3};
+  pointer-events: ${(props) => props.active && !props.disabled ? 'auto' : 'none'};
 
   transition: opacity 0.3s ease-out;
 
