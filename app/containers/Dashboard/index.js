@@ -239,6 +239,7 @@ class DashboardRoot extends React.Component {
   watchTokenEvents(proxyAddr) {
     this.token.floor.call();
     this.token.ceiling.call();
+    this.controller.completeSupply.call();
     this.token.totalSupply.call();
     this.token.activeSupply.call();
     this.token.balanceOf.call(proxyAddr);
