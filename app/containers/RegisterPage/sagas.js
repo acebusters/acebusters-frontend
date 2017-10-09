@@ -17,7 +17,7 @@ export function* registerSaga() {
     yield put(startSubmit('register'));
 
     try {
-      yield call(
+      const response = yield call(
         accountService.register,
         payload.email,
         payload.captchaResponse,
@@ -25,15 +25,22 @@ export function* registerSaga() {
         payload.referral
       );
 
+      if (response.errorMessage) {
+        throw new Error(response.errorMessage);
+      }
+
       yield put(push('/confirm'));
     } catch (err) {
       const errors = {};
       if (err.status && err.status === 409) {
         errors.email = 'Email taken.';
-        errors._error = 'Registration failed!'; // eslint-disable-line no-underscore-dangle
+        errors._error = { message: 'Registration failed!' }; // eslint-disable-line no-underscore-dangle
+      } else if (err.message && err.message === 'Failed to fetch') {
+        errors._error = { message: 'Registration failed due to interrupted connection, please try again', valid: true }; // eslint-disable-line no-underscore-dangle
       } else {
-        errors._error = `Registration failed with error code ${err}`; // eslint-disable-line no-underscore-dangle
+        errors._error = { message: `Registration failed with error code ${err.message || err}` }; // eslint-disable-line no-underscore-dangle
       }
+      yield put(change('register', 'captchaResponse', false));
       yield put(stopSubmit('register', errors));
     } finally {
       yield put(setProgress(100));
