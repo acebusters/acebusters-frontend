@@ -149,10 +149,12 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
         this.timeOut = null;
       }
 
-      let passed = Math.floor(Date.now() / 1000) - nextProps.hand.get('changed');
-      passed = (passed > TIMEOUT_PERIOD) ? TIMEOUT_PERIOD : passed;
-      const random = (Math.random() * 9000);
-      const timeOut = ((TIMEOUT_PERIOD * 1000) - (passed * 1000)) + random;
+      const timeoutPeriod = TIMEOUT_PERIOD(nextProps.hand.get('state'));
+      const passed = Math.min(
+        Math.floor(Date.now() / 1000) - nextProps.hand.get('changed'),
+        timeoutPeriod,
+      );
+      const timeOut = ((timeoutPeriod * 1000) - (passed * 1000)) + (Math.random() * 9000);
 
       if (timeOut > 0) {
         this.timeOut = setTimeout(() => {
