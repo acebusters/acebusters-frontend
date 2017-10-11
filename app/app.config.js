@@ -79,7 +79,7 @@ export function conf() {
     accountUrl: 'https://hsqkzjp3m8.execute-api.eu-west-1.amazonaws.com/v0',
     reservationUrl: 'https://6er5q4s7b0.execute-api.eu-west-1.amazonaws.com/v0',
     gasStatUrl: 'https://4by2hfw9mg.execute-api.eu-west-1.amazonaws.com/v0',
-    contrAddr: '0x02532733c0B47EC8B24bBB0c55bE523d15376dA5',
+    contrAddr: '0xDE52B22E98C01Cb03cE07839865205386Ae6841D',
     ntzAddr: '0x84e18564498531da0858a36a44f60d24d8e947bd',
     pwrAddr: '0x230a4d30aedb677ecbb571201bc920692d56ecf5',
     pullAddr: '0xE79c15A4be58b8Ec4e0007E348f0EecbaF7d3DD8',
