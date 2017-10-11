@@ -37,26 +37,27 @@ const Invest = (props) => {
     account,
     setInvestType,
     investType,
-    totalSupplyBabz,
+    completeSupplyBabz,
     totalSupplyPwr,
-    minPowerUpBabz,
+    // minPowerUpBabz,
     activeSupplyPwr,
   } = props;
+  const minPowerUpBabz = 100000;
   const disabledTabs = account.isLocked ? [POWERDOWN] : [];
   const adjTotalSupplyPwr = totalSupplyPwr.mul(2);
   const calcABPtoNTZ = (amount) => {
     const abpAmount = new BigNumber(amount);
-    return abpAmount.div(adjTotalSupplyPwr).mul(totalSupplyBabz);
+    return abpAmount.div(adjTotalSupplyPwr).mul(completeSupplyBabz);
   };
   const calcNTZtoABP = (amount) => {
     const ntzAmount = new BigNumber(amount);
-    return adjTotalSupplyPwr.mul(ntzAmount.div(totalSupplyBabz));
+    return adjTotalSupplyPwr.mul(ntzAmount.div(completeSupplyBabz));
   };
   const totalAvailPwr = totalSupplyPwr.minus(activeSupplyPwr);
   const powerDownMinAbp = adjTotalSupplyPwr.div(minPowerUpBabz).div(ABP_DECIMALS).round(3, BigNumber.ROUND_UP);
-  const powerUpRate = totalSupplyBabz.div(adjTotalSupplyPwr);
+  const powerUpRate = completeSupplyBabz.div(adjTotalSupplyPwr);
   // ensure that more ABP than exists can not be requested
-  const powerUpMaxBabz = totalAvailPwr.mul(totalSupplyBabz.div(adjTotalSupplyPwr)).div(1000).round(0, BigNumber.ROUND_DOWN).mul(1000);
+  const powerUpMaxBabz = totalAvailPwr.mul(completeSupplyBabz.div(adjTotalSupplyPwr)).div(1000).round(0, BigNumber.ROUND_DOWN).mul(1000);
   // ensure that powerDown can be called even with minimum powerUp
   const powerUpMinNtz = calcABPtoNTZ(powerDownMinAbp).div(100).round(0).mul(100);
   return (
@@ -90,9 +91,9 @@ Invest.propTypes = {
   account: PropTypes.object.isRequired,
   investType: PropTypes.oneOf([POWERUP, POWERDOWN]).isRequired,
   setInvestType: PropTypes.func.isRequired,
-  totalSupplyBabz: PropTypes.object.isRequired,
+  completeSupplyBabz: PropTypes.object.isRequired,
   totalSupplyPwr: PropTypes.object.isRequired,
-  minPowerUpBabz: PropTypes.number.isRequired,
+  // minPowerUpBabz: PropTypes.object.isRequired,
   activeSupplyPwr: PropTypes.object.isRequired,
 };
 export default Invest;

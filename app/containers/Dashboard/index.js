@@ -220,9 +220,7 @@ class DashboardRoot extends React.Component {
     this.power.downtime.call();
     this.power.totalSupply.call();
     this.power.activeSupply.call();
-    if (typeof this.power.minimumPowerUpSizeBabz === 'function') {
-      this.power.minimumPowerUpSizeBabz.call();
-    }
+    this.controller.minimumPowerUpSizeBabz.call();
     this.power.allEvents({
       toBlock: 'latest',
     }).watch((error, event) => {
@@ -388,20 +386,15 @@ class DashboardRoot extends React.Component {
   }
 
   render() {
-    let minPowerUpBabz;
     const { account } = this.props;
     const { isFishWarned } = this.state;
     const qrUrl = `ether:${account.proxy}`;
     const downtime = this.power.downtime();
-    const totalSupplyBabz = this.controller.completeSupply();
+    const completeSupplyBabz = this.controller.completeSupply();
     const totalSupplyPwr = this.power.totalSupply();
     const activeSupplyPwr = this.power.activeSupply();
     const activeSupplyBabz = this.token.activeSupply();
-    if (typeof this.power.minimumPowerUpSizeBabz === 'function') {
-      minPowerUpBabz = this.power.minimumPowerUpSizeBabz();
-    } else {
-      minPowerUpBabz = 10000;
-    }
+    const minPowerUpBabz = this.controller.minimumPowerUpSizeBabz();
     const weiBalance = this.web3.eth.balance(account.proxy);
     const ethBalance = weiBalance && weiBalance.div(ETH_DECIMALS);
     const babzBalance = this.token.balanceOf(account.proxy);
@@ -449,7 +442,7 @@ class DashboardRoot extends React.Component {
             pwrBalance,
             nutzBalance,
             totalSupplyPwr,
-            totalSupplyBabz,
+            completeSupplyBabz,
             activeSupplyPwr,
             activeSupplyBabz,
             listTxns,
