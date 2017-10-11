@@ -10,6 +10,7 @@ import {
   makeSitoutAmountSelector,
   makeLatestHandSelector,
   makeReservationSelector,
+  makeMyPosSelector,
 } from '../selectors';
 
 import { PLAYER1, PLAYER2, PLAYER3, PLAYER4, PLAYER_EMPTY } from './consts';
@@ -125,6 +126,52 @@ describe('handsSelector', () => {
       { handId: 0, lineup: [] },
       { handId: 1, lineup: [] },
     ]);
+  });
+});
+
+describe('myPosSelector', () => {
+  it('should select my pos from lineup', () => {
+    const tableState = fromJS({
+      0: {
+        lineup: [
+          { address: '0x001' },
+          { address: '0x32adb84cc8054048448a8696292c0c89030c554b' },
+        ],
+      },
+      data: {},
+    });
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: tableState,
+      },
+      account: {
+        privKey: '0e666fa73de161e29a67d099c2ac5a15ee8c0d6b9328a8b7103a13ee20f7cc88',
+      },
+    });
+    expect(makeMyPosSelector()(mockedState, PROPS)).toEqual(1);
+  });
+  it('should select my pos from reservation', () => {
+    const tableState = fromJS({
+      0: {
+        lineup: [
+          { address: '0x001' },
+          { address: '0x002' },
+        ],
+      },
+      reservation: {
+        1: { pos: 1, signerAddr: '0x32adb84cc8054048448a8696292c0c89030c554b' },
+      },
+      data: {},
+    });
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: tableState,
+      },
+      account: {
+        privKey: '0e666fa73de161e29a67d099c2ac5a15ee8c0d6b9328a8b7103a13ee20f7cc88',
+      },
+    });
+    expect(makeMyPosSelector()(mockedState, PROPS)).toEqual(1);
   });
 });
 
