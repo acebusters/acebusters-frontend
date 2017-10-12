@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import BigNumber from 'bignumber.js';
 import { FormattedMessage, FormattedHTMLMessage } from 'react-intl';
 
 import { ABP_DECIMALS } from '../../utils/amountFormatter';
@@ -25,7 +26,7 @@ const PowerDown = (props) => {
         <FormattedHTMLMessage {...messages.powerDownDescr} />
         <Alert theme="info">
           <FormattedMessage
-            values={{ min: powerDownMinAbp }}
+            values={{ min: powerDownMinAbp.round(3, BigNumber.ROUND_UP).toFormat(3) }}
             {...messages.powerDownMin}
           />
         </Alert>

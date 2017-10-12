@@ -12,7 +12,7 @@ import PowerUp from './PowerUp';
 import PowerDown from './PowerDown';
 import { Pane, Section } from './styles';
 
-import { ABP_DECIMALS } from '../../utils/amountFormatter';
+import { toNtz } from '../../utils/amountFormatter';
 
 const TABS = [
   {
@@ -39,10 +39,9 @@ const Invest = (props) => {
     investType,
     completeSupplyBabz,
     totalSupplyPwr,
-    // minPowerUpBabz,
     activeSupplyPwr,
+    minPowerUpBabz,
   } = props;
-  const minPowerUpBabz = 100000;
   const disabledTabs = account.isLocked ? [POWERDOWN] : [];
   const adjTotalSupplyPwr = totalSupplyPwr.mul(2);
   const calcABPtoNTZ = (amount) => {
@@ -54,12 +53,12 @@ const Invest = (props) => {
     return adjTotalSupplyPwr.mul(ntzAmount.div(completeSupplyBabz));
   };
   const totalAvailPwr = totalSupplyPwr.minus(activeSupplyPwr);
-  const powerDownMinAbp = adjTotalSupplyPwr.div(minPowerUpBabz).div(ABP_DECIMALS).round(3, BigNumber.ROUND_UP);
+  const powerDownMinAbp = calcNTZtoABP(toNtz(minPowerUpBabz));
   const powerUpRate = completeSupplyBabz.div(adjTotalSupplyPwr);
   // ensure that more ABP than exists can not be requested
   const powerUpMaxBabz = totalAvailPwr.mul(completeSupplyBabz.div(adjTotalSupplyPwr)).div(1000).round(0, BigNumber.ROUND_DOWN).mul(1000);
   // ensure that powerDown can be called even with minimum powerUp
-  const powerUpMinNtz = calcABPtoNTZ(powerDownMinAbp).div(100).round(0).mul(100);
+  const powerUpMinNtz = toNtz(minPowerUpBabz);
   return (
     <Pane name="dashboard-invest">
       <Section >
@@ -93,7 +92,7 @@ Invest.propTypes = {
   setInvestType: PropTypes.func.isRequired,
   completeSupplyBabz: PropTypes.object.isRequired,
   totalSupplyPwr: PropTypes.object.isRequired,
-  // minPowerUpBabz: PropTypes.object.isRequired,
+  minPowerUpBabz: PropTypes.object.isRequired,
   activeSupplyPwr: PropTypes.object.isRequired,
 };
 export default Invest;
