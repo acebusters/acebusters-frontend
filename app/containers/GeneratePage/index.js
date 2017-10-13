@@ -12,6 +12,7 @@ import Container from '../../components/Container';
 import FormField from '../../components/Form/FormField';
 import Button from '../../components/Button';
 import H1 from '../../components/H1';
+import A from '../../components/A';
 import MouseEntropy from '../../components/MouseEntropy';
 import { ErrorMessage } from '../../components/FormMessages';
 
@@ -60,6 +61,7 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     super(props);
     this.handleSaveEntropyClick = this.handleSaveEntropyClick.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleResend = this.handleResend.bind(this);
     this.updateEntropy = this.updateEntropy.bind(this);
     this.state = {
       secretCreated: false,
@@ -91,7 +93,7 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     }
 
     if (!receipt) {
-      throw new SubmissionError({ _error: 'Wrong receipt' });
+      throw new SubmissionError({ _error: { message: 'Wrong receipt' } });
     }
 
     if (receipt.type === Type.CREATE_CONF) {
@@ -99,11 +101,21 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
         await accountService.confirm(confCode);
       } catch (err) {
         if (err.status !== 409) {
-          throw new SubmissionError({ _error: `Email Confirmation failed with error code ${err}` });
+          if (receipt.created < (Date.now() / 1000) - (60 * 60 * 2)) { // receipt is outdated
+            throw new SubmissionError({
+              _error: { message: (
+                <p>Confirmation link is expired, <A onClick={this.handleResend}>click here</A> for a new link</p>
+              ) },
+            });
+          } else {
+            throw new SubmissionError({
+              _error: { message: `Email Confirmation failed with error code ${err}` },
+            });
+          }
         }
       }
     } else if (receipt.type !== Type.RESET_CONF) {
-      throw new SubmissionError({ _error: 'Unknown receipt type' });
+      throw new SubmissionError({ _error: { message: 'Unknown receipt type' } });
     }
 
     storageService.setItem('ab-confCode', confCode);
@@ -121,6 +133,12 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     }
 
     return state;
+  }
+
+  async handleResend() {
+    const { confCode } = this.state;
+    await accountService.resendEmail(confCode, window.location.origin);
+    browserHistory.replace('/confirm');
   }
 
   handleSaveEntropyClick() {
