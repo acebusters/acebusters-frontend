@@ -13,55 +13,86 @@ import {
 import { Logo } from '../Logo';
 import Link from '../Link';
 
+// Note: sitout value possibilities
+// sitout > 0, for enabled "play"
+// sitout === 0, for disabled "play"
+// sitout === undefined, for enabled "pause"
+// sitout === null, for disabled
+// myPos === -1, then not at table"pause"
+function isSioutDisabled(props) {
+  const { myPos, sitout, standingUp, myLastReceipt, state, sitoutInProgress, myStack } = props;
+  const isSitoutFlag = typeof sitout === 'number';
+  return (
+    myPos === undefined || sitout === 0 || sitout === null ||
+    standingUp || sitoutInProgress !== undefined ||
+    (isSitoutFlag && !myStack) || // player can't sit-in if his balance is empty
+    // player can't sit-in in the hand he sit-out after game started
+    (
+      isSitoutFlag &&
+      sitout > 0 &&
+      myLastReceipt &&
+      state !== 'waiting' &&
+      state !== 'dealing'
+    )
+  );
+}
+
+function isStadingUpDisabled(props) {
+  const { myPos, standingUp, sitoutInProgress } = props;
+  /* TODO add seatStatus to UI redux state and
+    mapStateToProps in TableMenu container to be used here */
+  // disabled: myPos === undefined ||
+  //   seatStatus === STATUS_MSG.sittingIn ||
+  //   seatStatus === STATUS_MSG.standingUp,
+  return myPos === undefined || standingUp || sitoutInProgress !== undefined;
+}
+
 class TableMenu extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      calledOpponent: false,
+    };
+
+    this.handleOpponentCall = this.handleOpponentCall.bind(this);
+  }
+
   handleClickOutside() {
     // only close the menu if it is already open
     if (this.props.open) {
       this.props.toggleMenuOpen();
     }
   }
+
+  handleOpponentCall() {
+    if (typeof this.props.onCallOpponent === 'function') {
+      this.props.onCallOpponent();
+      this.setState({ calledOpponent: true });
+    }
+  }
+
   render() {
     const {
-      loggedIn, open, myPos, sitout, handleClickLogout, onLeave, onSitout,
-      standingUp, myLastReceipt, state, sitoutInProgress, myStack, isMuted,
-      handleClickMuteToggle,
+      loggedIn, open, sitout, isMuted,
+      handleClickLogout, onLeave, onSitout, handleClickMuteToggle,
     } = this.props;
+    const { calledOpponent } = this.state;
+
     const isSitoutFlag = typeof sitout === 'number';
     const menuClose = [
-      // Note: sitout value possibilities
-      // sitout > 0, for enabled "play"
-      // sitout === 0, for disabled "play"
-      // sitout === undefined, for enabled "pause"
-      // sitout === null, for disabled
-      // myPos === -1, then not at table"pause"
       {
         name: 'sitout',
         icon: isSitoutFlag ? 'fa fa-play' : 'fa fa-pause',
         title: isSitoutFlag ? 'Sit-In' : 'Sit-Out',
         onClick: onSitout,
-        disabled: myPos === undefined || sitout === 0 || sitout === null ||
-                  standingUp || sitoutInProgress !== undefined ||
-                  (isSitoutFlag && !myStack) || // player can't sit-in if his balance is empty
-                  // player can't sit-in in the hand he sit-out after game started
-                  (
-                    isSitoutFlag &&
-                    sitout > 0 &&
-                    myLastReceipt &&
-                    state !== 'waiting' &&
-                    state !== 'dealing'
-                  ),
+        disabled: isSioutDisabled(this.props),
       },
       {
         name: 'standup',
         icon: 'fa fa-external-link',
         title: 'Stand-Up',
         onClick: onLeave,
-        disabled: myPos === undefined || standingUp || sitoutInProgress !== undefined,
-        /* TODO add seatStatus to UI redux state and
-          mapStateToProps in TableMenu container to be used here */
-        // disabled: myPos === undefined ||
-        //   seatStatus === STATUS_MSG.sittingIn ||
-        //   seatStatus === STATUS_MSG.standingUp,
+        disabled: isStadingUpDisabled(this.props),
       },
       {
         name: 'mute',
@@ -71,6 +102,17 @@ class TableMenu extends React.Component {
         disabled: false,
       },
     ];
+
+    if (!calledOpponent) {
+      menuClose.push({
+        name: 'call-opponent',
+        icon: 'fa fa-bullhorn',
+        title: 'Call an opponent',
+        onClick: this.handleOpponentCall,
+        disabled: false,
+      });
+    }
+
     const menuUserOpen = [
       {
         name: 'lobby',
@@ -153,20 +195,15 @@ class TableMenu extends React.Component {
 
 TableMenu.propTypes = {
   loggedIn: PropTypes.bool,
-  myPos: PropTypes.number,
   handleClickLogout: PropTypes.func,
   onLeave: PropTypes.func,
   sitout: PropTypes.any, // TODO change to only number
   onSitout: PropTypes.func,
   toggleMenuOpen: PropTypes.func,
   open: PropTypes.bool,
-  standingUp: PropTypes.bool,
-  myLastReceipt: PropTypes.object,
-  state: PropTypes.string,
-  sitoutInProgress: PropTypes.number,
-  myStack: PropTypes.number,
   isMuted: PropTypes.bool,
   handleClickMuteToggle: PropTypes.func,
+  onCallOpponent: PropTypes.func,
 };
 
 export default onClickOutside(TableMenu);

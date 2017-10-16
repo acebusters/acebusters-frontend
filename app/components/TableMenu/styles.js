@@ -59,10 +59,10 @@ export const TableLogoContainer = styled(LogoContainer)`
 export const MenuContainer = styled.div`
   position: absolute;
   top: 0;
-  left: calc(100% - 148px);
+  left: calc(100% - 165px);
   display: flex;
   flex-direction: column;
-  min-width: 148px;
+  min-width: 165px;
   margin-left: auto;
   pointer-events: all;
   background: ${(props) => props.open ? menuOpen : 'none'};

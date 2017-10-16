@@ -15,6 +15,10 @@ class TableService {
     this.privKey = privKey;
   }
 
+  callOpponent() {
+    return request('post', `table/${this.tableAddr}/callOpponent`);
+  }
+
   sendMessageReceipt(text) {
     return new Receipt(this.tableAddr).message(text).sign(this.privKey);
   }
@@ -120,7 +124,6 @@ class TableService {
   lineup() {
     return request('post', `table/${this.tableAddr}/lineup`);
   }
-
 
   net(handId, payload) {
     return request('post', `table/${this.tableAddr}/hand/${handId}/netting`, {
