@@ -5,6 +5,8 @@ import { createStructuredSelector } from 'reselect';
 import { FormattedMessage } from 'react-intl';
 import BigNumber from 'bignumber.js';
 
+import { CONFIRM_DIALOG } from 'containers/Modal/constants';
+
 import InvestTour from '../../components/Dashboard/InvestTour';
 
 import web3Connect from '../AccountProvider/web3Connect';
@@ -56,12 +58,10 @@ import {
 } from './selectors';
 
 import Container from '../../components/Container';
-import H2 from '../../components/H2';
 import Overview from '../../components/Dashboard/Overview';
 import Wallet from '../../components/Dashboard/Wallet';
 import Exchange from '../../components/Dashboard/Exchange';
 import Invest from '../../components/Dashboard/Invest';
-import SubmitButton from '../../components/SubmitButton';
 import Balances from '../../components/Dashboard/Balances';
 
 import PanesRoot from '../../components/Dashboard/PanesRoot';
@@ -156,19 +156,15 @@ class DashboardRoot extends React.Component {
     }
 
     if (this.props.dashboardTxs.txError !== nextProps.dashboardTxs.txError && nextProps.dashboardTxs.txError) {
-      this.props.modalAdd(
-        <div>
-          <H2>
-            <FormattedMessage {...messages.transactionErrorTitle} />
-          </H2>
-          <p>{nextProps.dashboardTxs.txError}</p>
-          <SubmitButton
-            onClick={() => this.props.modalDismiss()}
-          >
-            <FormattedMessage {...messages.ok} />
-          </SubmitButton>
-        </div>
-      );
+      this.props.modalAdd({
+        modalType: CONFIRM_DIALOG,
+        modalProps: {
+          title: <FormattedMessage {...messages.transactionErrorTitle} />,
+          msg: nextProps.dashboardTxs.txError,
+          onSubmit: this.props.modalDismiss,
+          buttonText: <FormattedMessage {...messages.ok} />,
+        },
+      });
     }
   }
 

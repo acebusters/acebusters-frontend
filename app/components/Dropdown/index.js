@@ -1,13 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import find from 'lodash/find';
+import { SELECT_TOKEN } from 'containers/Modal/constants';
 
 import {
   Button,
   Caret,
   Container,
-  ModalButton,
-  ModalContainer,
 } from './styles';
 
 const Dropdown = ({
@@ -19,23 +18,18 @@ const Dropdown = ({
   modalAdd,
   modalDismiss,
 }) => {
-  const handleSelectButton = (id) => {
-    onSelect(id);
-    modalDismiss();
-  };
-
   const handleToggle = () => {
-    modalAdd(
-      <ModalContainer>
-        {options.map((option, index) => (
-          <ModalButton key={index} onClick={() => handleSelectButton(option.id)}>
-            {option.node({ ...option.props })}
-          </ModalButton>
-          ))
-        }
-      </ModalContainer>,
-      { backdrop: true }
-    );
+    modalAdd({
+      modalType: SELECT_TOKEN,
+      modalProps: {
+        options,
+        handleSelectButton: (id) => {
+          onSelect(id);
+          modalDismiss();
+        },
+      },
+      backdrop: true,
+    });
   };
 
   const selectedOption = find(options, { id: selected });

@@ -3,9 +3,10 @@ export const MODAL_ADD = 'acebusters/App/MODAL_ADD';
 export const MODAL_DISMISS = 'acebusters/App/MODAL_DISMISS';
 export const GLOBAL_PROGRESS = 'acebusters/App/GLOBAL_PROGRESS';
 
-export function modalAdd(node, { closeHandler, backdrop } = {}) {
-  return { type: MODAL_ADD, payload: { node, closeHandler, backdrop } };
-}
+export const modalAdd = ({ modalType, modalProps, closeHandler, backdrop } = {}) => ({
+  type: MODAL_ADD,
+  payload: { modalType, modalProps, closeHandler, backdrop },
+});
 
 export function modalDismiss() {
   return { type: MODAL_DISMISS };

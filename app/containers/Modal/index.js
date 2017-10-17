@@ -1,6 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { createStructuredSelector } from 'reselect';
 import Modal from 'components/Modal';
+
+import { makeModalSelector } from 'containers/App/selectors';
+import { modalDismiss } from 'containers/App/actions';
 
 class ModalContainer extends React.Component {
 
@@ -34,17 +39,17 @@ class ModalContainer extends React.Component {
   }
 
   handleClose() {
-    const { modalDismiss, modal: { closeHandler } } = this.props;
+    const { modal: { closeHandler } } = this.props;
     if (typeof closeHandler === 'function') {
       closeHandler();
     } else {
-      modalDismiss();
+      this.props.modalDismiss();
     }
   }
 
   render() {
     return (
-      <Modal handleClose={this.handleClose} {...this.props} />
+      <Modal handleClose={this.handleClose} modal={this.props.modal} />
     );
   }
 }
@@ -55,4 +60,12 @@ ModalContainer.propTypes = {
   }),
 };
 
-export default ModalContainer;
+const mapDispatchToProps = (dispatch) => ({
+  modalDismiss: () => dispatch(modalDismiss()),
+});
+
+const mapStateToProps = createStructuredSelector({
+  modal: makeModalSelector(),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(ModalContainer);

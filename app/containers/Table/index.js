@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { FormattedMessage } from 'react-intl';
 import { createStructuredSelector } from 'reselect';
 import { browserHistory } from 'react-router';
 import Pusher from 'pusher-js';
@@ -15,11 +16,12 @@ import NotFoundPage from '../../containers/NotFoundPage';
 import Card from '../../components/Card';
 import { BoardCardWrapper } from '../../components/Table/Board';
 import Seat from '../Seat';
-import Button from '../../components/Button';
 import WithLoading from '../../components/WithLoading';
 import { nickNameByAddress } from '../../services/nicknames';
 import { formatNtz } from '../../utils/amountFormatter';
 import { promisifyWeb3Call } from '../../utils/promisifyWeb3Call';
+
+import { CONFIRM_DIALOG, JOIN_DIALOG, INVITE_DIALOG } from '../Modal/constants';
 
 // config data
 import {
@@ -28,6 +30,8 @@ import {
   TIMEOUT_PERIOD,
   conf,
 } from '../../app.config';
+
+import messages from './messages';
 
 import { modalAdd, modalDismiss } from '../App/actions';
 // actions
@@ -81,8 +85,6 @@ import {
 import TableComponent from '../../components/Table';
 import web3Connect from '../AccountProvider/web3Connect';
 import TableService from '../../services/tableService';
-import JoinDialog from '../JoinDialog';
-import InviteDialog from '../InviteDialog';
 
 const SpinnerWrapper = styled.div`
   position: absolute;
@@ -197,17 +199,18 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       const balance = this.balance;
 
       this.props.modalDismiss();
-      this.props.modalAdd(
-        <JoinDialog
-          onJoin={this.handleRebuy}
-          onLeave={() => this.handleLeave(this.props.myPos)}
-          modalDismiss={this.props.modalDismiss}
-          params={this.props.params}
-          balance={balance && Number(balance.toString())}
-          rebuy
-        />,
-        { closeHandler: this.handleLeave }
-      );
+      this.props.modalAdd({
+        modalType: JOIN_DIALOG,
+        modalProps: {
+          onJoin: this.handleRebuy,
+          onLeave: () => this.handleLeave(this.props.myPos),
+          modalDismiss: this.props.modalDismiss,
+          params: this.props.params,
+          balance: balance && Number(balance.toString()),
+          rebuy: true,
+        },
+        closeHandler: this.handleLeave,
+      });
     }
   }
 
@@ -312,29 +315,30 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     }
 
     if (open && myPos === undefined && !pending) {
-      this.props.modalAdd(
-        <JoinDialog
-          onJoin={(amount) => this.handleJoin(pos, amount)}
-          modalDismiss={this.props.modalDismiss}
-          params={this.props.params}
-          balance={balance}
-        />,
-        { backdrop: true },
-      );
+      this.props.modalAdd({
+        modalType: JOIN_DIALOG,
+        modalProps: {
+          onJoin: (amount) => this.handleJoin(pos, amount),
+          modalDismiss: this.props.modalDismiss,
+          params: this.props.params,
+          balance,
+        },
+        backdrop: true,
+      });
     } else if (open && this.props.myPos !== undefined && !pending) {
-      this.props.modalAdd((
-        <InviteDialog />
-      ));
+      this.props.modalAdd({ modalType: INVITE_DIALOG });
     }
   }
 
   handleOpponentCall() {
-    this.props.modalAdd(
-      <div style={{ textAlign: 'center' }}>
-        <p>Request sent. Wait for an opponent several minutes</p>
-        <Button onClick={this.props.modalDismiss}>OK</Button>
-      </div>
-    );
+    this.props.modalAdd({
+      modalType: CONFIRM_DIALOG,
+      modalProps: {
+        msg: <FormattedMessage {...messages.opponentCallSent} />,
+        onSubmit: this.props.modalDismiss,
+        buttonText: <FormattedMessage {...messages.ok} />,
+      },
+    });
     this.tableService.callOpponent();
   }
 
@@ -376,17 +380,16 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     }
 
     this.props.setExitHand(this.tableAddr, this.props.latestHand, pos, exitHand);
-    const statusElement = (<div>
-      <p>
-        Please wait until your leave request is processed!
-        Until then your status will be shown as pending.
-      </p>
-      <Button onClick={this.props.modalDismiss}>OK!</Button>
-    </div>);
-
     storageService.removeItem(`rebuyModal[${this.tableAddr + handId}]`);
     this.props.modalDismiss();
-    this.props.modalAdd(statusElement);
+    this.props.modalAdd({
+      modalType: CONFIRM_DIALOG,
+      modalProps: {
+        msg: <FormattedMessage {...messages.leaveInProgress} />,
+        onSubmit: this.props.modalDismiss,
+        buttonText: <FormattedMessage {...messages.ok} />,
+      },
+    });
 
     if (!this.props.sitout) {
       await this.handleSitout();
@@ -464,13 +467,10 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
         if (errorCode === 4) {
           msg = 'Sorry the Seat is taken';
         }
-
-        const errorElement = (
-          <div>
-            <h2>{msg}</h2>
-          </div>);
-
-        this.props.modalAdd(errorElement);
+        this.props.modalAdd({
+          modalType: CONFIRM_DIALOG,
+          modalProps: { msg, onSubmit: this.props.modalDismiss, buttonText: 'OK!' },
+        });
         break;
       }
 
