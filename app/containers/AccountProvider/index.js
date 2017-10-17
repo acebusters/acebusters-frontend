@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
+import { CONFIRM_DIALOG } from 'containers/Modal/constants';
 
 import {
   makeSelectIsWeb3Connected,
@@ -10,7 +11,6 @@ import {
 
 import { web3Connect, clearWeb3Error } from './actions';
 import { modalAdd, modalDismiss } from '../App/actions';
-import SubmitButton from '../../components/SubmitButton';
 
 export class AccountProvider extends React.PureComponent {
   componentDidMount() {
@@ -20,26 +20,27 @@ export class AccountProvider extends React.PureComponent {
   componentWillReceiveProps(nextProps) {
     if (nextProps.web3ErrMsg !== null
         && nextProps.web3ErrMsg !== this.props.web3ErrMsg) {
-      this.props.modalAdd((
-        <div>
-          <p>
-            {nextProps.web3ErrMsg}
-          </p>
-          <SubmitButton onClick={() => { this.props.clearWeb3Error(); this.props.modalDismiss(); }}>
-            OK!
-          </SubmitButton>
-        </div>
-      ));
+      this.props.modalAdd({
+        modalType: CONFIRM_DIALOG,
+        modalProps: {
+          msg: nextProps.web3ErrMsg,
+          onSubmit: () => {
+            this.props.clearWeb3Error();
+            this.props.modalDismiss();
+          },
+          buttonText: 'OK!',
+        },
+      });
     } else if (!nextProps.isWeb3Connected
               && nextProps.isWeb3Connected !== this.props.isWeb3Connected) {
-      this.props.modalAdd((
-        <div>
-          <p>
-            Connection Lost. Please try to refresh the page.
-          </p>
-          <SubmitButton onClick={this.props.modalDismiss}>OK!</SubmitButton>
-        </div>
-      ));
+      this.props.modalAdd({
+        modalType: CONFIRM_DIALOG,
+        modalProps: {
+          msg: 'Connection Lost. Please try to refresh the page.',
+          onSubmit: this.props.modalDismiss,
+          buttonText: 'OK!',
+        },
+      });
     }
   }
 
@@ -69,7 +70,7 @@ function mapDispatchToProps(dispatch) {
   return {
     web3Connect: () => dispatch(web3Connect()),
     clearWeb3Error: () => dispatch(clearWeb3Error()),
-    modalAdd: (node) => dispatch(modalAdd(node)),
+    modalAdd: (payload) => dispatch(modalAdd(payload)),
     modalDismiss: () => dispatch(modalDismiss()),
   };
 }

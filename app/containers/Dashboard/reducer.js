@@ -77,7 +77,10 @@ function dashboardReducer(state = initialState, action) {
       return state.set('investTour', !state.get('investTour'));
 
     case ACCOUNT_LOADED:
-      return state.set('proxy', action.payload.proxy);
+      if (action.payload.proxy) {
+        return state.set('proxy', action.payload.proxy);
+      }
+      return state;
 
     case CONTRACT_TX_SENDED:
       return addPending(

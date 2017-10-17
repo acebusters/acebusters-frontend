@@ -12,7 +12,6 @@ import { setAuthState } from '../AccountProvider/actions';
 import {
   makeSelectProgress,
   makeSelectTransferShow,
-  makeModalSelector,
   selectWorkerProgress,
 } from './selectors';
 import { modalDismiss } from './actions';
@@ -28,7 +27,6 @@ const mapDispatchToProps = (dispatch) => ({
 const mapStateToProps = createStructuredSelector({
   workerProgress: selectWorkerProgress,
   isModalOpen: makeSelectTransferShow(),
-  modal: makeModalSelector(),
   progress: makeSelectProgress(),
   notifications: selectNotifications(),
   loggedIn: makeSelectLoggedIn(),

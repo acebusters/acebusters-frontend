@@ -81,10 +81,14 @@ class ActionBarContainer extends React.Component {
         this.checkTimeOut = null;
       }
 
-      let passed = Math.floor(Date.now() / 1000) - nextProps.hand.get('changed');
-      passed = (passed > TIMEOUT_PERIOD) ? TIMEOUT_PERIOD : passed;
+      const timeoutPeriod = TIMEOUT_PERIOD(nextProps.hand.get('state'));
+      const passed = Math.min(
+        Math.floor(Date.now() / 1000) - nextProps.hand.get('changed'),
+        timeoutPeriod,
+      );
+
       // autoCheckTimeOut should be earlier than usual timeout, so -1.5 sec
-      const autoCheckTimeOut = ((TIMEOUT_PERIOD * 1000) - (passed * 1000)) - 1500;
+      const autoCheckTimeOut = ((timeoutPeriod * 1000) - (passed * 1000)) - 1500;
 
       if (autoCheckTimeOut > 0) {
         this.checkTimeOut = setTimeout(() => {

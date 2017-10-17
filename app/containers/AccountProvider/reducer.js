@@ -1,4 +1,5 @@
 import { fromJS } from 'immutable';
+import ethUtil from 'ethereumjs-util';
 import {
   SET_AUTH,
   WEB3_ERROR,
@@ -18,6 +19,9 @@ import {
   READY_STATE,
 } from './actions';
 import { ACCOUNT_TX_HASH_RECEIVED } from '../GeneratePage/constants';
+
+import { createBlocky } from '../../services/blockies';
+import { nickNameByAddress } from '../../services/nicknames';
 
 // The initial application state
 const initialState = fromJS({
@@ -62,13 +66,11 @@ function accountProviderReducer(state = initialState, action) {
       if (action.payload.refs) {
         return state.set('refs', action.payload.refs);
       }
+
       return (
         state
           .set('isLocked', action.payload.isLocked)
           .set('owner', action.payload.owner)
-          .set('blocky', action.payload.blocky)
-          .set('nickName', action.payload.nickName)
-          .set('signerAddr', action.payload.signer)
       );
 
     case WEB3_METHOD_SUCCESS:
@@ -111,10 +113,16 @@ function accountProviderReducer(state = initialState, action) {
               .set('refs', null);
           }
 
+          const privKeyBuffer = new Buffer(action.newAuthState.privKey.replace('0x', ''), 'hex');
+          const signer = `0x${ethUtil.privateToAddress(privKeyBuffer).toString('hex')}`;
+
           return newState
             .set('privKey', action.newAuthState.privKey)
             .set('accountId', action.newAuthState.accountId)
             .set('proxy', action.newAuthState.proxyAddr)
+            .set('signerAddr', signer)
+            .set('blocky', createBlocky(signer))
+            .set('nickName', nickNameByAddress(signer))
             .set('email', action.newAuthState.email);
         })
         .set('loggedIn', action.newAuthState.loggedIn);

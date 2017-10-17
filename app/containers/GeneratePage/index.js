@@ -12,6 +12,7 @@ import Container from '../../components/Container';
 import FormField from '../../components/Form/FormField';
 import Button from '../../components/Button';
 import H1 from '../../components/H1';
+import A from '../../components/A';
 import MouseEntropy from '../../components/MouseEntropy';
 import { ErrorMessage } from '../../components/FormMessages';
 
@@ -60,6 +61,7 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     super(props);
     this.handleSaveEntropyClick = this.handleSaveEntropyClick.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleResend = this.handleResend.bind(this);
     this.updateEntropy = this.updateEntropy.bind(this);
     this.state = {
       secretCreated: false,
@@ -91,7 +93,7 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     }
 
     if (!receipt) {
-      throw new SubmissionError({ _error: 'Wrong receipt' });
+      throw new SubmissionError({ _error: { message: 'Wrong receipt' } });
     }
 
     if (receipt.type === Type.CREATE_CONF) {
@@ -99,11 +101,21 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
         await accountService.confirm(confCode);
       } catch (err) {
         if (err.status !== 409) {
-          throw new SubmissionError({ _error: `Email Confirmation failed with error code ${err}` });
+          if (receipt.created < (Date.now() / 1000) - (60 * 60 * 2)) { // receipt is outdated
+            throw new SubmissionError({
+              _error: { message: (
+                <p>Confirmation link is expired, <A onClick={this.handleResend}>click here</A> for a new link</p>
+              ) },
+            });
+          } else {
+            throw new SubmissionError({
+              _error: { message: `Email Confirmation failed with error code ${err}` },
+            });
+          }
         }
       }
     } else if (receipt.type !== Type.RESET_CONF) {
-      throw new SubmissionError({ _error: 'Unknown receipt type' });
+      throw new SubmissionError({ _error: { message: 'Unknown receipt type' } });
     }
 
     storageService.setItem('ab-confCode', confCode);
@@ -121,6 +133,12 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     }
 
     return state;
+  }
+
+  async handleResend() {
+    const { confCode } = this.state;
+    await accountService.resendEmail(confCode, window.location.origin);
+    browserHistory.replace('/confirm');
   }
 
   handleSaveEntropyClick() {
@@ -239,7 +257,7 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
             <Form onSubmit={handleSubmit(this.handleSaveEntropyClick)}>
               <MouseEntropy totalBits={totalBits} width="100%" height="200px" onFinish={this.updateEntropy} sampleRate={0} />
               <Field name="entropy" type="hidden" component={FormField} label="" value={entropy} />
-              {error && <ErrorMessage error={error} />}
+              {error && <ErrorMessage error={error.message} />}
               <Button
                 type="submit"
                 disabled={!secretCreated || entropySaved}
@@ -259,9 +277,9 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
             >
               <Field name="password" type="password" component={FormField} label="Password" />
               <Field name="confirmedPassword" type="password" component={FormField} label="Confirm Password" />
-              {error && <ErrorMessage error={error} />}
+              {error && <ErrorMessage error={error.message} />}
 
-              <Button type="submit" disabled={submitting || invalid} size="large">
+              <Button type="submit" disabled={submitting || (invalid && (!error || !error.valid))} size="large">
                 {!submitting ? 'Encrypt and Save' : 'Please wait ...'}
               </Button>
             </Form>
@@ -296,9 +314,11 @@ const throwWorkerError = (workerErr) => {
 const throwSubmitError = (err) => {
   // If store account failed...
   if (err.status && err.status === 409) {
-    throw new SubmissionError({ email: 'Email taken.', _error: 'Registration failed!' });
+    throw new SubmissionError({ email: 'Email taken.', _error: { message: 'Registration failed!' } });
+  } else if (err.message && err.message === 'Failed to fetch') {
+    throw new SubmissionError({ _error: { message: 'Registration failed due to interrupted connection, please try again', valid: true } });
   } else {
-    throw new SubmissionError({ _error: `Registration failed with error code ${err}` });
+    throw new SubmissionError({ _error: { message: `Registration failed with error code ${err}` } });
   }
 };
 

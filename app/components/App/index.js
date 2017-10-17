@@ -44,7 +44,7 @@ const App = (props) => {
 
       {isNotTable && <Footer />}
 
-      <Modal {...props} />
+      <Modal />
 
     </div>
   );

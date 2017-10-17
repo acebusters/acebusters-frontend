@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import SubmitButton from '../../components/SubmitButton';
-import H2 from '../../components/H2';
+import SubmitButton from 'components/SubmitButton';
+import H2 from 'components/H2';
 
 const FishWarningDialog = ({ onSuccessButtonClick }) => (
   <div>

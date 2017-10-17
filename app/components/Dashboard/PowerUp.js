@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import BigNumber from 'bignumber.js';
 import { FormattedMessage, FormattedHTMLMessage } from 'react-intl';
 
 import { formatAmount, toNtz, ABP_DECIMALS } from '../../utils/amountFormatter';
@@ -21,8 +22,8 @@ const PowerUp = (props) => {
     handlePowerUp,
     totalAvailPwr,
     powerUpRate,
-    powerUpMinNtz,
     powerUpMaxBabz,
+    powerUpMinNtz,
     calcNTZtoABP,
   } = props;
   return (
@@ -44,7 +45,7 @@ const PowerUp = (props) => {
         <Alert theme="info" style={{ textAlign: 'center' }}>
           <FormattedMessage
             {...messages.powerUpMinAmount}
-            values={{ amount: powerUpMinNtz.toFormat(0) }}
+            values={{ amount: powerUpMinNtz.round(0, BigNumber.ROUND_UP).toFormat(0) }}
           />
         </Alert>
       </Description>
@@ -79,8 +80,8 @@ PowerUp.propTypes = {
   handlePowerUp: PropTypes.func,
   totalAvailPwr: PropTypes.object.isRequired,
   powerUpRate: PropTypes.object.isRequired,
-  powerUpMinNtz: PropTypes.object.isRequired,
   powerUpMaxBabz: PropTypes.object.isRequired,
+  powerUpMinNtz: PropTypes.object.isRequired,
   calcNTZtoABP: PropTypes.func.isRequired,
 };
 

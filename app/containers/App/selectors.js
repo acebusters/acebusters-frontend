@@ -22,10 +22,7 @@ export const makeSelectProgress = () => createSelector(
 
 export const makeModalSelector = () => createSelector(
   selectGlobal,
-  (state) => (state && state.get('modalStack').size > 0) ? {
-    node: state.get('modalStack').last(),
-    ...state.get('modalOptions').last(),
-  } : null
+  (state) => (state && state.get('modalStack').size > 0) ? state.get('modalStack').last() : null
 );
 
 export const makeSelectLocationState = () => {
@@ -43,4 +40,3 @@ export const makeSelectLocationState = () => {
     return prevRoutingStateJS;
   };
 };
-

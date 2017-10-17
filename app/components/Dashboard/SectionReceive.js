@@ -4,6 +4,7 @@ import QRCode from 'qrcode.react';
 import ethUtil from 'ethereumjs-util';
 import { FormattedMessage } from 'react-intl';
 
+import { FISH_WARNING_DIALOG } from 'containers/Modal/constants';
 import messages from '../../containers/Dashboard/messages';
 import AccountProgress from '../../containers/Dashboard/AccountProgress';
 import WithLoading from '../WithLoading';
@@ -12,6 +13,7 @@ import shapeshiftButton from './shapeshift.png';
 
 import Alert from '../Alert';
 
+
 import BtnUpgrade from './BtnUpgrade';
 import {
   Address,
@@ -19,7 +21,6 @@ import {
   ReceiveSection,
 } from './styles';
 import Button from '../Button';
-import FishWarningDialog from './FishWarningDialog';
 
 function handleShapeshiftClick(e) {
   e.preventDefault();
@@ -66,14 +67,15 @@ export const AccountIsLocked = (props) => {
             >
               <Button
                 size="small"
-                onClick={() => modalAdd(
-                  <FishWarningDialog
-                    onSuccessButtonClick={() => {
+                onClick={() => modalAdd({
+                  modalType: FISH_WARNING_DIALOG,
+                  modalProps: {
+                    onSuccessButtonClick: () => {
                       modalDismiss();
                       fishWarn();
-                    }}
-                  />
-                )}
+                    },
+                  },
+                })}
               >
                 Deposit
               </Button>

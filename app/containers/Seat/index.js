@@ -31,7 +31,7 @@ import {
 } from '../Table/selectors';
 
 import {
-  timeoutSeconds,
+  TIMEOUT_PERIOD,
 } from '../../app.config';
 
 import SeatComponent from '../../components/Seat';
@@ -48,6 +48,7 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
     });
 
     // manage timer
+    const timeoutSeconds = TIMEOUT_PERIOD(this.props.state);
     let timeLeft = timeoutSeconds;
     if (nextProps.whosTurn === nextProps.pos) {
       // TODO: Make timeLeft count down from 100 - 0, right now is 360 - 0?
@@ -80,7 +81,14 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
   }
 
   render() {
-    const timeLeft = (this.state && this.props.whosTurn === this.props.pos) ? ((this.state.timeLeft * 100) / timeoutSeconds) : timeoutSeconds;
+    const { state, pos, whosTurn } = this.props;
+    const timeoutSeconds = TIMEOUT_PERIOD(state);
+    const timeLeft = (
+      whosTurn === pos
+      ? ((this.state.timeLeft * 100) / timeoutSeconds)
+      : timeoutSeconds
+    );
+
     return (
       <SeatComponent
         {...this.props}
@@ -124,6 +132,7 @@ Seat.propTypes = {
   lastAmount: PropTypes.number,
   changed: PropTypes.number,
   whosTurn: PropTypes.number,
+  state: PropTypes.string,
   pos: PropTypes.number,
 };
 

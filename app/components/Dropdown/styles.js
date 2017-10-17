@@ -42,17 +42,6 @@ export const Caret = styled.i`
   }
 `;
 
-// Modal
-export const ModalContainer = styled(Container)`
-  min-width: 180px;
-`;
-export const ModalButton = styled(Button)`
-  margin-top: 6px;
-  &:first-child {
-    margin-top: 0;
-  }
-`;
-
 // Token Button
 export const TokenContainer = styled.div`
   display: flex;
@@ -99,4 +88,15 @@ export const ToggleOption = styled.div`
   };
   color: ${fontColor};
   font-size: 1.1em;
+`;
+
+// Modal
+export const ModalContainer = styled(Container)`
+  min-width: 180px;
+`;
+export const ModalButton = styled(Button)`
+  margin-top: 6px;
+  &:first-child {
+    margin-top: 0;
+  }
 `;
