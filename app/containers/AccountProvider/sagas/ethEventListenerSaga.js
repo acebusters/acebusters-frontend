@@ -3,7 +3,7 @@ import { eventChannel, END } from 'redux-saga';
 import { addEventsDate, isUserEvent } from '../utils';
 import { contractEvents } from '../actions';
 
-const ethEvent = (contract) => eventChannel((emitter) => {
+export const ethEvent = (contract) => eventChannel((emitter) => {
   const events = contract.allEvents({ fromBlock: 'latest' });
   events.watch((error, results) => {
     if (error) {

@@ -62,7 +62,7 @@ function generateWeb3Methods(params) {
 let updatedState;
 function getCurrentState() { return updatedState; }
 
-function generateNetworkApi(state, dispatch) {
+export function generateNetworkApi(state, dispatch) {
   updatedState = state;
   // reduce the supported api into action creators and getters
   const web3 = Object.keys(SUPPORTED_WEB3_METHODS).reduce((o, groupName) => ({
@@ -74,21 +74,7 @@ function generateNetworkApi(state, dispatch) {
     {}),
   }),
   {});
-  // nice little helper function
-  web3.eth.waitForMined = (tx, pollTime = 5 * 1000) => (
-    new Promise((resolve, reject) => {
-      function poll() {
-        return web3.eth.getTransactionReceipt(tx).then((res) => {
-          if (res) {
-            resolve(res);
-          } else {
-            setTimeout(poll, pollTime);
-          }
-        }).catch(reject);
-      }
-      setTimeout(poll, 10); // timeout for testrpc
-    })
-  );
+
   // custom contract creation api
   web3.eth.contract = generateContractApi({ web3, getState: getCurrentState, dispatch });
 

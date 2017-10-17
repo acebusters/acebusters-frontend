@@ -3,15 +3,18 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import WithLoading from '../../components/WithLoading';
+import EstimateWarning from '../../containers/EstimateWarning';
 
 import H2 from '../H2';
 import TimedButton from '../TimedButton';
+import Timed from '../Timed';
 
 import { formatAbp } from '../../utils/amountFormatter';
 import { formatDate } from '../../containers/Dashboard/utils';
 import { SectionOverview } from './styles';
 
-export default function ABPPayout({ downs, downtime, handlePayout, pending, messages }) {
+export default function ABPPayout({ downs, downtime, handlePayout, estimatePayout, pending, messages }) {
+  const nextPayoutDate = nextPayout(...downs, downtime);
   return (
     <SectionOverview
       name="power-down-requests"
@@ -31,8 +34,14 @@ export default function ABPPayout({ downs, downtime, handlePayout, pending, mess
         <PayoutDate request={downs} downtime={downtime} />
       </div>
 
+      {!pending &&
+        <Timed until={nextPayoutDate}>
+          <EstimateWarning estimate={estimatePayout} />
+        </Timed>
+      }
+
       <TimedButton
-        until={nextPayout(...downs, downtime)}
+        until={nextPayoutDate}
         onClick={handlePayout}
         disabled={pending}
       >
@@ -55,6 +64,7 @@ ABPPayout.propTypes = {
   downs: PropTypes.array,
   downtime: PropTypes.object,
   handlePayout: PropTypes.func,
+  estimatePayout: PropTypes.func,
   pending: PropTypes.bool,
   messages: PropTypes.object,
 };

@@ -18,8 +18,8 @@ import { Pane, SectionOverview, Subtitle } from './styles';
 const Overview = (props) => {
   const {
     account, listTxns, messages,
-    downs, handleABPPayout, downtime, abpPayoutPending,
-    ethAllowance, ethPayoutDate, ethPayoutPending, handleETHPayout,
+    downs, downtime, abpPayoutPending, handleABPPayout, estimateABPPayout,
+    ethAllowance, ethPayoutDate, ethPayoutPending, handleETHPayout, estimateETHPayout,
   } = props;
   const emptyColumnStyle = { width: 20 };
   const ethAmount = formatEth(ethAllowance);
@@ -73,6 +73,7 @@ const Overview = (props) => {
           payoutDate={ethPayoutDate}
           pending={ethPayoutPending}
           handlePayout={handleETHPayout}
+          estimatePayout={estimateETHPayout}
           amount={ethAmount}
           messages={messages}
         />
@@ -84,6 +85,7 @@ const Overview = (props) => {
           downtime={downtime}
           pending={abpPayoutPending}
           handlePayout={handleABPPayout}
+          estimatePayout={estimateABPPayout}
           messages={messages}
         />
       }
@@ -134,7 +136,9 @@ Overview.propTypes = {
   abpPayoutPending: PropTypes.bool,
   ethPayoutDate: PropTypes.object,
   handleETHPayout: PropTypes.func,
+  estimateETHPayout: PropTypes.func,
   handleABPPayout: PropTypes.func,
+  estimateABPPayout: PropTypes.func,
   messages: PropTypes.object,
   toggleInvestTour: PropTypes.func.isRequired,
 };

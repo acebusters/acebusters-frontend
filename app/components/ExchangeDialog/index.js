@@ -7,6 +7,7 @@ import { normalizerFloat } from '../../utils/amountFormatter';
 import { ABP, ETH, NTZ } from '../../containers/Dashboard/actions';
 
 import Web3Alerts from '../../containers/Web3Alerts';
+import EstimateWarning from '../../containers/EstimateWarning';
 import SubmitButton from '../SubmitButton';
 import H2 from '../H2';
 
@@ -46,6 +47,7 @@ class ExchangeDialog extends React.Component { // eslint-disable-line react/pref
       amount = 0,
       calcExpectedAmount,
       expectedAmountUnit,
+      estimateExchange,
       title,
       descr,
       invalid,
@@ -90,6 +92,13 @@ class ExchangeDialog extends React.Component { // eslint-disable-line react/pref
 
           <Web3Alerts />
 
+          {!invalid && canSendTx && amount &&
+            <EstimateWarning
+              estimate={estimateExchange}
+              args={[amount]}
+            />
+          }
+
           <SubmitButton
             disabled={invalid || !canSendTx}
             submitting={submitting}
@@ -115,6 +124,7 @@ ExchangeDialog.propTypes = {
   calcExpectedAmount: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func,
   handleExchange: PropTypes.func, // eslint-disable-line
+  estimateExchange: PropTypes.func, // eslint-disable-line
   stopSubmit: PropTypes.func,
   amount: PropTypes.string,
   title: PropTypes.node,

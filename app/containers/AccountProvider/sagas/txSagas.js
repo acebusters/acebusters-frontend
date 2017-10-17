@@ -19,12 +19,12 @@ function getTxArgs({ data, dest, args, methodName }) {
   return isForward ? args.slice(0, 3) : [dest, options.value || new BigNumber(0), data];
 }
 
-function* contractTransactionSend(action) {
+function* contractTransactionSend({ payload }) {
   const { proxy: proxyAddr, injected: injectedAddr, isLocked, owner, signerAddr } = yield select(makeSelectAccountData());
-  const txArgs = yield call(getTxArgs, action.payload);
+  const txArgs = yield call(getTxArgs, payload);
 
   if (isLocked) {
-    const forwardReceipt = new Receipt(owner).forward(0, ...txArgs).sign(action.payload.privKey);
+    const forwardReceipt = new Receipt(owner).forward(0, ...txArgs).sign(payload.privKey);
     const txHashChannel = fishTxHashChannel(signerAddr);
     yield call(sendTx, forwardReceipt);
     const txHash = yield take(txHashChannel);
@@ -34,11 +34,10 @@ function* contractTransactionSend(action) {
 
   const web3 = yield call(getWeb3, true);
   const proxy = web3.eth.contract(ABI_PROXY).at(proxyAddr);
-  const estimateGas = yield call(promisifyWeb3Call, proxy.forward.estimateGas);
   const sendTransaction = yield call(promisifyWeb3Call, proxy.forward.sendTransaction);
-  const gas = yield call(estimateGas, ...txArgs, { from: injectedAddr });
+  const gas = yield payload.estimateGas;
 
-  return yield call(sendTransaction, ...txArgs, { from: injectedAddr, gas: Math.round(gas * 1.9) });
+  return yield call(sendTransaction, ...txArgs, { from: injectedAddr, gas });
 }
 
 export function* contractTransactionSendSaga() {

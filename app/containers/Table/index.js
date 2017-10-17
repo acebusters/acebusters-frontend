@@ -103,7 +103,9 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.handleSitout = this.handleSitout.bind(this);
     this.handleOpponentCall = this.handleOpponentCall.bind(this);
     this.handleJoin = this.handleJoin.bind(this);
+    this.estimateJoin = this.estimateJoin.bind(this);
     this.handleRebuy = this.handleRebuy.bind(this);
+    this.estimateRebuy = this.estimateRebuy.bind(this);
     this.isTaken = this.isTaken.bind(this);
 
     this.tableAddr = props.params.tableAddr;
@@ -203,6 +205,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
         modalType: JOIN_DIALOG,
         modalProps: {
           onJoin: this.handleRebuy,
+          estimate: this.estimateRebuy,
           onLeave: () => this.handleLeave(this.props.myPos),
           modalDismiss: this.props.modalDismiss,
           params: this.props.params,
@@ -260,6 +263,16 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     });
   }
 
+  estimateRebuy(amount) {
+    const { signerAddr, myPos } = this.props;
+
+    return this.token.transData.estimateGas(
+      this.tableAddr,
+      amount,
+      `0x0${(myPos).toString(16)}${signerAddr.replace('0x', '')}`
+    );
+  }
+
   async handleJoin(pos, amount) {
     const { signerAddr, account } = this.props;
 
@@ -299,6 +312,15 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     }
   }
 
+  estimateJoin(pos, amount) {
+    const { signerAddr } = this.props;
+    return this.token.transData.estimateGas(
+      this.tableAddr,
+      amount,
+      `0x0${(pos).toString(16)}${signerAddr.replace('0x', '')}`,
+    );
+  }
+
   isTaken(open, myPos, pending, pos) {
     if (!this.props.account.loggedIn) {
       const loc = this.props.location;
@@ -319,6 +341,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
         modalType: JOIN_DIALOG,
         modalProps: {
           onJoin: (amount) => this.handleJoin(pos, amount),
+          estimate: (amount) => this.estimateJoin(pos, amount),
           modalDismiss: this.props.modalDismiss,
           params: this.props.params,
           balance,
