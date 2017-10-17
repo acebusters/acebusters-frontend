@@ -37,7 +37,7 @@ export const Wrapper = styled.div`
 
 export const Winner = styled.div` 
   left: 50%;
-  top: 100%;
+  top: 40%;
   position: absolute;
   padding: 0.5em;
   background-color: ${black};
