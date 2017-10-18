@@ -1,7 +1,6 @@
 import { fromJS } from 'immutable';
 import dashboardReducer from '../reducer';
-import { contractEvent, proxyEvent, proxyEvents, contractTxError } from '../../AccountProvider/actions';
-import { modalDismiss } from '../../App/actions';
+import { contractEvent, proxyEvent, proxyEvents } from '../../AccountProvider/actions';
 import { OVERVIEW, ETH, POWERUP } from '../actions';
 
 describe('dashboard reducer tests', () => {
@@ -10,7 +9,6 @@ describe('dashboard reducer tests', () => {
       activeTab: OVERVIEW,
       amountUnit: ETH,
       events: null,
-      failedTx: null,
       investType: POWERUP,
       investTour: false,
       proxy: null,
@@ -167,21 +165,5 @@ describe('dashboard reducer tests', () => {
       },
       proxy: '0x7c08ca8bef208ac8be8cd03ad15fbef643dd355c',
     }));
-  });
-
-  it('should save payload of transaction error action', () => {
-    expect(dashboardReducer(
-      undefined,
-      contractTxError({ error: 'Some error message' })
-    ).get('failedTx')).toEqual(fromJS({ error: 'Some error message' }));
-  });
-
-  it('should reset failed transaction on modal dismiss action', () => {
-    expect(dashboardReducer(
-      fromJS({
-        failedTx: { error: 'Some error message' },
-      }),
-      modalDismiss()
-    ).get('failedTx')).toEqual(null);
   });
 });

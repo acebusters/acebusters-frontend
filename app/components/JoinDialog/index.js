@@ -6,6 +6,7 @@ import SubmitButton from 'components/SubmitButton';
 import RangeSlider from 'components/Slider/RangeSlider';
 import H2 from 'components/H2';
 import Web3Alerts from 'containers/Web3Alerts';
+import EstimateWarning from 'containers/EstimateWarning';
 import messages from 'containers/JoinDialog/messages';
 
 import { formatNtz } from '../../utils/amountFormatter';
@@ -29,6 +30,7 @@ export class JoinDialog extends React.Component {
       balance,
       modalDismiss,
       handleSubmit,
+      estimate,
       amount,
       submitting,
       onLeave,
@@ -40,7 +42,7 @@ export class JoinDialog extends React.Component {
     const max = (balance < tableMax) ? balance - (balance % sb) : tableMax;
     if (balance < min) {
       return (
-        <div style={{ minWidth: '20em' }}>
+        <div style={{ maxWidth: '30em' }}>
           <H2><FormattedMessage {...messages.sorry} /></H2>
           <p><FormattedMessage {...(rebuy ? messages.balanceOutRebuy : messages.balanceOutJoin)} /></p>
           <SubmitButton onClick={modalDismiss}>
@@ -50,7 +52,7 @@ export class JoinDialog extends React.Component {
       );
     }
     return (
-      <Form style={{ minWidth: '20em' }} onSubmit={handleSubmit(this.handleSubmit)}>
+      <Form style={{ maxWidth: '30em' }} onSubmit={handleSubmit(this.handleSubmit)}>
         <Field
           component={RangeSlider}
           name="amount"
@@ -62,6 +64,13 @@ export class JoinDialog extends React.Component {
         <div>{formatNtz(amount)} NTZ</div>
 
         <Web3Alerts />
+
+        {canSendTx &&
+          <EstimateWarning
+            estimate={estimate}
+            args={[amount]}
+          />
+        }
 
         <ButtonContainer>
           <SubmitButton
@@ -85,6 +94,7 @@ JoinDialog.propTypes = {
   onLeave: PropTypes.func,
   rebuy: PropTypes.bool,
   handleSubmit: PropTypes.func,
+  estimate: PropTypes.func,
   modalDismiss: PropTypes.func,
   canSendTx: PropTypes.bool,
   sb: PropTypes.number,

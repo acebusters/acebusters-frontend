@@ -8,7 +8,7 @@ import { FISH_WARNING_DIALOG } from 'containers/Modal/constants';
 import messages from '../../containers/Dashboard/messages';
 import AccountProgress from '../../containers/Dashboard/AccountProgress';
 import WithLoading from '../WithLoading';
-import { MAIN_NET_GENESIS_BLOCK, conf } from '../../app.config';
+import { MAIN_NET_GENESIS_BLOCK, ETH_FISH_LIMIT, conf } from '../../app.config';
 import shapeshiftButton from './shapeshift.png';
 
 import Alert from '../Alert';
@@ -31,7 +31,6 @@ const shapeShiftLink = (proxy) => `https://shapeshift.io/shifty.html?destination
 
 export const AccountIsLocked = (props) => {
   const {
-    ETH_FISH_LIMIT,
     account,
     ethBalance,
     nutzBalance,
@@ -136,7 +135,6 @@ export const AccountIsLocked = (props) => {
   );
 };
 AccountIsLocked.propTypes = {
-  ETH_FISH_LIMIT: PropTypes.object,
   account: PropTypes.object,
   ethBalance: PropTypes.object,
   nutzBalance: PropTypes.object,

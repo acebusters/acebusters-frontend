@@ -3,12 +3,7 @@ import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import BigNumber from 'bignumber.js';
 
-import {
-  NTZ_DECIMALS,
-  ETH_DECIMALS,
-  formatNtz,
-  formatEth,
-} from '../../utils/amountFormatter';
+import { NTZ_DECIMALS, ETH_DECIMALS, formatNtz, formatEth } from '../../utils/amountFormatter';
 import { round } from '../../utils';
 
 import ExchangeDialog from '../../containers/ExchangeDialog';
@@ -19,10 +14,11 @@ import Alert from '../Alert';
 
 import { Pane, Section, ExchangeContainer } from './styles';
 
+import { ETH_FISH_LIMIT } from '../../app.config';
+
 const Exchange = (props) => {
   const {
     amountUnit,
-    ETH_FISH_LIMIT,
     messages,
     account,
     ethBalance,
@@ -30,7 +26,9 @@ const Exchange = (props) => {
     ceiling,
     floor,
     handleNTZSell,
+    estimateNTZSell,
     handleNTZPurchase,
+    estimateNTZPurchase,
   } = props;
   const calcETHAmount = (ntz) => new BigNumber(ntz.toString()).div(floor);
   const calcNTZAmount = (eth) => ceiling.mul(eth.toString());
@@ -57,6 +55,7 @@ const Exchange = (props) => {
               amountUnit={NTZ}
               calcExpectedAmount={calcExpectedAmountETH}
               handleExchange={handleNTZSell}
+              estimateExchange={estimateNTZSell}
               maxAmount={BigNumber.min(
                 account.isLocked
                   ? BigNumber.max(ETH_FISH_LIMIT.sub(ethBalance), 0).mul(floor)
@@ -65,7 +64,7 @@ const Exchange = (props) => {
               )}
               placeholder="0"
               expectedAmountUnit={ETH}
-              {...props}
+              messages={props.messages}
             />
           }
           {amountUnit === ETH && ethBalance && ceiling &&
@@ -85,6 +84,7 @@ const Exchange = (props) => {
               amountUnit={ETH}
               calcExpectedAmount={calcExpectedAmountNTZ}
               handleExchange={handleNTZPurchase}
+              estimateExchange={estimateNTZPurchase}
               maxAmount={BigNumber.min(
                 account.isLocked
                   ? BigNumber.max(ETH_FISH_LIMIT.sub(calcETHAmount(nutzBalance)), 0)
@@ -93,7 +93,7 @@ const Exchange = (props) => {
               )}
               placeholder="0.00"
               expectedAmountUnit={NTZ}
-              {...props}
+              messages={props.messages}
             />
           }
         </ExchangeContainer>
@@ -102,7 +102,6 @@ const Exchange = (props) => {
   );
 };
 Exchange.propTypes = {
-  ETH_FISH_LIMIT: PropTypes.object,
   amountUnit: PropTypes.oneOf([ETH, NTZ]),
   account: PropTypes.object,
   ethBalance: PropTypes.object,
@@ -111,7 +110,9 @@ Exchange.propTypes = {
   ceiling: PropTypes.object,
   floor: PropTypes.object,
   handleNTZSell: PropTypes.func,
+  estimateNTZSell: PropTypes.func,
   handleNTZPurchase: PropTypes.func,
+  estimateNTZPurchase: PropTypes.func,
 };
 
 export default Exchange;

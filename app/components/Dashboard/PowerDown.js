@@ -17,6 +17,7 @@ const PowerDown = (props) => {
     messages,
     pwrBalance,
     handlePowerDown,
+    estimatePowerDown,
     powerDownMinAbp,
     calcABPtoNTZ,
   } = props;
@@ -39,6 +40,7 @@ const PowerDown = (props) => {
         <ExchangeDialog
           form="exchangeABPtoNTZ"
           handleExchange={handlePowerDown}
+          estimateExchange={estimatePowerDown}
           maxAmount={pwrBalance.div(ABP_DECIMALS)}
           minAmount={powerDownMinAbp}
           hideAddress
@@ -57,6 +59,7 @@ const PowerDown = (props) => {
 PowerDown.propTypes = {
   messages: PropTypes.object.isRequired,
   handlePowerDown: PropTypes.func.isRequired,
+  estimatePowerDown: PropTypes.func.isRequired,
   pwrBalance: PropTypes.object,
   powerDownMinAbp: PropTypes.object.isRequired,
   calcABPtoNTZ: PropTypes.func.isRequired,

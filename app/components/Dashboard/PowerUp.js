@@ -20,6 +20,7 @@ const PowerUp = (props) => {
     account,
     nutzBalance,
     handlePowerUp,
+    estimatePowerUp,
     totalAvailPwr,
     powerUpRate,
     powerUpMaxBabz,
@@ -53,6 +54,7 @@ const PowerUp = (props) => {
         <ExchangeDialog
           form="exchangeNTZtoABP"
           handleExchange={handlePowerUp}
+          estimateExchange={estimatePowerUp}
           maxAmount={nutzBalance || toNtz(powerUpMaxBabz)}
           minAmount={powerUpMinNtz}
           label={<FormattedMessage {...messages.powerUpAmountLabel} />}
@@ -78,6 +80,7 @@ PowerUp.propTypes = {
   nutzBalance: PropTypes.object,
   messages: PropTypes.object.isRequired,
   handlePowerUp: PropTypes.func,
+  estimatePowerUp: PropTypes.func,
   totalAvailPwr: PropTypes.object.isRequired,
   powerUpRate: PropTypes.object.isRequired,
   powerUpMaxBabz: PropTypes.object.isRequired,

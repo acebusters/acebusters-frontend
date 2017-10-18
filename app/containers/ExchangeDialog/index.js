@@ -7,6 +7,8 @@ import ExchangeDialog from '../../components/ExchangeDialog';
 import messages from './messages';
 
 import { makeSelectCanSendTx } from '../AccountProvider/selectors';
+import { modalAdd, modalDismiss } from '../App/actions';
+import { setAmountUnit } from '../Dashboard/actions';
 
 const validate = (values, props) => {
   const errors = {};
@@ -32,6 +34,9 @@ const mapStateToProps = (state, ownProps) => {
 
 function mapDispatchToProps(dispatch, ownProps) {
   return {
+    modalAdd: (...args) => dispatch(modalAdd(...args)),
+    modalDismiss: (...args) => dispatch(modalDismiss(...args)),
+    setAmountUnit: (...args) => dispatch(setAmountUnit(...args)),
     stopSubmit: (errors) => dispatch(stopSubmit(ownProps.form, errors)),
   };
 }

@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import Modal from 'components/Modal';
+import Modal from '../../components/Modal';
 
-import { makeModalSelector } from 'containers/App/selectors';
-import { modalDismiss } from 'containers/App/actions';
+import { makeModalSelector } from '../../containers/App/selectors';
+import { modalDismiss } from '../../containers/App/actions';
 
 class ModalContainer extends React.Component {
 
