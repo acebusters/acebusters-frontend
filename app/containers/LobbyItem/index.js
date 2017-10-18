@@ -49,9 +49,9 @@ class LobbyItem extends React.PureComponent { // eslint-disable-line
           <Link
             to={`/table/${this.props.tableAddr}`}
             size="small"
-            icon="fa fa-eye"
-            component={Button}
-          />
+          >
+            <Button icon="fa fa-eye" />
+          </Link>
         </Td>
       </Tr>
     );
