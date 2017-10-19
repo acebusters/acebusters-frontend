@@ -47,6 +47,11 @@ export function* updateScanner(pokerHelper) {
       continue; // eslint-disable-line no-continue
     }
 
+    // reset payedBlind on hand revert after undefined distribution
+    if (action.hand.cards && action.hand.cards.length === 0) {
+      payedBlind[toggleKey] = false;
+    }
+
     // check if turn to pay small blind
     if (!complete) {
       if (isSbTurnByAction(action, { address: myAddr, sb }) && !payedBlind[toggleKey]) {
