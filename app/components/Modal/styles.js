@@ -48,7 +48,7 @@ export const DialogWrapper = styled.div`
   box-sizing: border-box;
   width: auto;
   margin-bottom: 20px;
-  padding: 20px;
+  padding: 40px 30px 20px 30px;
 
   color: #333;
   background: white;
@@ -58,8 +58,8 @@ export const DialogWrapper = styled.div`
 
 export const CloseButton = styled.a`
   position: absolute;
-  top: 0px;
-  right: 0px;
+  top: 5px;
+  right: 5px;
 
   width: 30px;
   height: 30px;

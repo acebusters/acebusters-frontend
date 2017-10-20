@@ -11,6 +11,7 @@ import {
   makeLatestHandSelector,
   makeReservationSelector,
   makeMyPosSelector,
+  makeTableStakesSelector,
 } from '../selectors';
 
 import { PLAYER1, PLAYER2, PLAYER3, PLAYER4, PLAYER_EMPTY } from './consts';
@@ -23,6 +24,22 @@ const PROPS = {
     tableAddr: TBL_ADDR,
   },
 };
+
+describe('makeTableStakesSelector', () => {
+  const mockedState = fromJS({
+    table: {
+      [TBL_ADDR]: { data: { smallBlind: 2 } },
+    },
+  });
+  const tableStakes = {
+    sb: 2,
+    min: 80,
+    tableMax: 400,
+  };
+  it('should create stakes based on sb', () => {
+    expect(makeTableStakesSelector()(mockedState, PROPS)).toEqual(tableStakes);
+  });
+});
 
 describe('tableStateSelector', () => {
   it('should select the table state', () => {

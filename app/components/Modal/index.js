@@ -10,6 +10,7 @@ import FishWarningDialog from './FishWarningDialog';
 import ModalsTransitionGroup from './ModalsTransitionGroup';
 import { DialogTransitionGroup } from './DialogTransitionGroup';
 import { ContainerTransitionGroup } from './ContainerTransitionGroup';
+import XButton from './XButton';
 
 import {
   DialogWrapper,
@@ -18,15 +19,6 @@ import {
   Background,
   Modals,
 } from './styles';
-
-const XButton = () => (
-  <svg width="30" height="30">
-    <g transform="rotate(45 15 15)">
-      <rect x="5" y="14.25" width="20" height="1.5" fill="#000" />
-      <rect y="5" x="14.25" height="20" width="1.5" fill="#000" />
-    </g>
-  </svg>
-);
 
 const MODALS = {
   [modals.CONFIRM_DIALOG]: ConfirmDialog,

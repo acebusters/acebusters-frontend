@@ -198,6 +198,15 @@ const makeSbSelector = () => createSelector(
   }
 );
 
+export const makeTableStakesSelector = () => createSelector(
+  [makeSbSelector()],
+  (sb) => ({
+    sb,
+    min: sb * 40,
+    tableMax: sb * 200,
+  }),
+);
+
 const makeWhosTurnSelector = () => createSelector(
   [makeHandSelector(), makeSbSelector()],
   (hand, sb) => {

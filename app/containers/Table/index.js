@@ -207,7 +207,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           onJoin: this.handleRebuy,
           estimate: this.estimateRebuy,
           onLeave: () => this.handleLeave(this.props.myPos),
-          modalDismiss: this.props.modalDismiss,
           params: this.props.params,
           balance: balance && Number(balance.toString()),
           rebuy: true,
@@ -509,37 +508,42 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     if (!lineup) {
       return seats;
     }
-    for (let i = 0; i < lineup.length; i += 1) {
-      const sitout = lineup[i].sitout;
-      seats.push(
-        <Seat
-          key={i}
-          pos={i}
-          sitout={sitout}
-          signerAddr={lineup[i].address}
-          params={this.props.params}
-          changed={changed}
-          isTaken={this.isTaken}
-        />
-      );
-    }
-    return seats;
+
+    return lineup.map((seat, i) => (
+      <Seat
+        key={i}
+        pos={i}
+        sitout={seat.sitout}
+        signerAddr={seat.address}
+        params={this.props.params}
+        changed={changed}
+        isTaken={this.isTaken}
+      />
+    ));
   }
 
   renderBoard() {
-    const board = [];
     const cards = this.props.board;
     const cardSize = 50;
-    if (cards && cards.length > 0) {
-      for (let i = 0; i < cards.length; i += 1) {
-        board.push(
-          <BoardCardWrapper key={i}>
-            <Card cardNumber={cards[i]} size={cardSize} />
-          </BoardCardWrapper>
-        );
-      }
+
+    if (Array.isArray(cards)) {
+      return cards.map((card, i) => (
+        <BoardCardWrapper key={i}>
+          <Card cardNumber={card} size={cardSize} />
+        </BoardCardWrapper>
+      ));
     }
-    return board;
+
+    return [];
+  }
+
+  renderWinners() {
+    const winners = this.props.winners || [];
+    return winners.map((winner, i) => (
+      <div key={i}>
+        {nickNameByAddress(winner.addr)} won {formatNtz(winner.amount - winner.maxBet)} NTZ {(winner.hand) ? `with ${winner.hand}` : ''}
+      </div>
+    ));
   }
 
   render() {
@@ -547,19 +551,11 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       return <NotFoundPage />;
     }
 
-    const lineup = (this.props.lineup) ? this.props.lineup.toJS() : null;
-    const changed = (this.props.hand) ? this.props.hand.get('changed') : null;
-    const seats = this.renderSeats(lineup, changed);
-    const board = this.renderBoard();
-    let winners = [];
-    if (this.props.winners && this.props.winners.length > 0) {
-      winners = this.props.winners.map((winner, index) => {
-        const handString = (winner.hand) ? `with ${winner.hand}` : '';
-        return (<div key={index}>{nickNameByAddress(winner.addr)} won {formatNtz(winner.amount - winner.maxBet)}  NTZ {handString}</div>);
-      });
-    }
-    const sb = (this.props.data && this.props.data.get('smallBlind')) ? this.props.data.get('smallBlind') : 0;
+    const lineup = this.props.lineup ? this.props.lineup.toJS() : null;
+    const changed = this.props.hand ? this.props.hand.get('changed') : null;
+    const sb = (this.props.data && this.props.data.get('smallBlind')) || 0;
     const pending = (lineup && lineup[this.props.myPos]) ? lineup[this.props.myPos].pending : false;
+
     return (
       <div>
         <TableDebug
@@ -585,12 +581,12 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
             {...this.props}
             id="table"
             sb={sb}
-            winners={winners}
+            winners={this.renderWinners()}
             myHand={this.props.myHand}
             pending={pending}
             sitout={this.props.sitout}
-            board={board}
-            seats={seats}
+            board={this.renderBoard()}
+            seats={this.renderSeats(lineup, changed)}
             hand={this.props.hand}
             potSize={this.props.potSize}
             onLeave={() => this.handleLeave(this.props.myPos)}
@@ -603,8 +599,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 }
 
-
-export function mapDispatchToProps() {
+function mapDispatchToProps() {
   return {
     loadTable,
     handRequest,

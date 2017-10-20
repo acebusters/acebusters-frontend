@@ -15,12 +15,6 @@ import {
   Winner,
 } from './styles';
 
-const Seats = (props) => (
-  <div name="seats">
-    { props.seats }
-  </div>
-);
-
 const TableComponent = (props) => (
   <div name="table-component">
     <Curtain {...props} />
@@ -58,10 +52,6 @@ const TableComponent = (props) => (
 
   </div>
 );
-
-Seats.propTypes = {
-  seats: PropTypes.array,
-};
 
 TableComponent.propTypes = {
   board: PropTypes.array,
