@@ -84,7 +84,13 @@ class DashboardRoot extends React.Component {
     const pwrBalance = this.power.balanceOf(account.proxy);
 
     // before crowdsale end, disable INVEST tab on production
-    const disabledTabs = conf().firstBlockHash === MAIN_NET_GENESIS_BLOCK ? [INVEST] : [];
+    const isMainnet = conf().firstBlockHash === MAIN_NET_GENESIS_BLOCK;
+    const inWhitelist = [
+      '0x8f3a1e097738a3f6f19c06b97d160df6b3a1801a', // sergey
+      '0x67BE75FeDEE88a84CBdCF5c87616bB1bB746C57E', // johann
+      '0x4a46401dF761F2Ccc022c83AA7A97AAc7A35303A', // sunify
+    ].indexOf(account.proxy) !== -1;
+    const disabledTabs = (isMainnet && !inWhitelist) ? [INVEST] : [];
     return (
       <Container>
         <Tabs
