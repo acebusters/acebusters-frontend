@@ -113,8 +113,8 @@ class ExchangeDialog extends React.Component { // eslint-disable-line react/pref
 
 ExchangeDialog.propTypes = {
   messages: PropTypes.object,
-  modalAdd: PropTypes.func,
-  modalDismiss: PropTypes.func,
+  modalAdd: PropTypes.func.isRequired,
+  modalDismiss: PropTypes.func.isRequired,
   minAmount: PropTypes.object, // BigNumber
   submitting: PropTypes.bool,
   setAmountUnit: PropTypes.func,

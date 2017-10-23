@@ -14,14 +14,12 @@ import {
   makeSelectTransferShow,
   selectWorkerProgress,
 } from './selectors';
-import { modalDismiss } from './actions';
 
 const mapDispatchToProps = (dispatch) => ({
   handleClickLogout: () => {
     browserHistory.push('/login');
     return dispatch(setAuthState({ loggedIn: false }));
   },
-  modalDismiss: () => dispatch(modalDismiss()),
 });
 
 const mapStateToProps = createStructuredSelector({

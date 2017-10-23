@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { createStructuredSelector } from 'reselect';
 import BigNumber from 'bignumber.js';
 
+import { modalDismiss } from '../App/actions';
 import web3Connect from '../AccountProvider/web3Connect';
 import { ETH_DECIMALS, NTZ_DECIMALS } from '../../utils/amountFormatter';
 import { SELL_NTZ, PURCHASE_NTZ } from '../Notifications/constants';
@@ -140,7 +141,7 @@ class Exchange extends React.Component {
 Exchange.propTypes = {
   amountUnit: PropTypes.oneOf([ETH, NTZ]),
   account: PropTypes.object,
-  modalDismiss: PropTypes.func,
+  modalDismiss: PropTypes.func.isRequired,
   web3Redux: PropTypes.any,
 };
 
@@ -149,4 +150,7 @@ const mapStateToProps = createStructuredSelector({
   amountUnit: getAmountUnit(),
 });
 
-export default web3Connect(mapStateToProps, () => ({ notifyCreate }))(Exchange);
+export default web3Connect(
+  mapStateToProps,
+  () => ({ notifyCreate, modalDismiss }),
+)(Exchange);

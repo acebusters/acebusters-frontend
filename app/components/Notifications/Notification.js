@@ -24,11 +24,9 @@ const Notification = ({
 }) => (
   <Container
     name="notification-container"
-    removing={removing}
-    type={type}
-    isNotTable={isNotTable}
+    {...{ removing, type, isNotTable }}
   >
-    <Wrapper type={type} isNotTable={isNotTable}>
+    <Wrapper {...{ type, isNotTable }}>
       <Category>{category}</Category>
       <Details>{details}</Details>
       <IconWrapper>
@@ -46,7 +44,7 @@ Notification.propTypes = {
   category: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   details: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   dismissable: PropTypes.bool,
-  isNotTable: PropTypes.bool,
+  isNotTable: PropTypes.bool.isRequired,
   infoIcon: PropTypes.node,
   notifyRemove: PropTypes.func,
   removing: PropTypes.bool,
@@ -57,7 +55,6 @@ Notification.defaultProps = {
   category: 'Creating Account',
   details: '',
   dismissable: true,
-  isNotTable: false,
   infoIcon: null,
   removing: false,
   type: 'danger',

@@ -76,7 +76,7 @@ const Exchange = (props) => {
               descr={
                 <Alert theme="info" style={{ textAlign: 'center' }}>
                   <FormattedMessage
-                    {...messages.floorPrice}
+                    {...messages.ceilingPrice}
                     values={{ amount: formatNtz(ceiling.mul(NTZ_DECIMALS)) }}
                   />
                 </Alert>
