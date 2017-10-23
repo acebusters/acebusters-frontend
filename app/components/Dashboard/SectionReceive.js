@@ -140,10 +140,10 @@ AccountIsLocked.propTypes = {
   nutzBalance: PropTypes.object,
   floor: PropTypes.object,
   qrUrl: PropTypes.string,
-  modalAdd: PropTypes.func,
-  modalDismiss: PropTypes.func,
+  modalAdd: PropTypes.func.isRequired,
+  modalDismiss: PropTypes.func.isRequired,
   isFishWarned: PropTypes.bool,
-  fishWarn: PropTypes.func,
+  fishWarn: PropTypes.func.isRequired,
 };
 
 export const AccountNotLocked = ({

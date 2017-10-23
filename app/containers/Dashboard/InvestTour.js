@@ -6,7 +6,6 @@ import InvestTourComponent from '../../components/Dashboard/InvestTour';
 
 import web3Connect from '../AccountProvider/web3Connect';
 
-import { modalAdd, modalDismiss } from '../App/actions';
 import { contractEvents, proxyEvents } from '../AccountProvider/actions';
 import {
   setActiveTab,
@@ -39,8 +38,6 @@ const mapDispatchToProps = () => ({
   setInvestType,
   setActiveTab,
   setAmountUnit,
-  modalAdd,
-  modalDismiss,
   proxyEvents,
   contractEvents,
   toggleInvestTour,
