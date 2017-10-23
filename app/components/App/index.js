@@ -18,7 +18,6 @@ const App = (props) => {
    } = props;
   const pathname = location.pathname;
   const isNotTable = pathname.indexOf('table') === -1;
-  const showNotifications = pathname.match(/table|lobby|dashboard|login/);
   return (
     <div name="app-container">
       <GoogleTagManager gtmId={conf().gtmId} />
@@ -27,9 +26,7 @@ const App = (props) => {
           <Header onClickLogout={props.handleClickLogout} {...props} />
         }
 
-        {showNotifications &&
-          <Notifications isNotTable={isNotTable} />
-        }
+        <Notifications {...{ isNotTable, location }} />
 
         <Content
           isTable={!isNotTable}

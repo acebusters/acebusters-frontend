@@ -35,6 +35,7 @@ export const Container = styled.div`
   align-items: center;
   justify-content: center;
   animation: ${(props) => props.removing ? noteOut : noteIn} 0.5s ease-in-out;
+  z-index: 1;
   ${(props) => props.isNotTable ?
     `margin-top: 52px;
     background-color: ${alertBg(props.type, 'solid')};`
@@ -62,10 +63,6 @@ export const Wrapper = styled.div`
        margin-left: 124px;
      }`
   };
-`;
-
-export const CenterWrapper = styled(Wrapper)`
-  justify-content: center;
 `;
 
 export const Category = styled.h3`
