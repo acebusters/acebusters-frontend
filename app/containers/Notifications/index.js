@@ -18,7 +18,7 @@ const NotificationsContainer = ({ location, ...props }) => {
   return null;
 };
 NotificationsContainer.propTypes = {
-  location: PropTypes.string,
+  location: PropTypes.object,
 };
 
 const mapDispatchToProps = (dispatch) => ({

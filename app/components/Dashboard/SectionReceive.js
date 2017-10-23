@@ -4,6 +4,7 @@ import QRCode from 'qrcode.react';
 import ethUtil from 'ethereumjs-util';
 import { FormattedMessage } from 'react-intl';
 
+import BtnUpgrade from 'containers/Button/BtnUpgrade';
 import { FISH_WARNING_DIALOG } from 'containers/Modal/constants';
 import messages from '../../containers/Dashboard/messages';
 import AccountProgress from '../../containers/Dashboard/AccountProgress';
@@ -13,8 +14,6 @@ import shapeshiftButton from './shapeshift.png';
 
 import Alert from '../Alert';
 
-
-import BtnUpgrade from './BtnUpgrade';
 import {
   Address,
   ReceiveWrapper,
@@ -121,7 +120,7 @@ export const AccountIsLocked = (props) => {
         {ethBalance && nutzBalance && floor &&
           <Alert theme="warning" data-tour="wallet-unlock">
             <FormattedMessage values={{ limit: ETH_FISH_LIMIT.toString() }} {...messages.ethLimit} />
-            <BtnUpgrade {...props} />
+            <BtnUpgrade {...{ account, messages }} />
             <AccountProgress
               ethBalance={ethBalance}
               nutzBalance={nutzBalance}
