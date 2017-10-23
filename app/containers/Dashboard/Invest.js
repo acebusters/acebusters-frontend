@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { createStructuredSelector } from 'reselect';
 import BigNumber from 'bignumber.js';
 
+import { modalDismiss } from '../App/actions';
 import web3Connect from '../AccountProvider/web3Connect';
 import {
   NTZ_DECIMALS,
@@ -10,7 +11,6 @@ import {
 } from '../../utils/amountFormatter';
 import { notifyCreate } from '../Notifications/actions';
 
-import { modalDismiss } from '../App/actions';
 import makeSelectAccountData, {
   makeSignerAddrSelector,
   makeSelectPrivKey,
@@ -135,20 +135,12 @@ class Invest extends React.Component {
 }
 Invest.propTypes = {
   account: PropTypes.object,
-  modalDismiss: PropTypes.func,
+  modalDismiss: PropTypes.func.isRequired,
   web3Redux: PropTypes.any,
-  notifyCreate: PropTypes.func,
+  notifyCreate: PropTypes.func.isRequired,
   investType: PropTypes.oneOf([POWERUP, POWERDOWN]).isRequired,
   setInvestType: PropTypes.func.isRequired,
 };
-
-const mapDispatchToProps = (dispatch) => ({
-  setInvestType,
-  setActiveTab,
-  setAmountUnit,
-  notifyCreate: (type, props) => dispatch(notifyCreate(type, props)),
-  modalDismiss,
-});
 
 const mapStateToProps = createStructuredSelector({
   activeTab: getActiveTab(),
@@ -165,5 +157,11 @@ const mapStateToProps = createStructuredSelector({
 
 export default web3Connect(
   mapStateToProps,
-  mapDispatchToProps,
+  () => ({
+    setInvestType,
+    setActiveTab,
+    setAmountUnit,
+    notifyCreate,
+    modalDismiss,
+  }),
 )(Invest);
