@@ -87,8 +87,8 @@ class DashboardRoot extends React.Component {
     const isMainnet = conf().firstBlockHash === MAIN_NET_GENESIS_BLOCK;
     const inWhitelist = [
       '0x8f3a1e097738a3f6f19c06b97d160df6b3a1801a', // sergey
-      '0x67BE75FeDEE88a84CBdCF5c87616bB1bB746C57E', // johann
-      '0x4a46401dF761F2Ccc022c83AA7A97AAc7A35303A', // sunify
+      '0x67be75fedee88a84cbdcf5c87616bb1bb746c57e', // johann
+      '0x4a46401df761f2ccc022c83aa7a97aac7a35303a', // sunify
     ].indexOf(account.proxy) !== -1;
     const disabledTabs = (isMainnet && !inWhitelist) ? [INVEST] : [];
     return (
