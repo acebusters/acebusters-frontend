@@ -100,7 +100,7 @@ Header.propTypes = {
   location: PropTypes.object,
   loggedIn: PropTypes.bool,
   onClickLogout: PropTypes.func,
-  setCollapsed: PropTypes.func,
+  setCollapsed: PropTypes.func.isRequired,
   collapsed: PropTypes.bool,
   nickName: PropTypes.string,
   blocky: PropTypes.string,

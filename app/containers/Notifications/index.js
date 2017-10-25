@@ -9,21 +9,17 @@ import { makeSelectLoggedIn } from '../AccountProvider/selectors';
 
 import Notifications from '../../components/Notifications';
 
-const NotificationsContainer = ({ location, ...props }) => {
-  const pathname = location.pathname;
+const NotificationsContainer = ({ location: { pathname }, ...props }) => {
   const showNotifications = pathname.match(/table|lobby|dashboard|login/);
+  const isTable = pathname.match('table');
   if (showNotifications) {
-    return <Notifications {...props} />;
+    return <Notifications isNotTable={!isTable} {...props} />;
   }
   return null;
 };
 NotificationsContainer.propTypes = {
-  location: PropTypes.object,
+  location: PropTypes.shape({ pathname: PropTypes.string.isRequired }),
 };
-
-const mapDispatchToProps = (dispatch) => ({
-  notifyRemove: (txId) => dispatch(notifyRemove(txId)),
-});
 
 const mapStateToProps = createStructuredSelector({
   notifications: selectNotifications(),
@@ -32,5 +28,5 @@ const mapStateToProps = createStructuredSelector({
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps,
+  { notifyRemove },
 )(NotificationsContainer);
