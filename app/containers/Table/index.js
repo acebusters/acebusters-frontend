@@ -107,9 +107,8 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.handleRebuy = this.handleRebuy.bind(this);
     this.estimateRebuy = this.estimateRebuy.bind(this);
     this.isTaken = this.isTaken.bind(this);
+    this.handleBeat = this.handleBeat.bind(this);
 
-    this.tableAddr = props.params.tableAddr;
-    this.web3 = props.web3Redux.web3;
     this.table = this.web3.eth.contract(ABI_TABLE).at(this.tableAddr);
     this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(conf().ntzAddr);
     // register event listener for table
@@ -119,11 +118,13 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     // getting table data from oracle
     this.pusher = new Pusher(conf().pusherApiKey, { cluster: 'eu', encrypted: true });
     this.channel = this.pusher.subscribe(this.tableAddr);
-    this.tableService = new TableService(this.props.params.tableAddr, this.props.privKey);
+    this.tableService = new TableService(this.tableAddr, this.props.privKey);
 
     this.state = {
       notFound: false,
     };
+
+    this.beatInterval = setInterval(this.handleBeat, 60000);
   }
 
   componentWillMount() {
@@ -178,15 +179,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       }
     }
 
-    // get balance of player
-    this.balance = this.token.balanceOf(this.props.proxyAddr);
-    if (!this.balance && nextProps.proxyAddr) {
-      this.token.balanceOf.call(nextProps.proxyAddr);
-    }
-
-    // show winner and forward browser to url of next hand
-    this.pushed = (this.pushed) ? this.pushed : {};
-
     const toggleKey = this.tableAddr + handId;
     // display Rebuy modal if state === 'waiting' and user stack is no greater than 0
     if (
@@ -217,16 +209,33 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   componentWillUnmount() {
-    if (this.timeOut) {
-      clearTimeout(this.timeOut);
-      this.timeOut = null;
-    }
+    clearTimeout(this.timeOut);
+    clearInterval(this.beatInterval);
     this.channel.unbind('update', this.handleUpdate);
 
     // Note: with wsProvider, the request made by stopWatching will throw an error
     // Note: passed callback prevents exception, but it should work even without callback
-    // need to fix wsProvider
     this.tableEvents.stopWatching(() => null);
+  }
+
+  get tableAddr() {
+    return this.props.params.tableAddr;
+  }
+
+  get web3() {
+    return this.props.web3Redux.web3;
+  }
+
+  handleBeat() {
+    if (
+      this.props.state === 'waiting' &&
+      this.props.myPos >= 0 &&
+      this.props.myPendingSeat === -1 &&
+      !this.props.standingUp &&
+      !this.props.sitout
+    ) {
+      this.tableService.beat();
+    }
   }
 
   handleUpdate(event) {

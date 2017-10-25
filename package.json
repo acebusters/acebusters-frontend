@@ -246,7 +246,7 @@
     "localStorage": "1.0.3",
     "lodash": "4.17.2",
     "minimist": "1.2.0",
-    "poker-helper": "0.6.7",
+    "poker-helper": "^0.6.10",
     "prismic-reactjs": "^0.1.0",
     "prop-types": "^15.5.10",
     "pusher-js": "^4.0.0",

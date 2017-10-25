@@ -407,10 +407,10 @@ const makeMySitoutSelector = () => createSelector(
   (lineup, myPos) => (lineup && myPos !== undefined && lineup.getIn([myPos, 'sitout']))
 );
 
-function makeReserveLineup(lineup, reservation) {
-  return lineup.map((_, i) => ({
+export function makeReserveLineup(lineup, reservation) {
+  return lineup.map((_, i) => (Map({
     address: reservation.getIn([String(i), 'signerAddr']),
-  })).toJS();
+  })));
 }
 
 const makeMyPosSelector = () => createSelector(
@@ -420,7 +420,7 @@ const makeMyPosSelector = () => createSelector(
       return pokerHelper.getMyPos(lineup.toJS(), myAddress);
     } catch (e) {
       try {
-        return pokerHelper.getMyPos(makeReserveLineup(lineup, reservation), myAddress);
+        return pokerHelper.getMyPos(makeReserveLineup(lineup, reservation).toJS(), myAddress);
       } catch (e2) {
         return undefined;
       }
