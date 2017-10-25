@@ -5,6 +5,7 @@ import { web3MethodCall, SUPPORTED_WEB3_METHODS } from './actions';
 import { selectAccount } from './selectors';
 import { getWeb3 } from './sagas';
 import generateContractApi from './generateContractApi';
+import { getMethodKey } from './utils';
 
 function degrade(fn, fallback) {
   try {
@@ -12,10 +13,6 @@ function degrade(fn, fallback) {
   } catch (e) {
     return fallback;
   }
-}
-
-export function getMethodKey({ groupName, methodName, args }) {
-  return `${groupName || ''}.${methodName}(${JSON.stringify(args)})`;
 }
 
 // returns the value of the gotten web3 method
@@ -81,7 +78,7 @@ export function generateNetworkApi(state, dispatch) {
   return { web3 };
 }
 
-export default function web3Connect(passedMapStateToProps, passedActions) {
+export default function web3Connect(passedMapStateToProps, passedActions = () => ({})) {
   // allow user to map custom map
   function mapStateToProps(state, props) {
     return { ...passedMapStateToProps(state, props), web3Redux: selectAccount(state) };

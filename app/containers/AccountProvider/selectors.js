@@ -1,6 +1,8 @@
 import EthUtil from 'ethereumjs-util';
 import { createSelector } from 'reselect';
 import { READY_STATE } from './actions';
+import { getMethodKey } from './utils';
+import { conf } from '../../app.config';
 
 /**
  * Direct selector to the accountProvider state domain
@@ -100,12 +102,22 @@ const makeSelectProxyAddr = () => createSelector(
   (account) => account.get('proxy')
 );
 
+const makeSelectWeb3MethodValue = (address, methodName, args = []) => createSelector(
+  selectAccount,
+  (account) => account.getIn([address, 'methods', getMethodKey({ methodName, args }), 'value']),
+);
+
 const makeSelectCanSendTx = () => createSelector(
   makeSelectIsLocked(),
   makeSelectHasWeb3(),
   makeSelectNetworkSupported(),
   makeSelectWrongInjected(),
-  (isLocked, hasWeb3, networkSupported, wrongInjected) => {
+  makeSelectWeb3MethodValue(conf().contrAddr, 'paused'),
+  (isLocked, hasWeb3, networkSupported, wrongInjected, paused) => {
+    if (paused) {
+      return false;
+    }
+
     if (isLocked) {
       return true;
     }

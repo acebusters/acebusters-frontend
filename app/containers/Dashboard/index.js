@@ -5,21 +5,8 @@ import { FormattedMessage } from 'react-intl';
 
 import web3Connect from '../AccountProvider/web3Connect';
 import makeSelectAccountData from '../AccountProvider/selectors';
-import {
-  OVERVIEW,
-  WALLET,
-  EXCHANGE,
-  INVEST,
-  setActiveTab,
-} from './actions';
-import messages from './messages';
-import {
-  getActiveTab,
-} from './selectors';
-
 import Container from '../../components/Container';
 import Balances from '../../components/Dashboard/Balances';
-
 import PanesRoot from '../../components/Dashboard/PanesRoot';
 import Tabs from '../../components/Dashboard/Tabs';
 
@@ -29,12 +16,11 @@ import Wallet from './Wallet';
 import Exchange from './Exchange';
 import InvestTour from './InvestTour';
 
-import {
-  ABI_TOKEN_CONTRACT,
-  ABI_POWER_CONTRACT,
-  MAIN_NET_GENESIS_BLOCK,
-  conf,
-} from '../../app.config';
+import { OVERVIEW, WALLET, EXCHANGE, INVEST, setActiveTab } from './actions';
+import messages from './messages';
+import { getActiveTab } from './selectors';
+
+import { ABI_TOKEN_CONTRACT, ABI_POWER_CONTRACT, MAIN_NET_GENESIS_BLOCK, conf } from '../../app.config';
 
 const confParams = conf();
 
@@ -72,9 +58,12 @@ class DashboardRoot extends React.Component {
   constructor(props) {
     super(props);
 
-    this.web3 = props.web3Redux.web3;
     this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(confParams.ntzAddr);
     this.power = this.web3.eth.contract(ABI_POWER_CONTRACT).at(confParams.pwrAddr);
+  }
+
+  get web3() {
+    return this.props.web3Redux.web3;
   }
 
   render() {

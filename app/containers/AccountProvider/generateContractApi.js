@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js';
 import { contractMethodCall, contractTxSend } from './actions';
 import { getWeb3 } from './sagas';
 import { last } from '../../utils';
+import { getMethodKey } from './utils';
 import { promisifyWeb3Call } from '../../utils/promisifyWeb3Call';
 
 import { ABI_PROXY } from '../../app.config';
@@ -13,10 +14,6 @@ function degrade(fn, fallback) {
   } catch (e) {
     return fallback;
   }
-}
-
-export function getMethodKey({ groupName, methodName, args }) {
-  return `${groupName || ''}.${methodName}(${JSON.stringify(args)})`;
 }
 
 function isForward(methodName, contractInstance) {
