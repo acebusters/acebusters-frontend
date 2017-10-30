@@ -19,14 +19,22 @@ export class Chat extends React.PureComponent { // eslint-disable-line react/pre
     this.props.onAddMessage(message);
   }
   render() {
-    const box = this.props.readonly ? null : <MessageBox onAddMessage={this.onAddMessage} />;
-    const area = (this.props.messages && this.props.messages.length)
-      ? <MessageList messages={this.props.messages} />
-      : <ChatPlaceholder>{this.props.placeholder}</ChatPlaceholder>;
+    const { readonly, messages, placeholder } = this.props;
+
     return (
       <ChatContainer>
-        <ChatArea>{area}</ChatArea>
-        <ChatBox>{box}</ChatBox>
+        <ChatArea>
+          {(messages && messages.length) &&
+            <MessageList messages={messages} />}
+
+          {!(messages && messages.length) &&
+            <ChatPlaceholder>{placeholder}</ChatPlaceholder>}
+        </ChatArea>
+        <ChatBox>
+          {!readonly &&
+            <MessageBox onAddMessage={this.onAddMessage} />
+          }
+        </ChatBox>
       </ChatContainer>
     );
   }

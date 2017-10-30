@@ -15,16 +15,14 @@ import {
   makeNickNameSelector,
   makeSelectLoggedIn,
 } from '../AccountProvider/selectors';
-import { makeStandingUpSelector } from '../Seat/selectors';
+import { makeStandingUpSelector, makeMyPendingSelector } from '../Seat/selectors';
 import {
   toggleMenuOpen,
   toggleMenuActive,
   mute,
   unmute,
 } from './actions';
-import {
-  makeSitoutInProgressSelector,
-} from '../Table/selectors';
+import { makeSitoutInProgressSelector } from '../Table/selectors';
 
 import TableMenu from '../../components/TableMenu';
 
@@ -50,6 +48,7 @@ const mapDispatchToProps = (dispatch) => ({
 
 const mapStateToProps = createStructuredSelector({
   loggedIn: makeSelectLoggedIn(),
+  myPending: makeMyPendingSelector(),
   open: makeSelectOpen(),
   active: makeSelectActive(),
   blocky: makeBlockySelector(),

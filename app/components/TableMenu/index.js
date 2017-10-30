@@ -20,10 +20,16 @@ import Link from '../Link';
 // sitout === null, for disabled
 // myPos === -1, then not at table"pause"
 function isSioutDisabled(props) {
-  const { myPos, sitout, standingUp, myLastReceipt, state, sitoutInProgress, myStack } = props;
+  const {
+    sitout, standingUp, sitoutInProgress,
+    myPos, myPending, myLastReceipt, myStack,
+    state,
+  } = props;
   const isSitoutFlag = typeof sitout === 'number';
   return (
-    myPos === undefined || sitout === 0 || sitout === null ||
+    myPending ||
+    myPos === undefined ||
+    sitout === 0 || sitout === null ||
     standingUp || sitoutInProgress !== undefined ||
     (isSitoutFlag && !myStack) || // player can't sit-in if his balance is empty
     // player can't sit-in in the hand he sit-out after game started
@@ -38,13 +44,13 @@ function isSioutDisabled(props) {
 }
 
 function isStadingUpDisabled(props) {
-  const { myPos, standingUp, sitoutInProgress } = props;
+  const { myPos, standingUp, sitoutInProgress, myPending } = props;
   /* TODO add seatStatus to UI redux state and
     mapStateToProps in TableMenu container to be used here */
   // disabled: myPos === undefined ||
   //   seatStatus === STATUS_MSG.sittingIn ||
   //   seatStatus === STATUS_MSG.standingUp,
-  return myPos === undefined || standingUp || sitoutInProgress !== undefined;
+  return myPending || myPos === undefined || standingUp || sitoutInProgress !== undefined;
 }
 
 class TableMenu extends React.Component {
@@ -73,7 +79,7 @@ class TableMenu extends React.Component {
 
   render() {
     const {
-      loggedIn, open, sitout, isMuted,
+      loggedIn, open, sitout, isMuted, standingUp,
       handleClickLogout, onLeave, onSitout, handleClickMuteToggle,
     } = this.props;
     const { calledOpponent } = this.state;
@@ -92,6 +98,7 @@ class TableMenu extends React.Component {
         icon: 'fa fa-external-link',
         title: 'Stand-Up',
         onClick: onLeave,
+        pending: standingUp,
         disabled: isStadingUpDisabled(this.props),
       },
       {
@@ -202,6 +209,7 @@ TableMenu.propTypes = {
   toggleMenuOpen: PropTypes.func,
   open: PropTypes.bool,
   isMuted: PropTypes.bool,
+  standingUp: PropTypes.bool,
   handleClickMuteToggle: PropTypes.func,
   onCallOpponent: PropTypes.func,
 };

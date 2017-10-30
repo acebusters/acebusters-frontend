@@ -19,6 +19,8 @@ import {
   makeMyPosSelector,
   makeLatestHandSelector,
 } from '../../containers/Table/selectors';
+
+import { makeMyPendingSelector } from '../../containers/Seat/selectors';
 import { makeSelectPrivKey } from '../../containers/AccountProvider/selectors';
 import { sendMessage } from '../../containers/Table/actions';
 
@@ -43,7 +45,7 @@ class Curtain extends React.PureComponent { // eslint-disable-line react/prefer-
 
   render() {
     const { isOpen } = this.state;
-    const { myPos, state, playerCount, params: { tableAddr }, messages: chatMessages, handId } = this.props;
+    const { myPos, state, playerCount, params: { tableAddr }, messages: chatMessages, handId, myPending } = this.props;
     return (
       <CurtainWrapper isOpen={isOpen}>
         <CurtainToggler onClick={this.toggle} isOpen={isOpen} />
@@ -51,7 +53,7 @@ class Curtain extends React.PureComponent { // eslint-disable-line react/prefer-
         <Chat
           onAddMessage={this.sendMessage}
           messages={chatMessages}
-          readonly={!(myPos != null)}
+          readonly={myPending || !(myPos != null)}
           placeholder={
             <FormattedHTMLMessage
               {...messages.placeholder}
@@ -82,6 +84,7 @@ const mapStateToProps = createStructuredSelector({
   handId: makeLatestHandSelector(),
   messages: makeMessagesSelector(),
   playerCount: makePlayersCountSelector(),
+  myPending: makeMyPendingSelector(),
   myPos: makeMyPosSelector(),
 });
 
@@ -89,6 +92,7 @@ Curtain.propTypes = {
   state: PropTypes.string,
   privKey: PropTypes.string,
   myPos: PropTypes.number,
+  myPending: PropTypes.bool,
   sendMessage: PropTypes.func,
   messages: PropTypes.array,
   handId: PropTypes.number,
