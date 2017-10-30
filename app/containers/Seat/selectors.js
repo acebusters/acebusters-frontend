@@ -221,7 +221,10 @@ const makeSeatStatusSelector = () => createSelector(
     }
     // player is returning from sitOut
     if (lastAction === Type.SIT_OUT && !lineup[pos].sitout) {
-      return STATUS_MSG.sittingIn;
+      if (lastReceipt.amount.eq(0) && hand.state !== 'waiting') {
+        return STATUS_MSG.sittingIn;
+      }
+      return STATUS_MSG.waiting;
     }
     // player is sitting at table playing
     if (lastReceipt && lastReceipt.handId >= 0) {
