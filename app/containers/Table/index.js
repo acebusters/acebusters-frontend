@@ -422,10 +422,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       },
     });
 
-    if (!this.props.sitout) {
-      await this.handleSitout();
-    }
-
     return this.tableService.leave(exitHand, lineup[pos].address).catch((err) => {
       Raven.captureException(err, { tags: {
         tableAddr: this.props.params.tableAddr,
