@@ -15,51 +15,52 @@ const Lobby = (props) => {
 
   return (
     <Container>
-      <LobbyMessage
-        bookmark="lobby-msg"
-      />
+      <Section>
+        <LobbyMessage
+          bookmark="lobby-msg"
+        />
+      </Section>
 
-      <TableStriped style={{ marginTop: 20 }}>
-        <thead>
-          <tr>
-            <th key="number">#</th>
-            <th key="blind">Blinds</th>
-            <th key="play">Players </th>
-            <th key="hand">Hand</th>
-            <th key="actn" />
-          </tr>
-        </thead>
-        {lobby && lobby.length > 0 && (
-          <tbody>
-            {lobby.map((tableAddr, i) =>
-              <LobbyItem key={i} tableAddr={tableAddr} />
-            )}
-          </tbody>
-        )}
-      </TableStriped>
-
-      <WithLoading
-        isLoading={lobby.length === 0}
-      />
-
-      <Button
-        style={{ width: '100%' }}
-        onClick={handleRefresh}
-        size="medium"
-        disabled={refreshing}
-      >
+      <Section>
         <WithLoading
-          isLoading={refreshing}
-          loadingSize="14px"
-          type="inline"
-          styles={{
-            inner: { marginLeft: 5 },
-          }}
+          styles={{ outer: { width: '100%', minHeight: 300 } }}
+          isLoading={lobby.length === 0}
         >
-          Refresh
+          <TableStriped>
+            <thead>
+              <tr>
+                <th key="number">#</th>
+                <th key="blind">Blinds</th>
+                <th key="play">Players </th>
+                <th key="hand">Hand</th>
+                <th key="actn" />
+              </tr>
+            </thead>
+            <tbody>
+              {lobby.map((tableAddr, i) =>
+                <LobbyItem key={i} tableAddr={tableAddr} />
+              )}
+            </tbody>
+          </TableStriped>
         </WithLoading>
-      </Button>
-
+        <Button
+          style={{ width: '100%' }}
+          onClick={handleRefresh}
+          size="medium"
+          disabled={refreshing}
+        >
+          <WithLoading
+            isLoading={refreshing}
+            loadingSize="14px"
+            type="inline"
+            styles={{
+              inner: { marginLeft: 5 },
+            }}
+          >
+            Refresh
+          </WithLoading>
+        </Button>
+      </Section>
 
       <Section>
         <DiscordWidget />

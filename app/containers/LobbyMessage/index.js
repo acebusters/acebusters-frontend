@@ -61,7 +61,7 @@ export default class LobbyMessage extends React.Component {
     const { document } = this.state;
 
     if (!document) {
-      return null;
+      return <div style={{ minHeight: 380 }} />;
     }
 
     return (
