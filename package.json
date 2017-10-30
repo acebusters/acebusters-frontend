@@ -1,6 +1,6 @@
 {
   "name": "ab-web",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "description": "A web app housing accounts, economy, and poker.",
   "repository": {
     "type": "git",
