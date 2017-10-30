@@ -28,7 +28,7 @@ const App = (props) => {
         }
 
         {showNotifications &&
-          <Notifications isNotTable={isNotTable} />
+          <Notifications isNotTable={isNotTable} location={location} />
         }
 
         <Content

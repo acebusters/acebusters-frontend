@@ -16,7 +16,7 @@ const FishWarningDialog = ({ onSuccessButtonClick }) => (
 );
 
 FishWarningDialog.propTypes = {
-  onSuccessButtonClick: PropTypes.func,
+  onSuccessButtonClick: PropTypes.func.isRequired,
 };
 
 export default FishWarningDialog;

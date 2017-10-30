@@ -113,10 +113,6 @@ DashboardRoot.propTypes = {
   web3Redux: PropTypes.any,
 };
 
-const mapDispatchToProps = () => ({
-  setActiveTab,
-});
-
 const mapStateToProps = createStructuredSelector({
   activeTab: getActiveTab(),
   account: makeSelectAccountData(),
@@ -124,5 +120,5 @@ const mapStateToProps = createStructuredSelector({
 
 export default web3Connect(
   mapStateToProps,
-  mapDispatchToProps,
+  () => ({ setActiveTab }),
 )(DashboardRoot);
