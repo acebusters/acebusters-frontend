@@ -24,10 +24,10 @@ export class Chat extends React.PureComponent { // eslint-disable-line react/pre
     return (
       <ChatContainer>
         <ChatArea>
-          {(messages && messages.length) &&
+          {(messages && messages.length > 0) &&
             <MessageList messages={messages} />}
 
-          {!(messages && messages.length) &&
+          {!(messages && messages.length > 0) &&
             <ChatPlaceholder>{placeholder}</ChatPlaceholder>}
         </ChatArea>
         <ChatBox>
