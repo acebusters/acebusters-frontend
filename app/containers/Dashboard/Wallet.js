@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { createStructuredSelector } from 'reselect';
 import BigNumber from 'bignumber.js';
 
-import { modalAdd, modalDismiss } from '../App/actions';
 import web3Connect from '../AccountProvider/web3Connect';
 import { ETH_DECIMALS, NTZ_DECIMALS } from '../../utils/amountFormatter';
 import { notifyCreate } from '../Notifications/actions';
@@ -33,11 +32,6 @@ class Wallet extends React.Component {
     if (props.account.proxy) {
       this.proxy = this.web3.eth.contract(ABI_PROXY).at(props.account.proxy);
     }
-
-    this.fishWarn = this.fishWarn.bind(this);
-    this.state = {
-      isFishWarned: false,
-    };
   }
 
   componentWillReceiveProps(nextProps) {
@@ -49,14 +43,9 @@ class Wallet extends React.Component {
     }
   }
 
-  fishWarn() {
-    this.setState({ isFishWarned: true });
-  }
-
   handleTxSubmit(txFn) {
     return new Promise((resolve, reject) => {
       txFn((err, result) => {
-        this.props.modalDismiss();
         if (err) {
           reject(err);
         } else {
@@ -98,33 +87,23 @@ class Wallet extends React.Component {
   }
 
   render() {
-    const { account, amountUnit } = this.props;
-    const { isFishWarned } = this.state;
-    const qrUrl = `ether:${account.proxy}`;
+    const { account } = this.props;
     const weiBalance = this.web3.eth.balance(account.proxy);
-    const ethBalance = weiBalance && weiBalance.div(ETH_DECIMALS);
     const babzBalance = this.token.balanceOf(account.proxy);
-    const nutzBalance = babzBalance && babzBalance.div(NTZ_DECIMALS);
-    const floor = this.token.floor();
 
     return (
       <WalletComponent
         {...{
           account,
-          floor,
-          ethBalance,
-          nutzBalance,
-          qrUrl,
+          floor: this.token.floor(),
+          ethBalance: weiBalance && weiBalance.div(ETH_DECIMALS),
+          nutzBalance: babzBalance && babzBalance.div(NTZ_DECIMALS),
           messages,
-          isFishWarned,
           handleNTZTransfer: this.handleNTZTransfer,
           estimateNTZTransfer: this.estimateNTZTransfer,
           handleETHTransfer: this.handleETHTransfer,
           estimateETHTransfer: this.estimateETHTransfer,
-          fishWarn: this.fishWarn,
-          amountUnit,
-          modalAdd: this.props.modalAdd,
-          modalDismiss: this.props.modalDismiss,
+          amountUnit: this.props.amountUnit,
         }}
       />
     );
@@ -135,8 +114,6 @@ Wallet.propTypes = {
   web3Redux: PropTypes.any,
   notifyCreate: PropTypes.func,
   amountUnit: PropTypes.string,
-  modalAdd: PropTypes.func.isRequired,
-  modalDismiss: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = createStructuredSelector({
@@ -148,7 +125,5 @@ export default web3Connect(
   mapStateToProps,
   () => ({
     notifyCreate,
-    modalAdd,
-    modalDismiss,
   }),
 )(Wallet);

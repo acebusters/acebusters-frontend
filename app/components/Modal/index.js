@@ -7,6 +7,7 @@ import * as modals from 'containers/Modal/constants';
 import ConfirmDialog from './ConfirmDialog';
 import SelectToken from './SelectToken';
 import FishWarningDialog from './FishWarningDialog';
+import DepositDialog from './DepositDialog';
 import ModalsTransitionGroup from './ModalsTransitionGroup';
 import { DialogTransitionGroup } from './DialogTransitionGroup';
 import { ContainerTransitionGroup } from './ContainerTransitionGroup';
@@ -22,6 +23,7 @@ import {
 
 const MODALS = {
   [modals.CONFIRM_DIALOG]: ConfirmDialog,
+  [modals.DEPOSIT_DIALOG]: DepositDialog,
   [modals.FISH_WARNING_DIALOG]: FishWarningDialog,
   [modals.INVITE_DIALOG]: InviteDialog,
   [modals.JOIN_DIALOG]: JoinDialog,
@@ -34,6 +36,7 @@ const Modal = ({ modal, handleClose }) => {
   if (modal) {
     SpecifiedModal = MODALS[modal.modalType];
   }
+  // console.log(modal.modalProps)
   return (
     <ModalsTransitionGroup>
       {modal && // required for leaveAnim
@@ -41,7 +44,7 @@ const Modal = ({ modal, handleClose }) => {
           <DialogTransitionGroup component={Modals}>
             <Background onClick={modal.modalProps.backdrop ? handleClose : null} />
             <DialogWrapper>
-              <SpecifiedModal {...modal.modalProps} />
+              <SpecifiedModal {...{ handleClose, ...modal.modalProps }} />
               <CloseButton onClick={handleClose}>
                 <XButton />
               </CloseButton>

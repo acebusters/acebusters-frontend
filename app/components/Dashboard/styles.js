@@ -42,18 +42,6 @@ export const SendContainer = styled.div`
   justify-content: center;
 `;
 
-export const Address = styled.p`
-  /* These are technically the same, but use both */
-  overflow-wrap: break-word;
-  word-wrap: break-word;
-
-  /* Instead use this non-standard one: */
-  word-break: break-word;
-
-  /* Adds a hyphen where the word breaks, if supported (No Blink) */
-  margin: 0 0;
-`;
-
 export const ConfirmButton = styled(Button)`
   display: flex;
   justify-content: center;
@@ -86,9 +74,8 @@ export const ExchangeContainer = styled.div`
 // Overview
 export const ReceiveSection = styled.div`
   display: flex;
+  flex-direction: column;
 `;
-
-export const ReceiveWrapper = styled.div``;
 
 // Balances
 export const BalanceSection = styled.div`

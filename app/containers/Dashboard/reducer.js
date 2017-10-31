@@ -15,6 +15,7 @@ import {
   SET_ACTIVE_TAB,
   SET_AMOUNT_UNIT,
   SET_INVEST_TYPE,
+  SET_FISH_WARNED,
   TOGGLE_INVEST_TOUR,
   OVERVIEW,
   ETH,
@@ -39,6 +40,7 @@ const confParams = conf();
  *   timestamp?: number;
  *   pending?: boolean;
  *   investTour: false;
+ *   isFishWarned: false;
  * }
  */
 const initialState = fromJS({
@@ -48,6 +50,7 @@ const initialState = fromJS({
   amountUnit: ETH,
   investType: POWERUP,
   investTour: false,
+  isFishWarned: false,
 });
 
 function dashboardReducer(state = initialState, action) {
@@ -117,6 +120,9 @@ function dashboardReducer(state = initialState, action) {
           }
           return state;
         });
+
+    case SET_FISH_WARNED:
+      return state.set('isFishWarned', true);
 
     default:
       return state;

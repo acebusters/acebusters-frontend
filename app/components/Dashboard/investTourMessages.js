@@ -71,8 +71,8 @@ export default defineMessages({
     id: 'app.containers.InvestTour.step5',
     defaultMessage: `
       <div>
-        <p>Deposit ether to your account address (in green).</p>
-        <Alert theme="info">You can deposit from any wallet, but make sure to leave at least 0.05ETH in MetaMask for future transactions.</Alert>
+        <p>Deposit ether to your account address.</p>
+        <Alert theme="info">You can deposit from any wallet, but make sure to leave at least 0.03ETH in MetaMask for future transactions.</Alert>
       </div>
     `,
   },
