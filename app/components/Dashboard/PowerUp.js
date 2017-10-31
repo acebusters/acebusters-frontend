@@ -55,8 +55,8 @@ const PowerUp = (props) => {
           form="exchangeNTZtoABP"
           handleExchange={handlePowerUp}
           estimateExchange={estimatePowerUp}
-          maxAmount={nutzBalance || toNtz(powerUpMaxBabz)}
-          minAmount={powerUpMinNtz}
+          maxAmount={(nutzBalance || toNtz(powerUpMaxBabz)).round(4, BigNumber.ROUND_UP)}
+          minAmount={powerUpMinNtz.round(0, BigNumber.ROUND_UP)}
           label={<FormattedMessage {...messages.powerUpAmountLabel} />}
           hideAddress
           amountUnit={NTZ}

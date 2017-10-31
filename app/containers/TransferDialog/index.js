@@ -28,7 +28,14 @@ const validate = (values, props) => {
     errors.address = 'Invalid Ethereum Address.';
   }
 
-  return validateFloat(messages, errors, amount, minAmount, maxAmount);
+  return validateFloat({
+    messages,
+    errors,
+    amount,
+    minAmount,
+    maxAmount,
+    onChange: (value) => props.dispatch(props.change('amount', String(value))),
+  });
 };
 
 const warn = () => {

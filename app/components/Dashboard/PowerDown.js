@@ -42,7 +42,7 @@ const PowerDown = (props) => {
           handleExchange={handlePowerDown}
           estimateExchange={estimatePowerDown}
           maxAmount={pwrBalance.div(ABP_DECIMALS)}
-          minAmount={powerDownMinAbp}
+          minAmount={powerDownMinAbp.round(3, BigNumber.ROUND_UP)}
           hideAddress
           label={<FormattedMessage {...messages.powerDownAmountLabel} />}
           calcExpectedAmount={(num) => calcABPtoNTZ(num).toFormat(0)}
