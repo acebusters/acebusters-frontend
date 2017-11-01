@@ -100,6 +100,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     this.watchTable = this.watchTable.bind(this);
     this.handleUpdate = this.handleUpdate.bind(this);
     this.handleLeave = this.handleLeave.bind(this);
+    this.handleLeaveRequest = this.handleLeaveRequest.bind(this);
     this.handleSitout = this.handleSitout.bind(this);
     this.handleOpponentCall = this.handleOpponentCall.bind(this);
     this.handleJoin = this.handleJoin.bind(this);
@@ -203,7 +204,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           balance: balance && Number(balance.toString()),
           rebuy: true,
         },
-        closeHandler: this.handleLeave,
+        closeHandler: () => this.handleLeave(this.props.myPos),
       });
     }
   }
@@ -400,34 +401,38 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     return sitOutToggle(sitoutAction, this.props.dispatch);
   }
 
-  async handleLeave(pos) {
-    const lineup = (this.props.lineup) ? this.props.lineup.toJS() : null;
+  handleLeave(pos) {
     const handId = this.props.latestHand;
-    const state = this.props.state;
-    const exitHand = (state !== 'waiting') ? handId : handId - 1;
-
-    if (!lineup) {
-      return Promise.reject('Lineup is empty');
-    }
+    const exitHand = this.props.state !== 'waiting' ? handId : handId - 1;
 
     this.props.setExitHand(this.tableAddr, this.props.latestHand, pos, exitHand);
     storageService.removeItem(`rebuyModal[${this.tableAddr + handId}]`);
-    this.props.modalDismiss();
-    this.props.modalAdd({
-      modalType: CONFIRM_DIALOG,
-      modalProps: {
-        msg: <FormattedMessage {...messages.leaveInProgress} />,
-        onSubmit: this.props.modalDismiss,
-        buttonText: <FormattedMessage {...messages.ok} />,
-      },
-    });
 
-    return this.tableService.leave(exitHand, lineup[pos].address).catch((err) => {
-      Raven.captureException(err, { tags: {
-        tableAddr: this.props.params.tableAddr,
-        handId,
-      } });
-    });
+    this.props.modalDismiss();
+    this.tableService.leave(exitHand, this.props.lineup.getIn([pos, 'address']))
+      .catch((err) => {
+        Raven.captureException(err, { tags: {
+          tableAddr: this.props.params.tableAddr,
+          handId,
+        } });
+      });
+  }
+
+  handleLeaveRequest(pos) {
+    if (this.props.lineup) {
+      if (this.props.state !== 'waiting') {
+        this.props.modalAdd({
+          modalType: CONFIRM_DIALOG,
+          modalProps: {
+            msg: <FormattedMessage {...messages.confirmLeave} />,
+            onSubmit: () => this.handleLeave(pos),
+            buttonText: <FormattedMessage {...messages.leave} />,
+          },
+        });
+      } else {
+        this.handleLeave(pos);
+      }
+    }
   }
 
   watchTable(error, result) {
@@ -594,7 +599,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
             seats={this.renderSeats(lineup, changed)}
             hand={this.props.hand}
             potSize={this.props.potSize}
-            onLeave={() => this.handleLeave(this.props.myPos)}
+            onLeave={() => this.handleLeaveRequest(this.props.myPos)}
             onSitout={this.handleSitout}
             onCallOpponent={this.handleOpponentCall}
           />

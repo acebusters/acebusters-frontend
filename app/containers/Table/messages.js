@@ -9,8 +9,12 @@ export default defineMessages({
     id: 'app.containers.Table.opponentCallSent',
     defaultMessage: 'Request sent. Wait for an opponent several minutes',
   },
-  leaveInProgress: {
-    id: 'app.containers.Table.leaveInProgress',
-    defaultMessage: 'Please wait until your leave request is processed! Your status will be shown as pending until complete',
+  confirmLeave: {
+    id: 'app.containers.Table.confirmLeave',
+    defaultMessage: 'You will lose your hand if you leave the table now',
+  },
+  leave: {
+    id: 'app.containers.Table.leave',
+    defaultMessage: 'Leave table',
   },
 });
