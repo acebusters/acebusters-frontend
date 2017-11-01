@@ -3,6 +3,7 @@ import { createStructuredSelector } from 'reselect';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { FormattedDate, FormattedTime } from 'react-intl';
+import { Receipt } from 'poker-helper';
 import { getWeb3 } from '../../containers/AccountProvider/utils';
 
 import { ABI_TABLE } from '../../app.config';
@@ -11,7 +12,7 @@ import { makeHandsSelector, makeLatestHandSelector } from '../Table/selectors';
 
 import { loadContractData } from './loadContractData';
 import { requestStat } from './requestStat';
-import { parseLastReceiptAmount, parseDistributionReceipt, renderNtz } from './utils';
+import { parseDistributionReceipt, receiptStringType, renderNtz } from './utils';
 import { Wrapper, Column, Columns, Table } from './styles';
 
 window.enableTableDebug = () => null;
@@ -179,14 +180,29 @@ class TableDebug extends React.Component {
             {hands.map((hand, i) => (
               <tr key={hand.handId}>
                 <th>{hand.handId}</th>
-                {hand.lineup.reduce((memo, seat, j) => memo.concat([
-                  <td key={j * 2}>
-                    {renderNtz(parseLastReceiptAmount(seat.last))}
-                  </td>,
-                  <td key={(j * 2) + 1}>
-                    {dists[i] && renderNtz(dists[i][seat.address])}
-                  </td>,
-                ]), [])}
+                {hand.lineup.reduce((memo, seat, j) => {
+                  const receipt = seat.last && Receipt.parse(seat.last);
+                  return memo.concat([
+                    <td key={j * 2} style={{ verticalAlign: 'top' }}>
+                      {renderNtz(receipt && receipt.amount)}
+                      {receipt &&
+                        <span
+                          style={{
+                            fontSize: 9,
+                            display: 'block',
+                            color: '#666',
+                            marginTop: -3,
+                          }}
+                        >
+                          {receiptStringType(receipt.type)}
+                        </span>
+                      }
+                    </td>,
+                    <td key={(j * 2) + 1} style={{ verticalAlign: 'top' }}>
+                      {dists[i] && renderNtz(dists[i][seat.address])}
+                    </td>,
+                  ]);
+                }, [])}
               </tr>
             ))}
           </tbody>

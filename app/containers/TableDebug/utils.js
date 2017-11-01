@@ -1,5 +1,9 @@
-import { Receipt } from 'poker-helper';
+import { Receipt, Type } from 'poker-helper';
 import { formatNtz } from '../../utils/amountFormatter';
+
+export function receiptStringType(type) {
+  return Object.keys(Type).find((key) => Type[key] === type);
+}
 
 export function parseDistributionReceipt(distribution, lineup) {
   if (!distribution) {
@@ -12,14 +16,6 @@ export function parseDistributionReceipt(distribution, lineup) {
     ...memo,
     [seat.address]: outs[pos],
   }), {});
-}
-
-export function parseLastReceiptAmount(receipt) {
-  if (!receipt) {
-    return null;
-  }
-
-  return Receipt.parse(receipt).amount;
 }
 
 export function renderNtz(amount) {
