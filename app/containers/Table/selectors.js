@@ -347,58 +347,54 @@ const makeSelectWinners = () => createSelector(
     const dealer = hand.get('dealer');
     const handState = hand.get('state');
 
-    let complete;
     try {
-      complete = pokerHelper.isHandComplete(lineup, dealer, handState);
-    } catch (e) {
-      return null;
-    }
+      const complete = pokerHelper.isHandComplete(lineup, dealer, handState);
 
-    if (!complete || handState === 'waiting') {
-      return null;
-    }
+      if (!complete || handState === 'waiting') {
+        return null;
+      }
 
-    let amounts;
-    try {
-      amounts = pokerHelper.calcDistribution(lineup, handState, board, 0, '0x123');
-    } catch (e) {
-      return null;
-    }
+      const amounts = pokerHelper.calcDistribution(lineup, handState, board, 0, '0x123');
+      if (!amounts) {
+        return null;
+      }
 
-
-    if (handState !== 'showdown') {
-      const lastMan = pokerHelper.nextPlayer(lineup, 0, 'active', handState);
-      // if there is no amount for lastMan
-      if (amounts[lineup[lastMan].address] === undefined) {
-        const entries = Object.entries(amounts);
-        // if there is only one amount which is more than zero
-        if (entries.filter((entry) => entry[1] > 0).length === 1) {
-          const [winnerAddress, winnerAmount] = entries.find((entry) => entry[1] > 0);
-          return [{
-            addr: winnerAddress,
-            amount: winnerAmount,
-            maxBet: selectMaxBet(lineup, winnerAddress),
-          }];
+      if (handState !== 'showdown') {
+        const lastMan = pokerHelper.nextPlayer(lineup, 0, 'active', handState);
+        // if there is no amount for lastMan
+        if (amounts[lineup[lastMan].address] === undefined) {
+          const entries = Object.entries(amounts);
+          // if there is only one amount which is more than zero
+          if (entries.filter((entry) => entry[1] > 0).length === 1) {
+            const [winnerAddress, winnerAmount] = entries.find((entry) => entry[1] > 0);
+            return [{
+              addr: winnerAddress,
+              amount: winnerAmount,
+              maxBet: selectMaxBet(lineup, winnerAddress),
+            }];
+          }
         }
+        return [{
+          addr: lineup[lastMan].address,
+          amount: amounts[lineup[lastMan].address],
+          maxBet: selectMaxBet(lineup, lineup[lastMan].address),
+        }];
       }
-      return [{
-        addr: lineup[lastMan].address,
-        amount: amounts[lineup[lastMan].address],
-        maxBet: selectMaxBet(lineup, lineup[lastMan].address),
-      }];
-    }
 
-    const winners = pokerHelper.getWinners(lineup, dealer, board);
-    const winnersWithAmounts = [];
-    winners.forEach((winner) => {
-      if (amounts[winner.addr]) {
-        winnersWithAmounts.push(Object.assign({}, winner, {
-          amount: amounts[winner.addr],
-          maxBet: selectMaxBet(lineup, winner.addr),
-        }));
-      }
-    });
-    return winnersWithAmounts;
+      const winners = pokerHelper.getWinners(lineup, dealer, board);
+      const winnersWithAmounts = [];
+      winners.forEach((winner) => {
+        if (amounts[winner.addr]) {
+          winnersWithAmounts.push(Object.assign({}, winner, {
+            amount: amounts[winner.addr],
+            maxBet: selectMaxBet(lineup, winner.addr),
+          }));
+        }
+      });
+      return winnersWithAmounts;
+    } catch (err) {
+      return null;
+    }
   }
 );
 
