@@ -4,11 +4,9 @@ import PropTypes from 'prop-types';
 import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
 
-import {
-  CurtainWrapper,
-  CurtainHeader,
-} from '../../components/Curtain';
+import { CurtainWrapper, CurtainHeader } from '../../components/Curtain';
 import CurtainToggler from '../../components/Curtain/CurtainToggler';
+import { tableNameByAddress } from '../../services/tableNames';
 
 import Chat from '../../containers/Chat';
 
@@ -58,7 +56,7 @@ class Curtain extends React.PureComponent { // eslint-disable-line react/prefer-
             <FormattedHTMLMessage
               {...messages.placeholder}
               values={{
-                tableAddr: tableAddr.substring(2, 8),
+                tableName: tableNameByAddress(tableAddr),
                 handId,
                 state,
                 playerCount,

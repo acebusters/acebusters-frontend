@@ -7,6 +7,7 @@ import { LogoContainer } from '../Logo';
 
 import {
   curtainStickyWidth,
+  tableNameWidth,
   menuClose,
 } from '../../variables';
 
@@ -40,13 +41,17 @@ const Button = styled(SharedButton)`
 // Logo
 export const LogoWrapper = styled.div`
   position: absolute;
-  top: 24px;
+  top: 10px;
   left: 18px;
   display: flex;
   align-items: center;
   pointer-events: none;
   color: #FFF;
   @media (min-width: ${curtainStickyWidth}) {
+    display: none;
+  }
+
+  @media (max-width: ${tableNameWidth}) {
     display: none;
   }
 `;

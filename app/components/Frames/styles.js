@@ -30,3 +30,11 @@ export const StyledDashboard = styled(Common)`
 export const StyledTable = styled(Common)`
   background-color: ${backgroundTableColor};
 `;
+
+export const TableNotificationsWrapper = styled.div`
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  top: 0;
+  right: 0;
+`;

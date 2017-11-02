@@ -8,6 +8,7 @@ import Link from 'components/Link';
 
 import { makeSelectTableData, makeSelectTableLastHandId } from './selectors';
 import { formatNtz } from '../../utils/amountFormatter';
+import { tableNameByAddress } from '../../services/tableNames';
 
 const Tr = styled.tr`
   &:nth-of-type(odd) {
@@ -27,30 +28,35 @@ const ADDR_EMPTY = '0x0000000000000000000000000000000000000000';
 class LobbyItem extends React.PureComponent { // eslint-disable-line
 
   render() {
-    if (!this.props.data || !this.props.data.seats) {
+    const { data, tableAddr, lastHandId } = this.props;
+    if (!data || !data.seats) {
       return (<tr />);
     }
-    let players = 0;
-    this.props.data.seats.forEach((seat) => {
-      if (seat && seat.address &&
-        seat.address.length >= 40 && seat.address !== ADDR_EMPTY) {
-        players += 1;
-      }
-    });
-    const sb = this.props.data.smallBlind;
+    const players = data.seats.filter((seat) => (
+      seat && seat.address &&
+      seat.address.length >= 40 && seat.address !== ADDR_EMPTY
+    )).length;
+    const sb = data.smallBlind;
     const bb = sb * 2;
+
     return (
       <Tr>
-        <Td key="ta">{this.props.tableAddr.substring(2, 8)}</Td>
+        <Td key="ta" style={{ textAlign: 'left' }}>
+          {tableAddr.substr(2, 6)}
+        </Td>
+        <Td key="tn" style={{ textAlign: 'left' }}>
+          <Link to={`/table/${tableAddr}`}>
+            {tableNameByAddress(tableAddr)}
+          </Link>
+        </Td>
         <Td key="sb">{formatNtz(sb)} NTZ / {formatNtz(bb)} NTZ</Td>
-        <Td key="np">{`${players}/${this.props.data.seats.length}`}</Td>
-        <Td key="lh">{this.props.lastHandId}</Td>
+        <Td key="np">{`${players}/${data.seats.length}`}</Td>
+        <Td key="lh">{lastHandId}</Td>
         <Td key="ac">
           <Link
-            to={`/table/${this.props.tableAddr}`}
-            size="small"
+            to={`/table/${tableAddr}`}
           >
-            <Button icon="fa fa-eye" />
+            <Button icon="fa fa-eye" size="small" />
           </Link>
         </Td>
       </Tr>
