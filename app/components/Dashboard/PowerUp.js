@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import BigNumber from 'bignumber.js';
 import { FormattedMessage, FormattedHTMLMessage } from 'react-intl';
 
+import BtnUpgrade from 'containers/Button/BtnUpgrade';
 import { formatAmount, toNtz, ABP_DECIMALS } from '../../utils/amountFormatter';
 
 import { ABP, NTZ } from '../../containers/Dashboard/actions';
@@ -10,7 +11,6 @@ import ExchangeDialog from '../../containers/ExchangeDialog';
 
 import FormField from '../Form/FormField';
 import Alert from '../Alert';
-import BtnUpgrade from '../Dashboard/BtnUpgrade';
 
 import { Description } from './styles';
 
@@ -55,8 +55,8 @@ const PowerUp = (props) => {
           form="exchangeNTZtoABP"
           handleExchange={handlePowerUp}
           estimateExchange={estimatePowerUp}
-          maxAmount={nutzBalance || toNtz(powerUpMaxBabz)}
-          minAmount={powerUpMinNtz}
+          maxAmount={(nutzBalance || toNtz(powerUpMaxBabz)).round(4, BigNumber.ROUND_UP)}
+          minAmount={powerUpMinNtz.round(0, BigNumber.ROUND_UP)}
           label={<FormattedMessage {...messages.powerUpAmountLabel} />}
           hideAddress
           amountUnit={NTZ}
@@ -69,7 +69,7 @@ const PowerUp = (props) => {
       }
       {account.isLocked &&
         <Alert theme="warning">
-          <BtnUpgrade {...props} />&nbsp;to Power Up.
+          <BtnUpgrade {...{ account, messages }} />&nbsp;to Power Up.
         </Alert>
       }
     </div>

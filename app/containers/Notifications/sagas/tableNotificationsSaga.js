@@ -8,6 +8,8 @@ import WithLoading from '../../../components/WithLoading';
 
 import { createTempNotification, createPersistNotification, removeNotification } from './utils';
 
+import { tableNameByAddress } from '../../../services/tableNames';
+
 function getIsRebuy(tableAddr, handId) {
   return !!storageService.getItem(`rebuyModal[${tableAddr}${handId}]`);
 }
@@ -25,7 +27,11 @@ export function* tableNotifications(sendAction) {
     const pendingNotification = {
       txId: tableAddr,
       category: isRebuy ? 'Rebuy' : 'Table joining',
-      details: <span><WithLoading isLoading loadingSize="14px" type="inline" /> {tableAddr.substring(2, 8)}</span>,
+      details: (
+        <span>
+          <WithLoading isLoading loadingSize="14px" type="inline" /> {tableNameByAddress(tableAddr)}
+        </span>
+      ),
       dismissable: true,
       date: new Date(),
       type: 'info',

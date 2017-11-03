@@ -12,7 +12,7 @@ import {
   SendContainer,
   TabIcon as ModeIcon,
 } from './styles';
-import { AccountIsLocked, AccountNotLocked } from './SectionReceive';
+import SectionReceive from './SectionReceive';
 
 function Wallet(props) {
   const {
@@ -24,9 +24,8 @@ function Wallet(props) {
     estimateNTZTransfer,
     estimateETHTransfer,
     amountUnit,
+    floor,
   } = props;
-
-  const AccComponent = account.isLocked ? AccountIsLocked : AccountNotLocked;
 
   return (
     <Pane name="dashboard-wallet">
@@ -35,7 +34,7 @@ function Wallet(props) {
         name="wallet-receive"
       >
         <H2><ModeIcon className="fa fa-inbox" />Deposit</H2>
-        <AccComponent {...props} />
+        <SectionReceive {...{ account, ethBalance, nutzBalance, floor }} />
       </Section>
 
       <Section name="wallet-send">
@@ -45,7 +44,7 @@ function Wallet(props) {
             <TransferDialog
               handleTransfer={handleETHTransfer}
               estimateTransfer={estimateETHTransfer}
-              maxAmount={ethBalance}
+              maxAmount={ethBalance.lt(1) ? ethBalance : ethBalance.round(4)}
               type="token"
               placeholder="0.00"
               messages={props.messages}
@@ -57,7 +56,7 @@ function Wallet(props) {
             <TransferDialog
               handleTransfer={handleNTZTransfer}
               estimateTransfer={estimateNTZTransfer}
-              maxAmount={nutzBalance}
+              maxAmount={nutzBalance.round(4)}
               type="token"
               placeholder="0"
               messages={props.messages}
@@ -71,7 +70,6 @@ function Wallet(props) {
 }
 
 Wallet.propTypes = {
-  account: PropTypes.object,
   ethBalance: PropTypes.object,
   nutzBalance: PropTypes.object,
   handleNTZTransfer: PropTypes.func,
@@ -80,6 +78,8 @@ Wallet.propTypes = {
   estimateETHTransfer: PropTypes.func,
   amountUnit: PropTypes.string,
   messages: PropTypes.object,
+  account: PropTypes.object.isRequired,
+  floor: PropTypes.object.isRequired,
 };
 
 export default Wallet;

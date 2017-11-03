@@ -13,6 +13,7 @@ import {
   makeWhosTurnSelector,
   makeSbSelector,
   makeLastRoundMaxBetSelector,
+  makeReserveLineup,
 } from '../Table/selectors';
 
 import { makeSignerAddrSelector } from '../AccountProvider/selectors';
@@ -131,21 +132,25 @@ const makeReservedSelector = () => createSelector(
 );
 
 const makeMyPendingSelector = () => createSelector(
-  [makeLineupSelector(), makeSignerAddrSelector()],
-  (lineup, signerAddr) => {
-    if (lineup && lineup.toJS) {
-      return lineup.toJS().some((l) => l.pending && l.pending.signerAddr === signerAddr);
-    }
-    return false;
-  }
+  [makeMyPendingSeatSelector()],
+  (myPendingSeat) => myPendingSeat !== -1
 );
 
 const makeMyPendingSeatSelector = () => createSelector(
-  [makeLineupSelector(), makeSignerAddrSelector()],
-  (lineup, signerAddr) => {
-    if (lineup && lineup.toJS) {
-      return lineup.toJS().findIndex((l) => l.pending && l.pending.signerAddr === signerAddr);
+  [makeLineupSelector(), makeReservationSelector(), makeSignerAddrSelector()],
+  (lineup, reservation, signerAddr) => {
+    if (lineup) {
+      const pendingPos = lineup.findIndex((seat) => seat.getIn(['pending', 'signerAddr']) === signerAddr);
+      if (pendingPos > -1) {
+        return pendingPos;
+      }
+
+      const pos = lineup.findIndex((seat) => seat.get('address') === signerAddr);
+      if (pos === -1) {
+        return makeReserveLineup(lineup, reservation).findIndex((seat) => seat.get('address') === signerAddr);
+      }
     }
+
     return -1;
   }
 );
@@ -216,7 +221,10 @@ const makeSeatStatusSelector = () => createSelector(
     }
     // player is returning from sitOut
     if (lastAction === Type.SIT_OUT && !lineup[pos].sitout) {
-      return STATUS_MSG.sittingIn;
+      if (lastReceipt.amount.eq(0) && hand.state !== 'waiting') {
+        return STATUS_MSG.sittingIn;
+      }
+      return STATUS_MSG.waiting;
     }
     // player is sitting at table playing
     if (lastReceipt && lastReceipt.handId >= 0) {

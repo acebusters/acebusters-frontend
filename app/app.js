@@ -23,9 +23,6 @@ import ReactGA from 'react-ga';
 // Import configs
 import { conf } from 'app.config';
 
-// Import root app
-import App from 'containers/App';
-
 // Import selector for `syncHistoryWithStore`
 import { makeSelectLocationState } from 'containers/App/selectors';
 
@@ -86,10 +83,7 @@ const logPageView = () => {
 };
 
 // Set up the router, wrapping all Routes in the App component
-const rootRoute = {
-  component: App,
-  childRoutes: createRoutes(store),
-};
+const rootRoute = createRoutes(store);
 
 Raven.config(conf().sentryDSN).install();
 

@@ -11,6 +11,7 @@ describe('dashboard reducer tests', () => {
       events: null,
       investType: POWERUP,
       investTour: false,
+      isFishWarned: false,
       proxy: null,
     });
   });

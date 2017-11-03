@@ -15,7 +15,14 @@ const validate = (values, props) => {
   const { maxAmount, minAmount = 0 } = props;
   const amount = values.get('amount');
 
-  return validateFloat(messages, errors, amount, minAmount, maxAmount);
+  return validateFloat({
+    messages,
+    errors,
+    amount,
+    minAmount,
+    maxAmount,
+    onChange: (value) => props.dispatch(props.change('amount', String(value))),
+  });
 };
 
 const warn = () => {

@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Link from '../Link';
+import WithLoading from '../WithLoading';
 
 import {
  ItemWrapper,
@@ -10,12 +11,7 @@ import {
 } from './styles';
 
 const MenuItem = ({ item, ...props }) => {
-  const children = [
-    <ItemIcon className={item.icon} aria-hidden key="0" />,
-    <ItemTitle key="1">
-      {item.title}
-    </ItemTitle>,
-  ];
+  const Component = item.onClick ? ItemWrapper : Link;
 
   const handleClick = () => {
     // if the menu is open, close it
@@ -27,27 +23,24 @@ const MenuItem = ({ item, ...props }) => {
     }
   };
 
-  if (item.onClick) {
-    return (
-      <ItemWrapper
-        name={item.name}
-        disabled={item.disabled}
-        onClick={handleClick}
-      >
-        {children}
-      </ItemWrapper>
-    );
-  }
-
   return (
-    <Link
+    <Component
       to={item.to}
       name={item.name}
       onClick={handleClick}
+      disabled={item.disabled}
       component={LinkWrapper}
     >
-      {children}
-    </Link>
+      {item.pending &&
+        <WithLoading loadingSize="14px" isLoading type="inline" />
+      }
+      {!item.pending &&
+        <ItemIcon className={item.icon} aria-hidden />
+      }
+      <ItemTitle>
+        {item.title}
+      </ItemTitle>
+    </Component>
   );
 };
 MenuItem.propTypes = {

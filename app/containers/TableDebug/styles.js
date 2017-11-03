@@ -1,11 +1,24 @@
 import styled from 'styled-components';
 
+export const ExtraDetail = styled.span`
+  font-size: 9px;
+  font-weight: normal;
+
+  display: block;
+  margin-top: -3px;
+
+  text-transform: uppercase;
+  letter-spacing: 1px;
+
+  color: #666;
+`;
+
 export const Wrapper = styled.div`
   position: fixed;
   z-index: 1000;
   top: 0;
   left: 0;
-  
+
   overflow: auto;
   width: 80%;
   max-height: 100vh;
@@ -43,6 +56,7 @@ export const Table = styled.table`
   td {
     padding: 5px 10px;
     white-space: nowrap;
+    vertical-align: top;
   }
 
   tbody tr:nth-child(odd) {

@@ -22,6 +22,10 @@ export function getWeb3(injected = false) {
   return web3Instance;
 }
 
+export function getMethodKey({ groupName, methodName, args }) {
+  return `${groupName || ''}.${methodName}(${JSON.stringify(args)})`;
+}
+
 export function addEventsDate(events) {
   if (events.length === 0) {
     return Promise.resolve(events);

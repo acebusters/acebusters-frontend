@@ -6,8 +6,10 @@ import ActionBar from '../../containers/ActionBar';
 import tableImage from './tableBG.svg';
 import Pot from '../Pot';
 import Curtain from '../../containers/Curtain';
+import { tableNameByAddress } from '../../services/tableNames';
 
 import {
+  TableName,
   TableContainer,
   TableAndChairs,
   PokerTable,
@@ -15,17 +17,14 @@ import {
   Winner,
 } from './styles';
 
-const Seats = (props) => (
-  <div name="seats">
-    { props.seats }
-  </div>
-);
-
 const TableComponent = (props) => (
   <div name="table-component">
     <Curtain {...props} />
 
     <TableContainer name="table-container">
+      <TableName>
+        {tableNameByAddress(props.params.tableAddr)}
+      </TableName>
 
       <TableAndChairs id="table-and-chairs" >
         <PokerTable>
@@ -46,8 +45,8 @@ const TableComponent = (props) => (
         </PokerTable>
       </TableAndChairs>
 
-      { props.myHand &&
-        <HandBox className="hand-box"> { props.myHand.descr }</HandBox>
+      {props.myHand &&
+        <HandBox className="hand-box">{props.myHand.descr}</HandBox>
       }
 
       <TableMenu {...props} />
@@ -59,10 +58,6 @@ const TableComponent = (props) => (
   </div>
 );
 
-Seats.propTypes = {
-  seats: PropTypes.array,
-};
-
 TableComponent.propTypes = {
   board: PropTypes.array,
   seats: PropTypes.array,
@@ -70,6 +65,7 @@ TableComponent.propTypes = {
   winners: PropTypes.array,
   myHand: PropTypes.object,
   sb: PropTypes.number,
+  params: PropTypes.object,
 };
 
 export default TableComponent;

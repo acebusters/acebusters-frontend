@@ -23,21 +23,17 @@ const Seat = (props) => {
 
   return (
     <SeatWrapper coords={coords} pos={pos} myPos={myPos}>
-      <SeatContainer
-        activePlayer={seatStatus && seatStatus === STATUS_MSG.active}
-      >
-        {seatStatus && seatStatus !== STATUS_MSG.active ?
+      <SeatContainer activePlayer={seatStatus && seatStatus === STATUS_MSG.active}>
+        {seatStatus && seatStatus !== STATUS_MSG.active &&
           <StatusSeatWrapper>
             <StatusSeat>{seatStatus.msg}</StatusSeat>
           </StatusSeatWrapper>
-          :
+        }
+        {(!seatStatus || seatStatus === STATUS_MSG.active) &&
           <CardsComponent {...props} />
         }
-
         <SeatInfo {...props} />
-
         <StatusAction {...props} />
-
       </SeatContainer>
     </SeatWrapper>
   );

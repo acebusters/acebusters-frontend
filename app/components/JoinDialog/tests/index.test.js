@@ -1,19 +1,15 @@
 import React from 'react';
 import { shallow } from 'enzyme';
+import RebuyDialog from 'components/RebuyDialog';
 import JoinDialog from '../index';
 
 describe('Join Dialog', () => {
-  it('should not render the appropiate modal when balance is not sufficient ', () => {
+  it('should render rebuy dialog when balance is insufficient', () => {
     const props = {
-      balance: 200,
-      sb: 40,
-      pos: 1,
-      modalDismiss: () => {},
-      handleJoin: () => {},
+      balance: 20,
+      tableStakes: { sb: 1, min: 40, tableMax: 200 },
     };
-    const joinDialog = shallow(
-      <JoinDialog {...props} />
-    );
-    expect(joinDialog.nodes[0].props.children[0].props.children.props.defaultMessage).toEqual('Sorry!');
+    const el = shallow(<JoinDialog {...props} />);
+    expect(el.find(RebuyDialog).length).toBe(1);
   });
 });

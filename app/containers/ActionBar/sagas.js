@@ -1,20 +1,14 @@
-import {
-  call,
-  put,
-  takeLatest,
-} from 'redux-saga/effects';
-import {
-  delay,
-} from 'redux-saga';
-import {
-  HANDLE_CLICK_BUTTON,
-  BET_SET,
-  updateActionBar,
-} from './actions';
+import { call, put, takeLatest, select } from 'redux-saga/effects';
+import { delay } from 'redux-saga';
+import { HANDLE_CLICK_BUTTON, BET_SET, updateActionBar } from './actions';
 import { playActionBarClick } from '../../sounds';
+import { makeSelectIsMuted } from '../TableMenu/selectors';
 
 function* handleClickButton({ buttonType }) {
-  yield call(playActionBarClick);
+  const isMuted = yield select(makeSelectIsMuted());
+  if (!isMuted) {
+    yield call(playActionBarClick);
+  }
   yield delay(200);
   const update = {};
   // tracks onMouseDown

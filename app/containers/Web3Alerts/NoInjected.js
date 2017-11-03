@@ -11,4 +11,3 @@ const NoInjected = () => (
 );
 
 export default NoInjected;
-

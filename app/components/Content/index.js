@@ -5,9 +5,6 @@ import {
   fontSizeBase,
   lineHeightBase,
   fontWeightBase,
-  navbarHeight,
-  transitionSpeed,
-  transitionFn,
   fontPrimary,
 } from 'variables';
 
@@ -37,15 +34,8 @@ const Content = styled.div`
   min-height: 100%;
   z-index: 800;
 
-  transition: ${transitionSpeed} ${transitionFn}, width ${transitionSpeed} ${transitionFn};
-
   /* fixed layout */
-  padding-top: ${(props) => {
-    if (props.isTable) return 'none';
-    if (props.fixed) return navbarHeight;
-    if (props.shiftForNotification) return '60px';
-    return '20px';
-  }
+  padding-top: none;
   }
 `;
 

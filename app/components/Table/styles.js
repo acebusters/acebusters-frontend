@@ -10,15 +10,40 @@ import {
   backgroundTable,
   curtainStickyWidth,
   curtainWidth,
+  tableNameWidth,
 } from 'variables';
 
 export const TableContainer = styled.div`
-  margin-top: 5%;
+  position: relative;
+  padding-top: 5%;
   margin-right: auto;
   margin-left: auto;
-  height: 100%;
+  height: 100vh;
   @media (min-width: ${curtainStickyWidth}) {
     margin-left: ${curtainWidth};
+  }
+`;
+
+export const TableName = styled.h2`
+  font-size: 18px;
+  z-index: 2;
+
+  position: absolute;
+  top: 10px;
+  left: 165px;
+  right: 165px;
+
+  overflow: hidden;
+  margin: 0;
+
+  white-space: nowrap;
+  text-align: center;
+
+  color: #FFF;
+
+  @media (max-width: ${tableNameWidth}) {
+    text-align: left;
+    left: 20px;
   }
 `;
 
@@ -35,7 +60,7 @@ export const Wrapper = styled.div`
   }
 `;
 
-export const Winner = styled.div` 
+export const Winner = styled.div`
   left: 50%;
   top: 40%;
   position: absolute;

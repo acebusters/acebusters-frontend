@@ -1,6 +1,5 @@
-import React from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { browserHistory } from 'react-router';
 import { createStructuredSelector } from 'reselect';
 import {
   makeSignerAddrSelector,
@@ -8,22 +7,19 @@ import {
   makeNickNameSelector,
   makeSelectLoggedIn,
 } from '../AccountProvider/selectors';
-
+import { setAuthState } from '../AccountProvider/actions';
 import { getHeaderCollapsed } from './selectors';
 import { setCollapsed } from './actions';
 
 import Header from '../../components/Header';
 
-const HeaderContainer = (props) => (
-  <Header
-    disableOnClickOutside={props.collapsed}
-    {...props}
-  />
-);
-
-HeaderContainer.propTypes = {
-  collapsed: PropTypes.bool,
-};
+const mapDispatchToProps = (dispatch) => ({
+  onClickLogout: () => {
+    browserHistory.push('/login');
+    return dispatch(setAuthState({ loggedIn: false }));
+  },
+  setCollapsed: (val) => dispatch(setCollapsed(val)),
+});
 
 const mapStateToProps = createStructuredSelector({
   loggedIn: makeSelectLoggedIn(),
@@ -35,5 +31,5 @@ const mapStateToProps = createStructuredSelector({
 
 export default connect(
   mapStateToProps,
-  { setCollapsed },
-)(HeaderContainer);
+  mapDispatchToProps,
+)(Header);

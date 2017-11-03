@@ -1,17 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import H2 from 'components/H2';
 import SubmitButton from 'components/SubmitButton';
+import {
+  DialogContents,
+  DialogTitle,
+  DialogButtonWrapper,
+} from 'components/Modal/styles';
 
 const ConfirmDialog = ({ title, msg, buttonText, onSubmit }) => (
-  <div>
-    {title && <H2>{title}</H2>}
+  <DialogContents>
+    {title && <DialogTitle>{title}</DialogTitle>}
     <p>{msg}</p>
-    <SubmitButton onClick={onSubmit}>
-      {buttonText}
-    </SubmitButton>
-  </div>
+    <DialogButtonWrapper>
+      <SubmitButton onClick={onSubmit}>
+        {buttonText}
+      </SubmitButton>
+    </DialogButtonWrapper>
+  </DialogContents>
 );
 ConfirmDialog.propTypes = {
   title: PropTypes.oneOfType([PropTypes.node, PropTypes.string]),

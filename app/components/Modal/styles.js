@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import H2 from 'components/H2';
 
 // Container
 export const Wrapper = styled.div`
@@ -48,7 +49,7 @@ export const DialogWrapper = styled.div`
   box-sizing: border-box;
   width: auto;
   margin-bottom: 20px;
-  padding: 20px;
+  padding: 40px 30px 20px 30px;
 
   color: #333;
   background: white;
@@ -56,10 +57,26 @@ export const DialogWrapper = styled.div`
   border-radius: 10px;
 `;
 
+export const DialogContents = styled.div`
+  width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+export const DialogTitle = styled(H2)`
+  margin-top: 0;
+`;
+
+export const DialogButtonWrapper = styled.div`
+  margin-top: 16px;
+  margin-bottom: 8px;
+`;
+
 export const CloseButton = styled.a`
   position: absolute;
-  top: 0px;
-  right: 0px;
+  top: 5px;
+  right: 5px;
 
   width: 30px;
   height: 30px;

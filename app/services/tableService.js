@@ -19,6 +19,12 @@ class TableService {
     return request('post', `table/${this.tableAddr}/callOpponent`);
   }
 
+  beat() {
+    return request('post', `table/${this.tableAddr}/beat`, undefined, {
+      Authorization: new Receipt(this.tableAddr).wait().sign(this.privKey),
+    });
+  }
+
   sendMessageReceipt(text) {
     return new Receipt(this.tableAddr).message(text).sign(this.privKey);
   }
