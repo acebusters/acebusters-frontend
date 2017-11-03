@@ -7,6 +7,7 @@ const borderColors = {
   danger: '#dcb1b1',
   warning: '#ccbb99',
   success: '#d4e7c4',
+  none: '#999',
 };
 
 const bgColors = {
@@ -14,6 +15,7 @@ const bgColors = {
   danger: '#ffcaca',
   warning: '#ffee99',
   success: '#e7efe4',
+  none: 'none',
 };
 
 const textColors = {
@@ -21,6 +23,7 @@ const textColors = {
   danger: '#634a49',
   warning: '#634a33',
   success: '#3a6536',
+  none: 'none',
 };
 
 const Alert = styled.div`
@@ -35,7 +38,7 @@ const Alert = styled.div`
 export default Alert;
 
 Alert.propTypes = {
-  theme: PropTypes.oneOf(['info', 'success', 'warning', 'danger']),
+  theme: PropTypes.oneOf(['info', 'success', 'warning', 'danger', 'none']),
 };
 
 Alert.defaultProps = {

@@ -55,7 +55,7 @@ const Lobby = (props) => {
           disabled={refreshing}
         >
           <WithLoading
-            isLoading={refreshing}
+            isLoading={!!refreshing}
             loadingSize="14px"
             type="inline"
             styles={{

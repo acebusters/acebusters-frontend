@@ -37,9 +37,10 @@ const handle = (props) => {
   const {
     value,
     dragging,
+    index, // key={index} only added to consume prop
     ...restProps } = props;
   return (
-    <Handle value={value} {...restProps}>
+    <Handle key={index} value={value} {...restProps}>
       <SliderHandle>
         <SliderDot active={dragging} />
       </SliderHandle>
@@ -49,6 +50,7 @@ const handle = (props) => {
 handle.propTypes = {
   value: PropTypes.number,
   dragging: PropTypes.bool,
+  index: PropTypes.number.isRequired,
 };
 
 const Slider = (props) => (
