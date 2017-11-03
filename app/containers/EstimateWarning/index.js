@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { FormattedNumber } from 'react-intl';
 
-import { makeSelectInjected } from '../AccountProvider/selectors';
+import { makeSelectIsLocked } from '../AccountProvider/selectors';
 
 import Alert from '../../components/Alert';
 
@@ -11,7 +11,7 @@ class EstimateWarning extends React.Component {
   static propTypes = {
     estimate: PropTypes.func.isRequired,
     args: PropTypes.array.isRequired,
-    injected: PropTypes.string,
+    isLocked: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -35,14 +35,16 @@ class EstimateWarning extends React.Component {
   }
 
   runEstimate(estimate, args) {
-    estimate(...args).then((gas) => this.setState({ gas }));
+    if (!this.props.isLocked) {
+      estimate(...args).then((gas) => this.setState({ gas }));
+    }
   }
 
   render() {
-    const { injected } = this.props;
+    const { isLocked } = this.props;
     const { gas } = this.state;
 
-    if (!injected || !gas) {
+    if (isLocked || !gas) {
       return null;
     }
 
@@ -56,5 +58,5 @@ class EstimateWarning extends React.Component {
 }
 
 export default connect((state) => ({
-  injected: makeSelectInjected()(state),
+  isLocked: makeSelectIsLocked()(state),
 }))(EstimateWarning);
