@@ -13,7 +13,7 @@ import { makeHandsSelector, makeLatestHandSelector } from '../Table/selectors';
 import { loadContractData } from './loadContractData';
 import { requestStat } from './requestStat';
 import { parseDistributionReceipt, receiptStringType, renderNtz } from './utils';
-import { Wrapper, Column, Columns, Table } from './styles';
+import { Wrapper, Column, Columns, Table, ExtraDetail } from './styles';
 
 window.enableTableDebug = () => null;
 window.disableTableDebug = () => null;
@@ -179,26 +179,22 @@ class TableDebug extends React.Component {
           <tbody>
             {hands.map((hand, i) => (
               <tr key={hand.handId}>
-                <th>{hand.handId}</th>
+                <th>
+                  {hand.handId}
+                  <ExtraDetail>{hand.state}</ExtraDetail>
+                </th>
                 {hand.lineup.reduce((memo, seat, j) => {
                   const receipt = seat.last && Receipt.parse(seat.last);
                   return memo.concat([
-                    <td key={j * 2} style={{ verticalAlign: 'top' }}>
+                    <td key={j * 2}>
                       {renderNtz(receipt && receipt.amount)}
                       {receipt &&
-                        <span
-                          style={{
-                            fontSize: 9,
-                            display: 'block',
-                            color: '#666',
-                            marginTop: -3,
-                          }}
-                        >
+                        <ExtraDetail>
                           {receiptStringType(receipt.type)}
-                        </span>
+                        </ExtraDetail>
                       }
                     </td>,
-                    <td key={(j * 2) + 1} style={{ verticalAlign: 'top' }}>
+                    <td key={(j * 2) + 1}>
                       {dists[i] && renderNtz(dists[i][seat.address])}
                     </td>,
                   ]);
