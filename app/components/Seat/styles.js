@@ -1,46 +1,23 @@
-/**
-* Created by jzobro 20170517
-*/
 import styled from 'styled-components';
 
-// colors
 import {
   infoBgInverse,
   activeColor,
   infoColor,
+  medShadow,
+  smallShadow,
 } from '../../variables';
 
 import {
   alertBg,
   alertColor,
   Button,
+  scaleSeat,
+  scaleButtonJoin,
 } from '../../utils/styleUtils';
 
-// shadows
-const smallShadow = '0 1px 4px 0 rgba(0,0,0,0.50)';
-const medShadow = '0 2px 4px 0 rgba(0,0,0,0.50)';
-// size
-const seatScale = 128;
-const joinButtonScale = 64;
-// font
 const fontWeightInfo = 500;
 const fontWeigthBold = 600;
-
-
-const calcSize = (baseSize, scaleSize, dimToScale) => {
-  const convertedNum = Math.round((scaleSize / baseSize) * dimToScale);
-  return `${convertedNum}px`;
-};
-
-const scaleSeat = (dimToScale) => {
-  const baseSeatSize = 128;
-  return calcSize(baseSeatSize, seatScale, dimToScale);
-};
-
-const scaleButtonJoin = (dimToScale) => {
-  const baseJoinButtonSize = 64;
-  return calcSize(baseJoinButtonSize, joinButtonScale, dimToScale);
-};
 
 // shared styles
 export const SharedMiddle = styled.div`
@@ -101,38 +78,6 @@ export const DealerButton = styled.div`
   font-weight: 600;
   font-size: ${scaleSeat(14)};
   color: #353535;
-`;
-
-// cards
-export const CardContainer = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  margin-right: ${scaleSeat(4)};
-  margin-top: ${(props) => props.empty ? scaleSeat(40) : 0};
-
-  background-color: none;
-`;
-
-// referenced in components/Card
-export const CardShared = styled.div`
-  background-color: none;
-  margin-right: ${scaleSeat(2)};
-  width:${scaleSeat(36)};
-`;
-
-export const CardBack = styled(CardShared)`
-  margin-top: ${scaleSeat(28)};
-  height: ${scaleSeat(12)};
-`;
-
-export const CardFront = styled(CardShared)`
-  height: ${scaleSeat(40)};
-`;
-
-export const CardStyle = styled.img`
-  max-width: 100%;
-  height: auto;
-  box-shadow: ${smallShadow};
 `;
 
 // info

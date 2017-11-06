@@ -13,8 +13,6 @@ import * as storageService from '../../services/sessionStorage';
 import TableDebug from '../../containers/TableDebug';
 import NotFoundPage from '../../containers/NotFoundPage';
 
-import Card from '../../components/Card';
-import { BoardCardWrapper } from '../../components/Table/Board';
 import Seat from '../Seat';
 import WithLoading from '../../components/WithLoading';
 import { nickNameByAddress } from '../../services/nicknames';
@@ -532,21 +530,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     ));
   }
 
-  renderBoard() {
-    const cards = this.props.board;
-    const cardSize = 50;
-
-    if (Array.isArray(cards)) {
-      return cards.map((card, i) => (
-        <BoardCardWrapper key={i}>
-          <Card cardNumber={card} size={cardSize} />
-        </BoardCardWrapper>
-      ));
-    }
-
-    return [];
-  }
-
   renderWinners() {
     const winners = this.props.winners || [];
     return winners.map((winner, i) => (
@@ -595,7 +578,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
             myHand={this.props.myHand}
             pending={pending}
             sitout={this.props.sitout}
-            board={this.renderBoard()}
+            board={this.props.board}
             seats={this.renderSeats(lineup, changed)}
             hand={this.props.hand}
             potSize={this.props.potSize}

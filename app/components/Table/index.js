@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Board } from './Board';
+import BoardCards from 'components/Card/BoardCards';
 import TableMenu from '../../containers/TableMenu';
 import ActionBar from '../../containers/ActionBar';
 import tableImage from './tableBG.svg';
@@ -35,9 +35,7 @@ const TableComponent = (props) => (
 
           { props.seats }
 
-          <Board id="board" board={props.board}>
-            { props.board }
-          </Board>
+          <BoardCards board={props.board} />
 
           { props.winners.length > 0 &&
             <Winner className="winner">{ props.winners }</Winner>

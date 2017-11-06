@@ -1,6 +1,3 @@
-/**
-* Created by jzobro 20170531
-*/
 import styled, { keyframes } from 'styled-components';
 
 import {
@@ -278,7 +275,7 @@ export const FlagBet = styled(FlagShared)`
     height: 100%;
 
     line-height: 100%;
-    
+
     outline: none;
     cursor: pointer;
     opacity: 0.7;

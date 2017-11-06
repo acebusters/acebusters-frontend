@@ -31,9 +31,9 @@ describe('components.seat.seat', () => {
 
     describe('if seat is ready', () => {
       const props = { seatStatus: STATUS_MSG.active };
-      it('should show <CardsComponent/>', () => {
+      it('should show <HoleCards/>', () => {
         const el = shallow(<Seat {...props} />);
-        expect(el.find('CardsComponent').length).toEqual(1);
+        expect(el.find('HoleCards').length).toEqual(1);
       });
     });
   });

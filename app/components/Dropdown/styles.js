@@ -3,6 +3,8 @@ import { Button as ButtonBase } from '../../utils/styleUtils';
 import {
   activeColor as activeBg,
   hover as hoverBg,
+  medShadow,
+  smallShadow,
 } from '../../variables';
 
 const fontColor = '#979797';
@@ -21,7 +23,7 @@ export const Button = styled(ButtonBase)`
   padding: 10px 12px;
   background-color: white;
   border-radius: 2px;
-  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.50);
+  box-shadow: ${smallShadow};
   width: 100%;
   color: ${fontColor};
   &:hover {
@@ -81,7 +83,7 @@ export const ToggleOption = styled.div`
     `
     background-color: white;
     border-radius: 6px;
-    box-shadow: 0 2px 4px 0 rgba(0,0,0,0.50);
+    box-shadow: ${medShadow};
     `
     :
     null

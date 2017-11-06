@@ -54,3 +54,22 @@ export const Button = styled.button`
     cursor: default;
   }
 `;
+
+// size
+const seatScale = 128;
+const joinButtonScale = 64;
+
+const calcSize = (baseSize, scaleSize, dimToScale) => {
+  const convertedNum = Math.round((scaleSize / baseSize) * dimToScale);
+  return `${convertedNum}px`;
+};
+
+export const scaleSeat = (dimToScale) => {
+  const baseSeatSize = 128;
+  return calcSize(baseSeatSize, seatScale, dimToScale);
+};
+
+export const scaleButtonJoin = (dimToScale) => {
+  const baseJoinButtonSize = 64;
+  return calcSize(baseJoinButtonSize, joinButtonScale, dimToScale);
+};

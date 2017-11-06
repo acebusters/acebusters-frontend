@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import CardsComponent from './CardsComponent';
+import HoleCards from 'components/Card/HoleCards';
 import SeatInfo from './SeatInfo';
 import StatusAction from './StatusAction';
 import { STATUS_MSG } from '../../app.config';
@@ -19,6 +19,8 @@ const Seat = (props) => {
     pos,
     myPos,
     seatStatus,
+    holeCards,
+    folded,
   } = props;
 
   return (
@@ -30,7 +32,7 @@ const Seat = (props) => {
           </StatusSeatWrapper>
         }
         {(!seatStatus || seatStatus === STATUS_MSG.active) &&
-          <CardsComponent {...props} />
+          <HoleCards {...{ holeCards, folded }} />
         }
         <SeatInfo {...props} />
         <StatusAction {...props} />
@@ -43,6 +45,8 @@ Seat.propTypes = {
   pos: PropTypes.number,
   coords: PropTypes.array,
   seatStatus: PropTypes.object,
+  holeCards: PropTypes.array,
+  folded: PropTypes.bool,
 };
 
 export default Seat;
