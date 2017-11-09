@@ -17,17 +17,19 @@ build:
   ci:
     # npm mirrors can sometimes be flacky, better to use shippable_retry
     # http://docs.shippable.com/ci/advancedOptions/retry/
-    - shippable_retry npm install
+    - npm install
     - npm test
     - npm run build
 
   post_ci:
     - aws configure set preview.cloudfront true
-    - if [ "$BRANCH" == "develop" -o "$BRANCH" == "master" ] && [ "$IS_PULL_REQUEST" == "false" ]; then DEPLOY=true; fi
-    # Deploy the app to sandbox.acebusters.com
-    - if [ "$DEPLOY" ]; then AWS_ACCESS_KEY_ID=$AWS_STAGING_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_STAGING_KEY npm run deploy:sandbox; fi
-    # Publish the app zip to S3 for later staging promotion
-    - if [ "$DEPLOY" ]; then AWS_ACCESS_KEY_ID=$AWS_STAGING_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_STAGING_KEY npm run deploy:sandbox:publish-artifact; fi
+    - aws configure set region eu-west-1
+    - aws configure set aws_access_key_id $AWS_STAGING_KEY_ID
+    - aws configure set aws_secret_access_key $AWS_STAGING_KEY
+    # Deploy the app to sandbox.acebusters.com and publish the app zip to S3 for later staging promotion
+    - if [ "$BRANCH" == "develop" ] && [ "$IS_PULL_REQUEST" == "false" ]; then npm run deploy:sandbox && npm run deploy:sandbox:publish-artifact; fi
+    # Deploy the app to staging.acebusters.com and deploy backend from sandbox to staging lambdas
+    - if [[ "$BRANCH" == release/* ]]; then ./scripts/deploy_staging.sh; fi
 
   notifications:
     - integrationName: slack_chainfish
@@ -38,6 +40,7 @@ build:
         only:
           - master
           - develop
+          - release/*
       on_success: change
       on_failure: always
       on_start: never

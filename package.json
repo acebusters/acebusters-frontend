@@ -49,7 +49,8 @@
     "deploy:sandbox": "npm run deploy:sandbox:upload && npm run deploy:sandbox:invalidate-cache",
     "deploy:sandbox:upload": "aws s3 sync build/ s3://sandbox.acebusters.com/ --delete --acl public-read",
     "deploy:sandbox:invalidate-cache": "aws cloudfront create-invalidation --distribution-id E3RARTII3ZDPBB --paths '/*'",
-    "deploy:sandbox:publish-artifact": "npm run build:zip && aws s3 cp ab-web-frontend.zip s3://builds.acebusters/sandbox/ab-web-frontend.zip"
+    "deploy:sandbox:publish-artifact": "npm run build:zip && aws s3 cp ab-web-frontend.zip s3://builds.acebusters/sandbox/ab-web-frontend.zip",
+    "deploy:staging": "./scripts/deploy_staging.sh"
   },
   "lint-staged": {
     "*.js": [
