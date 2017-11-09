@@ -24,6 +24,7 @@
     "build": "cross-env NODE_ENV=production webpack --config internals/webpack/webpack.prod.babel.js -p --progress",
     "build:clean": "npm run test:clean && rimraf ./build",
     "build:dll": "node ./internals/scripts/dependencies.js",
+    "build:zip": "cd build && zip -r ../ab-web-frontend.zip * && cd ..",
     "start": "cross-env NODE_ENV=development node server",
     "start:tunnel": "cross-env NODE_ENV=development ENABLE_TUNNEL=true node server",
     "start:production": "npm run test && npm run build && npm run start:prod",
@@ -44,7 +45,11 @@
     "test:watch": "cross-env NODE_ENV=test jest --watchAll",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "deploy:sandbox": "npm run deploy:sandbox:upload && npm run deploy:sandbox:invalidate-cache",
+    "deploy:sandbox:upload": "aws s3 sync build/ s3://sandbox.acebusters.com/ --delete --acl public-read",
+    "deploy:sandbox:invalidate-cache": "aws cloudfront create-invalidation --distribution-id E3RARTII3ZDPBB --paths '/*'",
+    "deploy:sandbox:publish-artifact": "npm run build:zip && aws s3 cp ab-web-frontend.zip s3://builds.acebusters/sandbox/ab-web-frontend.zip"
   },
   "lint-staged": {
     "*.js": [

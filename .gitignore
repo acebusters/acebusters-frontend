@@ -2,6 +2,7 @@
 coverage
 build
 node_modules
+ab-web-frontend.zip
 stats.json
 
 # Cruft

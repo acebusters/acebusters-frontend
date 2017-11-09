@@ -3,6 +3,14 @@ language: node_js
 node_js:
   - 7.4.0
 
+env:
+  global:
+    # AWS_SANDBOX_KEY_ID, AWS_SANDBOX_KEY, AWS_STAGING_KEY_ID, AWS_STAGING_KEY
+    - secure: P6Nel0E9JIMff+mOno0U3bkH/JlRcevYG7wtI+u66wriAiVWRZCHEtoY3DW89Y2mVE20ojg3tZ8UUAhKOByuIKZo5jUzrVbsvgadClED06MFYg46jOpMuihsjYCHzgeasF81tzkoRBmkcNAtpsaQ4H1q/ZQQ8RbQ7pLcgGHUnFrmfpj/QEyefdFeS/GL9P3JNZ9QMwNtt8wJOYjM2vBm13RZ0QrCpxiSTHHrutag4+4hjUEYHydBC0nTltxAFbOunNNiWUosqwpBo7R7UmIx7mptR+8Obqc7sWqNn+bzFGDa6OVW9gHYNcPNLQXlGYt68v7wmpdYKTtTHwEJpIMy8Q==
+
+install:
+  - sudo apt-get install zip
+
 build:
 
   # http://docs.shippable.com/ci/shippableyml/#ci
@@ -13,17 +21,23 @@ build:
     - npm test
     - npm run build
 
+  post_ci:
+    - aws configure set preview.cloudfront true
+    - if [ "$BRANCH" == "develop" -o "$BRANCH" == "master" ] && [ "$IS_PULL_REQUEST" == "false" ]; then DEPLOY=true; fi
+    # Deploy the app to sandbox.acebusters.com
+    - if [ "$DEPLOY" ]; then AWS_ACCESS_KEY_ID=$AWS_STAGING_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_STAGING_KEY npm run deploy:sandbox; fi
+    # Publish the app zip to S3 for later staging promotion
+    - if [ "$DEPLOY" ]; then AWS_ACCESS_KEY_ID=$AWS_STAGING_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_STAGING_KEY npm run deploy:sandbox:publish-artifact; fi
 
-# Integrations are used to connect external resources to CI
-# http://docs.shippable.com/integrations/overview/
-integrations:
-
-  # http://docs.shippable.com/ci/shippableyml/#notifications
   notifications:
-  # turning of email for PR builds, get notified only on failure and change in status
-  # http://docs.shippable.com/integrations/notifications/email/
-    - integrationName: email
-      type: email
+    - integrationName: slack_chainfish
+      type: slack
+      recipients:
+        - "#ci"
+      branches:
+        only:
+          - master
+          - develop
       on_success: change
       on_failure: always
-      on_pull_request: never
+      on_start: never
