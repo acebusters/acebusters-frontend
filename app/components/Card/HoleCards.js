@@ -1,13 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import TransitionGroup from 'react-addons-transition-group';
 
 import Card from '../Card';
-import FlipCard from './FlipCard';
+import HoleCard from './HoleCard';
 
 import { HoleCardContainer, UpWrapper, DownWrapper } from './styles';
 
 const cardHeight = 48;
-const animDelay = '0ms';
+const cardWidth = 36;
 
 const HoleCards = ({ holeCards, folded }) => (
   <HoleCardContainer
@@ -25,7 +26,9 @@ const HoleCards = ({ holeCards, folded }) => (
       if (!folded && cardNumber !== null) {
         return (
           <UpWrapper key={i}>
-            <FlipCard {...{ animDelay, cardNumber, cardHeight }} />
+            <TransitionGroup>
+              <HoleCard {...{ cardNumber, cardHeight, cardWidth }} />
+            </TransitionGroup>
           </UpWrapper>
         );
       }
