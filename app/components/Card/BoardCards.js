@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import FlipCard from './FlipCard';
-import { BoardContainer, BoardCardWrapper } from './styles';
+import TransitionGroup from 'react-addons-transition-group';
+import BoardCard from './BoardCard';
+import { BoardContainer } from './styles';
 
-import { boardCardFall } from './constants';
 // eslint-disable-next-line react/prefer-stateless-function
 class BoardCards extends React.Component {
   static propTypes = {
@@ -15,16 +15,19 @@ class BoardCards extends React.Component {
     const cardWidth = 37;
     return (
       <BoardContainer id="board">
-        {this.props.board.map((cardNumber, i) => (
-          <BoardCardWrapper
-            key={i}
-            animNumber={i}
-            height={cardHeight}
-            width={cardWidth}
-          >
-            <FlipCard {...{ animDelay: boardCardFall, cardNumber, cardHeight }} />
-          </BoardCardWrapper>
-        ))}
+        <TransitionGroup style={{ display: 'flex' }}>
+          {this.props.board.map((cardNumber, i) => (
+            <BoardCard
+              {...{
+                key: i,
+                animNum: i,
+                cardNumber,
+                cardHeight,
+                cardWidth,
+              }}
+            />
+          ))}
+        </TransitionGroup>
       </BoardContainer>
     );
   }

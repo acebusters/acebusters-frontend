@@ -24,8 +24,7 @@ build:
   post_ci:
     - aws configure set preview.cloudfront true
     - aws configure set region eu-west-1
-    - aws configure set aws_access_key_id $AWS_STAGING_KEY_ID
-    - aws configure set aws_secret_access_key $AWS_STAGING_KEY
+    - if [ "$IS_PULL_REQUEST" == "false" ]; then aws configure set aws_access_key_id $AWS_STAGING_KEY_ID; aws configure set aws_secret_access_key $AWS_STAGING_KEY; fi
     # Deploy the app to sandbox.acebusters.com and publish the app zip to S3 for later staging promotion
     - if [ "$BRANCH" == "develop" ] && [ "$IS_PULL_REQUEST" == "false" ]; then npm run deploy:sandbox && npm run deploy:sandbox:publish-artifact; fi
     # Deploy the app to staging.acebusters.com and deploy backend from sandbox to staging lambdas
