@@ -74,6 +74,9 @@ class TableMenu extends React.Component {
     if (typeof this.props.onCallOpponent === 'function') {
       this.props.onCallOpponent();
       this.setState({ calledOpponent: true });
+      setTimeout(() => {
+        this.setState({ calledOpponent: false });
+      }, 5 * 60 * 1000);
     }
   }
 
@@ -81,11 +84,19 @@ class TableMenu extends React.Component {
     const {
       loggedIn, open, sitout, isMuted, standingUp,
       handleClickLogout, onLeave, onSitout, handleClickMuteToggle,
+      myPos, myPending,
     } = this.props;
     const { calledOpponent } = this.state;
 
     const isSitoutFlag = typeof sitout === 'number';
     const menuClose = [
+      {
+        name: 'mute',
+        icon: `fa ${isMuted ? 'fa-volume-off' : 'fa-volume-up'}`,
+        title: isMuted ? 'Unmute' : 'Mute',
+        onClick: () => handleClickMuteToggle(!isMuted),
+        disabled: false,
+      },
       {
         name: 'sitout',
         icon: isSitoutFlag ? 'fa fa-play' : 'fa fa-pause',
@@ -101,13 +112,6 @@ class TableMenu extends React.Component {
         pending: standingUp,
         disabled: isStadingUpDisabled(this.props),
       },
-      {
-        name: 'mute',
-        icon: `fa ${isMuted ? 'fa-volume-off' : 'fa-volume-up'}`,
-        title: isMuted ? 'Unmute' : 'Mute',
-        onClick: () => handleClickMuteToggle(!isMuted),
-        disabled: false,
-      },
     ];
 
     if (!calledOpponent) {
@@ -116,7 +120,7 @@ class TableMenu extends React.Component {
         icon: 'fa fa-bullhorn',
         title: 'Call an opponent',
         onClick: this.handleOpponentCall,
-        disabled: false,
+        disabled: standingUp || myPending || myPos === undefined,
       });
     }
 
@@ -212,6 +216,8 @@ TableMenu.propTypes = {
   standingUp: PropTypes.bool,
   handleClickMuteToggle: PropTypes.func,
   onCallOpponent: PropTypes.func,
+  myPos: PropTypes.number,
+  myPending: PropTypes.bool,
 };
 
 export default onClickOutside(TableMenu);
