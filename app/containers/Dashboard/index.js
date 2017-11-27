@@ -7,49 +7,43 @@ import web3Connect from '../AccountProvider/web3Connect';
 import makeSelectAccountData from '../AccountProvider/selectors';
 import Container from '../../components/Container';
 import Balances from '../../components/Dashboard/Balances';
-import PanesRoot from '../../components/Dashboard/PanesRoot';
 import Tabs from '../../components/Dashboard/Tabs';
 
-import Invest from './Invest';
-import Overview from './Overview';
-import Wallet from './Wallet';
-import Exchange from './Exchange';
 import InvestTour from './InvestTour';
 
 import { OVERVIEW, WALLET, EXCHANGE, INVEST, setActiveTab } from './actions';
 import messages from './messages';
 import { getActiveTab } from './selectors';
+import { investIsAvailable } from './utils';
 
-import { ABI_TOKEN_CONTRACT, ABI_POWER_CONTRACT, MAIN_NET_GENESIS_BLOCK, conf } from '../../app.config';
+import { ABI_TOKEN_CONTRACT, ABI_POWER_CONTRACT, conf } from '../../app.config';
 
 const confParams = conf();
-
-const PANES = {
-  [OVERVIEW]: Overview,
-  [WALLET]: Wallet,
-  [EXCHANGE]: Exchange,
-  [INVEST]: Invest,
-};
 
 const TABS = [
   {
     name: OVERVIEW,
     title: <FormattedMessage {...messages[OVERVIEW]} />,
+    to: '/dashboard',
     icon: 'fa-tachometer',
+    onlyActiveOnIndex: true,
   },
   {
     name: WALLET,
     title: <FormattedMessage {...messages[WALLET]} />,
+    to: '/dashboard/wallet',
     icon: 'fa-money',
   },
   {
     name: EXCHANGE,
     title: <FormattedMessage {...messages[EXCHANGE]} />,
+    to: '/dashboard/exchange',
     icon: 'fa-exchange',
   },
   {
     name: INVEST,
     title: <FormattedMessage {...messages[INVEST]} />,
+    to: '/dashboard/invest',
     icon: 'fa-line-chart',
   },
 ];
@@ -73,13 +67,7 @@ class DashboardRoot extends React.Component {
     const pwrBalance = this.power.balanceOf(account.proxy);
 
     // before crowdsale end, disable INVEST tab on production
-    const isMainnet = conf().firstBlockHash === MAIN_NET_GENESIS_BLOCK;
-    const inWhitelist = [
-      '0x8f3a1e097738a3f6f19c06b97d160df6b3a1801a', // sergey
-      '0x67be75fedee88a84cbdcf5c87616bb1bb746c57e', // johann
-      '0x4a46401df761f2ccc022c83aa7a97aac7a35303a', // sunify
-    ].indexOf(account.proxy) !== -1;
-    const disabledTabs = (isMainnet && !inWhitelist) ? [INVEST] : [];
+    const disabledTabs = !investIsAvailable(account.proxy) ? [INVEST] : [];
     return (
       <Container>
         <Tabs
@@ -92,18 +80,14 @@ class DashboardRoot extends React.Component {
           pwrBalance={pwrBalance}
           weiBalance={weiBalance}
         />
-        <PanesRoot
-          panes={PANES}
-          paneType={this.props.activeTab}
-          paneProps={this.props}
-        />
+        {this.props.children}
         <InvestTour />
       </Container>
     );
   }
 }
 DashboardRoot.propTypes = {
-  activeTab: PropTypes.string,
+  children: PropTypes.any,
   account: PropTypes.object,
   web3Redux: PropTypes.any,
 };

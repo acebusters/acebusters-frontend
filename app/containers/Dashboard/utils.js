@@ -1,6 +1,6 @@
 import React from 'react';
 import { FormattedDate, FormattedTime } from 'react-intl';
-import { conf } from '../../app.config';
+import { conf, MAIN_NET_GENESIS_BLOCK } from '../../app.config';
 const confParams = conf();
 
 export function isSellEvent(event) {
@@ -61,3 +61,13 @@ export function formatDate(timestamp) {
   );
 }
 
+export function investIsAvailable(proxyAddr) {
+  const isMainnet = conf().firstBlockHash === MAIN_NET_GENESIS_BLOCK;
+  const inWhitelist = [
+    '0x8f3a1e097738a3f6f19c06b97d160df6b3a1801a', // sergey
+    '0x67be75fedee88a84cbdcf5c87616bb1bb746c57e', // johann
+    '0x4a46401df761f2ccc022c83aa7a97aac7a35303a', // sunify
+  ].indexOf(proxyAddr) !== -1;
+
+  return !isMainnet || inWhitelist;
+}

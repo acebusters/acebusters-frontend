@@ -79,7 +79,7 @@ Wallet.propTypes = {
   amountUnit: PropTypes.string,
   messages: PropTypes.object,
   account: PropTypes.object.isRequired,
-  floor: PropTypes.object.isRequired,
+  floor: PropTypes.object,
 };
 
 export default Wallet;

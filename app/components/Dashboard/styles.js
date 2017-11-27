@@ -123,7 +123,9 @@ export const TabButton = styled(Button)`
   min-height: 32px;
   padding: 0.7em 1.2em;
   margin: 0;
+  cursor: pointer;
   color: ${gray};
+  text-decoration: none;
   border-bottom: 2px solid transparent;
   &:hover {
     background-color: ${gray};
@@ -134,6 +136,16 @@ export const TabButton = styled(Button)`
     border-bottom: 2px solid ${baseColor};
   }
   &:disabled {
+    background-color: white;
+    border-bottom: 2px solid ${baseColor};
+    color: black;
+  }
+`;
+
+export const TabLink = TabButton.withComponent('a');
+export const TabLinkActive = styled(TabButton.withComponent('a'))`
+  &, &:hover {
+    cursor: default;
     background-color: white;
     border-bottom: 2px solid ${baseColor};
     color: black;

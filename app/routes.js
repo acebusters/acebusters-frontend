@@ -2,13 +2,14 @@
 // They are all wrapped in the App component, which should contain the navbar etc
 // See http://blog.mxstbr.com/2016/01/react-apps-with-pages for more information
 // about the code splitting business
-import App from 'containers/App';
-import TableFrame from 'components/Frames/Tables';
-import DashboardFrame from 'components/Frames/Dashboard';
+import App from './containers/App';
+import TableFrame from './components/Frames/Tables';
+import DashboardFrame from './components/Frames/Dashboard';
 import { getAsyncInjectors } from './utils/asyncInjectors';
 import { accountSaga } from './containers/AccountProvider/sagas';
 import { tableStateSaga } from './containers/Table/sagas';
 import { selectAccount } from './containers/AccountProvider/selectors';
+import { investIsAvailable } from './containers/Dashboard/utils';
 import { notificationsSaga } from './containers/Notifications/sagas';
 import { actionBarSaga } from './containers/ActionBar/sagas';
 import { tableMenuSaga } from './containers/TableMenu/sagas';
@@ -52,6 +53,77 @@ export default function createRoutes(store) {
 
   const dashboard = [
     {
+      path: 'wallet',
+      name: 'wallet',
+      getComponent(nextState, cb) {
+        const importModules = import('./containers/Dashboard/Wallet');
+        const renderRoute = loadModule(cb);
+
+        importModules.then((component) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    },
+    {
+      path: 'exchange',
+      name: 'exchange',
+      getComponent(nextState, cb) {
+        const importModules = import('./containers/Dashboard/Exchange');
+        const renderRoute = loadModule(cb);
+
+        importModules.then((component) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    },
+    {
+      path: 'invest',
+      name: 'invest',
+      onEnter: (nextState, replace) => {
+        const { proxyAddr } = selectAccount(store.getState()).toJS();
+        if (!investIsAvailable(proxyAddr)) {
+          replace({ pathname: '/dashboard' });
+        }
+      },
+      getComponent(nextState, cb) {
+        const importModules = import('./containers/Dashboard/Invest');
+        const renderRoute = loadModule(cb);
+
+        importModules.then((component) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+      indexRoute: {
+        getComponent(nextState, cb) {
+          const importModules = import('./containers/Dashboard/PowerUp');
+          const renderRoute = loadModule(cb);
+          importModules.then((component) => renderRoute(component));
+          importModules.catch(errorLoading);
+        },
+      },
+      childRoutes: [
+        {
+          path: 'powerDown',
+          name: 'powerDown',
+          getComponent(nextState, cb) {
+            const importModules = import('./containers/Dashboard/PowerDown');
+            const renderRoute = loadModule(cb);
+            importModules.then((component) => renderRoute(component));
+            importModules.catch(errorLoading);
+          },
+        },
+      ],
+    },
+  ];
+
+  const simplePages = [
+    {
       path: '/',
       name: 'default',
       onEnter: (nextState, replace) => {
@@ -77,27 +149,38 @@ export default function createRoutes(store) {
       },
     }, {
       onEnter: checkAuth,
-      childRoutes: [{
-        path: 'dashboard',
-        name: 'dashboard',
+      path: 'dashboard',
+      name: 'dashboard',
+      indexRoute: {
         getComponent(nextState, cb) {
-          const importModules = Promise.all([
-            import('containers/Dashboard/reducer'),
-            import('containers/Dashboard/sagas'),
-            import('containers/Dashboard'),
-          ]);
-
+          const importModules = import('./containers/Dashboard/Overview');
           const renderRoute = loadModule(cb);
 
-          importModules.then(([reducer, sagas, component]) => {
-            injectReducer('dashboard', reducer.default);
-            injectSagas(sagas.default);
+          import('./containers/Dashboard/Overview').then((component) => {
             renderRoute(component);
           });
 
           importModules.catch(errorLoading);
         },
-      }],
+      },
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/Dashboard/reducer'),
+          import('containers/Dashboard/sagas'),
+          import('containers/Dashboard'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('dashboard', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+      childRoutes: dashboard,
     }, {
       path: 'login',
       name: 'login',
@@ -213,7 +296,7 @@ export default function createRoutes(store) {
           childRoutes: [...tables],
         }, {
           component: DashboardFrame,
-          childRoutes: [...dashboard],
+          childRoutes: [...simplePages],
         },
       ],
     },
