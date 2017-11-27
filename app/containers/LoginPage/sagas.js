@@ -1,10 +1,6 @@
 import { take, put, race, fork } from 'redux-saga/effects';
 
-import {
-  WORKER_ERROR,
-  WALLET_IMPORTED,
-  WORKER_PROGRESS,
-} from './constants';
+import { WORKER_ERROR, WALLET_IMPORTED, WORKER_PROGRESS } from './constants';
 
 import { login } from './actions';
 
