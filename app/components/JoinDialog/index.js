@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { Form, Field } from 'redux-form/immutable';
+import BigNumber from 'bignumber.js';
 import Slider from 'components/Form/Slider';
 import SubmitButton from 'components/SubmitButton';
 import Web3Alerts from 'containers/Web3Alerts';
@@ -39,10 +40,12 @@ export class JoinDialog extends React.Component {
         tableMax,
       },
     } = this.props;
-    const max = (balance < tableMax) ? balance - (balance % sb) : tableMax;
+    const max = BigNumber.min(balance, tableMax).div(sb).floor().mul(sb);
+
     if (balance < min) {
       return <RebuyDialog messages={messages} {...this.props} />;
     }
+
     return (
       <Form style={{ maxWidth: '30em' }} onSubmit={handleSubmit(this.handleSubmit)}>
         <Field
@@ -52,7 +55,7 @@ export class JoinDialog extends React.Component {
           onAfterChange={(value) => this.props.changeFieldValue('join', 'amount', value)}
           onChange={(value) => this.props.changeFieldValue('join', 'amount', value)}
           min={min}
-          max={max}
+          max={max.toNumber()}
           step={sb}
         />
         <div><FormattedMessage {...messages.max} /> {formatNtz(max)} NTZ</div>
@@ -94,7 +97,7 @@ JoinDialog.propTypes = {
   tableStakes: PropTypes.object,
   submitting: PropTypes.bool,
   amount: PropTypes.number,
-  balance: PropTypes.number,
+  balance: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.object]),
   changeFieldValue: PropTypes.func,
 };
 
