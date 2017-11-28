@@ -162,7 +162,7 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
           </Form>
 
           <ForgotField>
-            <Link to="reset">
+            <Link to="/reset">
               Forgot password
             </Link>
           </ForgotField>

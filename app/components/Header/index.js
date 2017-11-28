@@ -38,14 +38,14 @@ class Header extends React.Component {
         <i className="fa fa-bars fa-2"></i>
       </NavToggle>,
       <NavItem
-        to="lobby"
+        to="/lobby"
         collapsed={this.props.collapsed}
         key="2"
         title="Lobby"
         location={this.props.location}
       />,
       <NavItem
-        to="dashboard"
+        to="/dashboard"
         key="3"
         collapsed={this.props.collapsed}
         title={<span>
