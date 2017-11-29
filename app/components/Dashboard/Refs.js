@@ -4,7 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import H2 from '../H2';
 
 import { SectionOverview } from './styles';
-import CopyInput from './CopyInput';
+import CopyInput from '../CopyInput';
 
 const refLink = ({ id }) => `${window.location.origin}/register/ref/${id}`;
 

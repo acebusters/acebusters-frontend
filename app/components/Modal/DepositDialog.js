@@ -5,6 +5,7 @@ import ethUtil from 'ethereumjs-util';
 import { FormattedMessage } from 'react-intl';
 import messages from 'containers/Dashboard/messages';
 import SubmitButton from 'components/SubmitButton';
+import CopyInput from 'components/CopyInput';
 import {
   DialogContents,
   DialogTitle,
@@ -50,7 +51,7 @@ const DepositDialog = ({ account, handleClose }) => {
           <div style={styles.qrCodeWrapper}>
             <QRCode value={qrUrl} size={160} />
           </div>
-          {ethUtil.toChecksumAddress(account.proxy)}
+          <CopyInput value={ethUtil.toChecksumAddress(account.proxy)} />
         </WithLoading>
       </Alert>
 
@@ -61,7 +62,7 @@ const DepositDialog = ({ account, handleClose }) => {
       )}
 
       <Alert style={styles.alertMargins} theme="warning">
-        Please note you´ll need some amount of ETH in your MetaMask wallet if
+        Please note you{'\''}ll need some amount of ETH in your MetaMask wallet if
         you want to unlock account and pay transaction fees after unlock (table
         joins, transfers etc). Depending on the gas price you will need to pay
         ≈0.004 ETH to join the table.

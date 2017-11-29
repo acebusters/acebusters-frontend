@@ -23,7 +23,7 @@ function CopyInput({ value }) {
         defaultValue={value}
         onClick={(e) => copyText(e.currentTarget)}
         readOnly
-        style={{ width: value.length * 9.5 }}
+        style={{ width: value.length * 10, fontSize: 15 }}
       />
     </label>
   );
