@@ -13,6 +13,7 @@ import Button from '../Button';
 import Economy from './Economy';
 import ETHPayout from './ETHPayout';
 import ABPPayout from './ABPPayout';
+import Refs from './Refs';
 import { Pane, SectionOverview, Subtitle } from './styles';
 
 const Overview = (props) => {
@@ -47,25 +48,10 @@ const Overview = (props) => {
       </SectionOverview>
 
       {account.refs && account.refs.length &&
-        <SectionOverview
-          name="refs"
-          style={{
-            alignItems: 'center',
-          }}
-        >
-          <H2><FormattedMessage {...messages.refs} /></H2>
-          <List
-            items={account.refs.map((ref) => [ref.id, ref.allowance])}
-            headers={[
-              'Code',
-              'Invitations left',
-            ]}
-            columnsStyle={{
-              0: { width: 20, textAlign: 'left', whiteSpace: 'nowrap', paddingLeft: '20px', paddingRight: '20px' },
-              1: { textAlign: 'right', whiteSpace: 'nowrap', paddingRight: '20px' },
-            }}
-          />
-        </SectionOverview>
+        <Refs
+          refs={account.refs}
+          messages={messages}
+        />
       }
 
       {ethAllowance && ethAllowance.toNumber() > 0 && ethPayoutDate &&

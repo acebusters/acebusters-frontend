@@ -80,7 +80,11 @@ export default defineMessages({
   },
   refs: {
     id: 'app.containers.Dashboard.refs',
-    defaultMessage: 'Promo codes',
+    defaultMessage: '{refsCount, plural, one {Referral link} other {Referral links}}',
+  },
+  invitationsLeft: {
+    id: 'app.containers.Dashboard.invitationsLeft',
+    defaultMessage: '{allowance} {allowance, plural, one {invitation left} other {invitations left}}',
   },
   transactionErrorTitle: {
     id: 'app.containers.Dashboard.transactionErrorTitle',
