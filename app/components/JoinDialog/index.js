@@ -4,15 +4,12 @@ import { FormattedMessage } from 'react-intl';
 import { Form, Field } from 'redux-form/immutable';
 import BigNumber from 'bignumber.js';
 import Slider from 'components/Form/Slider';
-import SubmitButton from 'components/SubmitButton';
 import Web3Alerts from 'containers/Web3Alerts';
-import EstimateWarning from 'containers/EstimateWarning';
+import TxSubmit from 'containers/TxSubmit';
 import messages from 'containers/JoinDialog/messages';
 import RebuyDialog from 'components/RebuyDialog';
 
 import { formatNtz } from '../../utils/amountFormatter';
-
-import { ButtonContainer } from './styles';
 
 export class JoinDialog extends React.Component {
   constructor(props) {
@@ -26,7 +23,6 @@ export class JoinDialog extends React.Component {
 
   render() {
     const {
-      canSendTx,
       balance,
       handleSubmit,
       estimate,
@@ -63,26 +59,17 @@ export class JoinDialog extends React.Component {
 
         <Web3Alerts />
 
-        {canSendTx &&
-          <EstimateWarning
-            estimate={estimate}
-            args={[amount]}
-          />
-        }
-
-        <ButtonContainer>
-          <SubmitButton
-            disabled={!canSendTx}
-            submitting={submitting}
-          >
+        <TxSubmit
+          estimate={estimate}
+          estimateArgs={[amount]}
+          submitting={submitting}
+          submitButtonLabel={
             <FormattedMessage {...(rebuy ? messages.rebuy : messages.join)} />
-          </SubmitButton>
-          {rebuy && onLeave &&
-            <SubmitButton type="button" onClick={onLeave}>
-              <FormattedMessage {...messages.leave} />
-            </SubmitButton>
           }
-        </ButtonContainer>
+          onCancel={rebuy ? onLeave : undefined}
+          cancelButtonLabel={<FormattedMessage {...messages.leave} />}
+          possibleFailReason="Maybe seat is already taken by other player"
+        />
       </Form>
     );
   }
@@ -93,7 +80,6 @@ JoinDialog.propTypes = {
   rebuy: PropTypes.bool,
   handleSubmit: PropTypes.func,
   estimate: PropTypes.func,
-  canSendTx: PropTypes.bool,
   tableStakes: PropTypes.object,
   submitting: PropTypes.bool,
   amount: PropTypes.number,

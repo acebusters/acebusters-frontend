@@ -6,7 +6,7 @@ import { createStructuredSelector } from 'reselect';
 
 import { modalDismiss } from '../App/actions';
 import { makeSbSelector, makeTableStakesSelector } from '../Table/selectors';
-import { makeSelectProxyAddr, makeSelectCanSendTx } from '../AccountProvider/selectors';
+import { makeSelectProxyAddr } from '../AccountProvider/selectors';
 
 const valueSelector = formValueSelector('join');
 
@@ -17,7 +17,6 @@ const mapDispatchToProps = (dispatch) => ({
 
 const mapStateToProps = createStructuredSelector({
   proxyAddr: makeSelectProxyAddr(),
-  canSendTx: makeSelectCanSendTx(),
   amount: (state) => valueSelector(state, 'amount'),
   initialValues: (state, props) => ({
     amount: makeSbSelector()(state, props) * 40,

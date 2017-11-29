@@ -38,7 +38,11 @@ export default class Timed extends React.Component {
   }
 
   render() {
-    if (this.props.until >= (Date.now() / 1000)) {
+    const disabled = this.props.until >= (Date.now() / 1000);
+
+    if (typeof this.props.children === 'function') {
+      return this.props.children(disabled);
+    } else if (disabled) {
       return null;
     }
 

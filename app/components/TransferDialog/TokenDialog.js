@@ -4,9 +4,8 @@ import { Form, Field } from 'redux-form/immutable';
 import BigNumber from 'bignumber.js';
 
 import Web3Alerts from '../../containers/Web3Alerts';
-import EstimateWarning from '../../containers/EstimateWarning';
+import TxSubmit from '../../containers/TxSubmit';
 import { ErrorMessage } from '../FormMessages';
-import SubmitButton from '../SubmitButton';
 import FormField from '../Form/FormField';
 import TokenAmountField from '../Form/TokenAmountField';
 
@@ -34,7 +33,6 @@ class TokenDialog extends React.Component {
       maxAmount,
       minAmount,
       invalid,
-      canSendTx,
       normalizer,
       placeholder,
     } = this.props;
@@ -69,27 +67,19 @@ class TokenDialog extends React.Component {
 
           <Web3Alerts />
 
-          {!invalid && canSendTx && amount && address &&
-            <EstimateWarning
-              estimate={estimateTransfer}
-              args={[amount, address]}
-            />
-          }
-
-          <SubmitButton
-            type="submit"
-            disabled={invalid || !canSendTx}
+          <TxSubmit
+            invalid={invalid}
             submitting={submitting}
-          >
-            Submit
-          </SubmitButton>
+            estimate={estimateTransfer}
+            estimateArgs={(amount && address) && [amount, address]}
+            submitButtonLabel="Submit"
+          />
         </Form>
       </div>
     );
   }
 }
 TokenDialog.propTypes = {
-  canSendTx: PropTypes.bool,
   submitting: PropTypes.bool,
   invalid: PropTypes.bool,
   maxAmount: PropTypes.object, // BigNumber

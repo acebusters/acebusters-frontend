@@ -2,11 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
-import WithLoading from '../../components/WithLoading';
-import EstimateWarning from '../../containers/EstimateWarning';
+import TxSubmit from '../../containers/TxSubmit';
 
 import H2 from '../H2';
-import TimedButton from '../TimedButton';
 import Timed from '../Timed';
 
 import { formatAbp } from '../../utils/amountFormatter';
@@ -34,28 +32,18 @@ export default function ABPPayout({ downs, downtime, handlePayout, estimatePayou
         <PayoutDate request={downs} downtime={downtime} />
       </div>
 
-      {!pending &&
-        <Timed until={nextPayoutDate}>
-          <EstimateWarning estimate={estimatePayout} />
-        </Timed>
-      }
-
-      <TimedButton
-        until={nextPayoutDate}
-        onClick={handlePayout}
-        disabled={pending}
-      >
-        Execute Pay-Out
-        {pending &&
-          <WithLoading
-            isLoading
-            loadingSize="14px"
-            type="inline"
-            styles={{ outer: { marginLeft: 5 } }}
+      <Timed until={nextPayoutDate}>
+        {(disabled) => (
+          <TxSubmit
+            estimate={estimatePayout}
+            esitmateArgs={[]}
+            invalid={disabled}
+            submitting={pending}
+            onSubmit={handlePayout}
+            submitButtonLabel="Execute Pay-Out"
           />
-        }
-      </TimedButton>
-
+        )}
+      </Timed>
     </SectionOverview>
   );
 }

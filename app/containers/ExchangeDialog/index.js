@@ -6,7 +6,6 @@ import { validateFloat } from '../../utils/inputValidators';
 import ExchangeDialog from '../../components/ExchangeDialog';
 import messages from './messages';
 
-import { makeSelectCanSendTx } from '../AccountProvider/selectors';
 import { modalAdd, modalDismiss } from '../App/actions';
 import { setAmountUnit } from '../Dashboard/actions';
 
@@ -30,14 +29,10 @@ const warn = () => {
   return warnings;
 };
 
-const mapStateToProps = (state, ownProps) => {
-  const valueSelector = formValueSelector(ownProps.form);
-  return {
-    messages,
-    amount: valueSelector(state, 'amount'),
-    canSendTx: makeSelectCanSendTx()(state),
-  };
-};
+const mapStateToProps = (state, ownProps) => ({
+  messages,
+  amount: formValueSelector(ownProps.form)(state, 'amount'),
+});
 
 function mapDispatchToProps(dispatch, ownProps) {
   return {

@@ -7,8 +7,7 @@ import { normalizerFloat } from '../../utils/amountFormatter';
 import { ABP, ETH, NTZ } from '../../containers/Dashboard/actions';
 
 import Web3Alerts from '../../containers/Web3Alerts';
-import EstimateWarning from '../../containers/EstimateWarning';
-import SubmitButton from '../SubmitButton';
+import TxSubmit from '../../containers/TxSubmit';
 import H2 from '../H2';
 
 import {
@@ -51,7 +50,6 @@ class ExchangeDialog extends React.Component { // eslint-disable-line react/pref
       title,
       descr,
       invalid,
-      canSendTx,
       placeholder,
     } = this.props;
     return (
@@ -92,19 +90,13 @@ class ExchangeDialog extends React.Component { // eslint-disable-line react/pref
 
           <Web3Alerts />
 
-          {!invalid && canSendTx && amount &&
-            <EstimateWarning
-              estimate={estimateExchange}
-              args={[amount]}
-            />
-          }
-
-          <SubmitButton
-            disabled={invalid || !canSendTx}
+          <TxSubmit
+            invalid={invalid}
             submitting={submitting}
-          >
-            <FormattedMessage {...messages.submitButton} />
-          </SubmitButton>
+            estimate={estimateExchange}
+            estimateArgs={[amount]}
+            submitButtonLabel={<FormattedMessage {...messages.submitButton} />}
+          />
         </Form>
       </div>
     );
@@ -119,7 +111,6 @@ ExchangeDialog.propTypes = {
   submitting: PropTypes.bool,
   setAmountUnit: PropTypes.func,
   invalid: PropTypes.bool,
-  canSendTx: PropTypes.bool,
   maxAmount: PropTypes.object, // BigNumber
   calcExpectedAmount: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func,
