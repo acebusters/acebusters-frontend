@@ -194,23 +194,31 @@ WebsocketProvider.prototype.sendAsync = function sendAsync(payload, callback) {
     // if(!this.connection.writable)
     //     this.connection.connect({path: this.path});
 
-  this.waitForConnection(() => {
+  this.waitForConnection(200).then(() => {
     this.connection.send(JSON.stringify(payload));
     this.addResponseCallback(payload, callback);
-  }, 200);
+  });
 };
 
-WebsocketProvider.prototype.waitForConnection = function waitForConnection(callback, duration) {
-  if (this.connection.readyState === 1) {
-    callback();
-  } else {
-    const interval = setInterval(() => {
+WebsocketProvider.prototype.waitForConnection = function waitForConnection(duration) {
+  if (!this.connectionPromise) {
+    this.connectionPromise = new Promise((resolve) => {
       if (this.connection.readyState === 1) {
-        clearInterval(interval);
-        callback();
+        resolve();
+        this.connectionPromise = null;
+      } else {
+        const interval = setInterval(() => {
+          if (this.connection.readyState === 1) {
+            clearInterval(interval);
+            resolve();
+            this.connectionPromise = null;
+          }
+        }, duration);
       }
-    }, duration);
+    });
   }
+
+  return this.connectionPromise;
 };
 
 /**
