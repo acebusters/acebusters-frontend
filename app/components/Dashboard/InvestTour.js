@@ -1,13 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Tour from 'reactour';
+import { browserHistory } from 'react-router';
 import { FormattedMessage, FormattedHTMLMessage } from 'react-intl';
-
-import {
-  OVERVIEW,
-  WALLET,
-  EXCHANGE,
-} from '../../containers/Dashboard/actions';
 
 import A from '../A';
 import Alert from '../Alert';
@@ -15,7 +10,6 @@ import Alert from '../Alert';
 import messages from './investTourMessages';
 
 const InvestTour = ({
-  setActiveTab,
   setAmountUnit,
   investTour,
   toggleInvestTour,
@@ -38,6 +32,7 @@ const InvestTour = ({
   const STEPS = [
     {
       selector: '[data-tour="tour-begin"]',
+      action: () => browserHistory.replace('/dashboard'),
       content: (
         <div>
           <FormattedHTMLMessage {...messages.step1} />
@@ -51,7 +46,7 @@ const InvestTour = ({
     {
       selector: '[data-tour="wallet"]',
       content: <div><FormattedMessage {...messages.step2} /></div>,
-      action: () => setActiveTab(WALLET),
+      action: () => browserHistory.replace('/dashboard/wallet'),
       style: stepStyle,
     },
     {
@@ -81,6 +76,7 @@ const InvestTour = ({
     },
     {
       selector: '[data-tour="wallet-address"]',
+      action: () => browserHistory.replace('/dashboard/wallet'),
       content: (
         <div>
           <FormattedHTMLMessage {...messages.step5} />
@@ -93,7 +89,7 @@ const InvestTour = ({
       selector: '[data-tour="exchange"]',
       content: <div><FormattedMessage {...messages.step6} /></div>,
       action: () => {
-        setActiveTab(EXCHANGE);
+        browserHistory.replace('/dashboard/exchange');
         setAmountUnit('eth');
       },
       style: stepStyle,
@@ -154,7 +150,7 @@ const InvestTour = ({
       isOpen={investTour}
       onRequestClose={toggleInvestTour}
       onBeforeClose={() => {
-        setActiveTab(OVERVIEW);
+        browserHistory.replace('/dashboard');
         document.body.style.overflowY = 'auto';
       }}
       scrollDuration={20}
@@ -167,7 +163,6 @@ const InvestTour = ({
   );
 };
 InvestTour.propTypes = {
-  setActiveTab: PropTypes.func,
   setAmountUnit: PropTypes.func,
   investTour: PropTypes.bool.isRequired,
   toggleInvestTour: PropTypes.func.isRequired,

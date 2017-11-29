@@ -8,7 +8,6 @@ import web3Connect from '../AccountProvider/web3Connect';
 
 import { contractEvents, proxyEvents } from '../AccountProvider/actions';
 import {
-  setActiveTab,
   setAmountUnit,
   setInvestType,
   toggleInvestTour,
@@ -20,7 +19,6 @@ function InvestTour(props) {
     <InvestTourComponent
       {...{
         toggleInvestTour: props.toggleInvestTour,
-        setActiveTab: props.setActiveTab,
         investTour: props.investTour,
         setAmountUnit: props.setAmountUnit,
       }}
@@ -28,7 +26,6 @@ function InvestTour(props) {
   );
 }
 InvestTour.propTypes = {
-  setActiveTab: PropTypes.func,
   setAmountUnit: PropTypes.func,
   investTour: PropTypes.bool.isRequired,
   toggleInvestTour: PropTypes.func.isRequired,
@@ -36,7 +33,6 @@ InvestTour.propTypes = {
 
 const mapDispatchToProps = () => ({
   setInvestType,
-  setActiveTab,
   setAmountUnit,
   proxyEvents,
   contractEvents,
