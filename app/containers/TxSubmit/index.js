@@ -96,6 +96,7 @@ class TxSubmit extends React.Component {
       submitting,
       canSendTx,
       invalid,
+      isLocked,
     } = this.props;
     const { gas } = this.state;
 
@@ -106,7 +107,7 @@ class TxSubmit extends React.Component {
 
         <ButtonContainer>
           <SubmitButton
-            disabled={!canSendTx || !gas || invalid || this.gasTooHigh}
+            disabled={!canSendTx || (!isLocked && !gas) || invalid || this.gasTooHigh}
             submitting={submitting}
             onClick={onSubmit}
             type={onSubmit ? 'button' : 'submit'}
