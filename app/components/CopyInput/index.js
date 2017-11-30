@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Input from '../Input';
 
-import { CopyIcon } from './styles';
+import { Container, CopyIcon, Tooltip } from './styles';
 
 function copyText(input) {
   input.select();
@@ -14,19 +14,39 @@ function copyText(input) {
   }
 }
 
-/* eslint-disable jsx-a11y/label-has-for */
-function CopyInput({ value }) {
-  return (
-    <label style={{ position: 'relative' }}>
-      <CopyIcon className="fa fa-copy" />
-      <Input
-        defaultValue={value}
-        onClick={(e) => copyText(e.currentTarget)}
-        readOnly
-        style={{ width: value.length * 10, fontSize: 15 }}
-      />
-    </label>
-  );
+class CopyInput extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      copied: false,
+    };
+  }
+
+  render() {
+    const { value } = this.props;
+    const { copied } = this.state;
+
+    return (
+      <Container
+        onMouseEnter={() => this.setState({ copied: false })}
+      >
+        <CopyIcon
+          className="fa fa-copy"
+        />
+        <Tooltip>{copied ? 'Copied' : 'Click to copy'}</Tooltip>
+        <Input
+          defaultValue={value}
+          onClick={(e) => {
+            this.setState({ copied: true });
+            copyText(e.currentTarget);
+          }}
+          readOnly
+          style={{ width: value.length * 10, fontSize: 15 }}
+        />
+      </Container>
+    );
+  }
 }
 
 CopyInput.propTypes = {
