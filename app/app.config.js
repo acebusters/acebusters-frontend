@@ -86,7 +86,7 @@ export function conf() {
     pwrAddr: '0x230a4d30aedb677ecbb571201bc920692d56ecf5',
     pullAddr: '0xE79c15A4be58b8Ec4e0007E348f0EecbaF7d3DD8',
     accountFactory: '0x12a023f15ef0a1763f2a6736cc88a1ef9f0556f1',
-    tableFactory: '0xbeb2f096f9438a4723b541db402d2dbf6bd86b17',
+    tableFactory: '0x446dcAEcD71Ca43DE5Db717f99901766c409f168',
     sentryDSN: 'https://8c3e021848b247ddaf627c8040f94e07@sentry.io/153017',
     gaProperty: 'UA-XXXXX-Y',
     gtmId: 'GTM-XXXX',
