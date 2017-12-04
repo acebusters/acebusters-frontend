@@ -48,6 +48,7 @@ const Wrapper = styled.div`
   z-index: 1000;
   top: ${(props) => props.top};
   left: ${(props) => props.left};
+  transition: left 0.8s cubic-bezier(0.645, 0.045, 0.355, 1), top 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
 `;
 
 const createChipStacks = (chipVals, potSize) => {
@@ -84,24 +85,26 @@ const range = (start, end, step = 1) => {
   return ret;
 };
 
-function Pot(props) {
-  const chipStacks = createChipStacks(chipValues, props.potSize);
+function Pot({ short, potSize, left, top }) {
+  const chipStacks = createChipStacks(chipValues, potSize);
 
   return (
-    <Wrapper name="stack-wrapper" top={props.top} left={props.left}>
-      {!props.short ?
-        chipStacks.map((stack, i) => (
-          <ChipStack index={i} key={i}>
-            {range(0, stack.count).map((j) => (
-              <Chip color={stack.color} index={j} key={j} />
-            ))}
-          </ChipStack>
-        )) :
+    <Wrapper name="stack-wrapper" top={top} left={left}>
+      {!short && chipStacks.map((stack, i) => (
+        <ChipStack index={i} key={i}>
+          {range(0, stack.count).map((j) => (
+            <Chip color={stack.color} index={j} key={j} />
+          ))}
+        </ChipStack>
+      ))}
+
+      {short &&
         <ChipStack index={0} key={0}>
           <Chip color={seatChipColor} index={0} key={0} />
         </ChipStack>
       }
-      <Amount>{ formatNtz(props.potSize) }</Amount>
+
+      <Amount>{ formatNtz(potSize) }</Amount>
     </Wrapper>
   );
 }

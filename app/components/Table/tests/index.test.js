@@ -17,7 +17,7 @@ const P1_ADDR = '0x6d2f2c0fa568243d2def3e999a791a6df45d816e';
 describe('ActionBar', () => {
   it('should render winners', () => {
     const props = {
-      state: 'showdoen',
+      state: 'showdown',
       params: {
         tableAddr: '0x123',
       },
@@ -28,7 +28,11 @@ describe('ActionBar', () => {
       me: {},
       sb: 1,
       winners: [
-        "Helge won with a pair of A's",
+        {
+          addr: '0x00',
+          amount: 0,
+          maxBet: 0,
+        },
       ],
     };
     const table = shallow(
