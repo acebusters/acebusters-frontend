@@ -6,9 +6,10 @@ import { FormattedDate, FormattedTime } from 'react-intl';
 import { Receipt } from 'poker-helper';
 import { getWeb3 } from '../../containers/AccountProvider/utils';
 
-import { ABI_TABLE } from '../../app.config';
+import { ABI_TABLE, conf } from '../../app.config';
 
 import { makeHandsSelector, makeLatestHandSelector } from '../Table/selectors';
+import A from '../../components/A';
 
 import { loadContractData } from './loadContractData';
 import { requestStat } from './requestStat';
@@ -292,6 +293,14 @@ class TableDebug extends React.Component {
           {expanded ? 'close' : 'open debug pane' }
         </button>
         Hand: {latestHand}
+
+        <A
+          href={`${conf().etherscanUrl}address/${this.props.contract.address}`}
+          style={{ marginLeft: 15 }}
+          target="_blank"
+        >
+          Etherscan
+        </A>
         {expanded &&
           <div>
             <button onClick={this.handleRefresh}>
