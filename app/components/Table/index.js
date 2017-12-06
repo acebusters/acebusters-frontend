@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import BoardCards from '../Card/BoardCards';
+import BoardCards from 'components/Card/BoardCards';
+import Seat from 'containers/Seat';
 import TableMenu from '../../containers/TableMenu';
 import ActionBar from '../../containers/ActionBar';
 import tableImage from './tableBG.svg';
@@ -107,7 +108,16 @@ class TableComponent extends React.Component {
                 />
               )).filter((el) => el.props.potSize > 0)}
 
-              {seats}
+              {seats.map((seat, i) => (
+                <Seat
+                  key={i}
+                  pos={i}
+                  sitout={seat.sitout}
+                  signerAddr={seat.address}
+                  params={this.props.params}
+                  isTaken={this.props.isTaken}
+                />
+              ))}
 
               <BoardCards board={board} />
 
@@ -133,8 +143,9 @@ class TableComponent extends React.Component {
 }
 
 TableComponent.propTypes = {
+  seats: PropTypes.array.isRequired,
+  isTaken: PropTypes.func.isRequired,
   board: PropTypes.array,
-  seats: PropTypes.array,
   potSize: PropTypes.number,
   winners: PropTypes.array,
   myHand: PropTypes.object,

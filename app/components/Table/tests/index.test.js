@@ -1,26 +1,23 @@
-/**
- * Created by helge on 31.03.17.
- */
-/**
- * Testing our Button component
- */
-
 import React from 'react';
 import { shallow } from 'enzyme';
-import Table from '../index';
+import Table from 'components/Table';
 import { Winner } from '../styles';
-
 
 // secretSeed: 'rural tent tests net drip fatigue uncle action repeat couple lawn rival'
 const P1_ADDR = '0x6d2f2c0fa568243d2def3e999a791a6df45d816e';
+const P2_ADDR = '0xA7Ba18a03393E8Aa141c69B3619b35676bd5a72d';
 
 describe('ActionBar', () => {
   it('should render winners', () => {
     const props = {
       state: 'showdown',
-      params: {
-        tableAddr: '0x123',
-      },
+      isTaken: () => {},
+      board: [], // showdown should require to show all cards?
+      params: { tableAddr: '0x123' },
+      seats: [
+        { address: P1_ADDR, cards: [1, 2] },
+        { address: P2_ADDR, cards: [-1, -1] },
+      ],
       lineup: [{
         address: P1_ADDR,
         cards: [1, 2],
@@ -35,9 +32,7 @@ describe('ActionBar', () => {
         },
       ],
     };
-    const table = shallow(
-      <Table {...props} />
-    );
+    const table = shallow(<Table {...props} />);
     expect(table.find(Winner).length).toBeGreaterThan(0);
   });
 });

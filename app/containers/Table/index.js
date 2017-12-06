@@ -13,7 +13,6 @@ import * as storageService from '../../services/sessionStorage';
 import TableDebug from '../../containers/TableDebug';
 import NotFoundPage from '../../containers/NotFoundPage';
 
-import Seat from '../Seat';
 import WithLoading from '../../components/WithLoading';
 import { promisifyWeb3Call } from '../../utils/promisifyWeb3Call';
 
@@ -506,34 +505,12 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     }
   }
 
-  renderSeats(lineup, changed) {
-    const seats = [];
-
-    if (!lineup) {
-      return seats;
-    }
-
-    return lineup.map((seat, i) => (
-      <Seat
-        key={i}
-        pos={i}
-        sitout={seat.sitout}
-        signerAddr={seat.address}
-        params={this.props.params}
-        changed={changed}
-        isTaken={this.isTaken}
-      />
-    ));
-  }
-
   render() {
     if (this.state.notFound) {
       return <NotFoundPage />;
     }
-
     const { data } = this.props;
     const lineup = this.props.lineup ? this.props.lineup.toJS() : null;
-    const changed = this.props.hand ? this.props.hand.get('changed') : null;
 
     return (
       <div>
@@ -564,13 +541,13 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
             myHand={this.props.myHand}
             pending={(lineup && lineup[this.props.myPos]) ? lineup[this.props.myPos].pending : false}
             sitout={this.props.sitout}
+            seats={lineup}
             board={this.props.board}
-            seats={this.renderSeats(lineup, changed)}
-            hand={this.props.hand}
             potSize={this.props.potSize}
             onLeave={() => this.handleLeaveRequest(this.props.myPos)}
             onSitout={this.handleSitout}
             onCallOpponent={this.handleOpponentCall}
+            isTaken={this.isTaken}
           />
         }
       </div>

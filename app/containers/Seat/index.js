@@ -27,6 +27,7 @@ import {
 import {
   makeMyPosSelector,
   makeHandStateSelector,
+  makeHandSelector,
   makeWhosTurnSelector,
 } from '../Table/selectors';
 
@@ -50,12 +51,13 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
     // manage timer
     const timeoutSeconds = TIMEOUT_PERIOD(this.props.state);
     let timeLeft = timeoutSeconds;
+    const changed = this.props.hand ? this.props.hand.get('changed') : null;
     if (nextProps.whosTurn === nextProps.pos) {
       // TODO: Make timeLeft count down from 100 - 0, right now is 360 - 0?
       if (!this.interval) {
         this.interval = setInterval(() => {
-          if (this.props.changed) {
-            const deadline = this.props.changed + timeoutSeconds;
+          if (changed) {
+            const deadline = changed + timeoutSeconds;
             timeLeft = deadline - Math.floor(Date.now() / 1000);
             if (timeLeft <= 0) {
               clearInterval(this.interval);
@@ -126,14 +128,15 @@ const mapStateToProps = createStructuredSelector({
   holeCards: makeCardsSelector(),
   folded: makeFoldedSelector(),
   stackSize: makeStackSelector(),
+  hand: makeHandSelector(),
 });
 
 Seat.propTypes = {
   lastAmount: PropTypes.number,
-  changed: PropTypes.number,
   whosTurn: PropTypes.number,
   state: PropTypes.string,
   pos: PropTypes.number,
+  hand: PropTypes.object.isRequired,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Seat);
