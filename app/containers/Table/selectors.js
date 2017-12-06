@@ -15,9 +15,9 @@ const rc = new ReceiptCache();
 const pokerHelper = new PokerHelper(rc);
 
 // direct selectors to state
-const tableStateSelector = (state, props) => (state && props) ? state.getIn(['table', props.params.tableAddr]) : null;
+export const tableStateSelector = (state, props) => (state && props) ? state.getIn(['table', props.params.tableAddr]) : null;
 
-const handSelector = (state, props) => {
+export const handSelector = (state, props) => {
   if (state && props) {
     const handId = props.latestHand || makeLatestHandSelector()(state, props);
     if (handId !== null) {
@@ -28,11 +28,11 @@ const handSelector = (state, props) => {
   return null;
 };
 
-const actionSelector = (action) => action;
+export const actionSelector = (action) => action;
 
-const addressSelector = (state, props) => (props) ? props.address : null;
+export const addressSelector = (state, props) => (props) ? props.address : null;
 
-const myPosByAction = createSelector(
+export const myPosByAction = createSelector(
   [actionSelector, addressSelector],
   (action, myAddr) => {
     if (!myAddr || !action.hand || !action.hand.lineup) {
@@ -47,7 +47,7 @@ const myPosByAction = createSelector(
   }
 );
 
-const isSbTurnByAction = createSelector(
+export const isSbTurnByAction = createSelector(
   [actionSelector, myPosByAction],
   (action, myPos) => {
     if (!action.hand) {
@@ -75,7 +75,7 @@ const isSbTurnByAction = createSelector(
   }
 );
 
-const isBbTurnByAction = createSelector(
+export const isBbTurnByAction = createSelector(
   [actionSelector, myPosByAction],
   (action, myPos) => {
     if (!action.hand) {
@@ -99,7 +99,7 @@ const isBbTurnByAction = createSelector(
   }
 );
 
-const is0rTurnByAction = createSelector(
+export const is0rTurnByAction = createSelector(
   [actionSelector, myPosByAction, isSbTurnByAction, isBbTurnByAction],
   (action, myPos, sbTurn, bbTurn) => {
     if (!action.hand || !action.hand.lineup) {
@@ -119,7 +119,7 @@ const is0rTurnByAction = createSelector(
   }
 );
 
-const isShowTurnByAction = createSelector(
+export const isShowTurnByAction = createSelector(
   [actionSelector, myPosByAction],
   (action, myPos) => {
     if (!action || !action.hand || action.hand.state !== 'showdown') {
@@ -136,7 +136,7 @@ const isShowTurnByAction = createSelector(
   }
 );
 
-const hasNettingInAction = createSelector(
+export const hasNettingInAction = createSelector(
   [actionSelector, addressSelector],
   (action, myAddr) => {
     // check data available
@@ -158,13 +158,13 @@ const hasNettingInAction = createSelector(
   }
 );
 
-const makeTableDataSelector = () => createSelector(
+export const makeTableDataSelector = () => createSelector(
   tableStateSelector,
   (table) => (table) ? (table.get('data')) : null
 );
 
 // other selectors
-const makeMessagesSelector = () => createSelector(
+export const makeMessagesSelector = () => createSelector(
   tableStateSelector,
   (table) => {
     const messages = (table) ? table.get('messages') : null;
@@ -172,7 +172,7 @@ const makeMessagesSelector = () => createSelector(
   }
 );
 
-const makePlayersCountSelector = () => createSelector(
+export const makePlayersCountSelector = () => createSelector(
   [makeTableDataSelector()],
   (data) => {
     const ADDR_EMPTY = '0x0000000000000000000000000000000000000000';
@@ -183,12 +183,12 @@ const makePlayersCountSelector = () => createSelector(
   }
 );
 
-const makeHandSelector = () => createSelector(
+export const makeHandSelector = () => createSelector(
   handSelector,
   (hand) => hand
 );
 
-const makeSbSelector = () => createSelector(
+export const makeSbSelector = () => createSelector(
   [makeTableDataSelector()],
   (data) => {
     if (!data || typeof data.get('smallBlind') === 'undefined') {
@@ -207,7 +207,7 @@ export const makeTableStakesSelector = () => createSelector(
   }),
 );
 
-const makeWhosTurnSelector = () => createSelector(
+export const makeWhosTurnSelector = () => createSelector(
   [makeHandSelector(), makeSbSelector()],
   (hand, sb) => {
     let whosTurn;
@@ -226,7 +226,7 @@ const makeWhosTurnSelector = () => createSelector(
   }
 );
 
-const lastAmountByAction = createSelector(
+export const lastAmountByAction = createSelector(
   [actionSelector, myPosByAction],
   (action, myPos) => {
     if (typeof myPos === 'undefined' || myPos < 0) {
@@ -241,17 +241,17 @@ const lastAmountByAction = createSelector(
   }
 );
 
-const makeHandStateSelector = () => createSelector(
+export const makeHandStateSelector = () => createSelector(
   makeHandSelector(),
   (hand) => (hand) ? hand.get('state') : null
 );
 
-const makeBoardSelector = () => createSelector(
+export const makeBoardSelector = () => createSelector(
   makeHandSelector(),
   (hand) => (hand && hand.get('cards')) ? hand.get('cards').toJS() : []
 );
 
-const makeReservationSelector = () => createSelector(
+export const makeReservationSelector = () => createSelector(
   [tableStateSelector],
   (table) => {
     if (!table || !table.has('reservation')) {
@@ -262,7 +262,7 @@ const makeReservationSelector = () => createSelector(
   }
 );
 
-const makeLineupSelector = () => createSelector(
+export const makeLineupSelector = () => createSelector(
   [handSelector, tableStateSelector],
   (hand, table) => {
     // we have no table yet
@@ -280,7 +280,19 @@ const makeLineupSelector = () => createSelector(
   }
 );
 
-function selectTable(state, props) {
+const EMPTY = '0x0000000000000000000000000000000000000000';
+export const makeTableIsFullSelector = () => createSelector(
+  [makeLineupSelector(), makeReservationSelector()],
+  (lineup, reservation) => {
+    const freeSeats = lineup.filter((seat, pos) => (
+      seat.get('address') === EMPTY &&
+      !reservation.has(String(pos))
+    ));
+    return freeSeats.size === 0;
+  },
+);
+
+export function selectTable(state, props) {
   return state.getIn(['table', props.params.tableAddr]);
 }
 
@@ -294,12 +306,12 @@ function getHands(table) {
   );
 }
 
-const makeHandsSelector = () => createSelector(
+export const makeHandsSelector = () => createSelector(
   [selectTable],
   (table) => table ? getHands(table) : []
 );
 
-const makeMyHandValueSelector = () => createSelector(
+export const makeMyHandValueSelector = () => createSelector(
   [makeHandSelector(), makeBoardSelector()],
   (hand, board) => {
     if (!hand || !hand.get || !hand.get('holeCards') || board.length === 0) {
@@ -316,7 +328,7 @@ const makeMyHandValueSelector = () => createSelector(
   }
 );
 
-const selectMaxBet = (lineup, address) => {
+export const selectMaxBet = (lineup, address) => {
   let pos;
   try {
     pos = pokerHelper.getMyPos(lineup, address);
@@ -336,7 +348,7 @@ const selectMaxBet = (lineup, address) => {
   return maxBet || 0;
 };
 
-const makeSelectWinners = () => createSelector(
+export const makeSelectWinners = () => createSelector(
   [makeHandSelector(), makeBoardSelector()],
   (hand, board) => {
     if (!hand || !hand.get || !hand.get('lineup')) {
@@ -398,7 +410,7 @@ const makeSelectWinners = () => createSelector(
   }
 );
 
-const makeMySitoutSelector = () => createSelector(
+export const makeMySitoutSelector = () => createSelector(
   [makeLineupSelector(), makeMyPosSelector()],
   (lineup, myPos) => (lineup && myPos !== undefined && lineup.getIn([myPos, 'sitout']))
 );
@@ -409,7 +421,7 @@ export function makeReserveLineup(lineup, reservation) {
   })));
 }
 
-const makeMyPosSelector = () => createSelector(
+export const makeMyPosSelector = () => createSelector(
   [makeLineupSelector(), makeReservationSelector(), makeSignerAddrSelector()],
   (lineup, reservation, myAddress) => {
     try {
@@ -424,7 +436,7 @@ const makeMyPosSelector = () => createSelector(
   }
 );
 
-const makeSitoutSelector = () => createSelector(
+export const makeSitoutSelector = () => createSelector(
   [makeLineupSelector(), makeMyPosSelector()],
   (lineup, myPos) => {
     if (lineup && myPos !== undefined) {
@@ -434,7 +446,7 @@ const makeSitoutSelector = () => createSelector(
   }
 );
 
-const makeSitoutAmountSelector = () => createSelector(
+export const makeSitoutAmountSelector = () => createSelector(
   [makeSitoutSelector(), makeSbSelector(), makeHandStateSelector(), makeMyMaxBetSelector(), makeMyLastReceiptSelector()],
   (sitout, sb, state, myMaxBet, myLastReceipt) => {
     if (sb && state && typeof myMaxBet !== 'undefined') {
@@ -459,12 +471,12 @@ const makeSitoutAmountSelector = () => createSelector(
   }
 );
 
-const makeIsMyTurnSelector = () => createSelector(
+export const makeIsMyTurnSelector = () => createSelector(
   [makeMyPosSelector(), makeWhosTurnSelector()],
   (myPos, whosTurn) => (myPos !== undefined && whosTurn !== undefined) ? myPos === whosTurn : false
 );
 
-const makeMaxBetSelector = () => createSelector(
+export const makeMaxBetSelector = () => createSelector(
   [makeHandSelector(), makeLineupSelector()],
   (hand, lineup) => {
     if (!hand || !lineup || !lineup.toJS || !hand.get('state')) {
@@ -481,7 +493,7 @@ const makeMaxBetSelector = () => createSelector(
   }
 );
 
-const makeMyMaxBetSelector = () => createSelector(
+export const makeMyMaxBetSelector = () => createSelector(
   [makeLineupSelector(), makeSignerAddrSelector(), makeMyPosSelector()],
   (lineup, myAddress, myPos) => {
     if (!lineup || !lineup.toJS || !myAddress || myPos === undefined) {
@@ -495,7 +507,7 @@ const makeMyMaxBetSelector = () => createSelector(
   }
 );
 
-const missingHandSelector = (table) => {
+export const missingHandSelector = (table) => {
   if (!table) {
     return null;
   }
@@ -527,12 +539,12 @@ const missingHandSelector = (table) => {
   return rsp;
 };
 
-const makeMissingHandSelector = () => createSelector(
+export const makeMissingHandSelector = () => createSelector(
   [tableStateSelector],
   missingHandSelector
 );
 
-const makeLatestHandSelector = () => createSelector(
+export const makeLatestHandSelector = () => createSelector(
   [tableStateSelector],
   (table) => {
     const hands = table && table.keySeq().map(Number).filter(not(isNaN)).toList();
@@ -544,17 +556,17 @@ const makeLatestHandSelector = () => createSelector(
   }
 );
 
-const makeLastRoundMaxBetSelector = () => createSelector(
+export const makeLastRoundMaxBetSelector = () => createSelector(
   [makeHandSelector()],
   (hand) => (hand && hand.get && hand.get('lastRoundMaxBet')) ? hand.get('lastRoundMaxBet') : 0
 );
 
-const makePotSizeSelector = () => createSelector(
+export const makePotSizeSelector = () => createSelector(
   makeLineupSelector(),
   (lineup) => (lineup) ? pokerHelper.calculatePotsize(lineup.toJS()) : 0
 );
 
-const makeAmountInTheMiddleSelector = () => createSelector(
+export const makeAmountInTheMiddleSelector = () => createSelector(
   [makeLineupSelector(), makeLastRoundMaxBetSelector()],
   (lineupImmu, lastRoundMaxBet) => {
     if (!lineupImmu || !lineupImmu.toJS) {
@@ -571,57 +583,17 @@ const makeAmountInTheMiddleSelector = () => createSelector(
   }
 );
 
-const makeMyLastReceiptSelector = () => createSelector(
+export const makeMyLastReceiptSelector = () => createSelector(
   [makeHandSelector(), makeMyPosSelector()],
   (hand, pos) => (hand && pos > -1 && hand.getIn && hand.getIn(['lineup', pos])) ? rc.get(hand.getIn(['lineup', pos, 'last'])) : undefined
 );
 
-const makeSitoutInProgressSelector = () => createSelector(
+export const makeSitoutInProgressSelector = () => createSelector(
   [makeHandSelector()],
   (hand) => (hand && hand.get) ? hand.get('sitoutInProgress') : undefined
 );
 
-const makeTableLoadingStateSelector = () => createSelector(
+export const makeTableLoadingStateSelector = () => createSelector(
   tableStateSelector,
   (table) => (table) ? (table.get('load')) : null
 );
-
-export {
-    tableStateSelector,
-    actionSelector,
-    isSbTurnByAction,
-    isBbTurnByAction,
-    is0rTurnByAction,
-    isShowTurnByAction,
-    hasNettingInAction,
-    lastAmountByAction,
-    makeMyHandValueSelector,
-    makeTableDataSelector,
-    makeSbSelector,
-    makeLineupSelector,
-    makeReservationSelector,
-    makeMySitoutSelector,
-    makeSelectWinners,
-    makeSitoutSelector,
-    makeSitoutAmountSelector,
-    makeHandStateSelector,
-    makeLatestHandSelector,
-    makeBoardSelector,
-    makeIsMyTurnSelector,
-    makeWhosTurnSelector,
-    makePotSizeSelector,
-    makeMyPosSelector,
-    makeHandSelector,
-    makeMaxBetSelector,
-    makeMyMaxBetSelector,
-    missingHandSelector,
-    makeMissingHandSelector,
-    makeMessagesSelector,
-    makePlayersCountSelector,
-    makeLastRoundMaxBetSelector,
-    makeAmountInTheMiddleSelector,
-    makeHandsSelector,
-    makeMyLastReceiptSelector,
-    makeSitoutInProgressSelector,
-    makeTableLoadingStateSelector,
-};

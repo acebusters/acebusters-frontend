@@ -84,7 +84,7 @@ class TableMenu extends React.Component {
     const {
       loggedIn, open, sitout, isMuted, standingUp,
       handleClickLogout, onLeave, onSitout, handleClickMuteToggle,
-      myPos, myPending,
+      myPos, myPending, tableIsFull,
     } = this.props;
     const { calledOpponent } = this.state;
 
@@ -120,7 +120,7 @@ class TableMenu extends React.Component {
         icon: 'fa fa-bullhorn',
         title: 'Call an opponent',
         onClick: this.handleOpponentCall,
-        disabled: standingUp || myPending || myPos === undefined,
+        disabled: tableIsFull || standingUp || myPending || myPos === undefined,
       });
     }
 
@@ -218,6 +218,7 @@ TableMenu.propTypes = {
   onCallOpponent: PropTypes.func,
   myPos: PropTypes.number,
   myPending: PropTypes.bool,
+  tableIsFull: PropTypes.bool,
 };
 
 export default onClickOutside(TableMenu);

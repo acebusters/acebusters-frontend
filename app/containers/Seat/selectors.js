@@ -10,7 +10,6 @@ import {
   makeReservationSelector,
   makeMyPosSelector,
   tableStateSelector,
-  makeWhosTurnSelector,
   makeSbSelector,
   makeLastRoundMaxBetSelector,
   makeReserveLineup,
@@ -33,7 +32,7 @@ const pokerHelper = new PokerHelper(rc);
 
 // Note: in Seat, position is stored in props.pos; in ActionBar, position is stored in props.myPos
 // FIXME: there should be a better way than hard coding these 2 fields
-const posSelector = (state, props) => {
+export const posSelector = (state, props) => {
   if (!state || !props) return -1;
   if (props.pos !== undefined) return props.pos;
   if (props.myPos !== undefined) return props.myPos;
@@ -41,24 +40,24 @@ const posSelector = (state, props) => {
   return -1;
 };
 
-const makeLastReceiptSelector = () => createSelector(
+export const makeLastReceiptSelector = () => createSelector(
     [makeHandSelector(), posSelector],
     (hand, pos) => (hand && pos > -1 && hand.getIn && hand.getIn(['lineup', pos])) ? rc.get(hand.getIn(['lineup', pos, 'last'])) : undefined
 );
 
-const seatSelector = (hand, pos) => (hand && pos > -1 && hand.getIn && hand.getIn(['lineup', pos])) ? hand.getIn(['lineup', pos]) : undefined;
+export const seatSelector = (hand, pos) => (hand && pos > -1 && hand.getIn && hand.getIn(['lineup', pos])) ? hand.getIn(['lineup', pos]) : undefined;
 
-const makeSeatSelector = () => createSelector(
+export const makeSeatSelector = () => createSelector(
     [makeHandSelector(), posSelector],
     seatSelector
 );
 
-const makeMySeatSelector = () => createSelector(
+export const makeMySeatSelector = () => createSelector(
     [makeHandSelector(), makeMyPosSelector()],
     seatSelector
 );
 
-const makeLastAmountSelector = () => createSelector(
+export const makeLastAmountSelector = () => createSelector(
     [makeLastReceiptSelector(), makeLastRoundMaxBetSelector(), makeHandSelector()],
     (lastReceipt, maxBet, hand) => {
       if (lastReceipt && lastReceipt.amount && hand && hand.get) {
@@ -71,7 +70,7 @@ const makeLastAmountSelector = () => createSelector(
     }
 );
 
-const makeLastActionSelector = () => createSelector(
+export const makeLastActionSelector = () => createSelector(
   [posSelector, makeHandSelector()],
   (pos, hand) => {
     if (hand && hand.getIn && hand.getIn(['lineup', pos, 'last'])) {
@@ -81,7 +80,7 @@ const makeLastActionSelector = () => createSelector(
   }
 );
 
-const makeCardsSelector = () => createSelector(
+export const makeCardsSelector = () => createSelector(
   [posSelector, makeHandSelector(), makeMyPosSelector(), makeLineupSelector()],
   (pos, hand, myPos, lineupImmu) => {
     // Note: meaning of card numbers
@@ -111,32 +110,32 @@ const makeCardsSelector = () => createSelector(
   }
 );
 
-const makeOpenSelector = () => createSelector(
+export const makeOpenSelector = () => createSelector(
   [makeLineupSelector(), posSelector],
   (lineup, pos) => (lineup && pos > -1 && lineup.toJS()[pos]) ? (lineup.toJS()[pos].address.indexOf('0x0000000000000000000000000000000000000000') > -1) : false
 );
 
-const makeSitoutSelector = () => createSelector(
+export const makeSitoutSelector = () => createSelector(
   [makeLineupSelector(), posSelector],
   (lineup, pos) => (lineup && pos !== undefined && lineup.getIn([pos, 'sitout']))
 );
 
-const makePendingSelector = () => createSelector(
+export const makePendingSelector = () => createSelector(
   [makeLineupSelector(), posSelector],
   (lineup, pos) => (lineup && pos > -1 && lineup.toJS()[pos]) ? lineup.toJS()[pos].pending : false
 );
 
-const makeReservedSelector = () => createSelector(
+export const makeReservedSelector = () => createSelector(
   [makeReservationSelector(), posSelector],
   (reservation, pos) => reservation.has(String(pos)) ? reservation.get(String(pos)).toJS() : false,
 );
 
-const makeMyPendingSelector = () => createSelector(
+export const makeMyPendingSelector = () => createSelector(
   [makeMyPendingSeatSelector()],
   (myPendingSeat) => myPendingSeat !== -1
 );
 
-const makeMyPendingSeatSelector = () => createSelector(
+export const makeMyPendingSeatSelector = () => createSelector(
   [makeLineupSelector(), makeReservationSelector(), makeSignerAddrSelector()],
   (lineup, reservation, signerAddr) => {
     if (lineup) {
@@ -155,54 +154,54 @@ const makeMyPendingSeatSelector = () => createSelector(
   }
 );
 
-const makeDealerSelector = () => createSelector(
+export const makeDealerSelector = () => createSelector(
   makeHandSelector(),
   (hand) => (hand && hand.get) ? hand.get('dealer') : -1
 );
 
-const makeMyCardsSelector = () => createSelector(
+export const makeMyCardsSelector = () => createSelector(
   makeHandSelector(),
   (hand) => (hand && hand.get('holeCards')) ? hand.get('holeCards').toJS() : [-1, -1]
 );
 
-const makeFoldedSelector = () => createSelector(
+export const makeFoldedSelector = () => createSelector(
     makeLastReceiptSelector(),
     (lastReceipt) => (lastReceipt && lastReceipt.type) ? lastReceipt.type === Type.FOLD : false
 );
 
-const makeCoordsSelector = () => createSelector(
+export const makeCoordsSelector = () => createSelector(
   [makeLineupSelector(), posSelector],
   (lineup, pos) => (lineup && pos > -1) ? getPosCoords(SEAT_COORDS, lineup.size, pos) : null
 );
 
-const makeAmountCoordsSelector = () => createSelector(
+export const makeAmountCoordsSelector = () => createSelector(
   [makeLineupSelector(), posSelector],
   (lineup, pos) => (lineup && pos > -1) ? AMOUNT_COORDS[pos] : null
 );
 
-const makeBlockySelector = () => createSelector(
+export const makeBlockySelector = () => createSelector(
   [makeLineupSelector(), posSelector],
   (lineup, pos) => (lineup && pos > -1) ? createBlocky(lineup.getIn([pos, 'address'])) : ''
 );
 
-const makeStackSelector = () => createSelector(
+export const makeStackSelector = () => createSelector(
   [tableStateSelector, posSelector],
   selectStack
 );
 
-const standingUpSelector = (seat) => seat && seat.get('exitHand') !== undefined;
+export const standingUpSelector = (seat) => seat && seat.get('exitHand') !== undefined;
 
-const makeStandingUpSelector = () => createSelector(
+export const makeStandingUpSelector = () => createSelector(
   [makeSeatSelector()],
   standingUpSelector
 );
 
-const makeMyStandingUpSelector = () => createSelector(
+export const makeMyStandingUpSelector = () => createSelector(
   [makeMySeatSelector()],
   standingUpSelector
 );
 
-const makeSeatStatusSelector = () => createSelector(
+export const makeSeatStatusSelector = () => createSelector(
   [makeHandSelector(), makeLastActionSelector(), makeLastReceiptSelector(),
     posSelector, makePendingSelector(), makeStandingUpSelector()],
   (hand, lastAction, lastReceipt, pos, pending, standingUp) => {
@@ -234,7 +233,7 @@ const makeSeatStatusSelector = () => createSelector(
   }
 );
 
-const makeShowStatusSelector = () => createSelector(
+export const makeShowStatusSelector = () => createSelector(
   [tableStateSelector, makeHandSelector(), makeLastActionSelector(), makeLastRoundMaxBetSelector(), makeLastReceiptSelector(), makeSbSelector(), posSelector],
   (table, hand, lastAction, lastRoundMaxBet, lastReceipt, sb, pos) => {
     if (lastAction && lastReceipt && hand && hand.get) {
@@ -317,7 +316,7 @@ const makeShowStatusSelector = () => createSelector(
   }
 );
 
-const makeMyStackSelector = () => createSelector(
+export const makeMyStackSelector = () => createSelector(
   [tableStateSelector, makeMyPosSelector()],
   selectStack
 );
@@ -368,31 +367,3 @@ const selectStack = (table, pos) => {
   return amount;
 };
 
-export {
-  posSelector,
-  makeSeatSelector,
-  makeLastReceiptSelector,
-  makeSitoutSelector,
-  makeLastAmountSelector,
-  makeDealerSelector,
-  makePendingSelector,
-  makeReservedSelector,
-  makeMyPendingSelector,
-  makeMyPendingSeatSelector,
-  makeOpenSelector,
-  makeCoordsSelector,
-  makeAmountCoordsSelector,
-  makeBlockySelector,
-  makeCardsSelector,
-  makeLastRoundMaxBetSelector,
-  makeShowStatusSelector,
-  makeMyCardsSelector,
-  makeFoldedSelector,
-  makeWhosTurnSelector,
-  makeMyStackSelector,
-  makeStackSelector,
-  makeLastActionSelector,
-  makeSeatStatusSelector,
-  makeStandingUpSelector,
-  makeMyStandingUpSelector,
-};
