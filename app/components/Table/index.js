@@ -62,6 +62,18 @@ class TableComponent extends React.Component {
     }
   }
 
+  makePots(winners, potSize) {
+    if (winners) {
+      if (winners.length === 1) {
+        return [Math.min(potSize, winners[0].amount)];
+      }
+
+      return winners.map(({ amount }) => amount);
+    }
+
+    return [potSize];
+  }
+
   renderWinners() {
     const winners = this.props.winners || [];
     return winners.map((winner, i) => (
@@ -88,20 +100,10 @@ class TableComponent extends React.Component {
             <PokerTable>
               <img src={tableImage} alt="" />
 
-              {potSize > 0 && !winners &&
+              {this.makePots(winners, potSize).map((pot, i) => (
                 <Pot
                   className="pot"
-                  potSize={potSize}
-                  top={potsPositions[0].top}
-                  left={potsPositions[0].left}
-                  key={0}
-                />
-              }
-
-              {winners && winners.map((winner, i) => (
-                <Pot
-                  className="pot"
-                  potSize={winners.length === 1 ? potSize : winner.amount}
+                  potSize={pot}
                   top={potsPositions[i].top}
                   left={potsPositions[i].left}
                   key={i}
