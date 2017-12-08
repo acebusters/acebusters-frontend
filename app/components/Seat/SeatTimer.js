@@ -19,7 +19,7 @@ const SeatTimer = ({ timeLeft }) => (
     <TimerBackground>
       <TimerBar
         type={timerDisplayColor(timeLeft)}
-        width={`${timeLeft}%`}
+        width={`${Math.min(100, timeLeft)}%`}
       />
     </TimerBackground>
   </TimerWrapper>
