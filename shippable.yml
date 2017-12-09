@@ -6,7 +6,7 @@ node_js:
 env:
   global:
     # AWS_SANDBOX_KEY_ID, AWS_SANDBOX_KEY, AWS_STAGING_KEY_ID, AWS_STAGING_KEY
-    - secure: P6Nel0E9JIMff+mOno0U3bkH/JlRcevYG7wtI+u66wriAiVWRZCHEtoY3DW89Y2mVE20ojg3tZ8UUAhKOByuIKZo5jUzrVbsvgadClED06MFYg46jOpMuihsjYCHzgeasF81tzkoRBmkcNAtpsaQ4H1q/ZQQ8RbQ7pLcgGHUnFrmfpj/QEyefdFeS/GL9P3JNZ9QMwNtt8wJOYjM2vBm13RZ0QrCpxiSTHHrutag4+4hjUEYHydBC0nTltxAFbOunNNiWUosqwpBo7R7UmIx7mptR+8Obqc7sWqNn+bzFGDa6OVW9gHYNcPNLQXlGYt68v7wmpdYKTtTHwEJpIMy8Q==
+    - secure: aOyXpLzu1ZqqbpWVaryjjvib7t0toV6J91za3M71i6g3o9j252xqEYueTP7OuyeadHPdbRLh0aYwDukS5INXkzFb+yfKVlJPi18InzGA1nJJqr+BZWoKdHsQ+csbVxAvPCnp4dZPDX64zeBhxvKLmDvAD+/PfVNTym3JDzrHXJk9aYcLlndGdng7B1nt7gGChTB2sA6NWMabzrdZAG1b7p+JjdBoP9AQfWx9SQI+ThzGRMo6ZsjR+OiE2AWZQK2ku1RpTi3PpOIWkmYcOleBXRn5/84+rBXfCjD6E47FVwqQhG0ECqHMo+ySE0TPve4VDhlLcWIyT4Da3N0AoSxwcA==
 
 install:
   - sudo apt-get install zip
