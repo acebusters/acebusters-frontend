@@ -9,6 +9,10 @@ Web app to play a fair and secure game of poker.
 
 Now you're ready to rumble!
 
+## How to Contribute
+
+Read [Fork & Pull Workflow](https://github.com/acebusters/ab-web/wiki/Standard-Fork-&-Pull-Request-Workflow).
+
 ## Developer Onboarding
 
-Check out the [wiki](https://github.com/acebusters/ab-web/wiki/Developer-Onboarding).
+Read this [Development Onboarding](https://github.com/acebusters/ab-web/wiki/Developer-Onboarding) Page.
