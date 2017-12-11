@@ -7,7 +7,7 @@ const confParams = conf();
 let web3Instance;
 let web3InjectedInstance;
 
-export function getWeb3(injected = false) {
+export function getWeb3(injected = false, refresh = false) {
   if (injected) {
     if (typeof web3InjectedInstance === 'undefined' && window.web3) {
       web3InjectedInstance = new Web3(window.web3.currentProvider);
@@ -19,6 +19,11 @@ export function getWeb3(injected = false) {
   if (typeof web3Instance === 'undefined') {
     web3Instance = new Web3(new WebsocketProvider(confParams.gethUrl));
   }
+
+  if (web3Instance && refresh) {
+    web3Instance.setProvider(new WebsocketProvider(confParams.gethUrl));
+  }
+
   return web3Instance;
 }
 

@@ -1,41 +1,41 @@
 import { put, take, call } from 'redux-saga/effects';
-import { eventChannel } from 'redux-saga';
+import { eventChannel, delay } from 'redux-saga';
 
 import { getWeb3 } from '../utils';
+import { web3Connected, web3Disconnected } from '../actions';
 
-import { web3Error, web3Connected, web3Disconnected } from '../actions';
+function wsEvents(ws, emitter) {
+  ws.on('connect', async (e) => { // eslint-disable-line no-unused-vars
+    emitter(web3Connected({ isConnected: true }));
+  });
+
+  ws.on('close', async (e) => {  // eslint-disable-line no-unused-vars
+    emitter(web3Disconnected());
+    ws = undefined; // eslint-disable-line
+    // try to reconnect
+    while (true) { // eslint-disable-line
+      try {
+        if (window.navigator.onLine) {
+          const web3 = getWeb3(false, true);
+          wsEvents(web3.currentProvider, emitter);
+          break;
+        }
+      } finally {
+        await delay(1000); // eslint-disable-line
+      }
+    }
+  });
+
+  // ws.on('error', (e) => {
+  //   emitter(web3Error(e));
+  // });
+}
 
 function websocketChannel() {
   return eventChannel((emitter) => {
-    const ws = getWeb3().currentProvider;
-    let firstConnect = true;
-
-    ws.on('connect', (e) => { // eslint-disable-line no-unused-vars
-      // Note: when websocket first emit this connect event, it seems to be still not initialized yet.
-      // and it could cause `accountLoginSaga` get called and throw an error in web3
-      if (!firstConnect) {
-        emitter(web3Connected({ web3: getWeb3(), isConnected: true }));
-      }
-
-      firstConnect = false;
-    });
-
-    // Note: if you just turn off the wifi, you won't get this close event immediately
-    // It may take about 1 min to detect that connection loss
-    // refer to:
-    // 1. https://github.com/http-kit/http-kit/issues/111#issuecomment-32988134
-    // 2. http://stackoverflow.com/questions/14227007/howto-detect-that-a-network-cable-has-been-unplugged-in-a-tcp-connection
-    // FIXME: Websocket doen't seem to be back online after you lose connection first and then turn on your wifi again.
-    ws.on('close', (e) => {  // eslint-disable-line no-unused-vars
-      emitter(web3Disconnected());
-    });
-
-    ws.on('error', (e) => {
-      emitter(web3Error(e));
-    });
-
+    wsEvents(getWeb3().currentProvider, emitter);
     return () => {
-      ws.reset();
+      getWeb3().currentProvider.reset();
     };
   });
 }

@@ -1,7 +1,10 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import invariant from 'invariant';
+
 import A from '../A';
+
+import { makeSelectIsWeb3Connected } from '../../containers/AccountProvider/selectors';
 
 function isLeftClickEvent(event) {
   return event.button === 0;
@@ -14,6 +17,8 @@ function isModifiedEvent(event) {
 function resolveToLocation(to, router) {
   return typeof to === 'function' ? to(router.location) : to;
 }
+
+const isConnectedSelector = makeSelectIsWeb3Connected();
 
 class Link extends React.Component {
   constructor(props) {
@@ -48,7 +53,12 @@ class Link extends React.Component {
 
     event.preventDefault();
 
-    router.push(resolveToLocation(this.props.to, router));
+    const isConnected = this.context.store ? isConnectedSelector(this.context.store.getState()) : true;
+    if (isConnected) {
+      router.push(resolveToLocation(this.props.to, router));
+    } else {
+      window.location = router.createHref(resolveToLocation(this.props.to, router));
+    }
   }
 
   render() {
@@ -78,6 +88,7 @@ class Link extends React.Component {
 
 Link.contextTypes = {
   router: PropTypes.object,
+  store: PropTypes.object,
 };
 
 Link.propTypes = {
@@ -87,6 +98,7 @@ Link.propTypes = {
   activeComponent: PropTypes.any,
   onClick: PropTypes.func,
   target: PropTypes.string,
+  isConnected: PropTypes.bool,
 };
 
 Link.defaultProps = {
