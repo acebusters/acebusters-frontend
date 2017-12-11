@@ -1,4 +1,4 @@
-export const indentity = (a) => a;
+export const identity = (a) => a;
 
 export const last = (arr) => arr[arr.length - 1];
 

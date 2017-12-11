@@ -7,7 +7,7 @@ import {
   valuesShort,
   suits,
 } from '../../app.config';
-import { not } from '../../utils';
+import { not, identity } from '../../utils';
 
 import { babz } from '../../utils/amountFormatter';
 
@@ -28,7 +28,7 @@ export const handSelector = (state, props) => {
   return null;
 };
 
-export const actionSelector = (action) => action;
+const actionSelector = identity;
 
 export const addressSelector = (state, props) => (props) ? props.address : null;
 
@@ -185,7 +185,21 @@ export const makePlayersCountSelector = () => createSelector(
 
 export const makeHandSelector = () => createSelector(
   handSelector,
-  (hand) => hand
+  identity,
+);
+
+export const makePrevHandSelector = () => createSelector(
+  (state, props) => {
+    if (state && props) {
+      const handId = props.latestHand || makeLatestHandSelector()(state, props);
+      if (handId !== null) {
+        return state.getIn(['table', props.params.tableAddr, String(handId - 1)]);
+      }
+    }
+
+    return null;
+  },
+  identity,
 );
 
 export const makeSbSelector = () => createSelector(

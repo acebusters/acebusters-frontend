@@ -65,6 +65,7 @@ import {
   makeAmountInTheMiddleSelector,
   makeBoardSelector,
   makeHandSelector,
+  makePrevHandSelector,
   makeHandStateSelector,
   makeLineupSelector,
   makeMyHandValueSelector,
@@ -87,6 +88,39 @@ const SpinnerWrapper = styled.div`
   top: 40%;
   transform: translate(-50%, -50%)
 `;
+
+function isRebuyNeeded(props, nextProps) {
+  const prevHand = nextProps.prevHand && nextProps.prevHand.toJS();
+  const hand = nextProps.hand && nextProps.hand.toJS();
+  const bb = nextProps.data ? nextProps.data.get('smallBlind') * 2 : 0;
+
+  if (!prevHand || !hand) {
+    return false;
+  }
+
+  const { myStack, standingUp, state } = nextProps;
+  const { myStack: prevStack, state: prevState } = props;
+
+  const rebuyModal = storageService.getItem(`rebuyModal[${props.params.tableAddr}${nextProps.latestHand}1]`);
+
+  if (prevHand) {
+    return !!(
+      hand.state === 'waiting' &&
+      myStack !== null && (myStack <= 0 || myStack < bb) &&
+      !standingUp &&
+      !rebuyModal &&
+      !!prevHand.distribution
+    );
+  }
+
+  return !!(
+    state === 'waiting' &&
+    myStack !== null && (myStack <= 0 || myStack < bb) &&
+    (state !== prevState || (myStack !== prevStack && prevStack > bb)) &&
+    !nextProps.standingUp &&
+    !rebuyModal
+  );
+}
 
 export class Table extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
 
@@ -175,17 +209,8 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       }
     }
 
-    const toggleKey = this.tableAddr + handId;
     // display Rebuy modal if state === 'waiting' and user stack is no greater than 0
-    if (
-      nextProps.state === 'waiting' &&
-      nextProps.myStack !== null && nextProps.myStack <= 0 &&
-      (
-        nextProps.state !== this.props.state ||
-        (nextProps.myStack !== this.props.myStack && this.props.myStack > 0)
-      ) &&
-      !nextProps.standingUp && !storageService.getItem(`rebuyModal[${toggleKey}]`)
-    ) {
+    if (isRebuyNeeded(this.props, nextProps)) {
       const balance = this.token.balanceOf(nextProps.account.proxy);
 
       this.props.modalDismiss();
@@ -248,10 +273,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
   }
 
   handleRebuy(amount) {
-    const handId = this.props.latestHand;
-    const toggleKey = this.tableAddr + handId;
-    storageService.setItem(`rebuyModal[${toggleKey}]`, true);
-
     const { signerAddr, myPos, account } = this.props;
 
     const promise = promisifyWeb3Call(this.token.transData.sendTransaction)(
@@ -262,8 +283,8 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
 
 
     return Promise.resolve(account.isLocked ? null : promise).then(() => {
+      storageService.setItem(`rebuyModal[${this.tableAddr}${this.props.latestHand}]`, true);
       this.props.modalDismiss();
-      storageService.removeItem(`rebuyModal[${toggleKey}]`);
     });
   }
 
@@ -314,6 +335,8 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       signerChannel.bind('update', this.handleUpdate);
       await reserve();
     }
+
+    storageService.setItem(`rebuyModal[${this.tableAddr}${this.props.latestHand}]`, true);
   }
 
   estimateJoin(pos, amount) {
@@ -399,7 +422,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     const exitHand = this.props.state !== 'waiting' ? handId : handId - 1;
 
     this.props.setExitHand(this.tableAddr, this.props.latestHand, pos, exitHand);
-    storageService.removeItem(`rebuyModal[${this.tableAddr + handId}]`);
+    storageService.removeItem(`rebuyModal[${this.tableAddr}${handId}]`);
 
     this.props.modalDismiss();
     this.tableService.leave(exitHand, this.props.lineup.getIn([pos, 'address']))
@@ -578,6 +601,7 @@ const mapStateToProps = createStructuredSelector({
   board: makeBoardSelector(),
   data: makeTableDataSelector(),
   hand: makeHandSelector(),
+  prevHand: makePrevHandSelector(),
   isMyTurn: makeIsMyTurnSelector(),
   lineup: makeLineupSelector(),
   latestHand: makeLatestHandSelector(),
@@ -603,9 +627,10 @@ Table.propTypes = {
   state: PropTypes.string,
   board: PropTypes.array,
   hand: PropTypes.object,
+  prevHand: PropTypes.object, // eslint-disable-line
+  myStack: PropTypes.number, // eslint-disable-line
   isMyTurn: PropTypes.bool,
   myHand: PropTypes.object,
-  myStack: PropTypes.number,
   lineup: PropTypes.object,
   sitout: PropTypes.any,
   params: PropTypes.object,

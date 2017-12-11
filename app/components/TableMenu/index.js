@@ -23,15 +23,16 @@ function isSioutDisabled(props) {
   const {
     sitout, standingUp, sitoutInProgress,
     myPos, myPending, myLastReceipt, myStack,
-    state,
+    state, smallBlind,
   } = props;
   const isSitoutFlag = typeof sitout === 'number';
+  const bb = (smallBlind || 0) * 2;
   return (
     myPending ||
     myPos === undefined ||
     sitout === 0 || sitout === null ||
     standingUp || sitoutInProgress !== undefined ||
-    (isSitoutFlag && !myStack) || // player can't sit-in if his balance is empty
+    (isSitoutFlag && (!myStack || myStack < bb || myStack <= 0)) || // player can't sit-in if his balance is empty
     // player can't sit-in in the hand he sit-out after game started
     (
       isSitoutFlag &&
@@ -217,6 +218,7 @@ TableMenu.propTypes = {
   handleClickMuteToggle: PropTypes.func,
   onCallOpponent: PropTypes.func,
   myPos: PropTypes.number,
+  smallBlind: PropTypes.number, // eslint-disable-line
   myPending: PropTypes.bool,
   tableIsFull: PropTypes.bool,
 };

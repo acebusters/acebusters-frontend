@@ -12,6 +12,7 @@ import {
   makeReservationSelector,
   makeMyPosSelector,
   makeTableStakesSelector,
+  makePrevHandSelector,
 } from '../selectors';
 
 import { PLAYER1, PLAYER2, PLAYER3, PLAYER4, PLAYER_EMPTY } from './consts';
@@ -120,6 +121,58 @@ describe('missingHandSelector', () => {
     });
     const missingHandSelector = makeMissingHandSelector();
     expect(missingHandSelector(mockedState, PROPS)).toEqual([4]);
+  });
+});
+
+describe('handsSelector', () => {
+  it('should select the table hands', () => {
+    const tableState = fromJS({
+      0: {
+        lineup: [],
+      },
+      1: {
+        lineup: [],
+      },
+      data: {},
+    });
+    const mockedState = fromJS({
+      table: {
+        [TBL_ADDR]: tableState,
+      },
+    });
+    expect(makeHandsSelector()(mockedState, PROPS)).toEqual([
+      { handId: 0, lineup: [] },
+      { handId: 1, lineup: [] },
+    ]);
+  });
+});
+
+describe('prevHandSelector', () => {
+  it('should select prev hand', () => {
+    expect(makePrevHandSelector()(fromJS({
+      table: {
+        [TBL_ADDR]: {
+          0: {
+            lineup: [],
+          },
+          1: {
+            lineup: [],
+          },
+          data: {},
+        },
+      },
+    }), PROPS)).toEqual(fromJS({ lineup: [] }));
+
+    expect(makePrevHandSelector()(fromJS({
+      table: {
+        [TBL_ADDR]: {
+          1: {
+            lineup: [],
+          },
+          data: {},
+        },
+      },
+    }), PROPS)).toEqual(undefined);
   });
 });
 

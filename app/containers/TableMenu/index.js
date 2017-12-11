@@ -22,7 +22,11 @@ import {
   mute,
   unmute,
 } from './actions';
-import { makeSitoutInProgressSelector, makeTableIsFullSelector } from '../Table/selectors';
+import {
+  makeSitoutInProgressSelector,
+  makeTableIsFullSelector,
+  makeSbSelector,
+} from '../Table/selectors';
 
 import TableMenu from '../../components/TableMenu';
 
@@ -57,6 +61,7 @@ const mapStateToProps = createStructuredSelector({
   sitoutInProgress: makeSitoutInProgressSelector(),
   isMuted: makeSelectIsMuted(),
   tableIsFull: makeTableIsFullSelector(),
+  smallBlind: makeSbSelector(),
 });
 
 export default connect(
