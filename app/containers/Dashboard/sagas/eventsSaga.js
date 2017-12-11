@@ -59,9 +59,9 @@ function* powerEventsSaga(power, token, proxyAddr) {
 }
 
 function* tokenEventsSaga(token, power, pullPayment, proxyAddr) {
-  const powerChannel = ethEvent(power);
+  const tokenChannel = ethEvent(token);
   while (true) { // eslint-disable-line
-    const event = yield take(powerChannel);
+    const event = yield take(tokenChannel);
 
     if (!isUserEvent(proxyAddr)(event)) {
       continue; // eslint-disable-line no-continue
