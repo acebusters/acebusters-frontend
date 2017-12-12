@@ -7,7 +7,6 @@ import styled from 'styled-components';
 import {
   black,
   white,
-  backgroundTable,
   curtainStickyWidth,
   curtainWidth,
   tableNameWidth,
@@ -90,7 +89,6 @@ export const HandBox = styled.div`
 export const PokerTable = styled.div`
   position: absolute;
   transform: translate(-50%, -50%);
-  background-image: ${backgroundTable};
   top: 48vh;
   left: 50%;
   width: 100%;
