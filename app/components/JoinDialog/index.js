@@ -61,7 +61,7 @@ export class JoinDialog extends React.Component {
 
         <TxSubmit
           estimate={estimate}
-          estimateArgs={[amount]}
+          estimateArgs={amount || min}
           submitting={submitting}
           submitButtonLabel={
             <FormattedMessage {...(rebuy ? messages.rebuy : messages.join)} />
