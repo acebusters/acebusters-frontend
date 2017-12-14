@@ -90,34 +90,14 @@ const SpinnerWrapper = styled.div`
 `;
 
 function isRebuyNeeded(props, nextProps) {
-  const prevHand = nextProps.prevHand && nextProps.prevHand.toJS();
-  const hand = nextProps.hand && nextProps.hand.toJS();
   const bb = nextProps.data ? nextProps.data.get('smallBlind') * 2 : 0;
-
-  if (!prevHand || !hand) {
-    return false;
-  }
-
-  const { myStack, standingUp, state } = nextProps;
-  const { myStack: prevStack, state: prevState } = props;
-
-  const rebuyModal = storageService.getItem(`rebuyModal[${props.params.tableAddr}${nextProps.latestHand}1]`);
-
-  if (prevHand) {
-    return !!(
-      hand.state === 'waiting' &&
-      myStack !== null && (myStack <= 0 || myStack < bb) &&
-      !standingUp &&
-      !rebuyModal &&
-      !!prevHand.distribution
-    );
-  }
+  const { myStack, standingUp, sitout } = nextProps;
+  const rebuyModal = storageService.getItem(`rebuyModal[${props.params.tableAddr}${nextProps.latestHand}]`);
 
   return !!(
-    state === 'waiting' &&
     myStack !== null && (myStack <= 0 || myStack < bb) &&
-    (state !== prevState || (myStack !== prevStack && prevStack > bb)) &&
-    !nextProps.standingUp &&
+    (sitout && typeof sitout === 'number') &&
+    !standingUp &&
     !rebuyModal
   );
 }
