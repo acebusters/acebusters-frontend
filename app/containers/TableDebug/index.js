@@ -157,22 +157,25 @@ class TableDebug extends React.Component {
 
     return (
       <div>
-        <Table>
+        <Table columns={3}>
           <thead>
             <tr>
-              <th>Hand Id</th>
+              <th>Hand</th>
               {hands[0].lineup.map((_, j) =>
-                <th key={j} colSpan={2}>Seat {j}</th>
+                <th key={j} colSpan={3}>Seat {j}</th>
               )}
             </tr>
             <tr>
               <td />
               {hands[0].lineup.reduce((memo, seat, j) => memo.concat([
-                <th key={j * 2}>
+                <th key={j * 3}>
                   Bet
                 </th>,
-                <th key={(j * 2) + 1}>
+                <th key={(j * 3) + 1}>
                   Dist
+                </th>,
+                <th key={(j * 3) + 2} title="Exit hand">
+                  Ext
                 </th>,
               ]), [])}
             </tr>
@@ -187,7 +190,7 @@ class TableDebug extends React.Component {
                 {hand.lineup.reduce((memo, seat, j) => {
                   const receipt = seat.last && Receipt.parse(seat.last);
                   return memo.concat([
-                    <td key={j * 2}>
+                    <td key={j * 3}>
                       {renderNtz(receipt && receipt.amount)}
                       {receipt &&
                         <ExtraDetail>
@@ -195,22 +198,17 @@ class TableDebug extends React.Component {
                         </ExtraDetail>
                       }
                     </td>,
-                    <td key={(j * 2) + 1}>
+                    <td key={(j * 3) + 1}>
                       {dists[i] && renderNtz(dists[i][seat.address])}
+                    </td>,
+                    <td key={(j * 3) + 2}>
+                      {seat.exitHand}
                     </td>,
                   ]);
                 }, [])}
               </tr>
             ))}
           </tbody>
-          <tfoot>
-            <tr>
-              <th>Exit hand</th>
-              {hands[0].lineup.map((seat, j) =>
-                <td key={j} colSpan={2}>{seat.exitHand}</td>
-              )}
-            </tr>
-          </tfoot>
         </Table>
       </div>
     );

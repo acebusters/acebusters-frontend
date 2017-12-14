@@ -63,7 +63,7 @@ export const Table = styled.table`
     background-color: rgba(0, 0, 0, 0.1);
   }
 
-  tbody td:nth-child(2n + 1):not(:last-child),
+  tbody td:nth-child(${({ columns = 2 }) => `${columns}n + 1`}):not(:last-child),
   tbody th {
     border-right: 1px solid #ccc;
   }
