@@ -88,11 +88,14 @@ class TxSubmit extends React.Component {
 
   refreshGas(props) {
     this.gasPromise = makeCancelable(this.estimateGas(props));
-    this.gasPromise.then((gas) => {
-      if (gas) {
-        this.setState({ gas });
-      }
-    });
+    this.gasPromise.then(
+      (gas) => {
+        if (gas) {
+          this.setState({ gas });
+        }
+      },
+      () => null,
+    );
   }
 
   estimateGas(props) {
