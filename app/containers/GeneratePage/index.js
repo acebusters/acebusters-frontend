@@ -73,6 +73,8 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
     this.confirmation = this.confirm().catch(({ errors }) => {
       this.props.dispatch(stopSubmit('register', errors));
     });
+
+    storageService.removeItem('pendingEmail');
   }
 
   componentDidMount() {
@@ -136,9 +138,13 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
   }
 
   async handleResend() {
-    const { confCode } = this.state;
-    await accountService.resendEmail(confCode, window.location.origin);
-    browserHistory.replace('/confirm');
+    const { receipt } = this.state;
+    if (receipt) {
+      const account = accountService.getAccount(receipt.accountId);
+      await accountService.resendEmail(account.pendingEmail, window.location.origin);
+      storageService.setItem('pendingEmail', account.pendingEmail);
+      browserHistory.replace('/confirm');
+    }
   }
 
   handleSaveEntropyClick() {

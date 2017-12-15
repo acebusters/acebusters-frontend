@@ -4,6 +4,7 @@ import { startSubmit, stopSubmit, startAsyncValidation, stopAsyncValidation, cha
 import { CHANGE, INITIALIZE } from 'redux-form/lib/actionTypes';
 import { push } from 'react-router-redux';
 import * as accountService from '../../services/account';
+import * as storageService from '../../services/localStorage';
 import { setProgress } from '../App/actions';
 import { conf } from '../../app.config';
 
@@ -29,6 +30,7 @@ export function* registerSaga() {
         throw new Error(response.errorMessage);
       }
 
+      storageService.setItem('pendingEmail', payload.email);
       yield put(push('/confirm'));
     } catch (err) {
       const errors = {};

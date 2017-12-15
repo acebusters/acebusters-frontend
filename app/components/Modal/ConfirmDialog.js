@@ -14,7 +14,7 @@ const ConfirmDialog = ({ title, msg, buttonText, onSubmit, handleClose }) => (
     <p>{msg}</p>
     <DialogButtonWrapper>
       <SubmitButton onClick={onSubmit || handleClose}>
-        {buttonText}
+        {buttonText || 'OK'}
       </SubmitButton>
     </DialogButtonWrapper>
   </DialogContents>

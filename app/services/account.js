@@ -31,8 +31,8 @@ export function register(email, recapResponse, origin, refCode) {
   });
 }
 
-export function resendEmail(sessionReceipt, origin) {
-  return request('post', 'resend', { sessionReceipt, origin });
+export function resendEmail(email, origin) {
+  return request('post', 'resend', { email, origin });
 }
 
 export function getAccount(accountId) {
