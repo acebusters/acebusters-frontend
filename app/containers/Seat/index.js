@@ -37,6 +37,17 @@ import {
 
 import SeatComponent from '../../components/Seat';
 
+export function getTimeLeft(hand) {
+  if (!hand) {
+    return 0;
+  }
+
+  const timeoutSeconds = TIMEOUT_PERIOD(hand.get('state'));
+  const changed = hand.get('changed');
+
+  return (changed + timeoutSeconds) - Math.floor(Date.now() / 1000);
+}
+
 class Seat extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   constructor(props) {
     super(props);
@@ -48,23 +59,17 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
       wasMostRecentAction: nextProps.lastAmount === this.props.lastAmount,
     });
 
-    // manage timer
-    const timeoutSeconds = TIMEOUT_PERIOD(this.props.state);
-    let timeLeft = timeoutSeconds;
-    const changed = this.props.hand ? this.props.hand.get('changed') : null;
     if (nextProps.whosTurn === nextProps.pos) {
       // TODO: Make timeLeft count down from 100 - 0, right now is 360 - 0?
       if (!this.interval) {
         this.interval = setInterval(() => {
-          if (changed) {
-            const deadline = changed + timeoutSeconds;
-            timeLeft = deadline - Math.floor(Date.now() / 1000);
-            if (timeLeft <= 0) {
-              clearInterval(this.interval);
-              this.interval = null;
-            } else {
-              this.setState({ timeLeft });
-            }
+          // manage timer
+          const timeLeft = getTimeLeft(this.props.hand);
+          if (timeLeft <= 0) {
+            clearInterval(this.interval);
+            this.interval = null;
+          } else {
+            this.setState({ timeLeft });
           }
         }, 1000);
       }
@@ -72,7 +77,7 @@ class Seat extends React.PureComponent { // eslint-disable-line react/prefer-sta
       clearInterval(this.interval);
       this.interval = null;
     }
-    this.setState({ timeLeft });
+    this.setState({ timeLeft: TIMEOUT_PERIOD(nextProps.state) });
   }
 
   componentWillUnmount() {
