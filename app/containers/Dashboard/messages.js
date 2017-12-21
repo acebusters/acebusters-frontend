@@ -86,6 +86,10 @@ export default defineMessages({
     id: 'app.containers.Dashboard.invitationsLeft',
     defaultMessage: '{allowance} {allowance, plural, one {invitation left} other {invitations left}}',
   },
+  ethPayoutInfo: {
+    id: 'app.containers.Dashboard.ethPayoutInfo',
+    defaultMessage: 'After an exchange, you will need to execute ETH payout.<br />Button will appear above this form',
+  },
   transactionErrorTitle: {
     id: 'app.containers.Dashboard.transactionErrorTitle',
     defaultMessage: 'Transaction error',

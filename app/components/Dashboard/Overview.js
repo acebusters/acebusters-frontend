@@ -23,7 +23,6 @@ const Overview = (props) => {
     ethAllowance, ethPayoutDate, ethPayoutPending, handleETHPayout, estimateETHPayout,
   } = props;
   const emptyColumnStyle = { width: 20 };
-  const ethAmount = formatEth(ethAllowance);
 
   return (
     <Pane name="dashboard-overview">
@@ -60,7 +59,7 @@ const Overview = (props) => {
           pending={ethPayoutPending}
           handlePayout={handleETHPayout}
           estimatePayout={estimateETHPayout}
-          amount={ethAmount}
+          amount={formatEth(ethAllowance)}
           messages={messages}
         />
       }
@@ -117,12 +116,12 @@ Overview.propTypes = {
   listTxns: PropTypes.array,
   downs: PropTypes.array,
   downtime: PropTypes.object,
-  ethAllowance: PropTypes.object,
   ethPayoutPending: PropTypes.bool,
-  abpPayoutPending: PropTypes.bool,
+  ethAllowance: PropTypes.object,
   ethPayoutDate: PropTypes.object,
   handleETHPayout: PropTypes.func,
   estimateETHPayout: PropTypes.func,
+  abpPayoutPending: PropTypes.bool,
   handleABPPayout: PropTypes.func,
   estimateABPPayout: PropTypes.func,
   messages: PropTypes.object,

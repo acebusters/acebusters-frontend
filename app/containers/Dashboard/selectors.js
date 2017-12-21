@@ -14,17 +14,23 @@ export const createIsFishWarnedSelector = () => createSelector(
 
 export const createDashboardTxsSelector = () => createSelector(
   selectDashboard,
-  (dashboard) => ({
-    dashboardEvents: dashboard.get('events') && dashboard.get('events').toList().toJS(),
-    pendingETHPayout: (
-      (dashboard.get('events') || fromJS({})).toList().toJS()
-        .filter((event) => event.pending && !event.error && isETHPayoutEvent(event)).length > 0
-    ),
-    pendingABPPayout: (
-      (dashboard.get('events') || fromJS({})).toList().toJS()
-        .filter((event) => event.pending && !event.error && isABPPayoutEvent(event)).length > 0
-    ),
-  }),
+  (dashboard) => dashboard.get('events') && dashboard.get('events').toList().toJS(),
+);
+
+export const createPendingETHPayoutSelector = () => createSelector(
+  selectDashboard,
+  (dashboard) => (
+    (dashboard.get('events') || fromJS({})).toList().toJS()
+      .filter((event) => event.pending && !event.error && isETHPayoutEvent(event)).length > 0
+  ),
+);
+
+export const createPendingABPPayoutSelector = () => createSelector(
+  selectDashboard,
+  (dashboard) => (
+    (dashboard.get('events') || fromJS({})).toList().toJS()
+      .filter((event) => event.pending && !event.error && isABPPayoutEvent(event)).length > 0
+  ),
 );
 
 export const createPendingsSelector = () => createSelector(

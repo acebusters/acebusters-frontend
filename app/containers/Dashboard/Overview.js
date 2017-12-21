@@ -6,15 +6,17 @@ import web3Connect from '../AccountProvider/web3Connect';
 import { getWeb3 } from '../AccountProvider/sagas';
 import { waitForTx } from '../../utils/waitForTx';
 import { notifyCreate } from '../Notifications/actions';
-import {
-  ETH_PAYOUT,
-} from '../Notifications/constants';
+import { ETH_PAYOUT } from '../Notifications/constants';
 
 import makeSelectAccountData from '../AccountProvider/selectors';
 import { toggleInvestTour } from './actions';
 import messages from './messages';
 import { txnsToList } from './txnsToList';
-import { createDashboardTxsSelector } from './selectors';
+import {
+  createDashboardTxsSelector,
+  createPendingETHPayoutSelector,
+  createPendingABPPayoutSelector,
+} from './selectors';
 
 import OverviewComponent from '../../components/Dashboard/Overview';
 
@@ -84,7 +86,7 @@ class Overview extends React.Component {
     const [ethAllowance, ethPayoutDate] = this.pullPayment.paymentOf(account.proxy) || [];
     const tables = this.tableFactory.getTables();
     const listTxns = txnsToList(
-      this.props.dashboardTxs.dashboardEvents,
+      this.props.dashboardTxs,
       tables,
       account.proxy
     );
@@ -96,8 +98,8 @@ class Overview extends React.Component {
           babzBalance,
           ethAllowance,
           ethPayoutDate,
-          ethPayoutPending: this.props.dashboardTxs.pendingETHPayout,
-          abpPayoutPending: this.props.dashboardTxs.pendingABPPayout,
+          ethPayoutPending: this.props.pendingETHPayout,
+          abpPayoutPending: this.props.pendingABPPayout,
           pwrBalance,
           completeSupplyBabz,
           activeSupplyPwr,
@@ -118,7 +120,9 @@ class Overview extends React.Component {
 }
 Overview.propTypes = {
   account: PropTypes.object,
-  dashboardTxs: PropTypes.object,
+  pendingETHPayout: PropTypes.bool,
+  pendingABPPayout: PropTypes.bool,
+  dashboardTxs: PropTypes.array,
   web3Redux: PropTypes.any,
   notifyCreate: PropTypes.func,
   toggleInvestTour: PropTypes.func,
@@ -132,6 +136,8 @@ const mapDispatchToProps = (dispatch) => ({
 const mapStateToProps = createStructuredSelector({
   account: makeSelectAccountData(),
   dashboardTxs: createDashboardTxsSelector(),
+  pendingETHPayout: createPendingETHPayoutSelector(),
+  pendingABPPayout: createPendingABPPayoutSelector(),
 });
 
 export default web3Connect(
