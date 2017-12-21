@@ -9,13 +9,13 @@ import { makeSelectAccountData } from '../../containers/AccountProvider/selector
 import { getWeb3 } from '../../containers/AccountProvider/utils';
 import NoWeb3Message from '../../containers/Web3Alerts/NoWeb3';
 import UnsupportedNetworkMessage from '../../containers/Web3Alerts/UnsupportedNetwork';
+import NoInjectedMessage from '../../containers/Web3Alerts/NoInjected';
 import SubmitButton from '../../components/SubmitButton';
 import FormGroup from '../../components/Form/FormGroup';
 import { CheckBox } from '../../components/Input';
 import Label from '../../components/Label';
 import H2 from '../../components/H2';
 import A from '../../components/A';
-import { Icon } from '../../containers/Dashboard/styles';
 
 import { accountUnlocked } from '../AccountProvider/actions';
 
@@ -94,20 +94,30 @@ class UpgradeDialog extends React.Component {
     return (
       <div>
         <H2>
-          Unlock your account &nbsp;
+          Unlock your account
+        </H2>
+
+        <p>
+          After you unlock your account you will be able to:<br />
+          – make deposits greater than 0.1 ETH<br />
+          – control your wallet with your own private key<br />
+          – <A href="http://help.acebusters.com/how-to-participate-in-the-crowdsale/invest-using-the-acebusters-dapp-recommended" target="_blank">powerUp</A> your NTZ to ABP after the crowdsale
+        </p>
+        <p>
+          Here’s more info on{' '}
           <A
             href="http://help.acebusters.com/quick-guide-to-acebusters/winning-the-pots/how-to-upgrade-to-a-shark-account"
             target="_blank"
           >
-            <Icon
-              className="fa fa-info-circle"
-              aria-hidden="true"
-            />
+            account unlocking
           </A>
-        </H2>
+        </p>
 
-        {!account.injected &&
+        {!window.web3 &&
           <NoWeb3Message />
+        }
+        {window.web3 && !account.injected &&
+          <NoInjectedMessage />
         }
         {account.injected && !account.onSupportedNetwork &&
           <UnsupportedNetworkMessage />
@@ -116,7 +126,6 @@ class UpgradeDialog extends React.Component {
         <Form onSubmit={handleSubmit(this.handleSubmit)}>
           {account.injected && !submitting && !success &&
             <div>
-              <p>This will unlock your account</p>
               <Field
                 name="accept"
                 type="checkbox"
