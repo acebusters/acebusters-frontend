@@ -67,6 +67,8 @@ export function investIsAvailable(proxyAddr) {
     '0x8f3a1e097738a3f6f19c06b97d160df6b3a1801a', // sergey
     '0x67be75fedee88a84cbdcf5c87616bb1bb746c57e', // johann
     '0x4a46401df761f2ccc022c83aa7a97aac7a35303a', // sunify
+    '0xc1fa672d02543c9f7608542b4c2ee30b3957fc75', // calvin
+    '0xf02c49cb05daef756e91d5d8190dc03881f0f8ed', // michi
   ].indexOf(proxyAddr) !== -1;
 
   return !isMainnet || inWhitelist;

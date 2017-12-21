@@ -84,8 +84,8 @@ export default function createRoutes(store) {
       path: 'invest',
       name: 'invest',
       onEnter: (nextState, replace) => {
-        const { proxyAddr } = selectAccount(store.getState()).toJS();
-        if (!investIsAvailable(proxyAddr)) {
+        const { proxy } = selectAccount(store.getState()).toJS();
+        if (!investIsAvailable(proxy)) {
           replace({ pathname: '/dashboard' });
         }
       },
