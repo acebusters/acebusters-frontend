@@ -39,7 +39,7 @@ const validate = (values) => {
     if (!values.has('defaultRef') && referral.length === 0) {
       errors.referral = 'Referral code is required';
     } else if (referral.length > 0) {
-      errors.referral = 'Referral code must have 8 letters';
+      errors.referral = 'Referral code must have 8 characters';
     }
   }
 
