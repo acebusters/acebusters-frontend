@@ -10,15 +10,8 @@ import { getTimeLeft } from '../Seat/index';
 import { playIsPlayerTurn } from '../../sounds';
 
 import {
-  handleClickButton,
-  setActionBarTurnComplete,
-  setActionBarButtonActive,
-  updateActionBar,
-  ALL_IN,
-  BET,
-  CHECK,
-  CALL,
-  FOLD,
+  handleClickButton, setActionBarTurnComplete, setActionBarButtonActive, updateActionBar,
+  ALL_IN, BET, CHECK, CALL, FOLD,
 } from './actions';
 
 import {
@@ -43,6 +36,8 @@ import {
   makeMessagesSelector,
   makePlayersCountSelector,
   makeLatestHandSelector,
+  makeHandStateSelector,
+  makeSbSelector,
 } from '../Table/selectors';
 
 import {
@@ -342,6 +337,8 @@ const mapStateToProps = createStructuredSelector({
   latestHand: makeLatestHandSelector(),
   canICheck: makeCanICheckSelector(),
   isMuted: makeSelectIsMuted(),
+  state: makeHandStateSelector(),
+  sb: makeSbSelector(),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ActionBarContainer);

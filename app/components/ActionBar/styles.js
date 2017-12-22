@@ -143,7 +143,7 @@ export const ActionText = styled.div`
 
 export const SliderWrapper = styled.div`
   align-self: center;
-  width: 200px;
+  width: 230px;
   height: 20px;
   margin-left: 24px;
   margin-right: 24px;

@@ -443,22 +443,20 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     // dispatch action according to event type
     switch (result.event) {
       case 'Join': {
-        const lineupReceivedArgs = (rsp) => [
-          this.tableAddr,
-          rsp,
-          this.props.data.get('smallBlind'),
-          this.props.latestHand,
-          this.props.myPendingSeat,
-        ];
-
+        // notify backend about change in lineup
         if (result.args && result.args.addr === this.props.proxyAddr) {
-          // notify backend about change in lineup
           this.tableService.lineup();
         }
 
         // update lineup when join successful
-        this.table.getLineup.callPromise().then((rsp) => {
-          this.props.lineupReceived(...lineupReceivedArgs(rsp));
+        this.table.getLineup.callPromise().then((lineup) => {
+          this.props.lineupReceived(
+            this.tableAddr,
+            lineup,
+            this.props.data.get('smallBlind'),
+            this.props.latestHand,
+            this.props.myPendingSeat,
+          );
         });
 
         break;
