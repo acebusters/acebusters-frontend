@@ -77,22 +77,18 @@ class ActionBarContainer extends React.Component {
     const { isMyTurn, canICheck } = nextProps;
     // # if player <in turn> can <check>: send <check> by timeout
     if (isMyTurn && canICheck) {
-      if (this.checkTimeOut) {
-        clearTimeout(this.checkTimeOut);
-        this.checkTimeOut = null;
-      }
-
       // autoCheckTimeOut should be earlier than usual timeout, so -1.5 sec
       const timeLeft = getTimeLeft(nextProps.hand) - 1.5;
 
-      if (timeLeft > 0) {
-        this.checkTimeOut = setTimeout(() => {
-          this.handleCheck(nextProps);
-        }, timeLeft * 1000);
+      if (this.checkTimeout) {
+        clearTimeout(this.checkTimeout);
       }
-    } else if (this.checkTimeOut) {
-      clearTimeout(this.checkTimeOut);
-      this.checkTimeOut = null;
+
+      if (timeLeft > 0) {
+        this.checkTimeout = setTimeout(() => this.handleCheck(nextProps), timeLeft * 1000);
+      }
+    } else if (this.checkTimeout) {
+      clearTimeout(this.checkTimeout);
     }
 
     if (nextProps.turnComplete === true) {
@@ -130,12 +126,30 @@ class ActionBarContainer extends React.Component {
     if (wasDisabled && !disabled && !prevProps.isMuted) {
       playIsPlayerTurn();
     }
+
+    const { hand, isMyTurn } = this.props;
+    if (this.secondDongTimeout) {
+      clearTimeout(this.secondDongTimeout);
+    }
+    if (isMyTurn) {
+      const timeLeft = getTimeLeft(hand, 0.5); // repeat sound when 1/2 of time is passed
+
+      if (timeLeft > 0) {
+        this.secondDongTimeout = setTimeout(() => {
+          if (!this.props.isMuted) {
+            playIsPlayerTurn();
+          }
+        }, timeLeft * 1000);
+      }
+    }
   }
 
   componentWillUnmount() {
-    if (this.checkTimeOut) {
-      clearTimeout(this.checkTimeOut);
-      this.checkTimeOut = null;
+    if (this.checkTimeout) {
+      clearTimeout(this.checkTimeout);
+    }
+    if (this.secondDongTimeout) {
+      clearTimeout(this.secondDongTimeout);
     }
   }
 
@@ -289,6 +303,7 @@ ActionBarContainer.propTypes = {
   updateActionBar: PropTypes.func,
   canICheck: PropTypes.bool,
   isMyTurn: PropTypes.bool,
+  isMuted: PropTypes.bool,
   hand: PropTypes.object,
 };
 

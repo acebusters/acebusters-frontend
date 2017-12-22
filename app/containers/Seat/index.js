@@ -37,12 +37,12 @@ import {
 
 import SeatComponent from '../../components/Seat';
 
-export function getTimeLeft(hand) {
+export function getTimeLeft(hand, n = 1) {
   if (!hand) {
     return 0;
   }
 
-  const timeoutSeconds = TIMEOUT_PERIOD(hand.get('state'));
+  const timeoutSeconds = TIMEOUT_PERIOD(hand.get('state')) * n;
   const changed = hand.get('changed');
 
   return (changed + timeoutSeconds) - Math.floor(Date.now() / 1000);
