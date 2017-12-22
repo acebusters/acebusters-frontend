@@ -194,7 +194,7 @@ function addPending(state, { methodName, args, txHash, address }) {
       }),
     );
   } else if (methodName === 'purchase') {
-    const options = typeof last(args) === 'function' ? args[args.length - 2] : last(args);
+    const options = typeof last(args) === 'function' ? last(args, 2) : last(args);
     const amount = options.value;
     return state.setIn(
       path,
@@ -291,12 +291,33 @@ function transformNutzContractEvent(state, event) {
   return null;
 }
 
+function getEventPath(state, dashboardEvent) {
+  const defaultPath = ['events', dashboardEvent.get('transactionHash')];
+
+  if (hasConflict(state, dashboardEvent)) {
+    const conflictEvent = state.getIn(defaultPath);
+    if (conflictEvent.get('event') === 'Purchase' && dashboardEvent.get('event') === 'Transfer') {
+      return [defaultPath, conflictEvent];
+    }
+
+    if (conflictEvent.get('event') === 'Transfer' && dashboardEvent.get('event') === 'Purchase') {
+      return [defaultPath, dashboardEvent];
+    }
+
+    return [[
+      'events',
+      `${dashboardEvent.get('transactionHash')}-${dashboardEvent.get('event')}`,
+    ], dashboardEvent];
+  }
+
+  return [defaultPath, dashboardEvent];
+}
+
 function addNutzContractEvent(state, event) {
   const dashboardEvent = transformNutzContractEvent(state, event);
 
   if (dashboardEvent) {
-    const path = hasConflict(state, dashboardEvent) ? ['events', `${event.transactionHash}-${event.event}`] : ['events', event.transactionHash];
-    return state.setIn(path, dashboardEvent);
+    return state.setIn(...getEventPath(state, dashboardEvent));
   }
 
   return state;
@@ -308,6 +329,7 @@ function makeDashboardEvent(event, fields) {
     transactionHash: event.transactionHash,
     value: event.args.value,
     timestamp: event.timestamp,
+    event: event.event,
     ...fields,
   });
 }

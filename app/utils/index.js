@@ -1,6 +1,6 @@
 export const identity = (a) => a;
 
-export const last = (arr) => arr[arr.length - 1];
+export const last = (arr, n = 1) => arr[arr.length - n];
 
 export const not = (fn) => (...args) => !fn(...args);
 
