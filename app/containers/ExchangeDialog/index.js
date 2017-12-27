@@ -10,23 +10,15 @@ import { modalAdd, modalDismiss } from '../App/actions';
 import { setAmountUnit } from '../Dashboard/actions';
 
 const validate = (values, props) => {
-  const errors = {};
   const { maxAmount, minAmount = 0 } = props;
-  const amount = values.get('amount');
-
   return validateFloat({
     messages,
-    errors,
-    amount,
+    errors: {},
+    amount: values.get('amount'),
     minAmount,
     maxAmount,
     onChange: (value) => props.dispatch(props.change('amount', String(value))),
   });
-};
-
-const warn = () => {
-  const warnings = {};
-  return warnings;
 };
 
 const mapStateToProps = (state, ownProps) => ({
@@ -43,9 +35,6 @@ function mapDispatchToProps(dispatch, ownProps) {
   };
 }
 
-export default reduxForm({
-  validate,
-  warn,
-})(
+export default reduxForm({ validate })(
   connect(mapStateToProps, mapDispatchToProps)(ExchangeDialog)
 );

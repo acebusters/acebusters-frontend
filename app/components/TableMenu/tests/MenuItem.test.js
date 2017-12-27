@@ -20,7 +20,7 @@ describe('components.TableMenu.MenuItem', () => {
       it('should call toggleMenuOpen func', () => {
         const newProps = Object.assign(props, { open: true });
         const el = mount(<MenuItem {...newProps} />);
-        el.find({ name: 'button' }).simulate('click');
+        el.find({ name: 'button' }).hostNodes().simulate('click');
         sinon.assert.calledOnce(props.toggleMenuOpen);
         sinon.assert.calledOnce(props.item.onClick);
         props.toggleMenuOpen.reset();
@@ -32,7 +32,7 @@ describe('components.TableMenu.MenuItem', () => {
       it('should NOT call toggleMenuOpen func', () => {
         const newProps = Object.assign(props, { open: false });
         const el = mount(<MenuItem {...newProps} />);
-        el.find({ name: 'button' }).simulate('click');
+        el.find({ name: 'button' }).hostNodes().simulate('click');
         sinon.assert.notCalled(props.toggleMenuOpen);
         sinon.assert.calledOnce(props.item.onClick);
         props.toggleMenuOpen.reset();

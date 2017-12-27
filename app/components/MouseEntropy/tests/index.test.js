@@ -1,14 +1,14 @@
 /* eslint no-multi-spaces: "off", key-spacing: "off" */
 
 import React from 'react';
-import { mount } from 'enzyme';
+import { shallow } from 'enzyme';
 import sinon from 'sinon';
 import MouseEntropy from '../index';
 
 describe('<MouseEntropy />', () => {
   it('onFinished triggered', () => {
     const onFinish = sinon.spy();
-    const wrapper  = mount(
+    const wrapper  = shallow(
       <MouseEntropy totalBits={10} width="200px" height="200px" sampleRate={-1} onFinish={onFinish} />
     );
 
@@ -20,7 +20,6 @@ describe('<MouseEntropy />', () => {
         clientY: Math.floor(Math.random() * 200),
       });
     }
-
     expect(onFinish).toHaveProperty('callCount', 1);
   });
 });

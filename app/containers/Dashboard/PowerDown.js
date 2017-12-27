@@ -89,12 +89,12 @@ class PowerDown extends React.Component {
     const completeSupplyBabz = this.controller.completeSupply();
     const activeSupplyPwr = this.power.activeSupply();
     const minPowerUpBabz = this.controller.minimumPowerUpSizeBabz();
+    const totalSupplyPwr = this.power.totalSupply();
 
-    if (!completeSupplyBabz || !activeSupplyPwr || !minPowerUpBabz) {
+    if (!completeSupplyBabz || !activeSupplyPwr || !minPowerUpBabz || !totalSupplyPwr) {
       return null;
     }
 
-    const totalSupplyPwr = this.power.totalSupply();
     const adjTotalSupplyPwr = totalSupplyPwr.mul(2);
     const calcABPtoNTZ = (amount) => {
       const abpAmount = new BigNumber(amount);

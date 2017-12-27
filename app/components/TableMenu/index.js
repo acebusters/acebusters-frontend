@@ -188,7 +188,7 @@ class TableMenu extends React.Component {
       return menuClose;
     };
     return (
-      <div>
+      <div name="table-menu">
         <LogoWrapper name="logo-wrapper">
           <Link to="/">
             <Logo />

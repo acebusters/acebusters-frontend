@@ -20,11 +20,11 @@ describe('atTable', () => {
   });
 
   describe(tests.atTable1.describe, () => {
-    const actionBar = shallow(
+    const actionBar = mount(
       <ActionBar {...tests.atTable1.props} />
     );
     it(tests.atTable1.it, () => {
-      expect(actionBar.find({ name: 'action-bar-wrapper' }).length).toBe(1);
+      expect(actionBar.find({ name: 'action-bar-wrapper' }).hostNodes().length).toBe(1);
     });
     it('should not be clickable', () => {
       actionBar.find('ControlCheckCall').simulate('click');
@@ -39,7 +39,7 @@ describe('atTable', () => {
       <ActionBar {...tests.atTable2.props} />
     );
     it(tests.atTable2.it, () => {
-      expect(actionBar.find({ name: 'action-bar-wrapper' }).length).toBe(1);
+      expect(actionBar.find({ name: 'action-bar-wrapper' }).hostNodes().length).toBe(1);
     });
     it('should render as expected', () => {
       expect(actionBar.find('ControlCheckCall').length).toBe(1);
@@ -60,9 +60,9 @@ describe('atTable', () => {
 describe(tests.amountToCheck.describe, () => {
   const actionBar = mount(<ActionBar {...tests.amountToCheck.props} />);
   it(tests.amountToCheck.it, () => {
-    expect(actionBar.find({ name: 'button-blank' }).length).toEqual(1);
-    expect(actionBar.find({ name: 'button-check' }).length).toEqual(1);
-    expect(actionBar.find({ name: 'button-bet' }).length).toEqual(1);
+    expect(actionBar.find({ name: 'button-blank' }).hostNodes().length).toEqual(1);
+    expect(actionBar.find({ name: 'button-check' }).hostNodes().length).toEqual(1);
+    expect(actionBar.find({ name: 'button-bet' }).hostNodes().length).toEqual(1);
   });
 });
 
@@ -71,9 +71,9 @@ describe(tests.amountToCall0.describe, () => {
     const actionBar = mount(
       <ActionBar {...tests.amountToCall0.props} />
     );
-    expect(actionBar.find({ name: 'button-fold' }).length).toEqual(1);
-    expect(actionBar.find({ name: 'button-call' }).length).toEqual(1);
-    expect(actionBar.find({ name: 'button-bet' }).length).toEqual(1);
+    expect(actionBar.find({ name: 'button-fold' }).hostNodes().length).toEqual(1);
+    expect(actionBar.find({ name: 'button-call' }).hostNodes().length).toEqual(1);
+    expect(actionBar.find({ name: 'button-bet' }).hostNodes().length).toEqual(1);
   });
 });
 
@@ -82,10 +82,10 @@ describe(tests.amountToCall1.describe, () => {
     const actionBar = mount(
       <ActionBar {...tests.amountToCall1.props} />
     );
-    expect(actionBar.find({ name: 'button-fold' }).length).toEqual(1);
+    expect(actionBar.find({ name: 'button-fold' }).hostNodes().length).toEqual(1);
     expect(actionBar.find({ name: 'button-call' }).length).toEqual(0);
-    expect(actionBar.find({ name: 'button-blank' }).length).toEqual(1);
-    expect(actionBar.find({ name: 'button-all-in' }).length).toEqual(1);
+    expect(actionBar.find({ name: 'button-blank' }).hostNodes().length).toEqual(1);
+    expect(actionBar.find({ name: 'button-all-in' }).hostNodes().length).toEqual(1);
   });
 });
 
@@ -94,10 +94,10 @@ describe(tests.minRaise0.describe, () => {
     const actionBar = mount(
       <ActionBar {...tests.minRaise0.props} />
     );
-    expect(actionBar.find({ name: 'button-fold' }).length).toEqual(1);
-    expect(actionBar.find({ name: 'button-call' }).length).toEqual(1);
+    expect(actionBar.find({ name: 'button-fold' }).hostNodes().length).toEqual(1);
+    expect(actionBar.find({ name: 'button-call' }).hostNodes().length).toEqual(1);
     expect(actionBar.find({ name: 'button-blank' }).length).toEqual(0);
-    expect(actionBar.find({ name: 'button-all-in' }).length).toEqual(1);
+    expect(actionBar.find({ name: 'button-all-in' }).hostNodes().length).toEqual(1);
   });
 });
 
@@ -107,7 +107,7 @@ describe('bet slider', () => {
       const actionBar = mount(
         <ActionBar {...tests.buttonBet0.props} />
       );
-      expect(actionBar.find({ name: 'slider-wrapper' }).length).toEqual(0);
+      expect(actionBar.find({ name: 'slider-wrapper' }).hostNodes().length).toEqual(0);
     });
   });
 
@@ -116,7 +116,7 @@ describe('bet slider', () => {
       const actionBar = mount(
         <ActionBar {...tests.buttonBet1.props} />
       );
-      expect(actionBar.find({ name: 'slider-wrapper' }).length).toEqual(1);
+      expect(actionBar.find({ name: 'slider-wrapper' }).hostNodes().length).toEqual(1);
     });
   });
 });
@@ -127,7 +127,7 @@ describe('raise slider', () => {
       const actionBar = mount(
         <ActionBar {...tests.buttonRaise0.props} />
       );
-      expect(actionBar.find({ name: 'slider-wrapper' }).length).toEqual(0);
+      expect(actionBar.find({ name: 'slider-wrapper' }).hostNodes().length).toEqual(0);
     });
   });
 
@@ -136,7 +136,7 @@ describe('raise slider', () => {
       const actionBar = mount(
         <ActionBar {...tests.buttonRaise1.props} />
       );
-      expect(actionBar.find({ name: 'slider-wrapper' }).length).toEqual(1);
+      expect(actionBar.find({ name: 'slider-wrapper' }).hostNodes().length).toEqual(1);
     });
   });
 });

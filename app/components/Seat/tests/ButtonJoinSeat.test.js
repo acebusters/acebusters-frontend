@@ -15,7 +15,7 @@ describe('components.seat.ButtonJoinSeat', () => {
     it('should show "Join" message', () => {
       const el = mount(<ButtonJoinSeat {...props} />);
 
-      expect(el.find('.fa-plus').length).toEqual(1);
+      expect(el.find('.fa-plus').hostNodes().length).toEqual(1);
       expect(el.text()).toEqual('Join');
     });
   });

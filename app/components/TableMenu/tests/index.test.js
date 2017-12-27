@@ -19,18 +19,18 @@ describe('components.TableMenu.TableMenu', () => {
       const el = mount(<TableMenu {...newProps} />);
 
       it('should display default components', () => {
-        expect(el.find({ name: 'logo-wrapper' }).length).toEqual(1);
+        expect(el.find({ name: 'logo-wrapper' }).hostNodes().length).toEqual(1);
       });
 
       it('should display guest header', () => {
-        expect(el.find({ name: 'item-title' }).length).toEqual(1);
-        expect(el.find({ name: 'item-title' }).text()).toEqual('Guest');
-        expect(el.find({ name: 'identicon' }).length).toEqual(1);
+        expect(el.find({ name: 'item-title' }).hostNodes().length).toEqual(1);
+        expect(el.find({ name: 'item-title' }).hostNodes().text()).toEqual('Guest');
+        expect(el.find({ name: 'identicon' }).hostNodes().length).toEqual(1);
       });
 
       it('should display closed menu', () => {
-        expect(el.find({ name: 'sitout' }).length).toEqual(1);
-        expect(el.find({ name: 'standup' }).length).toEqual(1);
+        expect(el.find({ name: 'sitout' }).hostNodes().length).toEqual(1);
+        expect(el.find({ name: 'standup' }).hostNodes().length).toEqual(1);
       });
     });
 
@@ -39,19 +39,19 @@ describe('components.TableMenu.TableMenu', () => {
       const el = mount(<TableMenu {...newProps} />);
 
       it('should display default components', () => {
-        expect(el.find({ name: 'logo-wrapper' }).length).toEqual(1);
+        expect(el.find({ name: 'logo-wrapper' }).hostNodes().length).toEqual(1);
       });
 
       it('should display guest header', () => {
-        expect(el.find({ name: 'item-title' }).length).toEqual(1);
-        expect(el.find({ name: 'item-title' }).text()).toEqual('Guest');
-        expect(el.find({ name: 'identicon' }).length).toEqual(1);
+        expect(el.find({ name: 'item-title' }).hostNodes().length).toEqual(1);
+        expect(el.find({ name: 'item-title' }).hostNodes().text()).toEqual('Guest');
+        expect(el.find({ name: 'identicon' }).hostNodes().length).toEqual(1);
       });
 
       it('should display guest menu', () => {
-        expect(el.find({ name: 'lobby' }).length).toEqual(1);
-        expect(el.find({ name: 'register' }).length).toEqual(1);
-        expect(el.find({ name: 'signin' }).length).toEqual(1);
+        expect(el.find({ name: 'lobby' }).hostNodes().length).toEqual(1);
+        expect(el.find({ name: 'register' }).hostNodes().length).toEqual(1);
+        expect(el.find({ name: 'signin' }).hostNodes().length).toEqual(1);
       });
     });
   });
@@ -68,17 +68,17 @@ describe('components.TableMenu.TableMenu', () => {
       const el = mount(<TableMenu {...newProps} />);
 
       it('should display default components', () => {
-        expect(el.find({ name: 'logo-wrapper' }).length).toEqual(1);
+        expect(el.find({ name: 'logo-wrapper' }).hostNodes().length).toEqual(1);
       });
 
       it('should display user header', () => {
-        expect(el.find({ name: 'item-title' }).text()).toEqual(props.nickName);
-        expect(el.find({ name: 'identicon' }).length).toEqual(1);
+        expect(el.find({ name: 'item-title' }).hostNodes().text()).toEqual(props.nickName);
+        expect(el.find({ name: 'identicon' }).hostNodes().length).toEqual(1);
       });
 
       it('should display closed menu', () => {
-        expect(el.find({ name: 'sitout' }).length).toEqual(1);
-        expect(el.find({ name: 'standup' }).length).toEqual(1);
+        expect(el.find({ name: 'sitout' }).hostNodes().length).toEqual(1);
+        expect(el.find({ name: 'standup' }).hostNodes().length).toEqual(1);
       });
     });
 
@@ -87,19 +87,19 @@ describe('components.TableMenu.TableMenu', () => {
       const el = mount(<TableMenu {...newProps} />);
 
       it('should display default components', () => {
-        expect(el.find({ name: 'logo-wrapper' }).length).toEqual(1);
+        expect(el.find({ name: 'logo-wrapper' }).hostNodes().length).toEqual(1);
       });
 
       it('should display user header', () => {
-        expect(el.find({ name: 'item-title' }).text()).toEqual(props.nickName);
-        expect(el.find({ name: 'identicon' }).length).toEqual(1);
+        expect(el.find({ name: 'item-title' }).hostNodes().text()).toEqual(props.nickName);
+        expect(el.find({ name: 'identicon' }).hostNodes().length).toEqual(1);
       });
 
       it('should display open user menu', () => {
-        expect(el.find({ name: 'lobby' }).length).toEqual(1);
-        expect(el.find({ name: 'dashboard' }).length).toEqual(1);
-        expect(el.find({ name: 'preferences' }).length).toEqual(1);
-        expect(el.find({ name: 'logout' }).length).toEqual(1);
+        expect(el.find({ name: 'lobby' }).hostNodes().length).toEqual(1);
+        expect(el.find({ name: 'dashboard' }).hostNodes().length).toEqual(1);
+        expect(el.find({ name: 'preferences' }).hostNodes().length).toEqual(1);
+        expect(el.find({ name: 'logout' }).hostNodes().length).toEqual(1);
       });
     });
   });

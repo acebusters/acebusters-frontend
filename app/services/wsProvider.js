@@ -21,7 +21,7 @@
  */
 
 
-const _ = require('lodash');
+const isFunction = require('lodash/isFunction');
 const errors = require('./errors');
 const WebSocket = require('websocket').w3cwebsocket;
 
@@ -45,7 +45,7 @@ const WebsocketProvider = function WebsocketProvider(path) {
       let id = null;
 
             // get the id which matches the returned id
-      if (_.isArray(result)) {
+      if (Array.isArray(result)) {
         result.forEach((load) => {
           if (self.responseCallbacks[load.id]) {
             id = load.id;
@@ -58,7 +58,7 @@ const WebsocketProvider = function WebsocketProvider(path) {
             // notification
       if (!id && result.method.indexOf('_subscription') !== -1) {
         self.notificationCallbacks.forEach((callback) => {
-          if (_.isFunction(callback)) { callback(null, result); }
+          if (isFunction(callback)) { callback(null, result); }
         });
 
                 // fire the callback
@@ -96,7 +96,7 @@ WebsocketProvider.prototype.defaultOnClose = function defaultOnClose(e) {
 
   // cancel subscriptions
   noteCb.forEach((callback) => {
-    if (_.isFunction(callback)) {
+    if (isFunction(callback)) {
       callback(e);
     }
   });
