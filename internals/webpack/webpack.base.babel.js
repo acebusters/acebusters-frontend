@@ -22,7 +22,10 @@ module.exports = (options) => ({
     rules: [
       {
         test: /\.js$/, // Transform all .js files required somewhere with Babel
-        exclude: /node_modules/,
+        include: [
+          path.resolve(process.cwd(), 'app'),
+          path.resolve(process.cwd(), 'node_modules', 'ethereumjs-util'),
+        ],
         use: {
           loader: 'babel-loader',
           options: options.babelQuery,

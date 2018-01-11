@@ -16,7 +16,7 @@
     "analyze:clean": "rimraf stats.json",
     "preanalyze": "npm run analyze:clean",
     "analyze": "node ./internals/scripts/analyze.js",
-    "extract-intl": "babel-node --presets latest,stage-0 -- ./internals/scripts/extract-intl.js",
+    "extract-intl": "babel-node --presets latest,stage-2 -- ./internals/scripts/extract-intl.js",
     "npmcheckversion": "node ./internals/scripts/npmcheckversion.js",
     "preinstall": "npm run npmcheckversion",
     "postinstall": "npm run build:dll",
@@ -70,13 +70,10 @@
         }
       ],
       "react",
-      "stage-0"
+      "stage-2"
     ],
     "env": {
       "production": {
-        "only": [
-          "app"
-        ],
         "plugins": [
           "transform-react-remove-prop-types",
           "transform-react-constant-elements",
@@ -261,10 +258,10 @@
     "raf": "^3.4.0",
     "raven-js": "^3.13.1",
     "rc-slider": "^8.1.2",
-    "react": "^16.2.0",
+    "react": "^15.6.2",
     "react-addons-css-transition-group": "^15.6.0",
     "react-addons-transition-group": "^15.6.2",
-    "react-dom": "^16.2.0",
+    "react-dom": "^15.6.2",
     "react-ga": "^2.2.0",
     "react-google-recaptcha": "^0.5.4",
     "react-intl": "^2.4.0",
@@ -309,7 +306,7 @@
     "babel-preset-env": "1.5.1",
     "babel-preset-react": "6.24.1",
     "babel-preset-react-hmre": "1.1.1",
-    "babel-preset-stage-0": "6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
     "cheerio": "0.22.0",
     "circular-dependency-plugin": "3.0.0",
     "coveralls": "2.13.1",
@@ -317,7 +314,7 @@
     "debug": "^2.6.8",
     "enhanced-resolve": "~0.9.0",
     "enzyme": "^3.2.0",
-    "enzyme-adapter-react-16": "^1.1.1",
+    "enzyme-adapter-react-15": "^1.0.5",
     "eslint": "3.19.0",
     "eslint-config-airbnb": "15.0.1",
     "eslint-config-airbnb-base": "11.2.0",
@@ -350,7 +347,7 @@
     "pre-commit": "1.2.2",
     "react-addons-shallow-compare": "^15.6.0",
     "react-addons-test-utils": "15.6.0",
-    "react-test-renderer": "^16.2.0",
+    "react-test-renderer": "^15.6.2",
     "redux-saga-tester": "1.0.186",
     "resolve": "^1.2.0",
     "rimraf": "2.6.1",
