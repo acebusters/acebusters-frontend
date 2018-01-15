@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import ReCAPTCHA from 'react-google-recaptcha';
+import ReCAPTCHA from 'react-recaptcha';
 import { conf } from '../../app.config';
 
 export default class Captcha extends React.Component { // eslint-disable-line react/prefer-stateless-function
@@ -17,7 +17,7 @@ export default class Captcha extends React.Component { // eslint-disable-line re
         <ReCAPTCHA
           ref={(recaptcha) => { this.recaptcha = recaptcha; }}
           sitekey={conf().recaptchaKey}
-          onChange={this.props.input.onChange}
+          verifyCallback={this.props.input.onChange}
         />
       </div>
     );

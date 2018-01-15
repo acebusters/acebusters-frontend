@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import ReCAPTCHA from 'react-google-recaptcha';
+import ReCAPTCHA from 'react-recaptcha';
 import { Form, Field, reduxForm, SubmissionError, propTypes } from 'redux-form/immutable';
 import { browserHistory } from 'react-router';
 // components
@@ -42,7 +42,7 @@ const Captcha = (props) => (
   <div style={{ marginBottom: '15px' }}>
     <ReCAPTCHA
       sitekey={'6LcE0RQUAAAAAEf6UWFsHEPedPBmRPAQiaSiWynN'}
-      onChange={props.input.onChange}
+      verifyCallback={props.input.onChange}
     />
   </div>
 );

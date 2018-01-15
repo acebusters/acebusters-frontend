@@ -147,7 +147,8 @@ export default function createRoutes(store) {
 
         importModules.catch(errorLoading);
       },
-    }, {
+    },
+    {
       onEnter: checkAuth,
       path: 'dashboard',
       name: 'dashboard',
@@ -181,7 +182,8 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
       childRoutes: dashboard,
-    }, {
+    },
+    {
       path: 'login',
       name: 'login',
       getComponent(nextState, cb) {
@@ -198,7 +200,8 @@ export default function createRoutes(store) {
 
         importModules.catch(errorLoading);
       },
-    }, {
+    },
+    {
       path: 'register(/ref/:refCode)',
       name: 'register',
       getComponent(nextState, cb) {
@@ -215,7 +218,8 @@ export default function createRoutes(store) {
 
         importModules.catch(errorLoading);
       },
-    }, {
+    },
+    {
       path: 'reset',
       name: 'reset',
       getComponent(nextState, cb) {
@@ -230,7 +234,8 @@ export default function createRoutes(store) {
 
         importModules.catch(errorLoading);
       },
-    }, {
+    },
+    {
       path: 'generate/:confCode',
       name: 'generate',
       getComponent(nextState, cb) {
@@ -247,7 +252,8 @@ export default function createRoutes(store) {
 
         importModules.catch(errorLoading);
       },
-    }, {
+    },
+    {
       path: 'confirm',
       name: 'confirmPage',
       getComponent(location, cb) {
@@ -255,7 +261,8 @@ export default function createRoutes(store) {
           .then(loadModule(cb))
           .catch(errorLoading);
       },
-    }, {
+    },
+    {
       path: '*',
       name: 'notfound',
       getComponent(nextState, cb) {
@@ -294,7 +301,8 @@ export default function createRoutes(store) {
         {
           component: TableFrame,
           childRoutes: [...tables],
-        }, {
+        },
+        {
           component: DashboardFrame,
           childRoutes: [...simplePages],
         },

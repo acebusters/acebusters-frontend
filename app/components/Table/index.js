@@ -98,7 +98,13 @@ class TableComponent extends React.Component {
 
           <TableAndChairs id="table-and-chairs" >
             <PokerTable>
-              <img src={tableImage} alt="" />
+              <img
+                src={tableImage}
+                width="1089"
+                height="564"
+                style={{ width: '100%', height: 'auto' }}
+                alt=""
+              />
 
               {this.makePots(winners, potSize).map((pot, i) => (
                 <Pot

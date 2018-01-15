@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import { scaleSeat } from '../../utils/styleUtils';
 import { smallShadow } from '../../variables';
 
@@ -51,4 +51,108 @@ export const DownWrapper = styled(CardShared)`
 
 export const UpWrapper = styled(CardShared)`
   height: ${scaleSeat(40)};
+`;
+
+const prop = (propName) => (props) => props[propName];
+
+export const CardContainer = styled.div`
+  position: relative;
+  width: ${prop('cardWidth')}px;
+  height: ${prop('cardHeight')}px;
+
+  & + & {
+    margin-left: 0.5em;
+  }
+`;
+
+const CardWrapper = styled.div`
+  position: absolute;
+  width: ${prop('cardWidth')}px;
+  height: ${prop('cardHeight')}px;
+  backface-visibility: hidden;
+`;
+
+const enterBoard = (front = true) => keyframes`
+  0% {
+    opacity: 0.3;
+    transform: rotateY(${front ? 180 : 0}deg) translateY(-400px);
+  }
+
+  70% {
+    opacity: 1;
+    transform: rotateY(${front ? 180 : 0}deg) translateY(0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: rotateY(${front ? 0 : 180}deg);
+  }
+`;
+
+const leaveBoard = (front = true) => keyframes`
+  0% {
+    opacity: 1;
+    transform: rotateY(${front ? 0 : 180}deg);
+  }
+
+  30% {
+    opacity: 1;
+    transform: rotateY(${front ? 180 : 0}deg) translateY(0);
+  }
+
+  100% {
+    opacity: 0.3;
+    transform: rotateY(${front ? 180 : 0}deg) translateY(-400px);
+  }
+`;
+
+export const BoardFront = styled(CardWrapper)`
+  opacity: 0;
+  animation: ${(props) => (props.leaving ? leaveBoard : enterBoard)(true)} 1.5s;
+  animation-delay: ${(props) => props.animNum * (props.leaving ? 0 : 0.1)}s;
+  animation-fill-mode: forwards;
+`;
+
+export const BoardBack = styled(CardWrapper)`
+  opacity: 0;
+  animation: ${(props) => (props.leaving ? leaveBoard : enterBoard)(false)} 1.5s;
+  animation-delay: ${(props) => props.animNum * (props.leaving ? 0 : 0.1)}s;
+  animation-fill-mode: forwards;
+`;
+
+
+const enterHole = (front = true) => keyframes`
+  0% {
+    opacity: 0.3;
+    transform: rotateY(${front ? 180 : 0}deg);
+  }
+
+  100% {
+    opacity: 1;
+    transform: rotateY(${front ? 0 : 180}deg);
+  }
+`;
+
+const leaveHole = (front = true) => keyframes`
+  0% {
+    opacity: 1;
+    transform: rotateY(${front ? 0 : 180}deg);
+  }
+
+  100% {
+    opacity: 0.3;
+    transform: rotateY(${front ? 180 : 0}deg);
+  }
+`;
+
+export const HoleFront = styled(CardWrapper)`
+  opacity: 0;
+  animation: ${(props) => (props.leaving ? leaveHole : enterHole)(true)} 0.4s;
+  animation-fill-mode: forwards;
+`;
+
+export const HoleBack = styled(CardWrapper)`
+  opacity: 0;
+  animation: ${(props) => (props.leaving ? leaveHole : enterHole)(false)} 0.4s;
+  animation-fill-mode: forwards;
 `;
