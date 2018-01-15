@@ -81,7 +81,6 @@ class Overview extends React.Component {
     const activeSupplyPwr = this.power.activeSupply();
     const activeSupplyBabz = this.token.activeSupply();
     const babzBalance = this.token.balanceOf(account.proxy);
-    const pwrBalance = this.power.balanceOf(account.proxy);
     const downs = this.power.downs(account.proxy);
     const [ethAllowance, ethPayoutDate] = this.pullPayment.paymentOf(account.proxy) || [];
     const tables = this.tableFactory.getTables();
@@ -100,7 +99,6 @@ class Overview extends React.Component {
           ethPayoutDate,
           ethPayoutPending: this.props.pendingETHPayout,
           abpPayoutPending: this.props.pendingABPPayout,
-          pwrBalance,
           completeSupplyBabz,
           activeSupplyPwr,
           activeSupplyBabz,

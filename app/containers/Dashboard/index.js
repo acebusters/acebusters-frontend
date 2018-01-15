@@ -9,9 +9,7 @@ import Container from '../../components/Container';
 import Balances from '../../components/Dashboard/Balances';
 import Tabs from '../../components/Dashboard/Tabs';
 
-import InvestTour from './InvestTour';
-
-import { OVERVIEW, WALLET, EXCHANGE, INVEST, setActiveTab } from './actions';
+import { OVERVIEW, WALLET, INVEST, setActiveTab } from './actions';
 import messages from './messages';
 import { getActiveTab } from './selectors';
 import { investIsAvailable } from './utils';
@@ -34,18 +32,18 @@ const TABS = [
     to: '/dashboard/wallet',
     icon: 'fa-money',
   },
-  {
-    name: EXCHANGE,
-    title: <FormattedMessage {...messages[EXCHANGE]} />,
-    to: '/dashboard/exchange',
-    icon: 'fa-exchange',
-  },
-  {
-    name: INVEST,
-    title: <FormattedMessage {...messages[INVEST]} />,
-    to: '/dashboard/invest',
-    icon: 'fa-line-chart',
-  },
+  // {
+  //   name: EXCHANGE,
+  //   title: <FormattedMessage {...messages[EXCHANGE]} />,
+  //   to: '/dashboard/exchange',
+  //   icon: 'fa-exchange',
+  // },
+  // {
+  //   name: INVEST,
+  //   title: <FormattedMessage {...messages[INVEST]} />,
+  //   to: '/dashboard/invest',
+  //   icon: 'fa-line-chart',
+  // },
 ];
 
 class DashboardRoot extends React.Component {
@@ -64,7 +62,6 @@ class DashboardRoot extends React.Component {
     const { account } = this.props;
     const weiBalance = this.web3.eth.balance(account.proxy);
     const babzBalance = this.token.balanceOf(account.proxy);
-    const pwrBalance = this.power.balanceOf(account.proxy);
 
     // before crowdsale end, disable INVEST tab on production
     const disabledTabs = !investIsAvailable(account.proxy) ? [INVEST] : [];
@@ -77,11 +74,9 @@ class DashboardRoot extends React.Component {
         />
         <Balances
           babzBalance={babzBalance}
-          pwrBalance={pwrBalance}
           weiBalance={weiBalance}
         />
         {this.props.children}
-        <InvestTour />
       </Container>
     );
   }

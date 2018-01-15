@@ -61,12 +61,14 @@ const DepositDialog = ({ account, handleClose }) => {
         </Alert>
       )}
 
-      <Alert style={styles.alertMargins} theme="warning">
-        Please note you{'\''}ll need some amount of ETH in your MetaMask wallet if
-        you want to unlock account and pay transaction fees after unlock (table
-        joins, transfers etc). Depending on the gas price you will need to pay
-        ≈0.004 ETH to join the table.
-      </Alert>
+      {false &&
+        <Alert style={styles.alertMargins} theme="warning">
+          Please note you{'\''}ll need some amount of ETH in your MetaMask wallet if
+          you want to unlock account and pay transaction fees after unlock (table
+          joins, transfers etc). Depending on the gas price you will need to pay
+          ≈0.004 ETH to join the table.
+        </Alert>
+      }
 
       <DialogButtonWrapper>
         <SubmitButton onClick={handleClose}>OK</SubmitButton>

@@ -104,7 +104,7 @@ export default defineMessages({
   },
   ethLimit: {
     id: 'app.containers.Dashboard.ethLimit',
-    defaultMessage: 'Warning: account limit {limit} ETH. To deposit more, ',
+    defaultMessage: 'Warning: account limit {limit} ETH',
   },
   ntzTransferTitle: {
     id: 'app.containers.Dashboard.ntzTransferTitle',

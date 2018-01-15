@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import {
   toEth,
   toNtz,
-  formatAbp,
 } from '../../utils/amountFormatter';
 
 import WithLoading from '../WithLoading';
@@ -14,7 +13,6 @@ import { Bold, BalanceSection, BalanceWrapper } from './styles';
 
 const Balances = ({
   babzBalance,
-  pwrBalance,
   weiBalance,
 }) => (
   <BalanceSection name="wallet-overview">
@@ -43,22 +41,10 @@ const Balances = ({
         {weiBalance && <GloryNumber number={toEth(weiBalance)} postfix={<Bold>ETH</Bold>} />}
       </WithLoading>
     </BalanceWrapper>
-
-    <BalanceWrapper name="power">
-      <WithLoading
-        isLoading={!pwrBalance}
-        loadingSize="14px"
-        type="inline"
-        styles={{ layout: { marginLeft: '15px' } }}
-      >
-        {pwrBalance && formatAbp(pwrBalance)} <Bold>ABP</Bold>
-      </WithLoading>
-    </BalanceWrapper>
   </BalanceSection>
 );
 Balances.propTypes = {
   babzBalance: PropTypes.object,
-  pwrBalance: PropTypes.object,
   weiBalance: PropTypes.object,
 };
 

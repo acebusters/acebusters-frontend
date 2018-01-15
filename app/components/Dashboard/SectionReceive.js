@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import ethUtil from 'ethereumjs-util';
 import { FormattedMessage } from 'react-intl';
 
-import BtnUpgrade from 'containers/Button/BtnUpgrade';
 import messages from '../../containers/Dashboard/messages';
 import AccountProgress from '../../containers/Dashboard/AccountProgress';
 import { MAIN_NET_GENESIS_BLOCK, ETH_FISH_LIMIT, conf } from '../../app.config';
@@ -33,7 +32,7 @@ export const SectionReceive = (props) => {
     <ReceiveSection>
       <DepositInfo />
 
-      {conf().firstBlockHash === MAIN_NET_GENESIS_BLOCK && (
+      {(conf().firstBlockHash === MAIN_NET_GENESIS_BLOCK || false) && (
         <a
           onClick={handleShapeshiftClick}
           href={shapeShiftLink(ethUtil.toChecksumAddress(account.proxy))}
@@ -51,7 +50,6 @@ export const SectionReceive = (props) => {
               values={{ limit: ETH_FISH_LIMIT.toString() }}
               {...messages.ethLimit}
             />
-            <BtnUpgrade {...{ account, messages }} />
             <AccountProgress
               ethBalance={ethBalance}
               nutzBalance={nutzBalance}

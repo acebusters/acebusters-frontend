@@ -9,7 +9,6 @@ import { getAsyncInjectors } from './utils/asyncInjectors';
 import { accountSaga } from './containers/AccountProvider/sagas';
 import { tableStateSaga } from './containers/Table/sagas';
 import { selectAccount } from './containers/AccountProvider/selectors';
-import { investIsAvailable } from './containers/Dashboard/utils';
 import { notificationsSaga } from './containers/Notifications/sagas';
 import { actionBarSaga } from './containers/ActionBar/sagas';
 import { tableMenuSaga } from './containers/TableMenu/sagas';
@@ -66,60 +65,60 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     },
-    {
-      path: 'exchange',
-      name: 'exchange',
-      getComponent(nextState, cb) {
-        const importModules = import('./containers/Dashboard/Exchange');
-        const renderRoute = loadModule(cb);
+    // {
+    //   path: 'exchange',
+    //   name: 'exchange',
+    //   getComponent(nextState, cb) {
+    //     const importModules = import('./containers/Dashboard/Exchange');
+    //     const renderRoute = loadModule(cb);
 
-        importModules.then((component) => {
-          renderRoute(component);
-        });
+    //     importModules.then((component) => {
+    //       renderRoute(component);
+    //     });
 
-        importModules.catch(errorLoading);
-      },
-    },
-    {
-      path: 'invest',
-      name: 'invest',
-      onEnter: (nextState, replace) => {
-        const { proxy } = selectAccount(store.getState()).toJS();
-        if (!investIsAvailable(proxy)) {
-          replace({ pathname: '/dashboard' });
-        }
-      },
-      getComponent(nextState, cb) {
-        const importModules = import('./containers/Dashboard/Invest');
-        const renderRoute = loadModule(cb);
+    //     importModules.catch(errorLoading);
+    //   },
+    // },
+    // {
+    //   path: 'invest',
+    //   name: 'invest',
+    //   onEnter: (nextState, replace) => {
+    //     const { proxy } = selectAccount(store.getState()).toJS();
+    //     if (!investIsAvailable(proxy)) {
+    //       replace({ pathname: '/dashboard' });
+    //     }
+    //   },
+    //   getComponent(nextState, cb) {
+    //     const importModules = import('./containers/Dashboard/Invest');
+    //     const renderRoute = loadModule(cb);
 
-        importModules.then((component) => {
-          renderRoute(component);
-        });
+    //     importModules.then((component) => {
+    //       renderRoute(component);
+    //     });
 
-        importModules.catch(errorLoading);
-      },
-      indexRoute: {
-        getComponent(nextState, cb) {
-          const importModules = import('./containers/Dashboard/PowerUp');
-          const renderRoute = loadModule(cb);
-          importModules.then((component) => renderRoute(component));
-          importModules.catch(errorLoading);
-        },
-      },
-      childRoutes: [
-        {
-          path: 'powerDown',
-          name: 'powerDown',
-          getComponent(nextState, cb) {
-            const importModules = import('./containers/Dashboard/PowerDown');
-            const renderRoute = loadModule(cb);
-            importModules.then((component) => renderRoute(component));
-            importModules.catch(errorLoading);
-          },
-        },
-      ],
-    },
+    //     importModules.catch(errorLoading);
+    //   },
+    //   indexRoute: {
+    //     getComponent(nextState, cb) {
+    //       const importModules = import('./containers/Dashboard/PowerUp');
+    //       const renderRoute = loadModule(cb);
+    //       importModules.then((component) => renderRoute(component));
+    //       importModules.catch(errorLoading);
+    //     },
+    //   },
+    //   childRoutes: [
+    //     {
+    //       path: 'powerDown',
+    //       name: 'powerDown',
+    //       getComponent(nextState, cb) {
+    //         const importModules = import('./containers/Dashboard/PowerDown');
+    //         const renderRoute = loadModule(cb);
+    //         importModules.then((component) => renderRoute(component));
+    //         importModules.catch(errorLoading);
+    //       },
+    //     },
+    //   ],
+    // },
   ];
 
   const simplePages = [

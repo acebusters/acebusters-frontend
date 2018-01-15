@@ -8,7 +8,6 @@ import { conf } from '../../app.config';
 import A from '../A';
 import H2 from '../H2';
 import List from '../List';
-import Button from '../Button';
 
 import Economy from './Economy';
 import ETHPayout from './ETHPayout';
@@ -36,14 +35,6 @@ const Overview = (props) => {
         <div style={{ margin: '1em' }}>
           <strong>Account email:</strong>&nbsp;{account.email}
         </div>
-        <Button
-          size="medium"
-          onClick={props.toggleInvestTour}
-          data-tour="tour-begin"
-        >
-          <i className="fa fa-graduation-cap" />&nbsp;
-          <FormattedMessage {...messages.investTutButton} />
-        </Button>
       </SectionOverview>
 
       {account.refs && account.refs.length &&
@@ -125,7 +116,6 @@ Overview.propTypes = {
   handleABPPayout: PropTypes.func,
   estimateABPPayout: PropTypes.func,
   messages: PropTypes.object,
-  toggleInvestTour: PropTypes.func.isRequired,
 };
 
 export default Overview;
