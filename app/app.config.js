@@ -17,33 +17,7 @@ export function conf() {
     sub = window.location.host.split('.')[0];
   }
   // ### PRODUCTION ENVIRONMENT CONFIG
-  if (sub === 'dapp') {
-    return {
-      recaptchaKey: '6LcE0RQUAAAAAEf6UWFsHEPedPBmRPAQiaSiWynN',
-      defaultRefCode: DEFAULT_REF_CODE,
-      etherscanUrl: 'https://etherscan.io/',
-      gethUrl: 'wss://mainnet.acebusters.com:443',
-      firstBlockHash: MAIN_NET_GENESIS_BLOCK,
-      networkName: 'Ethereum Main Net',
-      oracleUrl: 'https://lzckarzxxa.execute-api.eu-west-1.amazonaws.com/v0',
-      accountUrl: 'https://k7j57cmm86.execute-api.eu-west-1.amazonaws.com/v0',
-      reservationUrl: 'https://6j6m8132w7.execute-api.eu-west-1.amazonaws.com/v0',
-      gasStatUrl: '',
-      ntzAddr: '0xe1eda226759825e236831714bcdc0ca0b21fd862',
-      pwrAddr: '0x14b233a46cd4bdfdb7ca29aa0fd2406f667f8ff6',
-      pullAddr: '0x69cca8df17623f18a001b96ba4d958ce72bc6bdc',
-      tableFactory: '0x9508817ad157c1fdc2c9fafc2090a6bfe443c912',
-      sentryDSN: 'https://8c3e021848b247ddaf627c8040f94e07@sentry.io/153017',
-      gaProperty: 'UA-98848213-1',
-      gtmId: 'GTM-T7SBXCK',
-      intercomAppId: 'z9xn3a6h',
-      pusherApiKey: 'd4832b88a2a81f296f53',
-      shapeshiftKey: '1418115287605',
-    };
-  }
-
-  // ### STAGING ENVIRONMENT CONFIG
-  if (sub === 'staging') {
+  if (sub === 'dapp' || sub === 'staging') {
     return {
       recaptchaKey: '6LcE0RQUAAAAAEf6UWFsHEPedPBmRPAQiaSiWynN',
       defaultRefCode: DEFAULT_REF_CODE,
