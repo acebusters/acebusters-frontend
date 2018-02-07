@@ -85,9 +85,7 @@ class TableMenu extends React.Component {
     const {
       loggedIn, open, sitout, isMuted, standingUp,
       handleClickLogout, onLeave, onSitout, handleClickMuteToggle,
-      myPos, myPending, tableIsFull,
     } = this.props;
-    const { calledOpponent } = this.state;
 
     const isSitoutFlag = typeof sitout === 'number';
     const menuClose = [
@@ -115,15 +113,15 @@ class TableMenu extends React.Component {
       },
     ];
 
-    if (!calledOpponent) {
-      menuClose.push({
-        name: 'call-opponent',
-        icon: 'fa fa-bullhorn',
-        title: 'Call an opponent',
-        onClick: this.handleOpponentCall,
-        disabled: tableIsFull || standingUp || myPending || myPos === undefined,
-      });
-    }
+    // if (!calledOpponent) {
+    //   menuClose.push({
+    //     name: 'call-opponent',
+    //     icon: 'fa fa-bullhorn',
+    //     title: 'Call an opponent',
+    //     onClick: this.handleOpponentCall,
+    //     disabled: tableIsFull || standingUp || myPending || myPos === undefined,
+    //   });
+    // }
 
     const menuUserOpen = [
       {
@@ -217,10 +215,7 @@ TableMenu.propTypes = {
   standingUp: PropTypes.bool,
   handleClickMuteToggle: PropTypes.func,
   onCallOpponent: PropTypes.func,
-  myPos: PropTypes.number,
   smallBlind: PropTypes.number, // eslint-disable-line
-  myPending: PropTypes.bool,
-  tableIsFull: PropTypes.bool,
 };
 
 export default onClickOutside(TableMenu);

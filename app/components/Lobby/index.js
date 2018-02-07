@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Button from 'components/Button';
 import Container from 'components/Container';
-import DiscordWidget from 'components/DiscordWidget';
 import WithLoading from 'components/WithLoading';
 import { TableStriped } from 'components/List';
 import LobbyItem from 'containers/LobbyItem';
@@ -65,10 +64,6 @@ const Lobby = (props) => {
             Refresh
           </WithLoading>
         </Button>
-      </Section>
-
-      <Section>
-        <DiscordWidget />
       </Section>
 
     </Container>
