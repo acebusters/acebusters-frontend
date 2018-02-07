@@ -1,4 +1,4 @@
-import { select, put, take, call } from 'redux-saga/effects';
+import { select, put, take } from 'redux-saga/effects';
 import Raven from 'raven-js';
 
 import { ABI_PROXY } from '../../../app.config';
@@ -9,7 +9,7 @@ import { getWeb3 } from '../utils';
 import { SET_AUTH, WEB3_CONNECTED, accountLoaded } from '../actions';
 
 import { clearExpiringStorage } from '../../../services/expiringLocalStorage';
-import { getRefs } from '../../../services/account';
+// import { getRefs } from '../../../services/account';
 
 export function* accountLoginSaga() {
   let initialLoad = true;
@@ -53,8 +53,8 @@ export function* accountLoginSaga() {
         isLocked,
       }));
 
-      const refs = yield call(getRefs, account.accountId);
-      yield put(accountLoaded({ refs }));
+      // const refs = yield call(getRefs, account.accountId);
+      // yield put(accountLoaded({ refs }));
     } else {
       clearExpiringStorage();
     }
