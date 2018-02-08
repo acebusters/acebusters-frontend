@@ -20,7 +20,7 @@ export const CurtainWrapper = styled.div`
   bottom: 0;
   left: ${(props) => props.isOpen ? '0' : `-${curtainWidth}`};
   z-index: 6;
-  padding: 20px;
+  padding: 60px 20px 20px;
   transition: .15s ease left;
 
   @media (min-width: ${curtainStickyWidth}) {
@@ -30,7 +30,7 @@ export const CurtainWrapper = styled.div`
 
 export const CurtainTogglerWrapper = styled.div`
   position: absolute;
-  top: ${(props) => props.isOpen ? '40px' : '80px'};
+  top: 80px;
   left: ${(props) => props.isOpen ? 'auto' : '400px'};
   right: ${(props) => props.isOpen ? '24px' : 'auto'};
   cursor: pointer;

@@ -56,6 +56,21 @@ export const StyledUserName = styled.span`
   user-select: none; /* Non-prefixed version, currently not supported by any browser */
 `;
 
+export const StyledUser = styled.div`
+  display: flex;
+  align-items: center;
+  margin-top: -6px;
+`;
+
+export const Balances = styled.div`
+  font-size: 11px;
+  opacity: 0.8;
+
+  span + span {
+    margin-left: 8px;
+  }
+`;
+
 // Header
 export const StyledHeader = styled.header`
   &:before, &:after {
@@ -150,22 +165,24 @@ export const StyledLink = styled.a`
   color: inherit;
   display: block;
   cursor: pointer;
-  padding: ${navbarPaddingVertical} ${navbarPaddingHorizontal};
+  height: 55px;
+  padding: ${navbarPaddingVertical} ${navbarPaddingHorizontal} 0;
   position: relative;
   background-color: transparent;
 
-  border-bottom: 2px solid transparent;
+  border-top: 2px solid transparent;
+  padding-bottom: 10px;
 
   &:hover {
     color: ${(props) => props.theme.navbarHoverColor || '#fff'};
     text-decoration: none !important;
-    border-bottom-color: ${baseColor};
+    border-top-color: ${baseColor};
   }
 `;
 
 export const ActiveLink = styled(StyledLink)`
   cursor: default;
-  border-bottom: 2px solid ${navbarColorCurrent};
+  border-top: 2px solid ${navbarColorCurrent};
   background-color: ${navbarColorCurrent};
 
   &:hover {
@@ -197,10 +214,6 @@ export const StyledItem = styled.li`
   color: ${(props) => props.theme.navbarFontColor || '#fff'};
   border-left: ${(props) => props.theme.navbarItemBorder || 'none'};
 
-  @media (max-width: ${screenXsMax}) {
-    width: ${(props) => props.collapseOnMobile ? '100%' : 'auto'};
-    display: ${(props) => props.collapsed ? 'none' : 'block'};
-  }
 `;
 
 export const LogoWrapper = styled.div`
@@ -209,4 +222,38 @@ export const LogoWrapper = styled.div`
   top: 13px;
 
   text-decoration: none;
+
+  @media (max-width: ${screenXsMax}) {
+    display: none;
+  }
+`;
+
+export const MenuWrapper = styled.ul`
+  position: absolute;
+  top: 100%;
+  right: 0;
+
+  display: none;
+  min-width: 100%;
+  padding: 5px 0;
+
+  background-color: #5d5d5d;
+  border-top: 2px solid ${baseColor};;
+
+  ${StyledItem}:hover & {
+    display: block;
+  }
+`;
+
+export const MenuItem = styled.li`
+  width: 100%;
+  padding: 10px 15px;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  &:hover {
+    background-color: #353535;
+  }
 `;

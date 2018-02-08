@@ -9,8 +9,8 @@ import { loggedInSuccess, noWeb3Danger, noInjectedDanger, firstLogin, notLoggedI
 import { createTempNotification, createPersistNotification, removeNotification } from './utils';
 
 export function* authNotification({ newAuthState }) {
-  const { loggedIn } = newAuthState;
-  if (loggedIn) {
+  const { loggedIn, generated } = newAuthState;
+  if (loggedIn && !generated) {
     yield* removeNotification({ txId: notLoggedIn.txId });
     yield* removeNotification({ txId: firstLogin.txId });
     yield* createTempNotification(loggedInSuccess);

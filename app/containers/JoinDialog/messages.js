@@ -1,6 +1,14 @@
 import { defineMessages } from 'react-intl';
 
 export default defineMessages({
+  fundRequestInProgress: {
+    id: 'app.containers.JoinDialog.fundRequestInProgress',
+    defaultMessage: 'We sent you some NTZ for play',
+  },
+  fundRequestInProgressMessage: {
+    id: 'app.containers.JoinDialog.fundRequestInProgressMessage',
+    defaultMessage: 'Wait for a couple minutes. After that you will be able to join the table',
+  },
   sorry: {
     id: 'app.containers.JoinDialog.sorry',
     defaultMessage: 'Sorry!',

@@ -8,11 +8,8 @@ import { routerMiddleware } from 'react-router-redux';
 import createSagaMiddleware from 'redux-saga';
 
 import createReducer from './reducers';
-import { setAuthState } from './containers/AccountProvider/actions';
 import { formActionSaga } from './services/reduxFormSaga';
 import workers from './workers';
-
-import * as storageService from './services/localStorage';
 
 const sagaMiddleware = createSagaMiddleware();
 
@@ -66,22 +63,6 @@ export default function configureStore(initialState = {}, history) {
     });
   }
 
-  if (isLoggedIn()) {
-    store.dispatch(setAuthState({
-      loggedIn: true,
-      privKey: storageService.getItem('privKey'),
-      email: storageService.getItem('email'),
-      accountId: storageService.getItem('accountId'),
-      proxyAddr: storageService.getItem('proxyAddr'),
-    }));
-  } else {
-    store.dispatch(setAuthState({ loggedIn: false }));
-  }
-
   return store;
 }
 
-function isLoggedIn() {
-  const privKey = storageService.getItem('privKey');
-  return (privKey !== undefined && privKey.length > 32);
-}

@@ -15,3 +15,4 @@ export function modalDismiss() {
 export function setProgress(progress) {
   return { type: GLOBAL_PROGRESS, data: progress };
 }
+

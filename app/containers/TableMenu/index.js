@@ -14,6 +14,7 @@ import {
   makeBlockySelector,
   makeNickNameSelector,
   makeSelectLoggedIn,
+  makeSelectGenerated,
 } from '../AccountProvider/selectors';
 import { makeStandingUpSelector, makeMyPendingSelector } from '../Seat/selectors';
 import {
@@ -57,6 +58,7 @@ const mapStateToProps = createStructuredSelector({
   active: makeSelectActive(),
   blocky: makeBlockySelector(),
   nickName: makeNickNameSelector(),
+  accountIsGenerated: makeSelectGenerated(),
   standingUp: makeStandingUpSelector(),
   sitoutInProgress: makeSitoutInProgressSelector(),
   isMuted: makeSelectIsMuted(),

@@ -55,30 +55,18 @@ const makeSelectEmail = () => createSelector(
 );
 
 // return if current user is loggedIn or not
-const makeSelectLoggedIn = () => createSelector(
+const selectAccountKey = (key) => createSelector(
   selectAccount,
-  (account) => account.get('loggedIn')
+  (account) => account.get(key)
 );
 
-const makeSelectPrivKey = () => createSelector(
-  selectAccount,
-  (account) => account.get('privKey')
-);
-
-const makeSelectInjected = () => createSelector(
-  selectAccount,
-  (account) => account.get('injected'),
-);
-
-const makeSelectOwner = () => createSelector(
-  selectAccount,
-  (account) => account.get('owner'),
-);
-
-const makeSelectIsLocked = () => createSelector(
-  selectAccount,
-  (account) => !!account.get('isLocked'),
-);
+const makeSelectLoggedIn = () => selectAccountKey('loggedIn');
+const makeSelectPrivKey = () => selectAccountKey('privKey');
+const makeSelectInjected = () => selectAccountKey('injected');
+const makeSelectGenerated = () => selectAccountKey('generated');
+const makeSelectWallet = () => selectAccountKey('wallet');
+const makeSelectOwner = () => selectAccountKey('owner');
+const makeSelectIsLocked = () => selectAccountKey('isLocked');
 
 const makeSelectHasWeb3 = () => createSelector(
   makeSelectIsLocked(),
@@ -108,23 +96,9 @@ const makeSelectWeb3MethodValue = (address, methodName, args = []) => createSele
 );
 
 const makeSelectCanSendTx = () => createSelector(
-  makeSelectIsLocked(),
-  makeSelectHasWeb3(),
-  makeSelectNetworkSupported(),
-  makeSelectWrongInjected(),
   makeSelectIsWeb3Connected(),
   makeSelectWeb3MethodValue(conf().contrAddr, 'paused'),
-  (isLocked, hasWeb3, networkSupported, wrongInjected, isConnected, paused) => {
-    if (paused || !isConnected) {
-      return false;
-    }
-
-    if (isLocked) {
-      return true;
-    }
-
-    return hasWeb3 && networkSupported && !wrongInjected;
-  },
+  (isConnected, paused) => isConnected && !paused,
 );
 
 /**
@@ -140,6 +114,7 @@ export {
   makeSelectPrivKey,
   makeSelectProxyAddr,
   makeSelectEmail,
+  makeSelectGenerated,
   makeSelectLoggedIn,
   makeSelectIsWeb3Connected,
   makeSelectWeb3ErrMsg,
@@ -151,4 +126,5 @@ export {
   makeSelectCanSendTx,
   makeSelectIsLocked,
   makeSelectWeb3MethodValue,
+  makeSelectWallet,
 };

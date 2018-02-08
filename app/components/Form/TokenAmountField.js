@@ -1,17 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedMessage } from 'react-intl';
-
-import messages from '../../containers/Dashboard/messages';
-import { ETH, NTZ } from '../../containers/Dashboard/actions';
 
 import { InputWithUnit } from '../Input';
 import Label from '../Label';
-import Dropdown from '../Dropdown';
 import { ErrorMessage, WarningMessage } from '../FormMessages';
-import Token from '../Dropdown/Token';
-import Ethereum from '../Logo/Ethereum';
-import Nutz from '../Logo/Nutz';
 
 import FormGroup from './FormGroup';
 import {
@@ -20,21 +12,6 @@ import {
   Unit,
 } from './styles';
 
-const tokens = [{
-  id: ETH,
-  node: Token,
-  props: {
-    name: <FormattedMessage {...messages.ethereum} />,
-    icon: <Ethereum height={26} width={26} />,
-  },
-}, {
-  id: NTZ,
-  node: Token,
-  props: {
-    name: <FormattedMessage {...messages.nutz} />,
-    icon: <Nutz height={26} width={26} />,
-  },
-}];
 
 class TokenAmountField extends React.Component {
   constructor(props) {
@@ -58,7 +35,6 @@ class TokenAmountField extends React.Component {
       label,
       type,
       amountUnit,
-      setAmountUnit,
       maxAmount,
       meta: { touched, error, warning },
     } = this.props;
@@ -81,14 +57,6 @@ class TokenAmountField extends React.Component {
             />
             <Unit name="unit">{amountUnit}</Unit>
           </FieldGroup>
-          <FieldGroup style={{ width: 180 }} focus={this.state.unitFocus}>
-            <Dropdown
-              selected={amountUnit}
-              onSelect={setAmountUnit}
-              options={tokens}
-              {...this.props}
-            />
-          </FieldGroup>
         </ControlWrapper>
 
         {touched && error && <ErrorMessage error={error} />}
@@ -103,7 +71,6 @@ TokenAmountField.propTypes = {
   type: PropTypes.string,
   meta: PropTypes.object,
   amountUnit: PropTypes.string,
-  setAmountUnit: PropTypes.func,
   maxAmount: PropTypes.object,
 };
 

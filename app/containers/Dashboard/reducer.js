@@ -18,7 +18,7 @@ import {
   SET_FISH_WARNED,
   TOGGLE_INVEST_TOUR,
   OVERVIEW,
-  ETH,
+  NTZ,
   POWERUP,
 } from './actions';
 
@@ -47,7 +47,7 @@ const initialState = fromJS({
   proxy: null,
   events: null,
   activeTab: OVERVIEW,
-  amountUnit: ETH,
+  amountUnit: NTZ,
   investType: POWERUP,
   investTour: false,
   isFishWarned: false,
@@ -114,7 +114,7 @@ function dashboardReducer(state = initialState, action) {
               .set('failedTx', null)
               .set('events', null)
               .set('activeTab', OVERVIEW)
-              .set('amountUnit', ETH)
+              .set('amountUnit', NTZ)
               .set('investType', POWERUP)
               .set('investTour', false);
           }

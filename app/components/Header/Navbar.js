@@ -6,7 +6,6 @@ import {
   transitionSpeed,
   transitionFn,
   navbarHeight,
-  screenXsMax,
   black,
 } from '../../variables';
 
@@ -27,9 +26,6 @@ const StyledNavbarMenu = styled.div`
   box-sizing: border-box;
   display: block;
   float: right;
-  @media (max-width: ${screenXsMax}) {
-    width: ${(props) => props.loggedIn ? '100%' : 'auto'};
-  }
 `;
 
 const StyledNavbar = styled.nav`
@@ -54,12 +50,13 @@ const StyledNavbar = styled.nav`
   z-index: 1000;
   margin-bottom: 0;
   border-radius: 0;
-  background-color: ${black};
+  background-color: ${(props) => props.transparent ? 'transparent' : black};
 `;
 
 const Navbar = (props) => (
   <StyledNavbar
     topNav={props.topNav}
+    transparent={props.transparent}
   >
     <StyledNavbarMenu loggedIn={props.loggedIn} collapsed={props.collapsed}>
       <StyledNavbarMenuList name="navbar-menu-wrapper">
@@ -74,6 +71,7 @@ Navbar.propTypes = {
   children: PropTypes.node,
   topNav: PropTypes.bool,
   collapsed: PropTypes.bool,
+  transparent: PropTypes.bool,
   loggedIn: PropTypes.bool,
 };
 

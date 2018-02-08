@@ -9,6 +9,8 @@ import {
   StyledItem,
   StyledLink,
   StyledSpan,
+  MenuWrapper,
+  MenuItem,
 } from './styles';
 
 const displayImage = (src, icon) => {
@@ -20,7 +22,17 @@ const displayImage = (src, icon) => {
   return null;
 };
 
-const NavItem = ({ title, to, image, iconClass, collapsed, collapseOnMobile, onClick }) => (
+const NavItem = ({
+  title,
+  to,
+  image,
+  iconClass,
+  collapsed,
+  collapseOnMobile,
+  onClick,
+  menu,
+  onMenuClick,
+}) => (
   <StyledItem
     collapsed={collapsed}
     collapseOnMobile={collapseOnMobile}
@@ -34,6 +46,19 @@ const NavItem = ({ title, to, image, iconClass, collapsed, collapseOnMobile, onC
       {displayImage(image, iconClass)}
       <StyledSpan>{title}</StyledSpan>
     </Link>
+
+    {menu &&
+      <MenuWrapper>
+        {menu.map((item, i) => (
+          <MenuItem
+            key={i}
+            onClick={() => onMenuClick(i)}
+          >
+            {item}
+          </MenuItem>
+        ))}
+      </MenuWrapper>
+    }
   </StyledItem>
 );
 
@@ -43,8 +68,10 @@ NavItem.propTypes = {
   collapseOnMobile: PropTypes.bool,
   to: PropTypes.any,
   image: PropTypes.string,
+  menu: PropTypes.array,
+  onMenuClick: PropTypes.func,
   iconClass: PropTypes.string,
-  onClick: PropTypes.any,
+  onClick: PropTypes.func,
 };
 
 NavItem.defaultProps = {

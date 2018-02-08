@@ -20,6 +20,11 @@ export const makeSelectProgress = () => createSelector(
   (globalState) => globalState.get('progress')
 );
 
+export const makeSelectWallet = () => createSelector(
+  selectGlobal,
+  (globalState) => globalState.get('wallet')
+);
+
 export const makeModalSelector = () => createSelector(
   selectGlobal,
   (state) => (state && state.get('modalStack').size > 0) ? state.get('modalStack').last() : null

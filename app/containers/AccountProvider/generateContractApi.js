@@ -1,12 +1,10 @@
 import { bindActionCreators } from 'redux';
-import BigNumber from 'bignumber.js';
+// import BigNumber from 'bignumber.js';
 import { contractMethodCall, contractTxSend } from './actions';
 import { getWeb3 } from './sagas';
 import { last } from '../../utils';
 import { getMethodKey } from './utils';
 import { promisifyWeb3Call } from '../../utils/promisifyWeb3Call';
-
-import { ABI_PROXY } from '../../app.config';
 
 function degrade(fn, fallback) {
   try {
@@ -14,19 +12,6 @@ function degrade(fn, fallback) {
   } catch (e) {
     return fallback;
   }
-}
-
-function isForward(methodName, contractInstance) {
-  return methodName === 'forward' && contractInstance.abi === ABI_PROXY;
-}
-
-function proxyInstance(proxyAddr) {
-  proxyInstance.cache = proxyInstance.cache || {};
-  if (!proxyInstance.cache[proxyAddr]) {
-    proxyInstance.cache[proxyAddr] = getWeb3().eth.contract(ABI_PROXY).at(proxyAddr);
-  }
-
-  return proxyInstance.cache[proxyAddr];
 }
 
 function generateContractInstanceApi({ abi, address, getState, dispatch }) {
@@ -51,14 +36,11 @@ function generateContractInstanceApi({ abi, address, getState, dispatch }) {
       sendTransaction: (...args) => contractTxSend({
         args,
         methodName,
+        contractInstance,
         key: getMethodKey({ methodName, args }),
+        data: contractInstance[methodName].getData(...args),
         dest: address,
         estimateGas: estimateGas(...args),
-        data: (
-          !isForward(methodName, contractInstance)
-            ? contractInstance[methodName].getData(...args)
-            : ''
-        ),
         privKey: getState().get('privKey'),
         callback: typeof last(args) === 'function' ? last(args) : undefined,
       }),
@@ -81,15 +63,16 @@ function generateContractInstanceApi({ abi, address, getState, dispatch }) {
       });
     });
     const estimateGas = (...args) => {
-      const options = typeof last(args) === 'function' ? args[args.length - 2] : last(args);
-      const isForwardCall = isForward(methodName, contractInstance);
-      const data = !isForwardCall ? contractInstance[methodName].getData(...args) : '';
-      const txArgs = isForwardCall ? args.slice(0, 3) : [address, options.value || new BigNumber(0), data];
-      const proxy = proxyInstance(getState().get('proxy'));
-
-      return promisifyWeb3Call(proxy.forward.estimateGas)(...txArgs, {
-        from: getState().get('injected'),
-      }).then((gas) => Math.round((gas * 1.1) / 1000) * 1000);
+      const tx = {
+        to: contractInstance.address,
+        from: getState().get('wallet').address,
+        data: contractInstance[methodName].getData(...args),
+        value: '0x0',
+      };
+      return (
+        promisifyWeb3Call(getWeb3().eth.estimateGas)(tx)
+        .then((gas) => Math.round((gas * 1.1) / 1000) * 1000)
+      );
     };
     // add actions to base getter
     contractMethod.call = actions.call;

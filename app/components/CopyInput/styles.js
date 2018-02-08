@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { baseColor } from '../../variables';
 
 export const Container = styled.label`
+  display: inline-block;
   position: relative;
 `;
 

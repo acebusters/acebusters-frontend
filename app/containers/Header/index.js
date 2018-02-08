@@ -1,35 +1,31 @@
-import { connect } from 'react-redux';
-import { browserHistory } from 'react-router';
 import { createStructuredSelector } from 'reselect';
 import {
-  makeSignerAddrSelector,
   makeBlockySelector,
   makeNickNameSelector,
   makeSelectLoggedIn,
+  makeSignerAddrSelector,
 } from '../AccountProvider/selectors';
+import web3Connect from '../AccountProvider/web3Connect';
 import { setAuthState } from '../AccountProvider/actions';
-import { getHeaderCollapsed } from './selectors';
-import { setCollapsed } from './actions';
+import { modalAdd } from '../App/actions';
+import { IMPORT_DIALOG, EXPORT_DIALOG } from '../Modal/constants';
 
 import Header from '../../components/Header';
 
 const mapDispatchToProps = (dispatch) => ({
-  onClickLogout: () => {
-    browserHistory.push('/login');
-    return dispatch(setAuthState({ loggedIn: false }));
-  },
-  setCollapsed: (val) => dispatch(setCollapsed(val)),
+  onLogout: () => dispatch(setAuthState({ loggedIn: false })),
+  onImport: () => dispatch(modalAdd({ modalType: IMPORT_DIALOG })),
+  onExport: () => dispatch(modalAdd({ modalType: EXPORT_DIALOG })),
 });
 
 const mapStateToProps = createStructuredSelector({
   loggedIn: makeSelectLoggedIn(),
-  signerAddr: makeSignerAddrSelector(),
   nickName: makeNickNameSelector(),
+  signerAddr: makeSignerAddrSelector(),
   blocky: makeBlockySelector(),
-  collapsed: getHeaderCollapsed(),
 });
 
-export default connect(
+export default web3Connect(
   mapStateToProps,
   mapDispatchToProps,
 )(Header);

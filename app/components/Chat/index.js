@@ -10,7 +10,7 @@ export const ChatPlaceholder = styled.div`
 `;
 
 export const ChatContainer = styled.div`
-  height: calc(100% - 80px);
+  height: 100%;
 `;
 
 export const ChatArea = styled.div`

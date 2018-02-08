@@ -69,3 +69,7 @@ export function resetWallet(sessionReceipt, wallet) {
     wallet: JSON.stringify(wallet),
   });
 }
+
+export function requestFunds(address) {
+  return request('post', 'fund', { address });
+}

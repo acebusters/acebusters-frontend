@@ -108,8 +108,8 @@ class TableDebug extends React.Component {
           <thead>
             <tr>
               <th>Hand Id</th>
-              {contractData.lineup.map((_, i) =>
-                <th key={i} colSpan={2}>Seat {i}</th>)}
+              {contractData.lineup.map(({ address }, i) =>
+                <th key={i} colSpan={2} title={address}>Seat {i}</th>)}
             </tr>
             <tr>
               <th></th>
@@ -161,8 +161,8 @@ class TableDebug extends React.Component {
           <thead>
             <tr>
               <th>Hand</th>
-              {hands[0].lineup.map((_, j) =>
-                <th key={j} colSpan={3}>Seat {j}</th>
+              {hands[0].lineup.map(({ address }, j) =>
+                <th key={j} colSpan={3} title={address}>Seat {j}</th>
               )}
             </tr>
             <tr>

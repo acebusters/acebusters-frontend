@@ -9,10 +9,9 @@ import Container from '../../components/Container';
 import Balances from '../../components/Dashboard/Balances';
 import Tabs from '../../components/Dashboard/Tabs';
 
-import { OVERVIEW, WALLET, INVEST, setActiveTab } from './actions';
+import { OVERVIEW, WALLET, setActiveTab } from './actions';
 import messages from './messages';
 import { getActiveTab } from './selectors';
-import { investIsAvailable } from './utils';
 
 import { ABI_TOKEN_CONTRACT, ABI_POWER_CONTRACT, conf } from '../../app.config';
 
@@ -60,16 +59,14 @@ class DashboardRoot extends React.Component {
 
   render() {
     const { account } = this.props;
-    const weiBalance = this.web3.eth.balance(account.proxy);
-    const babzBalance = this.token.balanceOf(account.proxy);
+    const weiBalance = this.web3.eth.balance(account.signerAddr);
+    const babzBalance = this.token.balanceOf(account.signerAddr);
 
     // before crowdsale end, disable INVEST tab on production
-    const disabledTabs = !investIsAvailable(account.proxy) ? [INVEST] : [];
     return (
       <Container>
         <Tabs
           tabs={TABS}
-          disabledTabs={disabledTabs}
           {...this.props}
         />
         <Balances

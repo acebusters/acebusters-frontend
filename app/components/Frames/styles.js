@@ -33,7 +33,7 @@ export const StyledTable = styled(Common)`
 
 export const TableNotificationsWrapper = styled.div`
   position: absolute;
-  z-index: 2;
+  z-index: 2030;
   left: 0;
   top: 0;
   right: 0;

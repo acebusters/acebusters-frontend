@@ -1,9 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import InviteDialog from 'containers/InviteDialog';
-import JoinDialog from 'containers/JoinDialog';
-import UpgradeDialog from 'containers/UpgradeDialog';
-import * as modals from 'containers/Modal/constants';
+import InviteDialog from '../../containers/InviteDialog';
+import JoinDialog from '../../containers/JoinDialog';
+import UpgradeDialog from '../../containers/UpgradeDialog';
+import ImportDialog from '../../containers/ImportDialog';
+import ExportDialog from '../../containers/ExportDialog';
+import LogoutDialog from '../../containers/LogoutDialog';
+import * as modals from '../../containers/Modal/constants';
 import ConfirmDialog from './ConfirmDialog';
 import SelectToken from './SelectToken';
 import FishWarningDialog from './FishWarningDialog';
@@ -29,6 +32,9 @@ const MODALS = {
   [modals.JOIN_DIALOG]: JoinDialog,
   [modals.SELECT_TOKEN]: SelectToken,
   [modals.UPGRADE_DIALOG]: UpgradeDialog,
+  [modals.IMPORT_DIALOG]: ImportDialog,
+  [modals.EXPORT_DIALOG]: ExportDialog,
+  [modals.LOGOUT_DIALOG]: LogoutDialog,
 };
 
 const Modal = ({ modal, handleClose }) => {
@@ -36,11 +42,10 @@ const Modal = ({ modal, handleClose }) => {
   if (modal) {
     SpecifiedModal = MODALS[modal.modalType];
   }
-  // console.log(modal.modalProps)
   return (
     <ModalsTransitionGroup>
       {modal && // required for leaveAnim
-        <ContainerTransitionGroup component={Wrapper} style={{ zIndex: 7 }}>
+        <ContainerTransitionGroup component={Wrapper} style={{ zIndex: 2040 }}>
           <DialogTransitionGroup component={Modals}>
             <Background onClick={modal.modalProps.backdrop ? handleClose : null} />
             <DialogWrapper>

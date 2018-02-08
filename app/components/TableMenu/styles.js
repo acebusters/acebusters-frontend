@@ -63,7 +63,7 @@ export const TableLogoContainer = styled(LogoContainer)`
 // table-menu
 export const MenuContainer = styled.div`
   position: absolute;
-  top: 0;
+  top: 60px;
   left: calc(100% - 165px);
   display: flex;
   flex-direction: column;

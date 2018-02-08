@@ -29,6 +29,7 @@ class CopyInput extends React.Component {
 
     return (
       <Container
+        name="copy-container"
         onMouseEnter={() => this.setState({ copied: false })}
       >
         <CopyIcon
@@ -42,7 +43,7 @@ class CopyInput extends React.Component {
             copyText(e.currentTarget);
           }}
           readOnly
-          style={{ width: value.length * 10, fontSize: 15 }}
+          style={{ width: value.length * 8, fontSize: 15 }}
         />
       </Container>
     );

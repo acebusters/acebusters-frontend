@@ -15,7 +15,7 @@ export const ExtraDetail = styled.span`
 
 export const Wrapper = styled.div`
   position: fixed;
-  z-index: 1000;
+  z-index: 2000;
   top: 0;
   left: 0;
 

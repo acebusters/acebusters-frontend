@@ -1,13 +1,13 @@
 import { fromJS } from 'immutable';
 import dashboardReducer from '../reducer';
 import { contractEvent, proxyEvent, proxyEvents } from '../../AccountProvider/actions';
-import { OVERVIEW, ETH, POWERUP } from '../actions';
+import { OVERVIEW, NTZ, POWERUP } from '../actions';
 
 describe('dashboard reducer tests', () => {
   it('should return the default state.', () => {
     expect(dashboardReducer(undefined, {}).toJS()).toEqual({
       activeTab: OVERVIEW,
-      amountUnit: ETH,
+      amountUnit: NTZ,
       events: null,
       investType: POWERUP,
       investTour: false,

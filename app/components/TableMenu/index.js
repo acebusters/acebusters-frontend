@@ -2,16 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import onClickOutside from 'react-onclickoutside';
 
-import MenuHeader from './MenuHeader';
 import MenuItem from './MenuItem';
 
-import {
- LogoWrapper,
- MenuContainer,
-} from './styles';
+import { MenuContainer } from './styles';
 
-import { Logo } from '../Logo';
-import Link from '../Link';
 
 // Note: sitout value possibilities
 // sitout > 0, for enabled "play"
@@ -82,10 +76,7 @@ class TableMenu extends React.Component {
   }
 
   render() {
-    const {
-      loggedIn, open, sitout, isMuted, standingUp,
-      handleClickLogout, onLeave, onSitout, handleClickMuteToggle,
-    } = this.props;
+    const { open, sitout, isMuted, standingUp, onLeave, onSitout, handleClickMuteToggle } = this.props;
 
     const isSitoutFlag = typeof sitout === 'number';
     const menuClose = [
@@ -123,78 +114,10 @@ class TableMenu extends React.Component {
     //   });
     // }
 
-    const menuUserOpen = [
-      {
-        name: 'lobby',
-        icon: 'fa fa-search',
-        title: 'Lobby',
-        to: '/lobby',
-        disabled: false,
-      },
-      {
-        name: 'dashboard',
-        icon: 'fa fa-tachometer',
-        title: 'Dashboard',
-        to: '/dashboard',
-        disabled: false,
-      },
-      {
-        name: 'preferences',
-        icon: 'fa fa-cog',
-        title: 'Preferences',
-        onClick: () => {},
-        disabled: true,
-      },
-      {
-        name: 'logout',
-        icon: 'fa fa-sign-out',
-        title: 'Log-Out',
-        onClick: () => handleClickLogout(),
-        disabled: false,
-      },
-    ];
-    const menuGuestOpen = [
-      {
-        name: 'lobby',
-        icon: 'fa fa-search',
-        title: 'Lobby',
-        to: '/lobby',
-        disabled: false,
-      },
-      {
-        name: 'register',
-        icon: 'fa fa-user-plus',
-        title: 'Register',
-        to: '/register',
-        disabled: false,
-      },
-      {
-        name: 'signin',
-        icon: 'fa fa-sign-in',
-        title: 'Log-In',
-        to: '/login',
-        disabled: false,
-      },
-    ];
-    const renderMenu = () => {
-      if (loggedIn && open) {
-        return menuUserOpen;
-      }
-      if (!loggedIn && open) {
-        return menuGuestOpen;
-      }
-      return menuClose;
-    };
     return (
       <div name="table-menu">
-        <LogoWrapper name="logo-wrapper">
-          <Link to="/">
-            <Logo />
-          </Link>
-        </LogoWrapper>
         <MenuContainer open={open} name="menu-container">
-          <MenuHeader {...this.props} />
-          {renderMenu().map((item, index) => (
+          {menuClose.map((item, index) => (
             <MenuItem key={index} item={item} {...this.props} />
           ))}
         </MenuContainer>
@@ -204,8 +127,6 @@ class TableMenu extends React.Component {
 }
 
 TableMenu.propTypes = {
-  loggedIn: PropTypes.bool,
-  handleClickLogout: PropTypes.func,
   onLeave: PropTypes.func,
   sitout: PropTypes.any, // TODO change to only number
   onSitout: PropTypes.func,

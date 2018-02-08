@@ -1,9 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedNumber } from 'react-intl';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import { } from 'react-addons-shallow-compare';
 
 import { makeSelectIsLocked, makeSelectProxyAddr, makeSelectCanSendTx } from '../AccountProvider/selectors';
 import Alert from '../../components/Alert';
@@ -126,12 +124,7 @@ class TxSubmit extends React.Component {
       );
     }
 
-    return (
-      <Alert theme="success" key="estimate">
-        Be sure to give at least <FormattedNumber value={gas} /> gas limit for your transaction.
-        Otherwise&nbsp;transaction can fail
-      </Alert>
-    );
+    return null;
   }
 
   render() {
@@ -143,7 +136,6 @@ class TxSubmit extends React.Component {
       submitting,
       canSendTx,
       invalid,
-      isLocked,
     } = this.props;
     const { gas } = this.state;
     const estimating = canRunEstimate(this.props) && !gas;
@@ -154,7 +146,7 @@ class TxSubmit extends React.Component {
 
         <ButtonContainer>
           <SubmitButton
-            disabled={!canSendTx || (!isLocked && !gas) || invalid || this.gasTooHigh}
+            disabled={!canSendTx || !gas || invalid || this.gasTooHigh}
             submitting={submitting || estimating}
             onClick={onSubmit}
             type={onSubmit ? 'button' : 'submit'}
