@@ -9,7 +9,7 @@ import Container from '../../components/Container';
 import Balances from '../../components/Dashboard/Balances';
 import Tabs from '../../components/Dashboard/Tabs';
 
-import { OVERVIEW, WALLET, setActiveTab } from './actions';
+import { ADVANCED, OVERVIEW, WALLET, setActiveTab } from './actions';
 import messages from './messages';
 import { getActiveTab } from './selectors';
 
@@ -30,6 +30,12 @@ const TABS = [
     title: <FormattedMessage {...messages[WALLET]} />,
     to: '/dashboard/wallet',
     icon: 'fa-money',
+  },
+  {
+    name: ADVANCED,
+    title: <FormattedMessage {...messages[ADVANCED]} />,
+    to: '/dashboard/advanced',
+    icon: 'fa-exclamation-triangle',
   },
   // {
   //   name: EXCHANGE,

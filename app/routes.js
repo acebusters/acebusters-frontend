@@ -65,6 +65,20 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     },
+    {
+      path: 'advanced',
+      name: 'advanced',
+      getComponent(nextState, cb) {
+        const importModules = import('./containers/Dashboard/Advanced');
+        const renderRoute = loadModule(cb);
+
+        importModules.then((component) => {
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    },
     // {
     //   path: 'exchange',
     //   name: 'exchange',

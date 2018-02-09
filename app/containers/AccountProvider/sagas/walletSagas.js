@@ -8,7 +8,7 @@ import { getWeb3 } from '../../AccountProvider/utils';
 import * as localStorage from '../../../services/localStorage';
 import * as accountService from '../../../services/account';
 import { modalDismiss, modalAdd } from '../../App/actions';
-import { LOGOUT_DIALOG } from '../../Modal/constants';
+import { CONFIRM_DIALOG, LOGOUT_DIALOG } from '../../Modal/constants';
 import { promisifyWeb3Call } from '../../../utils/promisifyWeb3Call';
 import { NTZ_DECIMALS, ETH_DECIMALS } from '../../../utils/amountFormatter';
 import { ABI_TOKEN_CONTRACT, conf } from '../../../app.config';
@@ -79,5 +79,12 @@ export function* importSaga({ payload: mnemonic }) {
     generated: true,
   }));
   yield put(modalDismiss());
+  yield put(modalAdd({
+    modalType: CONFIRM_DIALOG,
+    modalProps: {
+      msg: 'Wallet successfully imported.',
+      buttonText: 'OK',
+    },
+  }));
   localStorage.setItem('wallet', JSON.stringify(wallet));
 }

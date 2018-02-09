@@ -68,6 +68,9 @@ export const DialogTitle = styled(H2)`
   margin-top: 0;
 `;
 
+export const DialogText = styled.p`
+`;
+
 export const DialogButtonWrapper = styled.div`
   margin-top: 16px;
   margin-bottom: 8px;

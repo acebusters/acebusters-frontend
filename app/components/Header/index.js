@@ -22,8 +22,6 @@ import { ABI_TOKEN_CONTRACT, conf } from '../../app.config';
 class Header extends React.Component {
   constructor(props) {
     super(props);
-    this.handleMenuClick = this.handleMenuClick.bind(this);
-
     this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(conf().ntzAddr);
   }
 
@@ -31,13 +29,13 @@ class Header extends React.Component {
     return this.props.web3Redux.web3;
   }
 
-  handleMenuClick(menuIndex) {
-    const { onImport, onExport, onLogout } = this.props;
-    const handler = [onImport, onExport, onLogout][menuIndex];
-    if (typeof handler === 'function') {
-      handler();
-    }
-  }
+  // handleMenuClick(menuIndex) {
+  //   const { onLogout } = this.props;
+  //   const handler = [onLogout][menuIndex];
+  //   if (typeof handler === 'function') {
+  //     handler();
+  //   }
+  // }
 
   render() {
     const { blocky, nickName, location, signerAddr } = this.props;
@@ -79,8 +77,8 @@ class Header extends React.Component {
               </StyledUser>
             }
             location={location}
-            menu={['Import account', 'Export account', 'Logout']}
-            onMenuClick={this.handleMenuClick}
+            // menu={[]}
+            // onMenuClick={this.handleMenuClick}
           />
         </Navbar>
       </StyledHeader>
@@ -95,9 +93,6 @@ Header.propTypes = {
   location: PropTypes.object,
   nickName: PropTypes.string,
   blocky: PropTypes.string,
-  onLogout: PropTypes.func,
-  onImport: PropTypes.func,
-  onExport: PropTypes.func,
   web3Redux: PropTypes.object,
   signerAddr: PropTypes.string,
 };

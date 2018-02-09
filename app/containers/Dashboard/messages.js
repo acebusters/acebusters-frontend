@@ -6,6 +6,10 @@
 import { defineMessages } from 'react-intl';
 
 export default defineMessages({
+  advanced: {
+    id: 'app.containers.Dashboard.advanced',
+    defaultMessage: 'Advanced',
+  },
   amount: {
     id: 'app.containers.Dashboard.amount',
     defaultMessage: 'Amount',
