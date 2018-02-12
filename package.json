@@ -1,10 +1,10 @@
 {
   "name": "ab-web",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "A web app housing accounts, economy, and poker.",
   "repository": {
     "type": "git",
-    "url": "git:bitbucket.org/johba/ab_web.git"
+    "url": "git@github.com:parsec-labs/acebusters-frontend.git"
   },
   "engines": {
     "npm": ">=3",
