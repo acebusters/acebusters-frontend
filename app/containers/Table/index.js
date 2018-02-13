@@ -45,11 +45,7 @@ import {
   reserveSeat,
 } from './actions';
 // selectors
-import makeSelectAccountData, {
-  makeSelectPrivKey,
-  makeSelectProxyAddr,
-  makeSignerAddrSelector,
-} from '../AccountProvider/selectors';
+import makeSelectAccountData, { makeSelectPrivKey, makeSignerAddrSelector } from '../AccountProvider/selectors';
 
 import {
   makeLastReceiptSelector,
@@ -419,7 +415,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     switch (result.event) {
       case 'Join': {
         // notify backend about change in lineup
-        if (result.args && result.args.addr === this.props.proxyAddr) {
+        if (result.args && result.args.addr === this.props.signerAddr) {
           this.tableService.lineup();
         }
 
@@ -449,7 +445,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
       }
 
       case 'Error': {
-        if (!result.args || result.args.addr !== this.props.proxyAddr) break;
+        if (!result.args || result.args.addr !== this.props.signerAddr) break;
 
         let msg = 'Ups Something went wrong';
         const errorCode = result.args.errorCode.toNumber();
@@ -565,7 +561,6 @@ const mapStateToProps = createStructuredSelector({
   myPos: makeMyPosSelector(),
   potSize: makeAmountInTheMiddleSelector(),
   privKey: makeSelectPrivKey(),
-  proxyAddr: makeSelectProxyAddr(),
   sitoutAmount: makeSitoutAmountSelector(),
   state: makeHandStateSelector(),
   signerAddr: makeSignerAddrSelector(),
@@ -592,7 +587,6 @@ Table.propTypes = {
   latestHand: PropTypes.any,
   sitoutAmount: PropTypes.number,
   standingUp: PropTypes.bool,
-  proxyAddr: PropTypes.string,
   signerAddr: PropTypes.string,
   web3Redux: PropTypes.any,
   data: PropTypes.any,
