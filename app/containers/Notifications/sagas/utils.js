@@ -4,7 +4,7 @@ import { delay } from 'redux-saga';
 import { put, take, race } from 'redux-saga/effects';
 
 import { CONTRACT_TX_SENDED, CONTRACT_TX_MINED, CONTRACT_TX_FAILED, CONTRACT_TX_NOT_EXISTS } from '../../AccountProvider/actions';
-import { POWERUP, POWERDOWN } from '../../Dashboard/actions';
+import { POWERUP, POWERDOWN } from '../../Dashboard/constants';
 import { conf } from '../../../app.config';
 
 import { notifyAdd, notifyDelete, notifyRemoving } from '../actions';

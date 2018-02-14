@@ -1,17 +1,13 @@
 import { fromJS } from 'immutable';
 import dashboardReducer from '../reducer';
 import { contractEvent, proxyEvent, proxyEvents } from '../../AccountProvider/actions';
-import { OVERVIEW, NTZ, POWERUP } from '../actions';
+import { OVERVIEW } from '../constants';
 
 describe('dashboard reducer tests', () => {
   it('should return the default state.', () => {
     expect(dashboardReducer(undefined, {}).toJS()).toEqual({
       activeTab: OVERVIEW,
-      amountUnit: NTZ,
       events: null,
-      investType: POWERUP,
-      investTour: false,
-      isFishWarned: false,
       proxy: null,
     });
   });

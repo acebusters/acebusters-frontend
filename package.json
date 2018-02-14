@@ -267,7 +267,6 @@
     "react-router-redux": "4.0.6",
     "react-router-scroll": "^0.4.3",
     "react-test-renderer": "^15.6.1",
-    "reactour": "1.6.2",
     "redux": "3.6.0",
     "redux-form": "^7.2.0",
     "redux-form-saga": "^0.1.0",

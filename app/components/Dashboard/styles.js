@@ -34,14 +34,7 @@ export const Text = styled.p`
   padding-left: 10px;
 `;
 
-// Wallet
-export const WalletContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-export const SendContainer = styled.div`
+export const ButtonGroup = styled.div`
   display: flex;
   justify-content: center;
 `;
@@ -67,18 +60,6 @@ export const Input = styled.input`
   width: 100%;
   border: 1px solid ${gray};
   border-radius: 4px;
-`;
-
-// Exchange
-export const ExchangeContainer = styled.div`
-  display: flex;
-  justify-content: center;
-`;
-
-// Overview
-export const ReceiveSection = styled.div`
-  display: flex;
-  flex-direction: column;
 `;
 
 // Balances
@@ -175,10 +156,6 @@ export const TabIcon = styled.i`
 export const TabTitle = styled.span`
   padding-bottom: 4px;
   font-weight: 400;
-`;
-
-export const Description = styled.div`
-  padding: 10px 0;
 `;
 
 export const Subtitle = styled.p`

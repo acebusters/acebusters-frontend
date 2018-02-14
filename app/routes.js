@@ -52,20 +52,6 @@ export default function createRoutes(store) {
 
   const dashboard = [
     {
-      path: 'wallet',
-      name: 'wallet',
-      getComponent(nextState, cb) {
-        const importModules = import('./containers/Dashboard/Wallet');
-        const renderRoute = loadModule(cb);
-
-        importModules.then((component) => {
-          renderRoute(component);
-        });
-
-        importModules.catch(errorLoading);
-      },
-    },
-    {
       path: 'advanced',
       name: 'advanced',
       getComponent(nextState, cb) {
@@ -79,60 +65,6 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     },
-    // {
-    //   path: 'exchange',
-    //   name: 'exchange',
-    //   getComponent(nextState, cb) {
-    //     const importModules = import('./containers/Dashboard/Exchange');
-    //     const renderRoute = loadModule(cb);
-
-    //     importModules.then((component) => {
-    //       renderRoute(component);
-    //     });
-
-    //     importModules.catch(errorLoading);
-    //   },
-    // },
-    // {
-    //   path: 'invest',
-    //   name: 'invest',
-    //   onEnter: (nextState, replace) => {
-    //     const { proxy } = selectAccount(store.getState()).toJS();
-    //     if (!investIsAvailable(proxy)) {
-    //       replace({ pathname: '/dashboard' });
-    //     }
-    //   },
-    //   getComponent(nextState, cb) {
-    //     const importModules = import('./containers/Dashboard/Invest');
-    //     const renderRoute = loadModule(cb);
-
-    //     importModules.then((component) => {
-    //       renderRoute(component);
-    //     });
-
-    //     importModules.catch(errorLoading);
-    //   },
-    //   indexRoute: {
-    //     getComponent(nextState, cb) {
-    //       const importModules = import('./containers/Dashboard/PowerUp');
-    //       const renderRoute = loadModule(cb);
-    //       importModules.then((component) => renderRoute(component));
-    //       importModules.catch(errorLoading);
-    //     },
-    //   },
-    //   childRoutes: [
-    //     {
-    //       path: 'powerDown',
-    //       name: 'powerDown',
-    //       getComponent(nextState, cb) {
-    //         const importModules = import('./containers/Dashboard/PowerDown');
-    //         const renderRoute = loadModule(cb);
-    //         importModules.then((component) => renderRoute(component));
-    //         importModules.catch(errorLoading);
-    //       },
-    //     },
-    //   ],
-    // },
   ];
 
   const simplePages = [

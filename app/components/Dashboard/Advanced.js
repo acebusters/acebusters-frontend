@@ -8,7 +8,7 @@ import {
   Pane,
   Section,
   Text,
-  SendContainer as ButtonGroup,
+  ButtonGroup,
   TabIcon as ModeIcon,
 } from './styles';
 

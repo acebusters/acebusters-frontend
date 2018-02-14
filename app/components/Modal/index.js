@@ -2,15 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import InviteDialog from '../../containers/InviteDialog';
 import JoinDialog from '../../containers/JoinDialog';
-import UpgradeDialog from '../../containers/UpgradeDialog';
 import ImportDialog from '../../containers/ImportDialog';
 import ExportDialog from '../../containers/ExportDialog';
 import LogoutDialog from '../../containers/LogoutDialog';
 import * as modals from '../../containers/Modal/constants';
 import ConfirmDialog from './ConfirmDialog';
 import SelectToken from './SelectToken';
-import FishWarningDialog from './FishWarningDialog';
-import DepositDialog from './DepositDialog';
 import ModalsTransitionGroup from './ModalsTransitionGroup';
 import { DialogTransitionGroup } from './DialogTransitionGroup';
 import { ContainerTransitionGroup } from './ContainerTransitionGroup';
@@ -26,12 +23,9 @@ import {
 
 const MODALS = {
   [modals.CONFIRM_DIALOG]: ConfirmDialog,
-  [modals.DEPOSIT_DIALOG]: DepositDialog,
-  [modals.FISH_WARNING_DIALOG]: FishWarningDialog,
   [modals.INVITE_DIALOG]: InviteDialog,
   [modals.JOIN_DIALOG]: JoinDialog,
   [modals.SELECT_TOKEN]: SelectToken,
-  [modals.UPGRADE_DIALOG]: UpgradeDialog,
   [modals.IMPORT_DIALOG]: ImportDialog,
   [modals.EXPORT_DIALOG]: ExportDialog,
   [modals.LOGOUT_DIALOG]: LogoutDialog,

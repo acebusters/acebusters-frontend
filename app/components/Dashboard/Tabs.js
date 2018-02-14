@@ -27,7 +27,7 @@ const Tabs = ({ tabs, disabledTabs }) => (
       }
 
       return (
-        <Tab name="tab" key={tab.name} data-tour={tab.name}>
+        <Tab name="tab" key={tab.name}>
           <Link
             to={tab.to}
             component={TabLink}

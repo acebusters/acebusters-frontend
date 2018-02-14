@@ -9,7 +9,8 @@ import Container from '../../components/Container';
 import Balances from '../../components/Dashboard/Balances';
 import Tabs from '../../components/Dashboard/Tabs';
 
-import { ADVANCED, OVERVIEW, WALLET, setActiveTab } from './actions';
+import { setActiveTab } from './actions';
+import { ADVANCED, OVERVIEW } from './constants';
 import messages from './messages';
 import { getActiveTab } from './selectors';
 
@@ -26,29 +27,11 @@ const TABS = [
     onlyActiveOnIndex: true,
   },
   {
-    name: WALLET,
-    title: <FormattedMessage {...messages[WALLET]} />,
-    to: '/dashboard/wallet',
-    icon: 'fa-money',
-  },
-  {
     name: ADVANCED,
     title: <FormattedMessage {...messages[ADVANCED]} />,
     to: '/dashboard/advanced',
     icon: 'fa-exclamation-triangle',
   },
-  // {
-  //   name: EXCHANGE,
-  //   title: <FormattedMessage {...messages[EXCHANGE]} />,
-  //   to: '/dashboard/exchange',
-  //   icon: 'fa-exchange',
-  // },
-  // {
-  //   name: INVEST,
-  //   title: <FormattedMessage {...messages[INVEST]} />,
-  //   to: '/dashboard/invest',
-  //   icon: 'fa-line-chart',
-  // },
 ];
 
 class DashboardRoot extends React.Component {
@@ -68,7 +51,6 @@ class DashboardRoot extends React.Component {
     const weiBalance = this.web3.eth.balance(account.signerAddr);
     const babzBalance = this.token.balanceOf(account.signerAddr);
 
-    // before crowdsale end, disable INVEST tab on production
     return (
       <Container>
         <Tabs

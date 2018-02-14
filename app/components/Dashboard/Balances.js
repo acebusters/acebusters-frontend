@@ -1,10 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {
-  toEth,
-  toNtz,
-} from '../../utils/amountFormatter';
+import { toEth, toNtz } from '../../utils/amountFormatter';
 
 import WithLoading from '../WithLoading';
 import GloryNumber from './GloryNumber';
