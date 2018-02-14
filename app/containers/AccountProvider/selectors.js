@@ -85,11 +85,6 @@ const makeSelectNetworkSupported = () => createSelector(
   (account) => account.get('isLocked') || account.get('onSupportedNetwork')
 );
 
-const makeSelectProxyAddr = () => createSelector(
-  selectAccount,
-  (account) => account.get('proxy')
-);
-
 const makeSelectWeb3MethodValue = (address, methodName, args = []) => createSelector(
   selectAccount,
   (account) => account.getIn([address, 'methods', getMethodKey({ methodName, args }), 'value']),
@@ -112,7 +107,6 @@ export {
   makeSignerAddrSelector,
   makeSelectAccountData,
   makeSelectPrivKey,
-  makeSelectProxyAddr,
   makeSelectEmail,
   makeSelectGenerated,
   makeSelectLoggedIn,

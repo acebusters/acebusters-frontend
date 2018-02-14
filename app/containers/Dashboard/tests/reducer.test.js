@@ -1,6 +1,6 @@
 import { fromJS } from 'immutable';
 import dashboardReducer from '../reducer';
-import { contractEvent, proxyEvent, proxyEvents } from '../../AccountProvider/actions';
+import { contractEvent } from '../../AccountProvider/actions';
 import { OVERVIEW } from '../constants';
 
 describe('dashboard reducer tests', () => {
@@ -8,7 +8,7 @@ describe('dashboard reducer tests', () => {
     expect(dashboardReducer(undefined, {}).toJS()).toEqual({
       activeTab: OVERVIEW,
       events: null,
-      proxy: null,
+      userAddr: null,
     });
   });
 
@@ -51,76 +51,10 @@ describe('dashboard reducer tests', () => {
       .toEqual(undefined);
   });
 
-  it('should handle proxy event', () => {
+  it('should get user address from action meta', () => {
     expect(dashboardReducer(
       fromJS({ events: null }),
-      proxyEvent({
-        event: 'Deposit',
-        address: '0x7c08ca8bef208ac8be8cd03ad15fbef643dd355c',
-        blockNumber: 582975,
-        transactionHash: '0x67ed561b9e1842016fda612d1940135465968cd3de0ea7008e7240347fe80bc1',
-        args: {
-          sender: '0x7caaca8bef208ac8be8cd03ad15fbef643dd355c',
-          value: '10000000',
-        },
-      })
-    )).toEqual(fromJS({
-      events: {
-        '0x67ed561b9e1842016fda612d1940135465968cd3de0ea7008e7240347fe80bc1': {
-          blockNumber: 582975,
-          transactionHash: '0x67ed561b9e1842016fda612d1940135465968cd3de0ea7008e7240347fe80bc1',
-          value: '10000000',
-          timestamp: undefined,
-          event: 'Deposit',
-          address: '0x7caaca8bef208ac8be8cd03ad15fbef643dd355c',
-          unit: 'eth',
-          type: 'income',
-        },
-      },
-    }));
-  });
-
-  it('should handle events with same transactionHash', () => {
-    const event = {
-      event: 'Deposit',
-      address: '0x7c08ca8bef208ac8be8cd03ad15fbef643dd355c',
-      blockNumber: 582975,
-      transactionHash: '0x67ed561b9e1842016fda612d1940135465968cd3de0ea7008e7240347fe80bc1',
-      args: {
-        sender: '0x7caaca8bef208ac8be8cd03ad15fbef643dd355c',
-        value: '10000000',
-      },
-    };
-    expect(dashboardReducer(
-      fromJS({
-        events: {
-          '0x67ed561b9e1842016fda612d1940135465968cd3de0ea7008e7240347fe80bc1': {
-          },
-        },
-      }),
-      proxyEvents([event, event])
-    )).toEqual(fromJS({
-      events: {
-        '0x67ed561b9e1842016fda612d1940135465968cd3de0ea7008e7240347fe80bc1': {
-        },
-        '0x67ed561b9e1842016fda612d1940135465968cd3de0ea7008e7240347fe80bc1-Deposit': {
-          blockNumber: 582975,
-          transactionHash: '0x67ed561b9e1842016fda612d1940135465968cd3de0ea7008e7240347fe80bc1',
-          value: '10000000',
-          timestamp: undefined,
-          event: 'Deposit',
-          address: '0x7caaca8bef208ac8be8cd03ad15fbef643dd355c',
-          unit: 'eth',
-          type: 'income',
-        },
-      },
-    }));
-  });
-
-  it('should get proxy address from action meta', () => {
-    expect(dashboardReducer(
-      fromJS({ events: null }),
-      proxyEvent({
+      contractEvent({
         event: 'Received',
         address: '0x7c08ca8bef208ac8be8cd03ad15fbef643dd355c',
         blockNumber: 582975,
@@ -130,14 +64,14 @@ describe('dashboard reducer tests', () => {
           value: '10000000',
         },
       }, '0x7caaca8bef208ac8be8cd03ad15fbef643dd355c')
-    ).get('proxy')).toEqual('0x7caaca8bef208ac8be8cd03ad15fbef643dd355c');
+    ).get('userAddr')).toEqual('0x7caaca8bef208ac8be8cd03ad15fbef643dd355c');
   });
 
   it('should handle nutz contract transfer event', () => {
     expect(dashboardReducer(
       fromJS({
         events: null,
-        proxy: '0x7c08ca8bef208ac8be8cd03ad15fbef643dd355c',
+        userAddr: '0x7c08ca8bef208ac8be8cd03ad15fbef643dd355c',
       }),
       contractEvent({
         event: 'Transfer',
@@ -163,7 +97,7 @@ describe('dashboard reducer tests', () => {
           type: 'income',
         },
       },
-      proxy: '0x7c08ca8bef208ac8be8cd03ad15fbef643dd355c',
+      userAddr: '0x7c08ca8bef208ac8be8cd03ad15fbef643dd355c',
     }));
   });
 });

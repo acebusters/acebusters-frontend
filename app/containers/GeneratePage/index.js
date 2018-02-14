@@ -23,7 +23,7 @@ import { getWeb3 } from '../../containers/AccountProvider/utils';
 import { ABI_PROXY } from '../../app.config';
 import { promisifyWeb3Call } from '../../utils/promisifyWeb3Call';
 
-import { walletExport, register, accountTxHashReceived } from './actions';
+import { walletExport, register } from './actions';
 
 const validate = (values) => {
   const errors = {};
@@ -195,7 +195,7 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
       })
       .then((txHash) => {
         if (txHash) {
-          this.props.onAccountTxHashReceived(txHash);
+          // this.props.onAccountTxHashReceived(txHash);
         }
         browserHistory.push('/login');
       });
@@ -309,7 +309,6 @@ export class GeneratePage extends React.Component { // eslint-disable-line react
 GeneratePage.propTypes = {
   ...propTypes,
   walletExport: PropTypes.func,
-  onAccountTxHashReceived: PropTypes.func,
   input: PropTypes.any,
 };
 
@@ -331,7 +330,6 @@ const throwSubmitError = (err) => {
 function mapDispatchToProps(dispatch) {
   return {
     walletExport: (...args) => dispatch(walletExport(...args)),
-    onAccountTxHashReceived: (...args) => dispatch(accountTxHashReceived(...args)),
     onEntropyUpdated: (data) => dispatch(change('register', 'entropy', data)),
   };
 }

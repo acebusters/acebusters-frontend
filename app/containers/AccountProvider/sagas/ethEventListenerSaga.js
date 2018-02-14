@@ -24,10 +24,10 @@ export function* ethEventListenerSaga(contract) {
     try {
       const event = yield take(chan);
       const state = yield select();
-      const proxy = state.getIn(['account', 'proxy']);
-      if (isUserEvent(proxy)(event)) {
+      const signerAddr = state.getIn(['account', 'signerAddr']);
+      if (isUserEvent(signerAddr)(event)) {
         const events = yield call(addEventsDate, [event]);
-        yield put(contractEvents(events, proxy));
+        yield put(contractEvents(events));
       }
     } catch (e) {} // eslint-disable-line no-empty
   }

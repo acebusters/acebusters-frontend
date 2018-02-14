@@ -51,16 +51,16 @@ export function addEventsDate(events) {
 
   return result;
 }
-export const isUserEvent = (proxyAddr) => (event) => {
+export const isUserEvent = (userAddr) => (event) => {
   const { args = {}, address } = event;
   return (
-    args.from === proxyAddr ||
-    args.purchaser === proxyAddr ||
-    args.seller === proxyAddr ||
-    args.sender === proxyAddr ||
-    args.owner === proxyAddr ||
-    args.spender === proxyAddr ||
-    args.to === proxyAddr ||
-    address === proxyAddr
+    args.from === userAddr ||
+    args.purchaser === userAddr ||
+    args.seller === userAddr ||
+    args.sender === userAddr ||
+    args.owner === userAddr ||
+    args.spender === userAddr ||
+    args.to === userAddr ||
+    address === userAddr
   );
 };

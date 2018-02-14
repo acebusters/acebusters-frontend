@@ -25,8 +25,6 @@ export const CONTRACT_TX_FAILED = 'acebusters/AccountProvider/CONTRACT_TX_FAILED
 export const CONTRACT_TX_MINED = 'acebusters/AccountProvider/CONTRACT_TX_MINED';
 export const CONTRACT_TX_APPEARED = 'acebusters/AccountProvider/CONTRACT_TX_APPEARED';
 
-export const PROXY_EVENTS = 'acebusters/AccountProvider/PROXY_EVENTS';
-
 export const CONTRACT_EVENTS = 'acebusters/AccountProvider/CONTRACT_EVENTS';
 
 export const WALLET_LOADED = 'acebusters/App/WALLET_LOADED';
@@ -153,18 +151,6 @@ export function contractMethodError({ address, key, payload }) {
   return { type: CONTRACT_METHOD_ERROR, address, key, payload };
 }
 
-export function proxyEvent(event, proxy) {
-  return proxyEvents([event], proxy);
-}
-
-export function proxyEvents(events, proxy) {
-  return {
-    type: PROXY_EVENTS,
-    payload: events,
-    meta: { proxy },
-  };
-}
-
 export function contractTxSend(payload) {
   return { type: CONTRACT_TX_SEND, payload };
 }
@@ -193,12 +179,12 @@ export function contractTxAppeared(txHash) {
   return { type: CONTRACT_TX_APPEARED, meta: { txHash } };
 }
 
-export function contractEvent(event, proxy) {
-  return contractEvents([event], proxy);
+export function contractEvent(event, userAddr) {
+  return contractEvents([event], userAddr);
 }
 
-export function contractEvents(events, proxy) {
-  return { type: CONTRACT_EVENTS, payload: events, meta: { proxy } };
+export function contractEvents(events, userAddr) {
+  return { type: CONTRACT_EVENTS, payload: events, meta: { userAddr } };
 }
 
 export function walletLoaded(wallet) {

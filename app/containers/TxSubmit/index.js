@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 
-import { makeSelectIsLocked, makeSelectProxyAddr, makeSelectCanSendTx } from '../AccountProvider/selectors';
+import { makeSelectIsLocked, makeSelectCanSendTx } from '../AccountProvider/selectors';
 import Alert from '../../components/Alert';
 import SubmitButton from '../../components/SubmitButton';
 import { makeCancelable } from '../../utils/makeCancelable';
@@ -166,7 +166,6 @@ class TxSubmit extends React.Component {
 
 const mapStateToProps = createStructuredSelector({
   isLocked: makeSelectIsLocked(),
-  proxyAddr: makeSelectProxyAddr(),
   canSendTx: makeSelectCanSendTx(),
 });
 

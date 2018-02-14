@@ -19,7 +19,6 @@ import {
   READY_STATE,
   WALLET_LOADED,
 } from './actions';
-import { ACCOUNT_TX_HASH_RECEIVED } from '../GeneratePage/constants';
 
 import { createBlocky } from '../../services/blockies';
 import { nickNameByAddress } from '../../services/nicknames';
@@ -62,9 +61,6 @@ function accountProviderReducer(state = initialState, action) {
 
     case NETWORK_SUPPORT_UPDATE:
       return state.set('onSupportedNetwork', action.payload);
-
-    case ACCOUNT_TX_HASH_RECEIVED:
-      return state.set('proxyTxHash', action.payload);
 
     case ACCOUNT_LOADED:
       if (action.payload.refs) {
@@ -110,7 +106,6 @@ function accountProviderReducer(state = initialState, action) {
               .delete('privKey')
               .delete('email')
               .delete('accountId')
-              .delete('proxy')
               .delete('generated')
               .set('blocky', null)
               .set('nickName', null)
@@ -124,7 +119,6 @@ function accountProviderReducer(state = initialState, action) {
           return newState
             .set('privKey', action.newAuthState.privKey)
             .set('accountId', action.newAuthState.accountId)
-            .set('proxy', action.newAuthState.proxyAddr)
             .set('generated', action.newAuthState.generated)
             .set('signerAddr', signer)
             .set('blocky', createBlocky(signer))

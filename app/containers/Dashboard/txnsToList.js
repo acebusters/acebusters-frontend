@@ -21,7 +21,7 @@ import {
 
 const confParams = conf();
 
-export function txnsToList(events, tableAddrs, proxyAddr) {
+export function txnsToList(events, tableAddrs, address) {
   if (!tableAddrs || !events) {
     return null;
   }
@@ -39,12 +39,12 @@ export function txnsToList(events, tableAddrs, proxyAddr) {
   return pending.concat(completed)
     .map((event) => [
       eventIcon(event),
-      formatTxAddress(event.address, tableAddrs, proxyAddr),
+      formatTxAddress(event.address, tableAddrs, address),
       formatDate(event.timestamp),
       infoIcon(event),
       formatValue(event),
       [
-        txDescription(event, tableAddrs, proxyAddr),
+        txDescription(event, tableAddrs, address),
         event.error && <Error key="err"> ({event.error})</Error>,
       ],
     ]);
@@ -63,7 +63,7 @@ function eventIcon(event) {
   return <TypeIcon>{typeIcons[event.type]}</TypeIcon>;
 }
 
-function formatTxAddress(address, tableAddrs, proxyAddr) {
+function formatTxAddress(address, tableAddrs, userAddr) {
   const economyAddrs = [confParams.pwrAddr, confParams.pullAddr, confParams.ntzAddr];
 
   if (economyAddrs.indexOf(address) > -1) {
@@ -77,7 +77,7 @@ function formatTxAddress(address, tableAddrs, proxyAddr) {
         }}
       />
     );
-  } else if (address === proxyAddr) {
+  } else if (address === userAddr) {
     return <FormattedMessage {...messages.me} />;
   }
 
@@ -115,7 +115,7 @@ function infoIcon(event) {
   );
 }
 
-function txDescription(event, tableAddrs, proxyAddr) {
+function txDescription(event, tableAddrs, address) {
   if (tableAddrs.indexOf(event.address) > -1) {
     return (
       <FormattedMessage
@@ -143,7 +143,7 @@ function txDescription(event, tableAddrs, proxyAddr) {
     return <FormattedMessage key="descr" {...messages.ethPayoutStatus} />;
   } else if (isSellEvent(event)) {
     return <FormattedMessage key="descr" {...messages.sellStatus} />;
-  } else if (isPurchaseEndEvent(event, proxyAddr)) {
+  } else if (isPurchaseEndEvent(event, address)) {
     return <FormattedMessage key="descr" {...messages.purchaseEnd} />;
   } else if (isPurchaseStartEvent(event)) {
     return <FormattedMessage key="descr" {...messages.purchaseStart} />;

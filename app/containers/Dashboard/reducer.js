@@ -3,7 +3,6 @@ import { fromJS, is } from 'immutable';
 import {
   ACCOUNT_LOADED,
   CONTRACT_EVENTS,
-  PROXY_EVENTS,
   CONTRACT_TX_SENDED,
   CONTRACT_TX_FAILED,
   SET_AUTH,
@@ -34,7 +33,7 @@ const confParams = conf();
  * }
  */
 const initialState = fromJS({
-  proxy: null,
+  userAddr: null,
   events: null,
   activeTab: OVERVIEW,
 });
@@ -47,8 +46,8 @@ function dashboardReducer(state = initialState, action) {
       return state.set('activeTab', action.whichTab);
 
     case ACCOUNT_LOADED:
-      if (action.payload.proxy) {
-        return state.set('proxy', action.payload.proxy);
+      if (action.payload.signerAddr) {
+        return state.set('userAddr', action.payload.signerAddr);
       }
       return state;
 
@@ -70,16 +69,10 @@ function dashboardReducer(state = initialState, action) {
     case MODAL_DISMISS:
       return state.set('failedTx', null);
 
-    case PROXY_EVENTS:
-      return payload.reduce(
-        composeReducers(addProxyContractEvent, completePending),
-        setProxy(initEvents(state), meta.proxy)
-      );
-
     case CONTRACT_EVENTS:
       return payload.reduce(
         composeReducers(addNutzContractEvent, completePending),
-        setProxy(initEvents(state), meta.proxy)
+        setUserAddr(initEvents(state), meta.userAddr)
       );
 
     case SET_AUTH:
@@ -87,7 +80,7 @@ function dashboardReducer(state = initialState, action) {
         .withMutations((newState) => {
           if (!action.newAuthState.loggedIn) {
             return newState
-              .set('proxy', null)
+              .set('userAddr', null)
               .set('failedTx', null)
               .set('events', null)
               .set('activeTab', OVERVIEW);
@@ -110,9 +103,9 @@ function initEvents(state) {
   return state;
 }
 
-function setProxy(state, proxy) {
-  if (proxy) {
-    return state.set('proxy', proxy);
+function setUserAddr(state, userAddr) {
+  if (userAddr) {
+    return state.set('userAddr', userAddr);
   }
 
   return state;
@@ -212,21 +205,10 @@ function hasConflict(state, newEvent) {
   return event && !is(event, newEvent);
 }
 
-function addProxyContractEvent(state, event) {
-  const isDeposit = event.event === 'Deposit';
-  const dashboardEvent = makeDashboardEvent(event, {
-    address: isDeposit ? event.args.sender : event.args.to,
-    unit: 'eth',
-    type: isDeposit ? 'income' : 'outcome',
-  });
-  const path = hasConflict(state, dashboardEvent) ? ['events', `${event.transactionHash}-${event.event}`] : ['events', event.transactionHash];
-
-  return state.setIn(path, dashboardEvent);
-}
 
 function transformNutzContractEvent(state, event) {
   if (event.event === 'Transfer') {
-    const isIncome = event.args.to === state.get('proxy');
+    const isIncome = event.args.to === state.get('userAddr');
 
     if (event.address === conf().pwrAddr) {
       if (isIncome) { // power up

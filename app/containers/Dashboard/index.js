@@ -14,7 +14,7 @@ import { ADVANCED, OVERVIEW } from './constants';
 import messages from './messages';
 import { getActiveTab } from './selectors';
 
-import { ABI_TOKEN_CONTRACT, ABI_POWER_CONTRACT, conf } from '../../app.config';
+import { ABI_TOKEN_CONTRACT, conf } from '../../app.config';
 
 const confParams = conf();
 
@@ -39,7 +39,6 @@ class DashboardRoot extends React.Component {
     super(props);
 
     this.token = this.web3.eth.contract(ABI_TOKEN_CONTRACT).at(confParams.ntzAddr);
-    this.power = this.web3.eth.contract(ABI_POWER_CONTRACT).at(confParams.pwrAddr);
   }
 
   get web3() {
