@@ -1,4 +1,5 @@
 import { call, put, select } from 'redux-saga/effects';
+import { delay } from 'redux-saga';
 import ethers from 'ethers';
 
 import { setAuthState, walletLoaded } from '../../AccountProvider/actions';
@@ -48,6 +49,7 @@ export function* walletSaga() {
   const babzBalance = yield call(balanceOf, wallet.address);
   const weiBalance = yield call(getBalance, wallet.address);
 
+  yield call(delay, 3000);
   if (
     babzBalance.lt(NTZ_DECIMALS.mul(200)) ||
     weiBalance.lt(ETH_DECIMALS.mul(0.03))
