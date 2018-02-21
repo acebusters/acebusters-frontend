@@ -1,7 +1,6 @@
 export const CONFIRM_DIALOG = 'CONFIRM_DIALOG';
 export const INVITE_DIALOG = 'INVITE_DIALOG';
 export const JOIN_DIALOG = 'JOIN_DIALOG';
-export const SELECT_TOKEN = 'SELECT_TOKEN';
 export const IMPORT_DIALOG = 'IMPORT_DIALOG';
 export const EXPORT_DIALOG = 'EXPORT_DIALOG';
 export const LOGOUT_DIALOG = 'LOGOUT_DIALOG';
