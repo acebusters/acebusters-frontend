@@ -31,7 +31,7 @@ export function conf() {
       ntzAddr: '0x652d4bd25fd0271bfef3bc9a5e720337d7d6b523',
       pwrAddr: '0xe2a24aec34ad4414bd9e4313cfda5f2e15c9cf0a',
       pullAddr: '0x681Db0fFB70F4509F6cF6217c83b7A817Ea8E7c6',
-      tableFactory: '0xD787e7eB682b77040431457422Dc1066f017A795',
+      tableFactory: '0x3aada141211d8b112c0012eda71157f6ed9aa799',
       sentryDSN: 'https://8c3e021848b247ddaf627c8040f94e07@sentry.io/153017',
       gaProperty: 'UA-98848213-1',
       gtmId: 'GTM-T7SBXCK',
