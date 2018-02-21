@@ -1,5 +1,4 @@
 export const SET_AUTH = 'acebusters/AccountProvider/SET_AUTH';
-export const ACCOUNT_LOADED = 'acebusters/AccountProvider/ACCOUNT_LOADED';
 export const ACCOUNT_UNLOCKED = 'acebusters/AccountProvider/ACCOUNT_UNLOCKED';
 export const INJECT_ACCOUNT_UPDATE = 'acebusters/AccountProvider/INJECT_ACCOUNT_UPDATE';
 export const NETWORK_SUPPORT_UPDATE = 'acebusters/AccountProvider/NETWORK_SUPPORT_UPDATE';
@@ -89,10 +88,6 @@ export function accountUnlocked() {
 
 export function updateInjectedAccount(account) {
   return { type: INJECT_ACCOUNT_UPDATE, payload: account };
-}
-
-export function accountLoaded(payload) {
-  return { type: ACCOUNT_LOADED, payload };
 }
 
 export function web3Error(err) {

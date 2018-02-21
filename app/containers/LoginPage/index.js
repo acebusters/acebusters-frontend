@@ -19,7 +19,6 @@ import { selectAccount } from '../AccountProvider/selectors';
 import { getWeb3 } from '../AccountProvider/utils';
 import { waitForTx } from '../../utils/waitForTx';
 import H1 from '../../components/H1';
-import { firstLogin } from '../Notifications/constants';
 
 import { ForgotField } from './styles';
 
@@ -86,7 +85,7 @@ export class LoginPage extends React.PureComponent { // eslint-disable-line reac
           // if user just created account, we need to ensure that proxy contract is deployed before continue login process
           const proxyTxHash = this.props.account.get('proxyTxHash');
           if (proxyTxHash) {
-            this.props.notifyAdd(firstLogin);
+            // firstLogin Notification
             return waitForTx(getWeb3(), proxyTxHash)
               .then(
                 () => data,

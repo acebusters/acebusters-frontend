@@ -1,7 +1,6 @@
 import { fromJS, is } from 'immutable';
 
 import {
-  ACCOUNT_LOADED,
   CONTRACT_EVENTS,
   CONTRACT_TX_SENDED,
   CONTRACT_TX_FAILED,
@@ -44,12 +43,6 @@ function dashboardReducer(state = initialState, action) {
   switch (action.type) {
     case SET_ACTIVE_TAB:
       return state.set('activeTab', action.whichTab);
-
-    case ACCOUNT_LOADED:
-      if (action.payload.signerAddr) {
-        return state.set('userAddr', action.payload.signerAddr);
-      }
-      return state;
 
     case CONTRACT_TX_SENDED:
       return addPending(
@@ -171,18 +164,6 @@ function addPending(state, { methodName, args, txHash, address }) {
         transactionHash: txHash,
       }),
     );
-  } else if (methodName === 'powerUp') {
-    return state.setIn(
-      path,
-      fromJS({
-        address: conf().pwrAddr,
-        value: args[0].toString ? args[0].toString() : args[0],
-        type: 'outcome',
-        unit: 'ntz',
-        pending: true,
-        transactionHash: txHash,
-      }),
-    );
   } else if (methodName === 'sell') {
     return state.setIn(
       path,
@@ -209,18 +190,6 @@ function hasConflict(state, newEvent) {
 function transformNutzContractEvent(state, event) {
   if (event.event === 'Transfer') {
     const isIncome = event.args.to === state.get('userAddr');
-
-    if (event.address === conf().pwrAddr) {
-      if (isIncome) { // power up
-        return makeDashboardEvent(event, {
-          address: conf().pwrAddr,
-          unit: 'abp',
-          type: 'income',
-        });
-      }
-
-      return null;
-    }
 
     return makeDashboardEvent(event, {
       address: isIncome ? event.args.from : event.args.to,

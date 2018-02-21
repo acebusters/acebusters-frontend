@@ -6,18 +6,11 @@ import BigNumber from 'bignumber.js';
 import A from '../../components/A';
 import WithLoading from '../../components/WithLoading';
 import { conf } from '../../app.config';
-import { formatEth, formatNtz, formatAbp } from '../../utils/amountFormatter';
+import { formatEth, formatNtz } from '../../utils/amountFormatter';
 
 import { Icon, TypeIcon, Error, ErrorIcon, typeIcons } from './styles';
 import messages from './messages';
-import {
-  isSellEvent,
-  isETHPayoutEvent,
-  isABPPayoutEvent,
-  isPurchaseStartEvent, isPurchaseEndEvent,
-  isPowerUpEvent,
-  formatDate,
-} from './utils';
+import { formatDate } from './utils';
 
 const confParams = conf();
 
@@ -85,7 +78,6 @@ function formatTxAddress(address, tableAddrs, userAddr) {
 }
 
 const formatters = {
-  abp: formatAbp,
   ntz: formatNtz,
   eth: formatEth,
 };
@@ -115,7 +107,8 @@ function infoIcon(event) {
   );
 }
 
-function txDescription(event, tableAddrs, address) {
+// eslint-disable-next-line consistent-return
+function txDescription(event, tableAddrs) {
   if (tableAddrs.indexOf(event.address) > -1) {
     return (
       <FormattedMessage
@@ -123,31 +116,5 @@ function txDescription(event, tableAddrs, address) {
         {...(event.type === 'income' ? messages.tableLeave : messages.tableJoin)}
       />
     );
-  } else if (isPowerUpEvent(event)) {
-    return 'Power Up';
-  } else if (isABPPayoutEvent(event)) {
-    return (
-      <FormattedMessage
-        key="descr"
-        {...messages.powerDownPayoutStatus}
-      />
-    );
-  } else if (event.address === confParams.pwrAddr && event.type === 'outcome') {
-    return (
-      <FormattedMessage
-        key="descr"
-        {...messages.powerUpStatus}
-      />
-    );
-  } else if (isETHPayoutEvent(event)) {
-    return <FormattedMessage key="descr" {...messages.ethPayoutStatus} />;
-  } else if (isSellEvent(event)) {
-    return <FormattedMessage key="descr" {...messages.sellStatus} />;
-  } else if (isPurchaseEndEvent(event, address)) {
-    return <FormattedMessage key="descr" {...messages.purchaseEnd} />;
-  } else if (isPurchaseStartEvent(event)) {
-    return <FormattedMessage key="descr" {...messages.purchaseStart} />;
   }
-
-  return <FormattedMessage key="descr" {...messages.transferStatus} />;
 }

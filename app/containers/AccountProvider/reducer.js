@@ -12,7 +12,6 @@ import {
   CONTRACT_TX_SEND,
   CONTRACT_TX_SENDED,
   CONTRACT_EVENTS,
-  ACCOUNT_LOADED,
   ACCOUNT_UNLOCKED,
   INJECT_ACCOUNT_UPDATE,
   NETWORK_SUPPORT_UPDATE,
@@ -61,17 +60,6 @@ function accountProviderReducer(state = initialState, action) {
 
     case NETWORK_SUPPORT_UPDATE:
       return state.set('onSupportedNetwork', action.payload);
-
-    case ACCOUNT_LOADED:
-      if (action.payload.refs) {
-        return state.set('refs', action.payload.refs);
-      }
-
-      return (
-        state
-          .set('isLocked', action.payload.isLocked)
-          .set('owner', action.payload.owner)
-      );
 
     case WEB3_METHOD_SUCCESS:
       return state.setIn(['web3', 'methods', action.key], fromJS(action.payload));

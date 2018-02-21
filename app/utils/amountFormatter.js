@@ -11,8 +11,6 @@ export const ETH_DECIMALS = new BigNumber(10).pow(18);
 // 1 x 10^0 - Babz
 export const NTZ_DECIMALS = new BigNumber(10).pow(12);
 
-export const ABP_DECIMALS = new BigNumber(10).pow(12);
-
 export const babz = (ntz) => NTZ_DECIMALS.mul(ntz);
 
 export const bn = (amount) => (typeof amount === 'object' && amount !== null) ? amount : new BigNumber(amount || 0);
@@ -31,7 +29,6 @@ export function formatAmount(decimals, amount, dp) {
 export const toEth = toAmount.bind(null, ETH_DECIMALS);
 export const toNtz = toAmount.bind(null, NTZ_DECIMALS);
 export const formatNtz = (amount, dp = 0) => formatAmount(NTZ_DECIMALS, amount, dp);
-export const formatAbp = (amount, dp = 3) => formatAmount(ABP_DECIMALS, amount, dp);
 export const formatEth = formatAmount.bind(null, ETH_DECIMALS);
 
 // only allow digits and one dot
