@@ -8,7 +8,6 @@ import DashboardFrame from './components/Frames/Dashboard';
 import { getAsyncInjectors } from './utils/asyncInjectors';
 import { accountSaga } from './containers/AccountProvider/sagas';
 import { tableStateSaga } from './containers/Table/sagas';
-import { selectAccount } from './containers/AccountProvider/selectors';
 import { notificationsSaga } from './containers/Notifications/sagas';
 import { actionBarSaga } from './containers/ActionBar/sagas';
 import { tableMenuSaga } from './containers/TableMenu/sagas';
@@ -25,21 +24,6 @@ const loadModule = (cb) => (componentModule) => {
 export default function createRoutes(store) {
   // create reusable async injectors using getAsyncInjectors factory
   const { injectReducer, injectSagas } = getAsyncInjectors(store);
-
-  /**
-  * Checks authentication status on route change
-  * @param  {object}   nextState The state we want to change into when we change routes
-  * @param  {function} replace Function provided by React Router to replace the location
-  */
-  const checkAuth = (nextState, replace) => {
-    const { loggedIn } = selectAccount(store.getState()).toJS();
-    if (!loggedIn) {
-      replace({
-        pathname: '/login',
-        state: { nextPathname: nextState.location.pathname },
-      });
-    }
-  };
 
   injectSagas([
     accountSaga,
@@ -94,7 +78,6 @@ export default function createRoutes(store) {
       },
     },
     {
-      onEnter: checkAuth,
       path: 'dashboard',
       name: 'dashboard',
       indexRoute: {
@@ -127,85 +110,6 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
       childRoutes: dashboard,
-    },
-    {
-      path: 'login',
-      name: 'login',
-      getComponent(nextState, cb) {
-        const importModules = Promise.all([
-          import('containers/LoginPage/sagas'),
-          import('containers/LoginPage'),
-        ]);
-        const renderRoute = loadModule(cb);
-
-        importModules.then(([sagas, component]) => {
-          injectSagas(sagas.default);
-          renderRoute(component);
-        });
-
-        importModules.catch(errorLoading);
-      },
-    },
-    {
-      path: 'register(/ref/:refCode)',
-      name: 'register',
-      getComponent(nextState, cb) {
-        const importModules = Promise.all([
-          import('containers/RegisterPage/sagas'),
-          import('containers/RegisterPage'),
-        ]);
-        const renderRoute = loadModule(cb);
-
-        importModules.then(([sagas, component]) => {
-          injectSagas(sagas.default);
-          renderRoute(component);
-        });
-
-        importModules.catch(errorLoading);
-      },
-    },
-    {
-      path: 'reset',
-      name: 'reset',
-      getComponent(nextState, cb) {
-        const importModules = Promise.all([
-          import('containers/ResetPage'),
-        ]);
-        const renderRoute = loadModule(cb);
-
-        importModules.then(([component]) => {
-          renderRoute(component);
-        });
-
-        importModules.catch(errorLoading);
-      },
-    },
-    {
-      path: 'generate/:confCode',
-      name: 'generate',
-      getComponent(nextState, cb) {
-        const importModules = Promise.all([
-          import('containers/GeneratePage/sagas'),
-          import('containers/GeneratePage'),
-        ]);
-        const renderRoute = loadModule(cb);
-
-        importModules.then(([sagas, component]) => {
-          injectSagas(sagas.default);
-          renderRoute(component);
-        });
-
-        importModules.catch(errorLoading);
-      },
-    },
-    {
-      path: 'confirm',
-      name: 'confirmPage',
-      getComponent(location, cb) {
-        import('containers/ConfirmPage')
-          .then(loadModule(cb))
-          .catch(errorLoading);
-      },
     },
     {
       path: '*',

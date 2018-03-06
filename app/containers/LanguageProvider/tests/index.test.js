@@ -9,8 +9,6 @@ import configureStore from '../../../store';
 
 import { translationMessages } from '../../../i18n';
 
-jest.mock('../../../workers.js', () => []);
-
 const messages = defineMessages({
   someMessage: {
     id: 'some.id',

@@ -2,8 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import { browserHistory } from 'react-router';
-import { setAuthState } from '../AccountProvider/actions';
 
 import {
   makeSelectOpen,
@@ -42,10 +40,6 @@ TableMenuContainer.propTypes = {
 };
 
 const mapDispatchToProps = (dispatch) => ({
-  handleClickLogout: () => {
-    browserHistory.push('/login');
-    return dispatch(setAuthState({ loggedIn: false }));
-  },
   toggleMenuOpen: () => dispatch(toggleMenuOpen()),
   toggleMenuActive: () => dispatch(toggleMenuActive()),
   handleClickMuteToggle: (toMute) => dispatch(toMute ? mute() : unmute()),

@@ -10,7 +10,7 @@ import { makeSelectLoggedIn } from '../AccountProvider/selectors';
 import Notifications from '../../components/Notifications';
 
 const NotificationsContainer = ({ location: { pathname }, ...props }) => {
-  const showNotifications = pathname.match(/table|lobby|dashboard|login/);
+  const showNotifications = pathname.match(/table|lobby|dashboard/);
   const isTable = pathname.match('table');
   if (showNotifications) {
     return <Notifications isNotTable={!isTable} {...props} />;

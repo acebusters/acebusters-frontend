@@ -14,8 +14,6 @@ import {
   getAsyncInjectors,
 } from '../asyncInjectors';
 
-jest.mock('workers.js', () => []);
-
 // Fixtures
 
 const initialState = fromJS({ reduced: 'soon' });

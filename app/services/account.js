@@ -9,26 +9,12 @@ function uuid(a) {
 };
 /* eslint-enable */
 
-export function login(email) {
-  return request('post', 'query', { email });
-}
-
 export function unlock(unlockRequest) {
   return request('get', `unlock/${encodeURIComponent(unlockRequest)}`);
 }
 
 export function checkReferral(code) {
   return request('get', code ? `referral/${encodeURIComponent(code)}` : 'referral/');
-}
-
-export function register(email, recapResponse, origin, refCode) {
-  const accountId = uuid();
-  return request('post', `account/${accountId}`, {
-    email,
-    recapResponse,
-    origin,
-    refCode,
-  });
 }
 
 export function resendEmail(email, origin) {
@@ -52,14 +38,6 @@ export function addWallet(sessionReceipt, wallet, proxyAddr) {
     sessionReceipt,
     wallet: JSON.stringify(wallet),
     proxyAddr,
-  });
-}
-
-export function reset(email, recapResponse, origin) {
-  return request('post', 'reset', {
-    email,
-    recapResponse,
-    origin,
   });
 }
 

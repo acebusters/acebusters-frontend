@@ -9,7 +9,6 @@ import createSagaMiddleware from 'redux-saga';
 
 import createReducer from './reducers';
 import { formActionSaga } from './services/reduxFormSaga';
-import workers from './workers';
 
 const sagaMiddleware = createSagaMiddleware();
 
@@ -18,7 +17,6 @@ export default function configureStore(initialState = {}, history) {
   // 1. sagaMiddleware: Makes redux-sagas work
   // 2. routerMiddleware: Syncs the location/URL path to the state
   const middlewares = [
-    ...workers,
     sagaMiddleware,
     routerMiddleware(history),
   ];
@@ -65,4 +63,3 @@ export default function configureStore(initialState = {}, history) {
 
   return store;
 }
-
