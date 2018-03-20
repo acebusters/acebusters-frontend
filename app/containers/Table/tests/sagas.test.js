@@ -36,7 +36,7 @@ describe('Saga Tests', () => {
     const hand = {
       state: 'waiting',
       dealer: 0,
-      sb: babz(50),
+      sb: babz(500),
       handId: 1,
       lineup: [{
         address: PLAYER1.address,
@@ -54,7 +54,10 @@ describe('Saga Tests', () => {
         privKey: PLAYER2.key,
       },
       table: {
-        [tableAddr]: { data: { smallBlind: babz(500) } },
+        [tableAddr]: {
+          data: { smallBlind: babz(500) },
+          1: hand,
+        },
       },
     });
 
@@ -76,6 +79,7 @@ describe('Saga Tests', () => {
       state: 'waiting',
       dealer: 0,
       handId: 1,
+      sb: babz(500),
       lineup: [{
         address: PLAYER1.address,
       }, {
@@ -89,7 +93,10 @@ describe('Saga Tests', () => {
         privKey: PLAYER1.key,
       },
       table: {
-        [tableAddr]: { data: { smallBlind: babz(500) } },
+        [tableAddr]: {
+          data: { },
+          1: hand,
+        },
       },
     });
 
@@ -111,7 +118,7 @@ describe('Saga Tests', () => {
       state: 'dealing',
       dealer: 0,
       handId: 1,
-      sb: babz(50),
+      sb: babz(500),
       lineup: [{
         address: PLAYER1.address,
       }, {
@@ -129,7 +136,10 @@ describe('Saga Tests', () => {
         privKey: PLAYER3.key,
       },
       table: {
-        [tableAddr]: { data: { smallBlind: babz(500) } },
+        [tableAddr]: {
+          data: { smallBlind: babz(500) },
+          1: hand,
+        },
       },
     });
 

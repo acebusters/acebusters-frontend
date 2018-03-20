@@ -179,6 +179,7 @@ export default function tableReducer(state = initialState, action) {
         let hand = Map({
           dealer: action.hand.dealer,
           state: action.hand.state,
+          sb: action.hand.sb,
           cards: List(action.hand.cards),
           changed: action.hand.changed,
           distribution: action.hand.distribution,
@@ -195,11 +196,11 @@ export default function tableReducer(state = initialState, action) {
         let messages = storageService.getItem(`messages${action.tableAddr}`) || [];
         const min15ago = Date.now() - (60 * 15 * 1000);
         messages = messages.filter((message) => message.created > min15ago);
-        return state.setIn([action.tableAddr, action.hand.handId.toString()], hand)
+        return state.setIn([action.tableAddr, handIdStr], hand)
           .setIn([action.tableAddr, 'messages'], List(messages));
       }
 
-      let hand = table.get(action.hand.handId.toString());
+      let hand = table.get(handIdStr);
 
       const sitoutInProgress = hand.getIn(['sitoutInProgress']);
       if (action.hand.lineup && action.hand.lineup[sitoutInProgress] && sitoutInProgress !== undefined) {
@@ -244,6 +245,7 @@ export default function tableReducer(state = initialState, action) {
         }
         hand = hand.set('lastRoundMaxBet', maxBet);
         hand = hand.set('state', action.hand.state);
+        hand = hand.set('sb', action.hand.sb);
         hand = hand.set('dealer', action.hand.dealer);
         hand = hand.set('changed', action.hand.changed);
         if (action.hand.cards && action.hand.cards.length > 0) {
@@ -265,10 +267,11 @@ export default function tableReducer(state = initialState, action) {
           hand = hand.setIn(['lineup', j], Map(action.hand.lineup[j]));
         }
       }
-      if (table.get(action.hand.handId.toString()) === hand) {
+
+      if (table.get(handIdStr) === hand) {
         return state;
       }
-      return state.setIn([action.tableAddr, action.hand.handId.toString()], hand);
+      return state.setIn([action.tableAddr, handIdStr], hand);
     }
 
     default:

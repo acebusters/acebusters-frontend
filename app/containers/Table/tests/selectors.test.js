@@ -29,7 +29,7 @@ const PROPS = {
 describe('makeTableStakesSelector', () => {
   const mockedState = fromJS({
     table: {
-      [TBL_ADDR]: { data: { smallBlind: 2 } },
+      [TBL_ADDR]: { 1: { sb: 2 } },
     },
   });
   const tableStakes = {
@@ -625,9 +625,9 @@ describe('sitout Selector', () => {
       table: {
         [TBL_ADDR]: {
           data: {
-            smallBlind: 50,
           },
           2: {
+            sb: 50,
             state: 'flop',
             lineup: [{
               address: PLAYER1.address,
@@ -662,9 +662,9 @@ describe('sitout Selector', () => {
       table: {
         [TBL_ADDR]: {
           data: {
-            smallBlind: 50,
           },
           2: {
+            sb: 50,
             state: 'waiting',
             lineup: [{
               address: PLAYER1.address,
@@ -698,9 +698,9 @@ describe('sitout Selector', () => {
       table: {
         [TBL_ADDR]: {
           data: {
-            smallBlind: 50,
           },
           2: {
+            sb: 50,
             state: 'waiting',
             lineup: [{
               address: PLAYER1.address,
@@ -733,9 +733,9 @@ describe('sitout Selector', () => {
       table: {
         [TBL_ADDR]: {
           data: {
-            smallBlind: 50,
           },
           2: {
+            sb: 50,
             state: 'flop',
             lineup: [{
               address: PLAYER1.address,

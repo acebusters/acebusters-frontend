@@ -499,9 +499,9 @@ describe('makeSeatStatusSelector', () => {
         table: {
           [TBL_ADDR]: {
             data: {
-              smallBlind: 50,
             },
             0: {
+              sb: 50,
               state: 'preflop',
               dealer: 0,
               lineup: [{
@@ -534,9 +534,9 @@ describe('makeSeatStatusSelector', () => {
         table: {
           [TBL_ADDR]: {
             data: {
-              smallBlind: 50,
             },
             2: {
+              sb: 50,
               state: 'preflop',
               dealer: 0,
               lineup: [{
@@ -569,9 +569,9 @@ describe('makeSeatStatusSelector', () => {
         table: {
           [TBL_ADDR]: {
             data: {
-              smallBlind: 50,
             },
             0: {
+              sb: 50,
               state: 'preflop',
               dealer: 0,
               lineup: [{
@@ -604,9 +604,9 @@ describe('makeSeatStatusSelector', () => {
         table: {
           [TBL_ADDR]: {
             data: {
-              smallBlind: 50,
             },
             1: {
+              sb: 50,
               state: 'preflop',
               dealer: 0,
               lineup: [{
@@ -638,9 +638,9 @@ describe('makeSeatStatusSelector', () => {
         table: {
           [TBL_ADDR]: {
             data: {
-              smallBlind: 50,
             },
             1: {
+              sb: 50,
               state: 'preflop',
               dealer: 0,
               lineup: [{
@@ -672,9 +672,9 @@ describe('makeSeatStatusSelector', () => {
         table: {
           [TBL_ADDR]: {
             data: {
-              smallBlind: 50,
             },
             1: {
+              sb: 50,
               state: 'preflop',
               dealer: 0,
               lineup: [{
@@ -706,9 +706,9 @@ describe('makeShowStatusSelector', () => {
       table: {
         [TBL_ADDR]: {
           data: {
-            smallBlind: babz(50).toNumber(),
           },
           0: {
+            sb: babz(50).toNumber(),
             state: 'preflop',
             dealer: 0,
             lineup: [{
@@ -738,10 +738,9 @@ describe('makeShowStatusSelector', () => {
     const mockedState = fromJS({
       table: {
         [TBL_ADDR]: {
-          data: {
-            smallBlind: babz(50).toNumber(),
-          },
+          data: {},
           0: {
+            sb: babz(50).toNumber(),
             state: 'preflop',
             dealer: 0,
             lineup: [{
@@ -771,9 +770,9 @@ describe('makeShowStatusSelector', () => {
       table: {
         [TBL_ADDR]: {
           data: {
-            smallBlind: 50,
           },
           3: {
+            sb: 50,
             state: 'flop',
             dealer: 0,
             lineup: [{
@@ -803,9 +802,9 @@ describe('makeShowStatusSelector', () => {
       table: {
         [TBL_ADDR]: {
           data: {
-            smallBlind: 50,
           },
           3: {
+            sb: 50,
             state: 'flop',
             dealer: 0,
             lineup: [{
@@ -835,9 +834,9 @@ describe('makeShowStatusSelector', () => {
       table: {
         [TBL_ADDR]: {
           data: {
-            smallBlind: 50,
           },
           3: {
+            sb: 50,
             state: 'flop',
             lastRoundMaxBet: babz(100),
             dealer: 0,
@@ -868,9 +867,9 @@ describe('makeShowStatusSelector', () => {
       table: {
         [TBL_ADDR]: {
           data: {
-            smallBlind: 50,
           },
           3: {
+            sb: 50,
             state: 'flop',
             lastRoundMaxBet: 100,
             dealer: 0,

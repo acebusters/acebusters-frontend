@@ -71,6 +71,7 @@ import {
   makeSelectWinners,
   makeMyLastReceiptSelector,
   makeTableLoadingStateSelector,
+  makeSbSelector,
 } from './selectors';
 
 import TableComponent from '../../components/Table';
@@ -481,7 +482,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
     if (this.state.notFound) {
       return <NotFoundPage />;
     }
-    const { data } = this.props;
     const lineup = this.props.lineup ? this.props.lineup.toJS() : null;
 
     return (
@@ -508,7 +508,7 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           <TableComponent
             {...this.props}
             id="table"
-            sb={(data && data.get('smallBlind')) || 0}
+            sb={this.props.sb || 0}
             winners={this.props.winners}
             myHand={this.props.myHand}
             pending={(lineup && lineup[this.props.myPos]) ? lineup[this.props.myPos].pending : false}
@@ -550,6 +550,7 @@ const mapStateToProps = createStructuredSelector({
   board: makeBoardSelector(),
   data: makeTableDataSelector(),
   hand: makeHandSelector(),
+  sb: makeSbSelector(),
   prevHand: makePrevHandSelector(),
   isMyTurn: makeIsMyTurnSelector(),
   lineup: makeLineupSelector(),
@@ -592,6 +593,7 @@ Table.propTypes = {
   data: PropTypes.any,
   myPos: PropTypes.any,
   potSize: PropTypes.number,
+  sb: PropTypes.number,
   modalAdd: PropTypes.func,
   setPending: PropTypes.func,
   setExitHand: PropTypes.func,

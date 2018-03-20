@@ -6,7 +6,8 @@ import { createStructuredSelector } from 'reselect';
 import Button from 'components/Button';
 import Link from 'components/Link';
 
-import { makeSelectTableData, makeSelectTableLastHandId } from './selectors';
+import { makeSelectTableData } from './selectors';
+import { makeHandSelector, makeLatestHandSelector } from '../Table/selectors';
 import { formatNtz } from '../../utils/amountFormatter';
 import { tableNameByAddress } from '../../services/tableNames';
 
@@ -28,15 +29,15 @@ const ADDR_EMPTY = '0x0000000000000000000000000000000000000000';
 class LobbyItem extends React.PureComponent { // eslint-disable-line
 
   render() {
-    const { data, tableAddr, lastHandId } = this.props;
-    if (!data || !data.seats) {
+    const { data, tableAddr, hand, latestHandId } = this.props;
+    if (!data || !data.seats || !hand) {
       return (<tr />);
     }
     const players = data.seats.filter((seat) => (
       seat && seat.address &&
       seat.address.length >= 40 && seat.address !== ADDR_EMPTY
     )).length;
-    const sb = data.smallBlind;
+    const sb = hand.get('sb');
     const bb = sb * 2;
 
     return (
@@ -51,7 +52,7 @@ class LobbyItem extends React.PureComponent { // eslint-disable-line
         </Td>
         <Td key="sb">{formatNtz(sb)} NTZ / {formatNtz(bb)} NTZ</Td>
         <Td key="np">{`${players}/${data.seats.length}`}</Td>
-        <Td key="lh">{lastHandId}</Td>
+        <Td key="lh">{latestHandId}</Td>
         <Td key="ac">
           <Link
             to={`/table/${tableAddr}`}
@@ -67,12 +68,14 @@ class LobbyItem extends React.PureComponent { // eslint-disable-line
 LobbyItem.propTypes = {
   tableAddr: PropTypes.string,
   data: PropTypes.object,
-  lastHandId: PropTypes.number,
+  hand: PropTypes.object,
+  latestHandId: PropTypes.number,
 };
 
 const mapStateToProps = createStructuredSelector({
   data: makeSelectTableData(),
-  lastHandId: makeSelectTableLastHandId(),
+  hand: makeHandSelector(),
+  latestHandId: makeLatestHandSelector(),
 });
 
 export default connect(mapStateToProps)(LobbyItem);

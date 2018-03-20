@@ -15,13 +15,21 @@ const rc = new ReceiptCache();
 const pokerHelper = new PokerHelper(rc);
 
 // direct selectors to state
-export const tableStateSelector = (state, props) => (state && props) ? state.getIn(['table', props.params.tableAddr]) : null;
+export const tableStateSelector = (state, props) => {
+  if (state && props) {
+    const tableAddr = props.tableAddr || props.params.tableAddr;
+    return state.getIn(['table', tableAddr]);
+  }
+
+  return null;
+};
 
 export const handSelector = (state, props) => {
   if (state && props) {
+    const tableAddr = props.tableAddr || props.params.tableAddr;
     const handId = props.latestHand || makeLatestHandSelector()(state, props);
     if (handId !== null) {
-      return state.getIn(['table', props.params.tableAddr, String(handId)]);
+      return state.getIn(['table', tableAddr, String(handId)]);
     }
   }
 
@@ -203,12 +211,12 @@ export const makePrevHandSelector = () => createSelector(
 );
 
 export const makeSbSelector = () => createSelector(
-  [makeTableDataSelector()],
-  (data) => {
-    if (!data || typeof data.get('smallBlind') === 'undefined') {
+  [handSelector],
+  (hand) => {
+    if (!hand || typeof hand.get('sb') === 'undefined') {
       return null;
     }
-    return data.get('smallBlind');
+    return hand.get('sb');
   }
 );
 
