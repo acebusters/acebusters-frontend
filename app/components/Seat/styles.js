@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
 import {
   infoBgInverse,
@@ -130,6 +130,11 @@ export const StatusWrapper = styled.div`
   background-color: none;
 `;
 
+const hideStatus = keyframes`
+  from { transform: translate(0, 0); }
+  to { transform: translate(0, -16px); }
+`;
+
 export const StatusActionStyle = styled(SharedLower)`
   padding-top: 0;
   padding-left: ${scaleSeat(10)};
@@ -142,6 +147,15 @@ export const StatusActionStyle = styled(SharedLower)`
   color: ${(props) => alertColor(props.type)};
   background: ${(props) => alertBg(props.type, 'solid')};
   opacity: ${(props) => props.recent ? 1 : 0.4};
+  animation: ${hideStatus} 0.3s;
+  animation-delay: 4s;
+  animation-fill-mode: backwards;
+  transform: translate(0, -16px);
+  transition: transform 0.3s;
+
+  ${SeatWrapper}:hover & {
+    transform: translate(0, 0);
+  }
 `;
 
 export const StatusSeatWrapper = styled.div`

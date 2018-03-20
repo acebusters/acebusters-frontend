@@ -26,7 +26,7 @@ const StatusAction = ({
   // if seat has a status, show action status
   if (!isEmpty(showStatus)) {
     return (
-      <StatusWrapper>
+      <StatusWrapper key={showStatus.msg}>
         <StatusActionStyle
           name="status-action-style"
           type={showStatus.style}
