@@ -63,9 +63,13 @@ export const Table = styled.table`
     background-color: rgba(0, 0, 0, 0.1);
   }
 
-  tbody td:nth-child(${({ columns = 2 }) => `${columns}n + 1`}):not(:last-child),
-  tbody th {
+  tbody td:nth-child(${({ columns = 2, headerColumns = 1 }) => `${columns}n + ${headerColumns}`}):not(:last-child) {
     border-right: 1px solid #ccc;
+  }
+
+  tbody th ~ th + td,
+  tbody th:first-child + td {
+    border-left: 1px solid #ccc;
   }
 
   tfoot tr:first-child {

@@ -21,6 +21,10 @@ function getLineup(contract) {
   });
 }
 
+function getSmallBlind(contract) {
+  return promisifyWeb3Call(contract.smallBlind.call)().then((sb) => sb.toNumber());
+}
+
 function getIns(contract, handId, lineup) {
   const getIn = promisifyWeb3Call(contract.getIn.call);
   return Promise.all(lineup.map(({ address }) => {
@@ -66,10 +70,12 @@ function handsRange(handA, handB) {
 export function loadContractData(contract) {
   return Promise.all([
     getLineup(contract),
+    getSmallBlind(contract),
     getLastNettingRequestHandId(contract),
     getLastNettingRequestTime(contract),
   ]).then(([
     { lineup, lastHandNetted },
+    smallBlind,
     lastNettingRequestHandId,
     lastNettingRequestTime,
   ]) => {
@@ -83,6 +89,7 @@ export function loadContractData(contract) {
     return Promise.all(promises)
       .then((results) => ({
         lineup,
+        smallBlind,
         hands: hands.reduce((memo, handId, i) => ({
           ...memo,
           [handId]: { ins: results[i * 2], outs: results[(i * 2) + 1] },

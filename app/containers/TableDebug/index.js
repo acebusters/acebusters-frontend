@@ -92,6 +92,10 @@ class TableDebug extends React.Component {
       <div>
         <ul>
           <li>
+            <strong>Small blind: </strong>
+            {renderNtz(contractData.smallBlind)} NTZ
+          </li>
+          <li>
             <strong>lastHandNetted: </strong>
             {contractData.lastHandNetted.toString()}
           </li>
@@ -157,15 +161,17 @@ class TableDebug extends React.Component {
 
     return (
       <div>
-        <Table columns={3}>
+        <Table headerColumns={2} columns={3}>
           <thead>
             <tr>
               <th>Hand</th>
+              <th>SB</th>
               {hands[0].lineup.map(({ address }, j) =>
                 <th key={j} colSpan={3} title={address}>Seat {j}</th>
               )}
             </tr>
             <tr>
+              <td />
               <td />
               {hands[0].lineup.reduce((memo, seat, j) => memo.concat([
                 <th key={j * 3}>
@@ -187,6 +193,7 @@ class TableDebug extends React.Component {
                   {hand.handId}
                   <ExtraDetail>{hand.state}</ExtraDetail>
                 </th>
+                <th>{renderNtz(hand.sb)}</th>
                 {hand.lineup.reduce((memo, seat, j) => {
                   const receipt = seat.last && Receipt.parse(seat.last);
                   return memo.concat([
