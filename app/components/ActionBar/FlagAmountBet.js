@@ -14,10 +14,16 @@ class FlagAmountBet extends React.Component {
   constructor(props) {
     super(props);
 
+    this.handleBlur = this.handleBlur.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleKeyUp = this.handleKeyUp.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleRef = this.handleRef.bind(this);
+
+    this.state = {
+      amount: props.amount,
+      touched: false,
+    };
   }
 
   componentWillReceiveProps(nextProps) {
@@ -26,10 +32,18 @@ class FlagAmountBet extends React.Component {
         this.input.focus();
       }, 1000);
     }
+
+    if (nextProps.amount !== this.props.amount) {
+      this.setState({
+        amount: nextProps.amount,
+        touched: false,
+      });
+    }
   }
 
   handleKeyDown(e) {
-    const { sb, amount } = this.props;
+    const { sb } = this.props;
+    const { amount } = this.state;
 
     switch (e.keyCode) { // eslint-disable-line default-case
       case 38: // ↑
@@ -48,14 +62,22 @@ class FlagAmountBet extends React.Component {
     const { handleClickButton, setActionBarButtonActive, mode, active, disabled } = this.props;
 
     if (e.keyCode === 13) { // Enter
+      this.handleUpdate(NTZ_DECIMALS.mul(Number(this.state.amount)));
       if (!active || disabled || mode === BET) return;
       setActionBarButtonActive(BET);
       handleClickButton(BET);
     }
   }
 
+  handleBlur() {
+    this.handleUpdate(NTZ_DECIMALS.mul(Number(this.state.amount)));
+  }
+
   handleChange(e) {
-    this.handleUpdate(NTZ_DECIMALS.mul(Number(e.target.value)));
+    this.setState({
+      amount: e.target.value,
+      touched: true,
+    });
   }
 
   handleUpdate(amount) {
@@ -74,7 +96,8 @@ class FlagAmountBet extends React.Component {
   }
 
   render() {
-    const { amount, sliderOpen, sb } = this.props;
+    const { sliderOpen, sb } = this.props;
+    const { amount, touched } = this.state;
 
     return (
       <FlagBet sliderOpen={sliderOpen}>
@@ -84,10 +107,11 @@ class FlagAmountBet extends React.Component {
         <input
           ref={this.handleRef}
           type="number"
-          value={formatNtz(amount)}
-          onChange={this.handleChange}
+          value={touched ? amount : formatNtz(amount)}
+          onBlur={this.handleBlur}
           onKeyUp={this.handleKeyUp}
           onKeyDown={this.handleKeyDown}
+          onChange={this.handleChange}
         />
         <button onClick={() => this.handleUpdate(amount + (sb * 2))}>
           +
