@@ -161,16 +161,18 @@ class TableDebug extends React.Component {
 
     return (
       <div>
-        <Table headerColumns={2} columns={3}>
+        <Table headerColumns={3} columns={3}>
           <thead>
             <tr>
               <th>Hand</th>
               <th>SB</th>
+              <th>Start</th>
               {hands[0].lineup.map(({ address }, j) =>
                 <th key={j} colSpan={3} title={address}>Seat {j}</th>
               )}
             </tr>
             <tr>
+              <td />
               <td />
               <td />
               {hands[0].lineup.reduce((memo, seat, j) => memo.concat([
@@ -194,6 +196,7 @@ class TableDebug extends React.Component {
                   <ExtraDetail>{hand.state}</ExtraDetail>
                 </th>
                 <th>{renderNtz(hand.sb)}</th>
+                <th><FormattedTime value={hand.started * 1000} /></th>
                 {hand.lineup.reduce((memo, seat, j) => {
                   const receipt = seat.last && Receipt.parse(seat.last);
                   return memo.concat([
