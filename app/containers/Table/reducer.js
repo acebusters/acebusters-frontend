@@ -131,11 +131,15 @@ export default function tableReducer(state = initialState, action) {
         newState = newState.setIn([action.tableAddr, action.handId], hand);
       }
 
-      const sb = (typeof action.smallBlind === 'object') ? action.smallBlind.toNumber() : action.smallBlind;
-      return newState.setIn([action.tableAddr, 'data', 'seats'], lineup)
-        .setIn([action.tableAddr, 'data', 'amounts'], amounts)
-        .setIn([action.tableAddr, 'data', 'lastHandNetted'], action.lineup[0].toNumber())
-        .setIn([action.tableAddr, 'data', 'smallBlind'], sb);
+      if (action.smallBlind !== undefined) {
+        newState = newState.setIn([action.tableAddr, 'data', 'smallBlind'], Number(action.smallBlind));
+      }
+
+      return (
+        newState.setIn([action.tableAddr, 'data', 'seats'], lineup)
+                .setIn([action.tableAddr, 'data', 'amounts'], amounts)
+                .setIn([action.tableAddr, 'data', 'lastHandNetted'], action.lineup[0].toNumber())
+      );
     }
 
     case TableActions.EXIT_HAND_SET: {
