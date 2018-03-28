@@ -92,8 +92,8 @@ export function updateReceived(tableAddr, hand) {
   return { type: UPDATE_RECEIVED, tableAddr, hand };
 }
 
-export function lineupReceived(tableAddr, lineup, smallBlind, handId, myPendingSeat) {
-  return { type: LINEUP_RECEIVED, tableAddr, lineup, smallBlind, handId, myPendingSeat };
+export function lineupReceived(tableAddr, lineup, handId, myPendingSeat, smallBlind) {
+  return { type: LINEUP_RECEIVED, tableAddr, lineup, handId, myPendingSeat, smallBlind };
 }
 
 export function reservationReceived(tableAddr, reservation) {

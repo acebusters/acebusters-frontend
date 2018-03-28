@@ -334,7 +334,7 @@ describe('table reducer tests', () => {
       [P1_ADDR, P2_ADDR, P3_ADDR],
       [new BigNumber(3000), new BigNumber(3000), new BigNumber(2000)],
       [new BigNumber(0), new BigNumber(0), new BigNumber(0)],
-    ], new BigNumber(0)));
+    ], undefined, undefined, 0));
     expect(nextState).toEqual(expectedResult);
 
     const nextState2 = tableReducer(before, lineupReceived(tableAddr, [
@@ -342,7 +342,7 @@ describe('table reducer tests', () => {
       [P1_ADDR, P2_ADDR, P3_ADDR],
       [new BigNumber(3000), new BigNumber(3000), new BigNumber(2000)],
       [new BigNumber(0), new BigNumber(0), new BigNumber(0)],
-    ], 0));
+    ], undefined, undefined, 0));
     expect(nextState2).toEqual(expectedResult);
   });
 

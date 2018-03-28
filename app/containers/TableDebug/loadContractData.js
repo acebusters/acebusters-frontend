@@ -21,8 +21,20 @@ function getLineup(contract) {
   });
 }
 
-function getSmallBlind(contract) {
-  return promisifyWeb3Call(contract.smallBlind.call)().then((sb) => sb.toNumber());
+function getBlindLevelDuration(contract) {
+  return promisifyWeb3Call(contract.blindLevelDuration.call)().then((dur) => dur.toNumber());
+}
+
+async function getBlindStructure(contract) {
+  // const duration = await promisifyWeb3Call(contract.blindLevelDuration.call)().then((d) => d.toNumber());
+  const blindStructureCall = promisifyWeb3Call(contract.blindStructure.call);
+  const blindStructure = (await Promise.all(Array.from(new Array(10), (_, n) => blindStructureCall(n)))).map((n) => n.toNumber());
+  const zeroIdx = blindStructure.indexOf(0);
+  if (zeroIdx === -1) {
+    return blindStructure;
+  }
+
+  return blindStructure.slice(0, zeroIdx);
 }
 
 function getIns(contract, handId, lineup) {
@@ -70,12 +82,14 @@ function handsRange(handA, handB) {
 export function loadContractData(contract) {
   return Promise.all([
     getLineup(contract),
-    getSmallBlind(contract),
+    getBlindStructure(contract),
+    getBlindLevelDuration(contract),
     getLastNettingRequestHandId(contract),
     getLastNettingRequestTime(contract),
   ]).then(([
     { lineup, lastHandNetted },
-    smallBlind,
+    blindStructure,
+    blindLevelDuration,
     lastNettingRequestHandId,
     lastNettingRequestTime,
   ]) => {
@@ -85,11 +99,11 @@ export function loadContractData(contract) {
       getIns(contract, handId, lineup),
       getOuts(contract, handId, lineup),
     ], []);
-
     return Promise.all(promises)
       .then((results) => ({
         lineup,
-        smallBlind,
+        blindStructure,
+        blindLevelDuration,
         hands: hands.reduce((memo, handId, i) => ({
           ...memo,
           [handId]: { ins: results[i * 2], outs: results[(i * 2) + 1] },

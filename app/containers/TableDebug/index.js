@@ -92,8 +92,12 @@ class TableDebug extends React.Component {
       <div>
         <ul>
           <li>
-            <strong>Small blind: </strong>
-            {renderNtz(contractData.smallBlind)} NTZ
+            <strong>Blind structure: </strong>
+            {contractData.blindStructure.join(', ')}
+          </li>
+          <li>
+            <strong>Blind level duration: </strong>
+            {contractData.blindLevelDuration} sec
           </li>
           <li>
             <strong>lastHandNetted: </strong>

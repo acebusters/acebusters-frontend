@@ -29,7 +29,10 @@ const PROPS = {
 describe('makeTableStakesSelector', () => {
   const mockedState = fromJS({
     table: {
-      [TBL_ADDR]: { 1: { sb: 2 } },
+      [TBL_ADDR]: {
+        1: { sb: 2 },
+        data: { smallBlind: 2 },
+      },
     },
   });
   const tableStakes = {
@@ -37,7 +40,7 @@ describe('makeTableStakesSelector', () => {
     min: 80,
     tableMax: 400,
   };
-  it('should create stakes based on sb', () => {
+  it('should create stakes based on contract sb', () => {
     expect(makeTableStakesSelector()(mockedState, PROPS)).toEqual(tableStakes);
   });
 });
