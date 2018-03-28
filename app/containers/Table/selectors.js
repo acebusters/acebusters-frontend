@@ -168,7 +168,7 @@ export const hasNettingInAction = createSelector(
 
 export const makeTableDataSelector = () => createSelector(
   tableStateSelector,
-  (table) => (table) ? (table.get('data')) : null
+  (table) => table ? (table.get('data')) : null
 );
 
 // other selectors
@@ -220,8 +220,18 @@ export const makeSbSelector = () => createSelector(
   }
 );
 
+export const makeContractSbSelector = () => createSelector(
+  [makeTableDataSelector()],
+  (data) => {
+    if (!data || !data.has('smallBlind')) {
+      return null;
+    }
+    return data.get('smallBlind');
+  }
+);
+
 export const makeTableStakesSelector = () => createSelector(
-  [makeSbSelector()],
+  [makeContractSbSelector()],
   (sb) => ({
     sb,
     min: sb * 40,

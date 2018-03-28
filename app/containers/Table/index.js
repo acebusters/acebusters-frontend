@@ -425,7 +425,6 @@ export class Table extends React.PureComponent { // eslint-disable-line react/pr
           this.props.lineupReceived(
             this.tableAddr,
             lineup,
-            this.props.data.get('smallBlind'),
             this.props.latestHand,
             this.props.myPendingSeat,
           );
@@ -590,7 +589,6 @@ Table.propTypes = {
   standingUp: PropTypes.bool,
   signerAddr: PropTypes.string,
   web3Redux: PropTypes.any,
-  data: PropTypes.any,
   myPos: PropTypes.any,
   potSize: PropTypes.number,
   sb: PropTypes.number,

@@ -37,13 +37,13 @@ export function* loadTable(action) {
       throw new Error('Table doesn\'t exists');
     }
 
-    const [sb, reservation, tableState] = yield Promise.all([
-      promisifyWeb3Call(table.smallBlind)(),
+    const [smallBlind, reservation, tableState] = yield Promise.all([
+      promisifyWeb3Call(table.smallBlind)(0),
       reservationService.lineup(tableAddr),
       fetchTableState(tableAddr),
     ]);
 
-    yield put(lineupReceived(tableAddr, lineup, sb));
+    yield put(lineupReceived(tableAddr, lineup, undefined, undefined, smallBlind));
     const states = [
       tableState,
       ...yield loadHands(tableAddr, tableState),
