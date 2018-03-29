@@ -315,6 +315,7 @@ describe('table reducer tests', () => {
     const expectedResult = fromJS({
       [tableAddr]: {
         data: {
+          smallBlind: 0,
           seats: [{
             address: P1_ADDR,
           }, {
@@ -324,7 +325,6 @@ describe('table reducer tests', () => {
           }],
           amounts: [3000, 3000, 2000],
           lastHandNetted: 0,
-          smallBlind: 0,
         } },
     });
 

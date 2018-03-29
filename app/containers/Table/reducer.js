@@ -88,7 +88,7 @@ export default function tableReducer(state = initialState, action) {
       );
 
     case TableActions.SEATS_RELEASED:
-      return action.payload.reduce((st, item) => st.deleteIn([
+      return action.payload.reduce((newState, item) => newState.deleteIn([
         action.meta.tableAddr,
         'reservation',
         String(item.pos),
@@ -101,45 +101,43 @@ export default function tableReducer(state = initialState, action) {
       return state.deleteIn([action.payload.tableAddr, action.payload.handId.toString(), 'sitoutInProgress']);
 
     case TableActions.LINEUP_RECEIVED: {
-      let lineup = List([]);
-      let amounts = List([]);
-      let newState = state;
-
-      for (let i = 0; i < action.lineup[1].length; i += 1) {
-        lineup = lineup.push(Map({ address: action.lineup[1][i] }));
-        amounts = amounts.push(action.lineup[2][i].toNumber());
-      }
+      const amounts = List(action.lineup[2].map(Number));
+      const lineup = List(action.lineup[1].map((address) => Map({ address })));
 
       // Note: not every LINEUP_RECEIVED provide a handId param. LINEUP_RECEIVED is triggered in 2 cases:
       // 1. Lobby: LobbyItem fires LINEUP_RECEIVED when loaded
       // 2. Table: after Join Successful (table events)
       // The 2nd case will provide a handId, and we'll use it to update lineup data in 'hand'
-      if (action.handId) {
-        const table = state.get(action.tableAddr);
-        let hand = table.get(String(action.handId));
-
-        for (let j = 0; j < action.lineup.length; j += 1) {
-          if (hand.getIn(['lineup', j, 'address']) !== action.lineup[1][j]) {
-            const seat = { address: action.lineup[1][j] };
-            if (hand.get('state') !== 'waiting') {
-              seat.sitout = Math.floor(Date.now() / 1000);
-            }
-            hand = hand.setIn(['lineup', j], Map(seat));
+      return state
+        .withMutations((newState) => {
+          if (action.smallBlind !== undefined) {
+            return newState.setIn([action.tableAddr, 'data', 'smallBlind'], Number(action.smallBlind));
           }
-        }
 
-        newState = newState.setIn([action.tableAddr, action.handId], hand);
-      }
+          return newState;
+        })
+        .withMutations((newState) => {
+          if (action.handId) {
+            const path = [action.tableAddr, String(action.handId)];
 
-      if (action.smallBlind !== undefined) {
-        newState = newState.setIn([action.tableAddr, 'data', 'smallBlind'], Number(action.smallBlind));
-      }
+            return newState.setIn([action.tableAddr, action.handId], action.lineup.reduce((hand, _, j) => {
+              if (hand.getIn(['lineup', j, 'address']) !== action.lineup[1][j]) {
+                const seat = { address: action.lineup[1][j] };
+                if (hand.get('state') !== 'waiting') {
+                  seat.sitout = Math.floor(Date.now() / 1000);
+                }
+                return hand.setIn(['lineup', j], Map(seat));
+              }
 
-      return (
-        newState.setIn([action.tableAddr, 'data', 'seats'], lineup)
-                .setIn([action.tableAddr, 'data', 'amounts'], amounts)
-                .setIn([action.tableAddr, 'data', 'lastHandNetted'], action.lineup[0].toNumber())
-      );
+              return hand;
+            }, state.getIn(path)));
+          }
+
+          return newState;
+        })
+        .setIn([action.tableAddr, 'data', 'seats'], lineup)
+        .setIn([action.tableAddr, 'data', 'amounts'], amounts)
+        .setIn([action.tableAddr, 'data', 'lastHandNetted'], action.lineup[0].toNumber());
     }
 
     case TableActions.EXIT_HAND_SET: {
