@@ -230,6 +230,16 @@ export const makeContractSbSelector = () => createSelector(
   }
 );
 
+export const makeBlindLevelDurationSelector = () => createSelector(
+  [makeTableDataSelector()],
+  (data) => {
+    if (!data || !data.has('blindLevelDuration')) {
+      return null;
+    }
+    return data.get('blindLevelDuration');
+  }
+);
+
 export const makeTableStakesSelector = () => createSelector(
   [makeContractSbSelector()],
   (sb) => ({
@@ -275,12 +285,17 @@ export const lastAmountByAction = createSelector(
 
 export const makeHandStateSelector = () => createSelector(
   makeHandSelector(),
-  (hand) => (hand) ? hand.get('state') : null
+  (hand) => hand && hand.get('state')
+);
+
+export const makeHandStartedSelector = () => createSelector(
+  makeHandSelector(),
+  (hand) => hand && hand.get('started')
 );
 
 export const makeBoardSelector = () => createSelector(
   makeHandSelector(),
-  (hand) => (hand && hand.get('cards')) ? hand.get('cards').toJS() : []
+  (hand) => (hand && hand.get('cards') && hand.get('cards').toJS()) || []
 );
 
 export const makeReservationSelector = () => createSelector(

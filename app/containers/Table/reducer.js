@@ -117,6 +117,13 @@ export default function tableReducer(state = initialState, action) {
           return newState;
         })
         .withMutations((newState) => {
+          if (action.blindLevelDuration !== undefined) {
+            return newState.setIn([action.tableAddr, 'data', 'blindLevelDuration'], Number(action.blindLevelDuration));
+          }
+
+          return newState;
+        })
+        .withMutations((newState) => {
           if (action.handId) {
             const path = [action.tableAddr, String(action.handId)];
 

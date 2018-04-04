@@ -10,6 +10,8 @@ class SeatComponent extends React.Component {
   static propTypes = {
     isTaken: PropTypes.func,
     myPos: PropTypes.number,
+    started: PropTypes.number,
+    blindLevelDuration: PropTypes.number.isRequired,
     open: PropTypes.bool,
     pos: PropTypes.number,
     pending: PropTypes.shape({
@@ -29,9 +31,13 @@ class SeatComponent extends React.Component {
       pending,
       myPending,
       reserved,
+      started,
+      blindLevelDuration,
     } = this.props;
+    const now = Math.round(Date.now() / 1000);
+    const ableToJoin = !started || (now - started) <= blindLevelDuration;
     if (open) {
-      if ((myPos === undefined && !myPending) || pending || reserved) {
+      if ((ableToJoin && myPos === undefined && !myPending) || pending || reserved) {
         if (pending) {
           return <Seat {...this.props} {...pending} />;
         }
@@ -55,7 +61,7 @@ class SeatComponent extends React.Component {
           />
         );
       }
-      if (typeof myPos === 'number' || myPending) {
+      if (typeof myPos === 'number' || myPending || !ableToJoin) {
         return <ButtonOpenSeat {...this.props} />;
       }
     }

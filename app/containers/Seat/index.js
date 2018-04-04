@@ -27,8 +27,10 @@ import {
 import {
   makeMyPosSelector,
   makeHandStateSelector,
+  makeHandStartedSelector,
   makeHandSelector,
   makeWhosTurnSelector,
+  makeBlindLevelDurationSelector,
 } from '../Table/selectors';
 
 import {
@@ -115,6 +117,8 @@ export function mapDispatchToProps() {
 
 const mapStateToProps = createStructuredSelector({
   state: makeHandStateSelector(),
+  started: makeHandStartedSelector(),
+  blindLevelDuration: makeBlindLevelDurationSelector(),
   dealer: makeDealerSelector(),
   open: makeOpenSelector(),
   seatStatus: makeSeatStatusSelector(),

@@ -200,7 +200,7 @@ class TableDebug extends React.Component {
                   <ExtraDetail>{hand.state}</ExtraDetail>
                 </th>
                 <th>{renderNtz(hand.sb)}</th>
-                <th><FormattedTime value={hand.started * 1000} /></th>
+                <th>{hand.started && <FormattedTime value={hand.started * 1000} />}</th>
                 {hand.lineup.reduce((memo, seat, j) => {
                   const receipt = seat.last && Receipt.parse(seat.last);
                   return memo.concat([
