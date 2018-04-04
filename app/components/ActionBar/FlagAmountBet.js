@@ -70,7 +70,9 @@ class FlagAmountBet extends React.Component {
   }
 
   handleBlur() {
-    this.handleUpdate(NTZ_DECIMALS.mul(Number(this.state.amount)));
+    if (this.state.touched) {
+      this.handleUpdate(NTZ_DECIMALS.mul(Number(this.state.amount)));
+    }
   }
 
   handleChange(e) {
